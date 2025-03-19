@@ -47,7 +47,7 @@ export default {
     "links": {
       "guide": "Guide",
       "blog": "Blog",
-      "makcu_tools": "Makcu Online Tools",
+      "makcu_tools": "Online Flash Tools",
       "guides": "Guides",
       "discord": "Discord"
     },

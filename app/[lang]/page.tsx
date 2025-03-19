@@ -60,9 +60,9 @@ export default async function Home({ params }: LangProps) {
 
         <div className="relative">
           <div className="animate-[clip_10s_ease-in-out_infinite] w-full h-full absolute grayscale contrast-[105%] invert top-0 z-10 overflow-hidden">
-            <Image src={ProductImage} alt="product_image" />
+            <Image src={ProductImage} alt="product_image" priority />
           </div>
-          <Image src={ProductImage} alt="product_image" />
+          <Image src={ProductImage} alt="product_image" priority />
         </div>
       </div>
 

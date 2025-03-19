@@ -32,7 +32,7 @@ const components = {
   StepperItem,
   img: Image,
   a: Link,
-  Outlet,
+  Outlet
 };
 
 // can be used for other pages like blogs, Guides etc

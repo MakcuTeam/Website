@@ -20,7 +20,7 @@ export const NAVLINKS = [
   },
   {
     title: "makcu_tools",
-    href: "#",
+    href: "/tool",
   },
 ];
 
