@@ -41,8 +41,8 @@ export async function generateMetadata(params: LangProps): Promise<Metadata> {
   const dict = await getDictionary(lang);
   return {
     title: dict.metadata.title,
-    metadataBase: new URL("https://Makcu.vercel.app/"),
     description: dict.metadata.description,
+    metadataBase: new URL("https://makcu.com"),
   };
 }
 

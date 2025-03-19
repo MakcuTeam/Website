@@ -3,15 +3,13 @@ import LocalizedLink from "@/components/localized-link";
 import { buttonVariants } from "@/components/ui/button";
 import { getDictionary, LangProps } from "@/lib/dictionaries";
 import { page_routes } from "@/lib/routes-config";
-import { Cpu, MoveUpRightIcon, TerminalSquareIcon } from "lucide-react";
+import { Cpu, MoveUpRightIcon } from "lucide-react";
 import Link from "next/link";
 import { UsersRound, Mouse } from "lucide-react";
 import ProductImage from "@/assets/makcu.png";
 import Image from "next/image";
 import siteConfig from "@/config/site.json";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Card } from "@/components/ui/card";
-import { useRouter } from "next/navigation";
+
 import People from "@/components/people";
 export default async function Home({ params }: LangProps) {
   const { lang } = await params;
@@ -60,7 +58,7 @@ export default async function Home({ params }: LangProps) {
 
         <div className="relative">
           <div className="animate-[clip_10s_ease-in-out_infinite] w-full h-full absolute grayscale contrast-[105%] invert top-0 z-10 overflow-hidden">
-            <Image src={ProductImage} alt="product_image" priority />
+            <Image src={ProductImage} alt="product_image" loading="lazy" />
           </div>
           <Image src={ProductImage} alt="product_image" priority />
         </div>

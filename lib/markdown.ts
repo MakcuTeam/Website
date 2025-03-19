@@ -5,11 +5,10 @@ import remarkGfm from "remark-gfm";
 import rehypePrism from "rehype-prism-plus";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import rehypeSlug from "rehype-slug";
-import rehypeCodeTitles from "rehype-code-titles";
+
 import { page_routes, ROUTES } from "./routes-config";
 import { visit } from "unist-util-visit";
 import matter from "gray-matter";
-import { Locale } from "./locale";
 
 // custom components imports
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -44,7 +43,6 @@ async function parseMdx<Frontmatter>(rawMdx: string) {
       mdxOptions: {
         rehypePlugins: [
           preProcess,
-          rehypeCodeTitles,
           rehypePrism,
           rehypeSlug,
           rehypeAutolinkHeadings,
@@ -171,61 +169,7 @@ const postProcess = () => (tree: any) => {
   });
 };
 
-export type Author = {
-  avatar?: string;
-  handle: string;
-  username: string;
-  handleUrl: string;
-};
 
-export type BlogMdxFrontmatter = BaseMdxFrontmatter & {
-  date: string;
-  authors: Author[];
-  cover: string;
-};
 
-export async function getAllBlogStaticPaths(lang: Locale) {
-  try {
-    const blogFolder = path.join(process.cwd(), `/contents/blogs/${lang}`);
-    const res = await fs.readdir(blogFolder);
-    return res.map((file) => file.split(".")[0]);
-  } catch (err) {
-    console.log(err);
-  }
-}
 
-export async function getAllBlogs(lang: Locale) {
-  const blogFolder = path.join(process.cwd(), `/contents/blogs/${lang}`);
-  const files = await fs.readdir(blogFolder);
-  const uncheckedRes = await Promise.all(
-    files.map(async (file) => {
-      if (!file.endsWith(".mdx")) return undefined;
-      const filepath = path.join(
-        process.cwd(),
-        `/contents/blogs/${lang}/${file}`,
-      );
-      const rawMdx = await fs.readFile(filepath, "utf-8");
-      return {
-        ...justGetFrontmatterFromMD<BlogMdxFrontmatter>(rawMdx),
-        slug: file.split(".")[0],
-      };
-    }),
-  );
-  return uncheckedRes.filter((it) => !!it) as (BlogMdxFrontmatter & {
-    slug: string;
-  })[];
-}
 
-export async function getBlogForSlug(slug: string, lang: Locale) {
-  const blogFile = path.join(
-    process.cwd(),
-    "/contents/blogs/",
-    `${lang}/${slug}.mdx`,
-  );
-  try {
-    const rawMdx = await fs.readFile(blogFile, "utf-8");
-    return await parseMdx<BlogMdxFrontmatter>(rawMdx);
-  } catch {
-    return undefined;
-  }
-}

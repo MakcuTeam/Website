@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { buttonVariants } from "./ui/button";
-import { CommandIcon, HeartIcon, TriangleIcon } from "lucide-react";
+import { HeartIcon } from "lucide-react";
 import { Dictionary } from "@/lib/dictionaries";
 
 export function Footer({ dict }: { dict: Dictionary }) {
@@ -11,10 +11,7 @@ export function Footer({ dict }: { dict: Dictionary }) {
           {/* <CommandIcon className="sm:block hidden w-5 h-5 text-muted-foreground" /> */}
           <p className="text-center">
             Copyright &copy; 2024 - 2025
-            <Link
-              className="px-1 underline underline-offset-2"
-              href="#"
-            >
+            <Link className="px-1 underline underline-offset-2" href="#">
               Makcu Team
             </Link>
             .

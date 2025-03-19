@@ -1,6 +1,6 @@
 import { Card } from "@/components/ui/card";
-import { LucideProps, UsersRound } from "lucide-react";
-import { ForwardRefExoticComponent, ReactElement, RefAttributes } from "react";
+import { LucideProps } from "lucide-react";
+import { ForwardRefExoticComponent, RefAttributes } from "react";
 export type InfoCardProps = {
   Icon: ForwardRefExoticComponent<
     Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>

@@ -2,7 +2,7 @@ import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { EachRoute, ROUTES } from "./routes-config";
 import { Dictionary } from "./dictionaries";
-import { StaticImageData } from "next/image";
+
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
