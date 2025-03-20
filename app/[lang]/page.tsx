@@ -8,9 +8,9 @@ import Link from "next/link";
 import { UsersRound, Mouse } from "lucide-react";
 import ProductImage from "@/assets/makcu.png";
 import Image from "next/image";
-import siteConfig from "@/config/site.json";
 
-import People from "@/components/people";
+import { DiscordCard } from "@/components/discord";
+
 export default async function Home({ params }: LangProps) {
   const { lang } = await params;
   const dict = await getDictionary(lang);
@@ -22,7 +22,7 @@ export default async function Home({ params }: LangProps) {
   };
 
   return (
-    <div className="flex flex-col px-2 sm:py-8 py-12 mt-32">
+    <div className="flex flex-col px-2 sm:py-8 py-12 mt-32 gap-12">
       <div className="sm:flex-row flex flex-col gap-8 sm:gap-2 items-center">
         <div className="flex-1">
           <Link
@@ -58,24 +58,24 @@ export default async function Home({ params }: LangProps) {
 
         <div className="relative">
           <div className="animate-[clip_10s_ease-in-out_infinite] w-full h-full absolute grayscale contrast-[105%] invert top-0 z-10 overflow-hidden">
-            <Image src={ProductImage} alt="product_image" loading="lazy" />
+            <Image src={ProductImage} alt="product_image" priority />
           </div>
           <Image src={ProductImage} alt="product_image" priority />
         </div>
       </div>
 
-      <div className="flex gap-3 flex-col mt-24">
+      <div className="flex gap-3 flex-col ">
         <span className="flex gap-3 items-center mb-12 ">
           <div className="w-full h-[.5px] bg-white/35 rounded flex-1" />
-          <div className="w-auto text-center flex-grow-1 flex-2 text-3xl">
+          <div className="w-auto text-center flex-grow-1 flex-2 text-3xl font-logo">
             {dict.info.title}
           </div>
           <div className="w-full h-[.5px] bg-white/35 rounded flex-1" />
         </span>
 
-        <div className="gap-3 grid-cols-3 grid">
+        <div className="gap-3 grid-cols-1 grid md:grid-cols-3 sm:grid-cols-1">
           {dict.info.list.map((item, index) => {
-            const IconComponent = iconMap[item.icon as keyof typeof iconMap]; // 动态解析图标组件
+            const IconComponent = iconMap[item.icon as keyof typeof iconMap]; 
             return (
               <InfoCard
                 key={index}
@@ -89,24 +89,22 @@ export default async function Home({ params }: LangProps) {
         </div>
       </div>
 
-      <div className="flex gap-3 flex-col mt-24">
-        <span className="flex gap-3 items-center mb-12 ">
-          <div className="w-auto text-center flex-grow-1 flex-2 text-xl">
+      <DiscordCard />
+
+      <div className="flex gap-8 flex-col">
+        <span className="flex gap-3 items-center">
+          <div className="w-auto text-center flex-grow-1 flex-2 text-xl font-logo">
             {dict.contributions.title}
           </div>
           <div className="w-full h-[.5px] bg-white/35 rounded flex-1" />
         </span>
 
         <div className="flex gap-3 items-center flex-wrap">
-          {siteConfig.contributions.map((item, index) => {
-            return <People key={index} item={item} />;
-          })}
-          <People
-            key={"last-join"}
-            item={{
-              Name: dict.contributions.more,
-            }}
-          />
+          {/* {siteConfig.contributions.map((item, index) => {
+            return <div>
+              @{item.Name}
+            </div>;
+          })} */}
         </div>
       </div>
     </div>

@@ -11,8 +11,8 @@ export function Footer({ dict }: { dict: Dictionary }) {
           {/* <CommandIcon className="sm:block hidden w-5 h-5 text-muted-foreground" /> */}
           <p className="text-center">
             Copyright &copy; 2024 - 2025
-            <Link className="px-1 underline underline-offset-2" href="#">
-              Makcu Team
+            <Link className="px-1 underline underline-offset-2" href="https://github.com/makcuTeam">
+              MakcuTeam
             </Link>
             .
           </p>
@@ -37,7 +37,7 @@ export function FooterButtons({ dict }: { dict: Dictionary }) {
         {dict.footer.deploy}
       </Link> */}
       <Link
-        href="https://github.com/sponsors/nisabmohd"
+        href="https://github.com/makcuTeam/"
         className={buttonVariants({ variant: "outline", size: "sm" })}
       >
         <HeartIcon className="h-4 w-4 mr-2 text-red-600 fill-current" />

@@ -15,10 +15,6 @@ export const NAVLINKS = [
     absolute: true,
   },
   {
-    title: "discord",
-    href: "https://www.google.com",
-  },
-  {
     title: "makcu_tools",
     href: "/tool",
   },

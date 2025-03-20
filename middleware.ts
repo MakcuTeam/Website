@@ -6,7 +6,9 @@ export function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;
     const hasLocale = pathnameHasLocale(pathname);
     if (hasLocale) return;
-
+    if (pathname.includes('favicon.ico')) {
+        return;
+    }
     // Redirect if there is no locale
     const locale = getLocale(pathname);
     request.nextUrl.pathname = `/${locale}${pathname}`;

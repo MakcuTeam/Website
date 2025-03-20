@@ -1,9 +1,10 @@
 {
-  "name": "aria-docs",
+  "name": "makcu",
   "version": "2.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --experimental-https",
+    "dev-ssl": "next dev --experimental-https",
+    "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
