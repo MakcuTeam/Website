@@ -9,6 +9,9 @@ export function middleware(request: NextRequest) {
     if (pathname.includes('favicon.ico')) {
         return;
     }
+    if (pathname.includes('/api/')) {
+        return;
+    }
     // Redirect if there is no locale
     const locale = getLocale(pathname);
     request.nextUrl.pathname = `/${locale}${pathname}`;

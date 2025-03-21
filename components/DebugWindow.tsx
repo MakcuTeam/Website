@@ -1,6 +1,5 @@
-
 import React, { forwardRef, useImperativeHandle, useState } from "react";
-import { Locale } from "@/lib/locale";
+
 import { Dictionary } from "@/lib/dictionaries";
 import { Button } from "./ui/button";
 

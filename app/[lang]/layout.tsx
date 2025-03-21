@@ -10,7 +10,7 @@ import "@/styles/globals.css";
 import localFont from "next/font/local";
 
 const roadRage = localFont({
-  src: "../fonts/Road-Rage.otf",
+  src: "../../fonts/Road-Rage.otf",
   display: "swap",
   variable: "--font-logo",
   weight: "400",
