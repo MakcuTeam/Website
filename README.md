@@ -12,8 +12,8 @@ This project is the official website of makcu, developed using the React framewo
 First, clone the repository:
 
 ```bash
-git clone https://github.com/MakcuTeam/Website your-project-name
-cd makcu
+git clone https://github.com/MakcuTeam/Website project-name
+cd project-name
 ```
 
 Install dependencies:
