@@ -19,39 +19,48 @@ import { DebugWindow } from "./debugWindow";
 import { Locale } from "@/lib/locale";
 import Loading from "./Loading";
 
-const ONLINE_DATA_LIST = [
-  {
-    name: "MAKCU_LEFT.bin",
-    url: "/api/download/MAKCU_LEFT.bin",
-  },
-  {
-    name: "MAKCU_RIGHT.bin",
-    url: "/api/download/MAKCU_RIGHT.bin",
-  },
-  {
-    name: "V3_LEFT.bin",
-    url: "/api/download/V3_LEFT.bin",
-  },
-  {
-    name: "V3_RIGHT.bin",
-    url: "/api/download/V3_RIGHT.bin",
-  },
-];
+interface DataListType {
+  name: string;
+  path: string;
+  size: number;
+  lastModified: string;
+  downloadUrl: string;
+}
 
 export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
   const [dict, setDict] = useState<Dictionary>();
   const debugRef = useRef<any>(null);
 
+  const [onlineDataList, setOnlineDataList] = useState<DataListType[]>([]);
+
+  const fetchOnlineDataList = async () => {
+    try {
+      const response = await fetch("/api/makcu");
+      const data: DataListType[] = await response.json();
+      setOnlineDataList(data);
+    } catch {
+      console.error("Failed to fetch online data list");
+    }
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      await fetchOnlineDataList();
+    };
+
+    fetchData();
+  }, []);
+
   const [config, setConfig] = useState<{ mode: "online" | "offline" }>({
-    mode: "offline",
+    mode: "online",
   });
   const [loading, setLoading] = useState(false);
   const [device, setDevice] = useState<Transport | null>(null);
   const [esploader, setEsploader] = useState<ESPLoader | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
-  const [firstItem] = ONLINE_DATA_LIST;
-  const [onlineSelect, setOnlineSelect] = useState<string>(firstItem.name);
+  const [firstItem] = onlineDataList;
+  const [onlineSelect, setOnlineSelect] = useState<string>();
 
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -76,6 +85,7 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
   };
 
   const connectToDevice = async () => {
+    setLoading(true);
     try {
       const result = await serialLib?.requestPort({});
       const transport = new Transport(result, false);
@@ -96,7 +106,6 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
         debugLogging: false,
       } as LoaderOptions;
 
-      setLoading(true);
       const loader = new ESPLoader(flashOptions);
       await loader.main();
       setDevice(transport);
@@ -162,9 +171,7 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
   };
 
   const flashOnline = async () => {
-    const selected = ONLINE_DATA_LIST.find(
-      (item) => item.name === onlineSelect
-    );
+    const selected = onlineDataList.find((item) => item.name === onlineSelect);
     if (!selected) {
       handleAddInfo("Selected firmware not found");
       return;
@@ -172,7 +179,7 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
 
     try {
       handleAddInfo(`Downloading ${selected.name}...`);
-      const response = await fetch(selected.url);
+      const response = await fetch(selected.downloadUrl);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -217,12 +224,11 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
   return (
     <div>
       <h1 className="text-5xl text-center font-logo mb-12">Makcu Flash Tool</h1>
-
       <Loading
         loading={loading}
-        className="border w-full h-full rounded flex flex-row items-center justify-between relative"
+        className="border w-full h-full rounded flex flex-row items-center justify-between relative bg-gray-100 dark:bg-black"
       >
-        <div className="flex items-left flex-col gap-12 flex-1 p-5">
+        <div className="flex items-left flex-col gap-12 flex-1 p-5 ">
           <div className="flex items-center gap-2">
             <Switch id="device-connected" disabled checked={!!device} />
             <Label htmlFor="device-connected">{dict.tools.title}</Label>
@@ -234,9 +240,7 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
             </Button>
           </div>
           <div className="flex items-center gap-2">
-            <Label>
-              {dict.tools.flashMode} :
-            </Label>
+            <Label>{dict.tools.flashMode} :</Label>
             <RadioGroup
               value={config.mode}
               onValueChange={handleModeChange}
@@ -260,13 +264,26 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
             {config.mode === "offline" ? (
               <div className="flex items-center gap-3">
                 <Label>{dict.tools.offlineFlash}</Label>
-                <Input
-                  type="file"
-                  className="w-52"
-                  accept=".bin"
-                  ref={fileRef}
-                  onChange={handleFileChange}
-                />
+                <Button
+                  variant={"outline"}
+                  size="sm"
+                  onClick={() => fileRef.current?.click()}
+                >
+                  <Input
+                    type="file"
+                    className="w-52 hidden"
+                    accept=".bin"
+                    ref={fileRef}
+                    onChange={handleFileChange}
+                  />
+                  {selectedFile ? (
+                    selectedFile.name
+                  ) : (
+                    <span className=" opacity-50">
+                      {dict.tools.uploadFirmware}
+                    </span>
+                  )}
+                </Button>
               </div>
             ) : (
               <div className="flex items-center gap-3">
@@ -276,7 +293,7 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
                     <SelectValue placeholder={dict.tools.list} />
                   </SelectTrigger>
                   <SelectContent>
-                    {ONLINE_DATA_LIST.map((item) => (
+                    {onlineDataList.map((item) => (
                       <SelectItem key={item.name} value={item.name}>
                         {item.name}
                       </SelectItem>

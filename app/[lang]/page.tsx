@@ -66,11 +66,11 @@ export default async function Home({ params }: LangProps) {
 
       <div className="flex gap-3 flex-col ">
         <span className="flex gap-3 items-center mb-12 ">
-          <div className="w-full h-[.5px] bg-white/35 rounded flex-1" />
+        <div className="w-full border-b dark:border-b-[hsl(var(--border))] rounded flex-1" />
           <div className="w-auto text-center flex-grow-1 flex-2 text-3xl font-logo">
             {dict.info.title}
           </div>
-          <div className="w-full h-[.5px] bg-white/35 rounded flex-1" />
+          <div className="w-full border-b dark:border-b-[hsl(var(--border))] rounded flex-1" />
         </span>
 
         <div className="gap-3 grid-cols-1 grid md:grid-cols-3 sm:grid-cols-1">
@@ -96,7 +96,7 @@ export default async function Home({ params }: LangProps) {
           <div className="w-auto text-center flex-grow-1 flex-2 text-xl font-logo">
             {dict.contributions.title}
           </div>
-          <div className="w-full h-[.5px] bg-white/35 rounded flex-1" />
+          <div className="w-full border-b dark:border-b-[hsl(var(--border))] rounded flex-1" />
         </span>
 
         <div className="flex gap-3 items-center flex-wrap">

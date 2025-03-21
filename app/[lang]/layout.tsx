@@ -42,7 +42,7 @@ export async function generateMetadata(params: LangProps): Promise<Metadata> {
   return {
     title: dict.metadata.title,
     description: dict.metadata.description,
-    metadataBase: new URL("https://makcu.com"),
+    metadataBase: new URL("https://www.makcu.com"),
   };
 }
 
@@ -59,7 +59,7 @@ export default async function RootLayout({
   return (
     <html lang={lang} suppressHydrationWarning>
       <body
-        className={`${sansFont.variable} ${notoSerif.variable} ${monoFont.variable} ${roadRage.variable} font-basic  antialiased tracking-wide`}
+        className={`${sansFont.variable} ${notoSerif.variable} ${monoFont.variable} ${roadRage.variable} font-basic antialiased tracking-wide`}
         suppressHydrationWarning
       >
         <ClientDictionary dict={dict}>

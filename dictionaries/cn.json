@@ -70,7 +70,8 @@
     "list": "设备列表",
     "onlineFlash": "在线刷写",
     "offlineFlash": "离线刷写",
-    "clearDebugInfo": "清除调试信息"
+    "clearDebugInfo": "清除调试信息",
+    "uploadFirmware": "上传固件"
   },
   "docs": {
     "on_this_page": "On this page",

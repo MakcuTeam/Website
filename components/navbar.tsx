@@ -22,7 +22,7 @@ export const NAVLINKS = [
 
 export function Navbar({ dict }: { dict: Dictionary }) {
   return (
-    <nav className="w-full border-b h-16 sticky top-0 z-50 bg-background">
+    <nav className="w-full border-b h-16 sticky top-0 z-50  backdrop-blur bg-black/10">
       <div className="sm:container mx-auto w-[95vw] h-full flex items-center justify-between md:gap-2">
         <div className="flex items-center gap-5">
           <SheetLeftbar dict={dict} />
@@ -41,7 +41,6 @@ export function Navbar({ dict }: { dict: Dictionary }) {
             <Search dict={dict} />
             <div className="flex ml-2.5 sm:ml-0">
               <LangSelect />
-
               <ModeToggle dict={dict} />
             </div>
           </div>
@@ -73,7 +72,7 @@ export function NavMenu({
           <LocalizedLink
             key={item.title + item.href}
             className="flex items-center gap-1 dark:text-stone-300/85 text-stone-800 "
-            activeClassName="!text-white  font-extrabold"
+            activeClassName="dark:text-white font-extrabold"
             href={item.href}
             absolute={item.absolute}
           >

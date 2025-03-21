@@ -74,7 +74,8 @@
     "list": "Device List",
     "onlineFlash": "Online Flash",
     "offlineFlash": "Offline Flash",
-    "clearDebugInfo": "Clear Debug Info"
+    "clearDebugInfo": "Clear Debug Info",
+    "uploadFirmware": "Upload Firmware"
   },
   "docs": {
     "on_this_page": "On this page",

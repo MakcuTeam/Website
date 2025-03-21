@@ -74,7 +74,7 @@ export const DiscordCard = () => {
   return (
     <div className="flex flex-col gap-5">
       <span className="flex gap-3 items-center mb-8">
-        <div className="w-full h-[.5px] bg-white/35 rounded flex-1" />
+        <div className="w-full border-b dark:border-b-[hsl(var(--border))] rounded flex-1" />
         <div className="w-auto text-center flex-grow-1 flex-2 text-xl font-logo">
           Online Customer ({discord?.presence_count})
         </div>
@@ -82,9 +82,9 @@ export const DiscordCard = () => {
 
       <div className="flex flex-wrap gap-3 justify-between overflow-hidden relative text-sm">
         <a href={discord?.instant_invite} target="_blank">
-          <Card className=" py-3 relative flex gap-3 items-center  bg-[#5865f2] justify-center  uppercase max-w-40 min-w-40 overflow-hidden">
+          <Card className="text-white py-3 relative flex gap-3 items-center  bg-[#5865f2] justify-center  uppercase max-w-40 min-w-40 overflow-hidden">
             <BotMessageSquare />
-            <span className="text-center">Join Us</span>
+            <span className="text-center ">Join Us</span>
           </Card>
         </a>
         {discord &&
