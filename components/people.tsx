@@ -11,7 +11,7 @@ export const People: React.FC<{
         href={item.Url ? item.Url : "#"}
         target={item.Url ? "_blank" : "_self"}
       >
-        <Card className="h-14 flex flex-row items-center cursor-pointer overflow-hidden min-w-40 justify-between">
+        <Card className="h-14 flex flex-row items-center cursor-pointer overflow-hidden min-w-40 justify-between ">
           {item.Avatar && (
             <Image
               src={item.Avatar}

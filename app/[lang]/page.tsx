@@ -11,6 +11,28 @@ import Image from "next/image";
 
 import { DiscordCard } from "@/components/discord";
 
+interface UserListType {
+  Reseller?: Reseller[];
+  "VIP buyers"?: VIPBuyer[];
+  "MAKCU Devs"?: Reseller[];
+  "Server Booster"?: Reseller[];
+  Media?: Reseller[];
+  Sponsor?: Reseller[];
+  "XIM Support"?: Reseller[];
+}
+
+interface VIPBuyer {
+  id: string;
+  username: string;
+  avatar_url: null | string;
+}
+
+interface Reseller {
+  id: string;
+  username: string;
+  avatar_url: string;
+}
+
 export default async function Home({ params }: LangProps) {
   const { lang } = await params;
   const dict = await getDictionary(lang);
@@ -57,16 +79,19 @@ export default async function Home({ params }: LangProps) {
         </div>
 
         <div className="relative">
-          <div className="animate-[clip_10s_ease-in-out_infinite] w-full h-full absolute grayscale contrast-[105%] invert top-0 z-10 overflow-hidden">
-            <Image src={ProductImage} alt="product_image" priority />
-          </div>
-          <Image src={ProductImage} alt="product_image" priority />
+          <Image
+            src={ProductImage}
+            className=" grayscale contrast-[100%] invert dark:invert-0 brightness-[.9]"
+            alt="product_image"
+            loading="eager"
+            priority
+          />
         </div>
       </div>
 
       <div className="flex gap-3 flex-col ">
         <span className="flex gap-3 items-center mb-12 ">
-        <div className="w-full border-b dark:border-b-[hsl(var(--border))] rounded flex-1" />
+          <div className="w-full border-b dark:border-b-[hsl(var(--border))] rounded flex-1" />
           <div className="w-auto text-center flex-grow-1 flex-2 text-3xl font-logo">
             {dict.info.title}
           </div>
@@ -75,7 +100,7 @@ export default async function Home({ params }: LangProps) {
 
         <div className="gap-3 grid-cols-1 grid md:grid-cols-3 sm:grid-cols-1">
           {dict.info.list.map((item, index) => {
-            const IconComponent = iconMap[item.icon as keyof typeof iconMap]; 
+            const IconComponent = iconMap[item.icon as keyof typeof iconMap];
             return (
               <InfoCard
                 key={index}
@@ -99,13 +124,7 @@ export default async function Home({ params }: LangProps) {
           <div className="w-full border-b dark:border-b-[hsl(var(--border))] rounded flex-1" />
         </span>
 
-        <div className="flex gap-3 items-center flex-wrap">
-          {/* {siteConfig.contributions.map((item, index) => {
-            return <div>
-              @{item.Name}
-            </div>;
-          })} */}
-        </div>
+        <div className="flex gap-3 items-center flex-wrap"></div>
       </div>
     </div>
   );

@@ -11,7 +11,7 @@ export type InfoCardProps = {
 };
 export const InfoCard: React.FC<InfoCardProps> = (props) => {
   return (
-    <Card>
+    <Card className="bg-transparent backdrop-blur-sm">
       <div className="flex justify-between p-3">
         {props.Icon && <props.Icon />}
         {props.title && <div>{props.title}</div>}

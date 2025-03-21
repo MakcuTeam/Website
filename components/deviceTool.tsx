@@ -18,7 +18,7 @@ import { getDictionary, Dictionary } from "@/lib/dictionaries";
 import { DebugWindow } from "./debugWindow";
 import { Locale } from "@/lib/locale";
 import Loading from "./Loading";
-
+import { toast } from "sonner";
 interface DataListType {
   name: string;
   path: string;
@@ -59,7 +59,7 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
   const [esploader, setEsploader] = useState<ESPLoader | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
-  const [firstItem] = onlineDataList;
+  const [progress, setProgress] = useState(-1);
   const [onlineSelect, setOnlineSelect] = useState<string>();
 
   const fileRef = useRef<HTMLInputElement>(null);
@@ -107,12 +107,11 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
       } as LoaderOptions;
 
       const loader = new ESPLoader(flashOptions);
-      await loader.main();
+      await loader.main().then(() => {
+        toast.success(dict?.tools.connectSuccess);
+      });
       setDevice(transport);
       setEsploader(loader);
-    } catch (error) {
-      handleAddInfo("Error: " + error);
-      console.error("Failed to connect to device:", error);
     } finally {
       setLoading(false);
     }
@@ -140,6 +139,9 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
       compress: true,
       flashMode: "dio",
       flashFreq: "40m",
+      reportProgress(fileIndex, written, total) {
+        setProgress((written / total) * 100);
+      },
     };
   };
 
@@ -189,7 +191,9 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
 
       handleAddInfo("Download complete, starting flash...");
       const flashOptions = createFlashOptions(stringBuffer);
-      await executeFlash(flashOptions);
+      await executeFlash(flashOptions).then((e) => {
+        toast.success(dict?.tools.flashSuccess);
+      });
     } catch (error) {
       handleAddInfo("Error downloading firmware: " + error);
     }
@@ -224,95 +228,99 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
   return (
     <div>
       <h1 className="text-5xl text-center font-logo mb-12">Makcu Flash Tool</h1>
-      <Loading
-        loading={loading}
-        className="border w-full h-full rounded flex flex-row items-center justify-between relative bg-gray-100 dark:bg-black"
-      >
-        <div className="flex items-left flex-col gap-12 flex-1 p-5 ">
-          <div className="flex items-center gap-2">
-            <Switch id="device-connected" disabled checked={!!device} />
-            <Label htmlFor="device-connected">{dict.tools.title}</Label>
-            <Button
-              size="sm"
-              onClick={device ? disconnectDevice : connectToDevice}
-            >
-              {device ? dict.tools.disconnectBtn : dict.tools.connectBtn}
-            </Button>
+      <div className="flex flex-row gap-5">
+        <Loading
+          loading={loading}
+          className="border w-full h-full rounded flex flex-row items-center justify-between relative backdrop-blur-sm "
+        >
+          <div className="flex items-left flex-col gap-12 flex-1 p-5 ">
+            <div className="flex items-center gap-2">
+              <Switch id="device-connected" disabled checked={!!device} />
+              <Label htmlFor="device-connected">{dict.tools.title}</Label>
+              <Button
+                size="sm"
+                onClick={device ? disconnectDevice : connectToDevice}
+              >
+                {device ? dict.tools.disconnectBtn : dict.tools.connectBtn}
+              </Button>
+            </div>
+            <div className="flex items-center gap-2">
+              <Label>{dict.tools.flashMode} :</Label>
+              <RadioGroup
+                value={config.mode}
+                onValueChange={handleModeChange}
+                className="flex items-center gap-6"
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="online" id="online" />
+                  <Label className="cursor-pointer" htmlFor="online">
+                    {dict.tools.online}
+                  </Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="offline" id="offline" />
+                  <Label className="cursor-pointer" htmlFor="offline">
+                    {dict.tools.offline}
+                  </Label>
+                </div>
+              </RadioGroup>
+            </div>
+            <div className="flex items-center gap-3">
+              {config.mode === "offline" ? (
+                <div className="flex items-center gap-3">
+                  <Label>{dict.tools.offlineFlash}</Label>
+                  <Button
+                    variant={"outline"}
+                    onClick={() => fileRef.current?.click()}
+                    className="w-[12.7em]"
+                  >
+                    <Input
+                      type="file"
+                      className="hidden"
+                      accept=".bin"
+                      ref={fileRef}
+                      onChange={handleFileChange}
+                    />
+                    {selectedFile ? (
+                      selectedFile.name
+                    ) : (
+                      <span className=" opacity-50">
+                        {dict.tools.uploadFirmware}
+                      </span>
+                    )}
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex items-center gap-3">
+                  <Label>{dict.tools.onlineFlash}</Label>
+                  <Select value={onlineSelect} onValueChange={setOnlineSelect}>
+                    <SelectTrigger className="w-[180px]">
+                      <SelectValue placeholder={dict.tools.list} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {onlineDataList.map((item) => (
+                        <SelectItem key={item.name} value={item.name}>
+                          {item.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+              <Button
+                size="sm"
+                onClick={handleFlashClick}
+                disabled={
+                  !device || (config.mode === "offline" && !selectedFile)
+                }
+              >
+                {dict.tools.flash}
+              </Button>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            <Label>{dict.tools.flashMode} :</Label>
-            <RadioGroup
-              value={config.mode}
-              onValueChange={handleModeChange}
-              className="flex items-center gap-2"
-            >
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="online" id="online" />
-                <Label className="cursor-pointer" htmlFor="online">
-                  {dict.tools.online}
-                </Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="offline" id="offline" />
-                <Label className="cursor-pointer" htmlFor="offline">
-                  {dict.tools.offline}
-                </Label>
-              </div>
-            </RadioGroup>
-          </div>
-          <div className="flex items-center gap-3">
-            {config.mode === "offline" ? (
-              <div className="flex items-center gap-3">
-                <Label>{dict.tools.offlineFlash}</Label>
-                <Button
-                  variant={"outline"}
-                  size="sm"
-                  onClick={() => fileRef.current?.click()}
-                >
-                  <Input
-                    type="file"
-                    className="w-52 hidden"
-                    accept=".bin"
-                    ref={fileRef}
-                    onChange={handleFileChange}
-                  />
-                  {selectedFile ? (
-                    selectedFile.name
-                  ) : (
-                    <span className=" opacity-50">
-                      {dict.tools.uploadFirmware}
-                    </span>
-                  )}
-                </Button>
-              </div>
-            ) : (
-              <div className="flex items-center gap-3">
-                <Label>{dict.tools.onlineFlash}</Label>
-                <Select value={onlineSelect} onValueChange={setOnlineSelect}>
-                  <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder={dict.tools.list} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {onlineDataList.map((item) => (
-                      <SelectItem key={item.name} value={item.name}>
-                        {item.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
-            <Button
-              size="sm"
-              onClick={handleFlashClick}
-              disabled={!device || (config.mode === "offline" && !selectedFile)}
-            >
-              {dict.tools.flash}
-            </Button>
-          </div>
-        </div>
-        <DebugWindow ref={debugRef} dict={dict} />
-      </Loading>
+        </Loading>
+        <DebugWindow ref={debugRef} dict={dict} progress={progress} />
+      </div>
     </div>
   );
 };

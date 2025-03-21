@@ -71,11 +71,13 @@
     "offline": "Offline",
     "flash": "Flash",
     "firmware": "Firmware",
-    "list": "Device List",
+    "list": "Select Firmware",
     "onlineFlash": "Online Flash",
     "offlineFlash": "Offline Flash",
     "clearDebugInfo": "Clear Debug Info",
-    "uploadFirmware": "Upload Firmware"
+    "uploadFirmware": "Upload Firmware",
+    "connectSuccess": "Connect Success",
+    "flashSuccess": "Frimware Flash Success"
   },
   "docs": {
     "on_this_page": "On this page",

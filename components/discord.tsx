@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { Card } from "./ui/card";
-import Image from "next/image";
 import { Avatar, AvatarImage } from "./ui/avatar";
 import { BotMessageSquare } from "lucide-react";
 interface DiscordType {
@@ -91,7 +90,7 @@ export const DiscordCard = () => {
           getDiscordMemberRandom(discord?.members, 19).map((i, k) => {
             return (
               <Card
-                className="relative flex gap-3 items-center justify-between uppercase  max-w-40 min-w-40 overflow-hidden"
+                className="relative bg-transparent backdrop-blur-sm flex gap-3 items-center justify-between uppercase  max-w-40 min-w-40 overflow-hidden"
                 key={k}
               >
                 <span className="overflow-hidden pl-3 whitespace-nowrap text-ellipsis">
