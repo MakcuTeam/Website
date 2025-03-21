@@ -222,7 +222,7 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
         loading={loading}
         className="border w-full h-full rounded flex flex-row items-center justify-between relative"
       >
-        <div className="flex items-left flex-col gap-5 flex-1 p-5">
+        <div className="flex items-left flex-col gap-12 flex-1 p-5">
           <div className="flex items-center gap-2">
             <Switch id="device-connected" disabled checked={!!device} />
             <Label htmlFor="device-connected">{dict.tools.title}</Label>
@@ -233,9 +233,15 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
               {device ? dict.tools.disconnectBtn : dict.tools.connectBtn}
             </Button>
           </div>
-          <div>
-            {dict.tools.flashMode}: {config.mode}
-            <RadioGroup value={config.mode} onValueChange={handleModeChange}>
+          <div className="flex items-center gap-2">
+            <Label>
+              {dict.tools.flashMode} :
+            </Label>
+            <RadioGroup
+              value={config.mode}
+              onValueChange={handleModeChange}
+              className="flex items-center gap-2"
+            >
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="online" id="online" />
                 <Label className="cursor-pointer" htmlFor="online">

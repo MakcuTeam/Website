@@ -1,5 +1,5 @@
 import { Locale } from "./locale";
-
+import { cache } from "react";
 export type LangProps = { params: Promise<{ lang: Locale }> };
 
 export const dictionaries = {
@@ -7,6 +7,9 @@ export const dictionaries = {
     cn: () => import("@/dictionaries/cn.json").then((module) => module.default),
 };
 
-export const getDictionary = async (locale: Locale) => dictionaries[locale]();
+
+const getDictionaryUncached = async (locale: Locale) => dictionaries[locale]();
+
+export const getDictionary = cache(getDictionaryUncached);
 
 export type Dictionary = Awaited<ReturnType<typeof getDictionary>>;
