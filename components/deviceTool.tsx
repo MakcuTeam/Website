@@ -15,10 +15,11 @@ import {
 import { ESPLoader, FlashOptions, LoaderOptions, Transport } from "esptool-js";
 import { serial } from "web-serial-polyfill";
 import { getDictionary, Dictionary } from "@/lib/dictionaries";
-import { DebugWindow } from "@/components/debugWindow";
+import { DebugWindow } from "./debugWindow";
 import { Locale } from "@/lib/locale";
 import Loading from "./Loading";
 import { toast } from "sonner";
+
 
 interface DataListType {
   name: string;
