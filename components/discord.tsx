@@ -41,7 +41,7 @@ export const DiscordCard = () => {
               </Card>
             );
           })}
-        <Card className="p-3 relative flex gap-3 items-center justify-center uppercase max-w-40 min-w-40 overflow-hidden">
+        <Card className="p-3 relative flex gap-3 items-center bg-transparent backdrop-blur-sm justify-center uppercase max-w-40 min-w-40 overflow-hidden">
           <span className="text-center">...(more)</span>
         </Card>
       </div>

@@ -11,27 +11,6 @@ import Image from "next/image";
 
 import { DiscordCard } from "@/components/discord";
 
-interface UserListType {
-  Reseller?: Reseller[];
-  "VIP buyers"?: VIPBuyer[];
-  "MAKCU Devs"?: Reseller[];
-  "Server Booster"?: Reseller[];
-  Media?: Reseller[];
-  Sponsor?: Reseller[];
-  "XIM Support"?: Reseller[];
-}
-
-interface VIPBuyer {
-  id: string;
-  username: string;
-  avatar_url: null | string;
-}
-
-interface Reseller {
-  id: string;
-  username: string;
-  avatar_url: string;
-}
 
 export default async function Home({ params }: LangProps) {
   const { lang } = await params;
@@ -48,8 +27,7 @@ export default async function Home({ params }: LangProps) {
       <div className="sm:flex-row flex flex-col gap-8 sm:gap-2 items-center">
         <div className="flex-1">
           <Link
-            href="https://github.com/nisabmohd/Aria-Docs"
-            target="_blank"
+            href="#"
             className="mb-5 sm:text-lg flex items-center gap-2 underline underline-offset-4 sm:-mt-12"
           >
             {dict.home.tips}
@@ -60,12 +38,12 @@ export default async function Home({ params }: LangProps) {
           </h1>
           <div className="flex flex-row items-center gap-5 pt-8">
             <LocalizedLink
-              href={`/docs${page_routes[0].href}`}
+              href={`/tool`}
               className={buttonVariants({ className: "px-6", size: "lg" })}
             >
               {dict.home.get_started}
             </LocalizedLink>
-            <LocalizedLink
+            {/* <LocalizedLink
               href={`/docs${page_routes[0].href}`}
               className={buttonVariants({
                 variant: "secondary",
@@ -74,7 +52,7 @@ export default async function Home({ params }: LangProps) {
               })}
             >
               {dict.home.read_guide}
-            </LocalizedLink>
+            </LocalizedLink> */}
           </div>
         </div>
 

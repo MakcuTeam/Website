@@ -2,7 +2,6 @@
 
 import { ModeToggle } from "@/components/theme-toggle";
 
-import Search from "./search";
 import { SheetLeftbar } from "./leftbar";
 import { page_routes } from "@/lib/routes-config";
 import { SheetClose } from "@/components/ui/sheet";
@@ -28,7 +27,6 @@ export function Navbar({ dict }: { dict: Dictionary }) {
 
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
-            <Search dict={dict} />
             <div className="flex ml-2.5 sm:ml-0">
               <LangSelect />
               <ModeToggle dict={dict} />
@@ -59,11 +57,11 @@ export function NavMenu({
   const { data } = useSelector((state: RootState) => state.discord);
 
   const NAVLINKS = [
-    {
-      title: "guide",
-      href: `/docs${page_routes[0].href}`,
-      absolute: true,
-    },
+    // {
+    //   title: "guide",
+    //   href: `/docs${page_routes[0].href}`,
+    //   absolute: true,
+    // },
     {
       title: "makcu_tools",
       href: "/tool",
@@ -83,7 +81,6 @@ export function NavMenu({
             className="flex items-center gap-1 dark:text-stone-300/85 text-stone-800 "
             activeClassName={item.href ? "dark:text-white font-extrabold" : ""}
             href={item.href ?? ""}
-            absolute={item.absolute}
             target={item.target}
           >
             {dict.navbar.links[item.title as keyof typeof dict.navbar.links]}
