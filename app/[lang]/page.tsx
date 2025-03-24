@@ -124,7 +124,9 @@ export default async function Home({ params }: LangProps) {
           <div className="w-full border-b dark:border-b-[hsl(var(--border))] rounded flex-1" />
         </span>
 
-        <div className="flex gap-3 items-center flex-wrap"></div>
+        <div className="flex gap-3 items-center flex-wrap">
+          
+        </div>
       </div>
     </div>
   );

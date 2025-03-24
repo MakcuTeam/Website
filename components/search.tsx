@@ -75,7 +75,7 @@ export default function Search({ dict }: { dict: Dictionary }) {
           </DialogHeader>
           {filteredResults.length == 0 && searchedInput && (
             <p className="text-muted-foreground mx-auto mt-2 text-sm">
-              {dict.navbar.search.no_results_found}{" "}
+              {dict.navbar.search.no_results_found}
               <span className="text-primary">{`"${searchedInput}"`}</span>
             </p>
           )}
@@ -101,7 +101,7 @@ export default function Search({ dict }: { dict: Dictionary }) {
                           level > 1 && "border-l pl-4"
                         )}
                       >
-                        <FileIcon className="h-[1.1rem] w-[1.1rem] mr-1" />{" "}
+                        <FileIcon className="h-[1.1rem] w-[1.1rem] mr-1" />
                         {dict.leftbar[item.title as keyof typeof dict.leftbar]}
                       </div>
                     </LocalizedLink>

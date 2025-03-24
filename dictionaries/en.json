@@ -95,13 +95,6 @@
     "introduction": "Introduction",
     "installation": "Installation"
   },
-  "blog": {
-    "title": "The latest blogs of this product",
-    "sub_title": "All the latest blogs and news, straight from the team.",
-    "published_on": "Published on",
-    "back_to_blog": "Back to blog",
-    "posted_by": "Posted by"
-  },
   "error": {
     "oops": "Oops!",
     "something_went_wrong": "Something went wrong.",

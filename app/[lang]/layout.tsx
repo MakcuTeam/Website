@@ -8,7 +8,8 @@ import { ClientDictionary } from "@/components/contexts/dictionary-provider";
 import { locales } from "@/lib/locale";
 import "@/styles/globals.css";
 import localFont from "next/font/local";
-import { Toaster } from "@/components/ui/sonner";
+
+import RootLayoutProvider from "./provider";
 const roadRage = localFont({
   src: "../../fonts/Road-Rage.otf",
   display: "swap",
@@ -62,21 +63,7 @@ export default async function RootLayout({
         className={`${sansFont.variable} ${notoSerif.variable} ${monoFont.variable} ${roadRage.variable} font-basic antialiased tracking-wide`}
         suppressHydrationWarning
       >
-        <Toaster />
-        <ClientDictionary dict={dict}>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <Navbar dict={dict} />
-            <main className="sm:container mx-auto w-[90vw] h-auto scroll-smooth">
-              {children}
-            </main>
-            <Footer dict={dict} />
-          </ThemeProvider>
-        </ClientDictionary>
+        <RootLayoutProvider dict={dict}>{children}</RootLayoutProvider>
       </body>
     </html>
   );

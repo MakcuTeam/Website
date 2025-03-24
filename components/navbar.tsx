@@ -1,3 +1,5 @@
+"use client";
+
 import { ModeToggle } from "@/components/theme-toggle";
 
 import Search from "./search";
@@ -7,18 +9,6 @@ import { SheetClose } from "@/components/ui/sheet";
 import LangSelect from "./lang-select";
 import { Dictionary } from "@/lib/dictionaries";
 import LocalizedLink from "./localized-link";
-
-export const NAVLINKS = [
-  {
-    title: "guide",
-    href: `/docs${page_routes[0].href}`,
-    absolute: true,
-  },
-  {
-    title: "makcu_tools",
-    href: "/tool",
-  },
-];
 
 export function Navbar({ dict }: { dict: Dictionary }) {
   return (
@@ -57,7 +47,8 @@ export function Logo() {
     </LocalizedLink>
   );
 }
-
+import useStore, { RootState } from "@/store";
+import { useSelector } from "react-redux";
 export function NavMenu({
   isSheet = false,
   dict,
@@ -65,6 +56,24 @@ export function NavMenu({
   isSheet?: boolean;
   dict: Dictionary;
 }) {
+  const { data } = useSelector((state: RootState) => state.discord);
+
+  const NAVLINKS = [
+    {
+      title: "guide",
+      href: `/docs${page_routes[0].href}`,
+      absolute: true,
+    },
+    {
+      title: "makcu_tools",
+      href: "/tool",
+    },
+    {
+      title: "discord",
+      href: data?.instant_invite ?? "",
+      target: "_blank",
+    },
+  ];
   return (
     <>
       {NAVLINKS.map((item) => {
@@ -72,9 +81,10 @@ export function NavMenu({
           <LocalizedLink
             key={item.title + item.href}
             className="flex items-center gap-1 dark:text-stone-300/85 text-stone-800 "
-            activeClassName="dark:text-white font-extrabold"
-            href={item.href}
+            activeClassName={item.href ? "dark:text-white font-extrabold" : ""}
+            href={item.href ?? ""}
             absolute={item.absolute}
+            target={item.target}
           >
             {dict.navbar.links[item.title as keyof typeof dict.navbar.links]}
           </LocalizedLink>

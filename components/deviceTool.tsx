@@ -19,6 +19,7 @@ import { DebugWindow } from "./debugWindow";
 import { Locale } from "@/lib/locale";
 import Loading from "./Loading";
 import { toast } from "sonner";
+
 interface DataListType {
   name: string;
   path: string;
@@ -87,8 +88,8 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
   const connectToDevice = async () => {
     setLoading(true);
     try {
-      const result = await serialLib?.requestPort({});
-      const transport = new Transport(result, false);
+      const result = await serialLib.requestPort();
+      const transport = new Transport(result, false, false);
       const flashOptions = {
         transport,
         baudrate: 115200,
