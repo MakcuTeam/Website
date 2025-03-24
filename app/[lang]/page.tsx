@@ -116,7 +116,7 @@ export default async function Home({ params }: LangProps) {
 
       <DiscordCard />
 
-      <div className="flex gap-8 flex-col">
+      {/* <div className="flex gap-8 flex-col">
         <span className="flex gap-3 items-center">
           <div className="w-auto text-center flex-grow-1 flex-2 text-xl font-logo">
             {dict.contributions.title}
@@ -127,7 +127,7 @@ export default async function Home({ params }: LangProps) {
         <div className="flex gap-3 items-center flex-wrap">
           
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }

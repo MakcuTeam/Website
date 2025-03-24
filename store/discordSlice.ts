@@ -42,7 +42,8 @@ export const fetchDiscordData = createAsyncThunk(
         throw new Error("Failed to fetch data");
       }
       const data = await response.json();
-      data.members = data.members.sort(() => Math.random()).slice(0, 19);
+      // 随机
+      data.members = data.members.sort(() => Math.random() - 0.5).slice(0, 19);
       return data;
     } catch (error: any) {
       return rejectWithValue(error.message);

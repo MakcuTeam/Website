@@ -1,12 +1,10 @@
 "use client";
 
-import { useEffect } from "react";
 import { Card } from "./ui/card";
 import { Avatar, AvatarImage } from "./ui/avatar";
 import { BotMessageSquare } from "lucide-react";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
-import { Member } from "@/store/discordSlice";
 
 export const DiscordCard = () => {
   const discordStore = useSelector((state: RootState) => state.discord);
