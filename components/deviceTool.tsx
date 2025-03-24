@@ -18,7 +18,7 @@ import { getDictionary, Dictionary } from "@/lib/dictionaries";
 import { Locale } from "@/lib/locale";
 import Loading from "./Loading";
 import { toast } from "sonner";
-import { DebugWindow } from "./DebugWindow";
+import { DebugWindow } from "@/components/DebugWindow";
 
 interface DataListType {
   name: string;
