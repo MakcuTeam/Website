@@ -129,14 +129,10 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
   };
 
   const createFlashOptions = (buffer: ArrayBuffer): FlashOptions => {
-    const dataStr = Array.from(new Uint8Array(buffer))
-      .map((b) => String.fromCharCode(b))
-      .join("");
-
     return {
       fileArray: [
         {
-          data: dataStr,
+          data: new Uint8Array(buffer),
           address: 0x0,
         },
       ],
