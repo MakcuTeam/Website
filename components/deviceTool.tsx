@@ -36,8 +36,9 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
 
   const fetchOnlineDataList = async () => {
     try {
-      const response = await fetch("/api/makcu");
-      const data: DataListType[] = await response.json();
+      const res = await fetch("/api/makcu");
+      if (!res.ok) throw new Error("network");
+      const data: DataListType[] = await res.json();
       setOnlineDataList(data);
     } catch {
       console.error("Failed to fetch online data list");
@@ -127,12 +128,12 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
     }
   };
 
-  const createFlashOptions = (data: string): FlashOptions => {
+  const createFlashOptions = (buffer: ArrayBuffer): FlashOptions => {
     return {
       fileArray: [
         {
-          data,
-          address: parseInt(Buffer.byteLength(data).toString(), 10),
+          data: new Uint8Array(buffer) as unknown as string,
+          address: 0x0,
         },
       ],
       flashSize: "keep",
@@ -165,8 +166,7 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
   const flashDevice = async (file: File) => {
     try {
       const buffer = await file.arrayBuffer();
-      const stringBuffer = new TextDecoder().decode(buffer);
-      const flashOptions = createFlashOptions(stringBuffer);
+      const flashOptions = createFlashOptions(buffer);
       await executeFlash(flashOptions);
     } catch (error) {
       handleAddInfo("Error reading file: " + error);
@@ -188,10 +188,9 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
       }
 
       const buffer = await response.arrayBuffer();
-      const stringBuffer = new TextDecoder().decode(buffer);
 
       handleAddInfo("Download complete, starting flash...");
-      const flashOptions = createFlashOptions(stringBuffer);
+      const flashOptions = createFlashOptions(buffer);
       await executeFlash(flashOptions).then((e) => {
         toast.success(dict?.tools.flashSuccess);
       });

@@ -1,46 +1,68 @@
 import { NextResponse } from "next/server";
-import fs from "fs";
-import path from "path";
-import { promisify } from "util";
 
-const readdir = promisify(fs.readdir);
-const stat = promisify(fs.stat);
+const GITHUB_CONTENTS_API =
+  "https://api.github.com/repos/terrafirma2021/MAKCM_v2_files/contents";
 
-const RESOURCE_DIR = path.join(process.cwd(), "resource");
+async function fetchLastModified(url: string, headers: HeadersInit) {
+  try {
+    const res = await fetch(url, { method: "HEAD", headers });
+    if (res.ok) {
+      return res.headers.get("last-modified") || "";
+    }
+  } catch {
+    // ignore errors and fallback to empty string
+  }
+  return "";
+}
 
 export async function GET() {
-    try {
-        if (!fs.existsSync(RESOURCE_DIR)) {
-            return NextResponse.json(
-                { error: "Resource directory not found" },
-                { status: 404 }
-            );
-        }
-        const files = await readdir(RESOURCE_DIR);
-
-        const makcuFiles = files.filter((file) => file.endsWith(".bin"));
-
-        const fileDetails = await Promise.all(
-            makcuFiles.map(async (fileName) => {
-                const filePath = path.join(RESOURCE_DIR, fileName);
-                const fileStat = await stat(filePath);
-
-                return {
-                    name: fileName,
-                    path: `/resource/${fileName}`,
-                    size: fileStat.size,
-                    lastModified: fileStat.mtime,
-                    downloadUrl: `/api/download/${fileName}`,
-                };
-            })
-        );
-
-        return NextResponse.json(fileDetails);
-    } catch (error) {
-        console.error("Error listing makcu bin files:", error);
-        return NextResponse.json(
-            { error: "Failed to list resource files" },
-            { status: 500 }
-        );
+  try {
+    const headers: HeadersInit = {};
+    if (process.env.GITHUB_TOKEN) {
+      headers["Authorization"] = `Bearer ${process.env.GITHUB_TOKEN}`;
     }
+
+    const res = await fetch(GITHUB_CONTENTS_API, { headers });
+    if (!res.ok) {
+      return NextResponse.json(
+        { error: "Failed to fetch repository contents" },
+        { status: res.status }
+      );
+    }
+
+    const files = (await res.json()) as Array<{
+      name: string;
+      path: string;
+      size: number;
+      download_url: string | null;
+      type: string;
+    }>;
+
+    const binFiles = files.filter(
+      (f) => f.type === "file" && f.name.endsWith(".bin")
+    );
+
+    const fileDetails = await Promise.all(
+      binFiles.map(async (file) => {
+        const lastModified = file.download_url
+          ? await fetchLastModified(file.download_url, headers)
+          : "";
+        return {
+          name: file.name,
+          path: file.path,
+          size: file.size,
+          lastModified,
+          downloadUrl: file.download_url,
+        };
+      })
+    );
+
+    return NextResponse.json(fileDetails);
+  } catch (error) {
+    console.error("Error listing makcu bin files:", error);
+    return NextResponse.json(
+      { error: "Failed to list resource files" },
+      { status: 500 }
+    );
+  }
 }
