@@ -6,6 +6,7 @@ interface DiscordType {
   channels: any[];
   members: Member[];
   presence_count: number;
+  member_count?: number;
 }
 
 export interface Member {
@@ -44,6 +45,18 @@ export const fetchDiscordData = createAsyncThunk(
       const data = await response.json();
       // 随机
       data.members = data.members.sort(() => Math.random() - 0.5).slice(0, 20);
+
+      const inviteCode = data.instant_invite?.split("/").pop();
+      if (inviteCode) {
+        const inviteRes = await fetch(
+          `https://discord.com/api/invites/${inviteCode}?with_counts=true`
+        );
+        if (inviteRes.ok) {
+          const inviteData = await inviteRes.json();
+          data.member_count =
+            inviteData.approximate_member_count ?? inviteData.member_count;
+        }
+      }
       return data;
     } catch (error: any) {
       return rejectWithValue(error.message);
