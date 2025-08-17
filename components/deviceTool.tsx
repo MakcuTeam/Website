@@ -165,7 +165,9 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
     const ports = await serialLib.getPorts();
     const allowed = ports.filter((p) => isAllowedDevice(p.getInfo()));
     if (allowed.length === 0) {
-      handleAddInfo("No allowed devices found; waiting for manual connection");
+      handleAddInfo(
+        "MAKCU Not found:\nHold button,\nconnect usb cable,\nlet go of button",
+      );
       return;
     }
     allowed.sort(
