@@ -1,20 +1,23 @@
+"use client";
+
 import InfoCard from "@/components/info-card";
 import LocalizedLink from "@/components/localized-link";
 import { buttonVariants } from "@/components/ui/button";
-import { getDictionary, LangProps } from "@/lib/dictionaries";
-import { page_routes } from "@/lib/routes-config";
-import { Cpu, MoveUpRightIcon } from "lucide-react";
+import { Cpu, MoveUpRightIcon, UsersRound, Mouse } from "lucide-react";
 import Link from "next/link";
-import { UsersRound, Mouse } from "lucide-react";
 import ProductImage from "@/assets/makcu.png";
 import Image from "next/image";
-
 import { DiscordCard } from "@/components/discord";
+import { useDictionary } from "@/components/contexts/dictionary-provider";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store";
 
 
-export default async function Home({ params }: LangProps) {
-  const { lang } = await params;
-  const dict = await getDictionary(lang);
+export default function Home() {
+  const dict = useDictionary();
+  const presenceCount = useSelector(
+    (state: RootState) => state.discord.data?.presence_count
+  );
 
   const iconMap = {
     users_round: UsersRound,
@@ -79,12 +82,16 @@ export default async function Home({ params }: LangProps) {
         <div className="gap-3 grid-cols-1 grid md:grid-cols-3 sm:grid-cols-1">
           {dict.info.list.map((item, index) => {
             const IconComponent = iconMap[item.icon as keyof typeof iconMap];
+            const number =
+              item.icon === "users_round"
+                ? presenceCount?.toString() ?? ""
+                : item.number;
             return (
               <InfoCard
                 key={index}
                 Icon={IconComponent}
                 title={item.title}
-                number={item.number}
+                number={number}
                 description={item.description}
               />
             );
