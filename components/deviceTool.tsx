@@ -7,7 +7,9 @@ import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 import {
   Select,
   SelectContent,
+  SelectLabel,
   SelectItem,
+  SelectSeparator,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
@@ -40,6 +42,8 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
   };
 
   const [onlineDataList, setOnlineDataList] = useState<DataListType[]>([]);
+  const [leftFiles, setLeftFiles] = useState<DataListType[]>([]);
+  const [rightFiles, setRightFiles] = useState<DataListType[]>([]);
 
   const fetchOnlineDataList = async () => {
     try {
@@ -49,6 +53,18 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
       data.sort((a, b) =>
         b.name.localeCompare(a.name, undefined, { numeric: true })
       );
+      const left = data
+        .filter((item) => /LEFT/i.test(item.name))
+        .sort((a, b) =>
+          b.name.localeCompare(a.name, undefined, { numeric: true })
+        );
+      const right = data
+        .filter((item) => /RIGHT/i.test(item.name))
+        .sort((a, b) =>
+          b.name.localeCompare(a.name, undefined, { numeric: true })
+        );
+      setLeftFiles(left);
+      setRightFiles(right);
       setOnlineDataList(data);
     } catch (error) {
       console.error("Failed to fetch online data list", error);
@@ -312,7 +328,15 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
                       <SelectValue placeholder={dict.tools.list} />
                     </SelectTrigger>
                     <SelectContent>
-                      {onlineDataList.map((item) => (
+                      <SelectLabel>{dict.tools.usb1Left}</SelectLabel>
+                      {leftFiles.map((item) => (
+                        <SelectItem key={item.name} value={item.name}>
+                          {item.name}
+                        </SelectItem>
+                      ))}
+                      <SelectSeparator />
+                      <SelectLabel>{dict.tools.usb3Right}</SelectLabel>
+                      {rightFiles.map((item) => (
                         <SelectItem key={item.name} value={item.name}>
                           {item.name}
                         </SelectItem>
