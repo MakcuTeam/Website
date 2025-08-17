@@ -14,7 +14,11 @@ export const DebugWindow = forwardRef<
   DebugWindowRef,
   { dict: Dictionary; progress?: number }
 >((props, ref) => {
-  const [info, setInfo] = useState(["Welcome!"]);
+  const [info, setInfo] = useState([
+    "1. Connect device",
+    "2. Select firmware",
+    "3. Click Flash",
+  ]);
 
   useImperativeHandle(ref, () => ({
     addInfo: (newInfo: string) => {
