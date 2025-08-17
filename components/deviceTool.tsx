@@ -54,9 +54,12 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
   const [dict, setDict] = useState<Dictionary>();
   const debugRef = useRef<DebugWindowRef | null>(null);
   const handleAddInfo = (info: string) => {
-    const imageWarning =
-      "Image file at 0x0 doesn't look like an image file, so not changing any flash settings.";
-    if (info.includes(imageWarning)) {
+    const suppressedDiagnostics = [
+      "Image file at 0x0 doesn't look like an image file, so not changing any flash settings.",
+      "Running stub...",
+      "Stub running...",
+    ];
+    if (suppressedDiagnostics.some((msg) => info.includes(msg))) {
       return;
     }
     debugRef.current?.addInfo(info);
