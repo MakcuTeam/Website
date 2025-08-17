@@ -4,7 +4,6 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
-import { Switch } from "./ui/switch";
 import {
   Select,
   SelectContent,
@@ -143,15 +142,6 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
     }
   };
 
-  const disconnectDevice = () => {
-    if (device) {
-      device.disconnect();
-      setDevice(null);
-      setEsploader(null);
-      handleAddInfo("Device disconnected");
-    }
-  };
-
   const createFlashOptions = (buffer: ArrayBuffer): FlashOptions => {
     const data = Buffer.from(buffer).toString("binary");
     return {
@@ -264,17 +254,7 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
           loading={loading}
           className="border w-full h-full rounded flex flex-row items-center justify-between relative backdrop-blur-sm "
         >
-          <div className="flex items-left flex-col gap-12 flex-1 p-5 ">
-            <div className="flex items-center gap-2">
-              <Switch id="device-connected" disabled checked={!!device} />
-              <Label htmlFor="device-connected">{dict.tools.title}</Label>
-              <Button
-                size="sm"
-                onClick={device ? disconnectDevice : connectToDevice}
-              >
-                {device ? dict.tools.disconnectBtn : dict.tools.connectBtn}
-              </Button>
-            </div>
+          <div className="flex items-left flex-col gap-8 flex-1 p-5 ">
             <div className="flex items-center gap-2">
               <Label>{dict.tools.flashMode} :</Label>
               <RadioGroup
