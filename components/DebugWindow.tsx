@@ -40,7 +40,7 @@ export const DebugWindow = forwardRef<
   return (
     <div className="flex-1 h-64 border rounded backdrop-blur-sm">
       <div className="p-4  border-b border-b-gray-300 dark:border-white/5">
-        <Button size="xs" onClick={() => setInfo([])}>
+        <Button onClick={() => setInfo([])}>
           {props.dict.tools.clearDebugInfo}
         </Button>
       </div>
