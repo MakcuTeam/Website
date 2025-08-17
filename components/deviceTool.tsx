@@ -77,6 +77,8 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
   const [onlineSelect, setOnlineSelect] = useState<string>();
 
   const fileRef = useRef<HTMLInputElement>(null);
+  const hasAutoConnected = useRef(false);
+  const isConnecting = useRef(false);
 
   useEffect(() => {
     const loadDictionary = async () => {
@@ -90,7 +92,20 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
   const serialLib =
     !Navigator.serial && Navigator.usb ? serial : Navigator.serial;
 
+  useEffect(() => {
+    if (hasAutoConnected.current) return;
+    hasAutoConnected.current = true;
+
+    if (!Navigator.serial && !Navigator.usb) {
+      alert("Your web browser is not supported; please use Chrome");
+      return;
+    }
+    connectToDevice();
+  }, []);
+
   const connectToDevice = async () => {
+    if (isConnecting.current) return;
+    isConnecting.current = true;
     setLoading(true);
     try {
       const result = (await serialLib.requestPort()) as unknown as SerialPort;
@@ -124,6 +139,7 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
       toast.error(message);
     } finally {
       setLoading(false);
+      isConnecting.current = false;
     }
   };
 
