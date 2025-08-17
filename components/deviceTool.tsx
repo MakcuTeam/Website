@@ -32,6 +32,13 @@ interface DataListType {
 export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
   const [dict, setDict] = useState<Dictionary>();
   const debugRef = useRef<DebugWindowRef | null>(null);
+  const handleAddInfo = (info: string) => {
+    debugRef.current?.addInfo(info);
+  };
+
+  const handleClearInfo = () => {
+    debugRef.current?.clearInfo();
+  };
 
   const [onlineDataList, setOnlineDataList] = useState<DataListType[]>([]);
 
@@ -41,8 +48,12 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
       if (!res.ok) throw new Error("network");
       const data: DataListType[] = await res.json();
       setOnlineDataList(data);
-    } catch {
-      console.error("Failed to fetch online data list");
+    } catch (error) {
+      console.error("Failed to fetch online data list", error);
+      handleAddInfo(
+        "Failed to fetch online data list. Please check your connection and try again."
+      );
+      toast.error("Failed to fetch online data list");
     }
   };
 
@@ -78,14 +89,6 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
   const Navigator = navigator as Navigator & { serial?: Serial; usb?: unknown };
   const serialLib =
     !Navigator.serial && Navigator.usb ? serial : Navigator.serial;
-
-  const handleAddInfo = (info: string) => {
-    debugRef.current?.addInfo(info);
-  };
-
-  const handleClearInfo = () => {
-    debugRef.current?.clearInfo();
-  };
 
   const connectToDevice = async () => {
     setLoading(true);
