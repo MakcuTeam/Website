@@ -46,6 +46,9 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
       const res = await fetch("/api/makcu");
       if (!res.ok) throw new Error("network");
       const data: DataListType[] = await res.json();
+      data.sort((a, b) =>
+        b.name.localeCompare(a.name, undefined, { numeric: true })
+      );
       setOnlineDataList(data);
     } catch (error) {
       console.error("Failed to fetch online data list", error);
