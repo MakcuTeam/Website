@@ -52,7 +52,7 @@ export const DebugWindow = forwardRef<
         {info.map((e, k) => (
           <span
             key={k}
-            className="block whitespace-pre-line border-b text-xs border-gray-300 py-2 px-4 dark:border-white/5"
+            className="block whitespace-pre-line border-b text-sm border-gray-300 py-2 px-4 dark:border-white/5"
           >
             {e}
           </span>

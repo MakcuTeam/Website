@@ -390,7 +390,7 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
               <Button onClick={connectToDevice}>{dict.tools.connectBtn}</Button>
             </div>
             <div className="flex items-center gap-2">
-              <Label>{dict.tools.flashMode} :</Label>
+              <Label className="text-sm">{dict.tools.flashMode} :</Label>
               <RadioGroup
                 value={config.mode}
                 onValueChange={handleModeChange}
@@ -398,13 +398,13 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
               >
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="online" id="online" />
-                  <Label className="cursor-pointer" htmlFor="online">
+                  <Label className="cursor-pointer text-sm" htmlFor="online">
                     {dict.tools.online}
                   </Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="offline" id="offline" />
-                  <Label className="cursor-pointer" htmlFor="offline">
+                  <Label className="cursor-pointer text-sm" htmlFor="offline">
                     {dict.tools.offline}
                   </Label>
                 </div>
@@ -413,7 +413,7 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
             <div className="flex items-center gap-3">
               {config.mode === "offline" ? (
                 <div className="flex items-center gap-3">
-                  <Label>{dict.tools.offlineFlash}</Label>
+                  <Label className="text-sm">{dict.tools.offlineFlash}</Label>
                   <Button
                     variant={"outline"}
                     onClick={() => fileRef.current?.click()}
@@ -437,7 +437,7 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
                 </div>
               ) : (
                 <div className="flex items-center gap-3">
-                  <Label>{dict.tools.onlineFlash}</Label>
+                  <Label className="text-sm">{dict.tools.onlineFlash}</Label>
                   <Select
                     value={onlineSelect}
                     onValueChange={(value) => {
@@ -445,7 +445,7 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
                       flashOnline(value);
                     }}
                   >
-                    <SelectTrigger className="w-[180px]">
+                    <SelectTrigger className="w-[180px] text-sm">
                       <SelectValue placeholder={dict.tools.list} />
                     </SelectTrigger>
                     <SelectContent>
