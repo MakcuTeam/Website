@@ -18,7 +18,8 @@ import { getDictionary, Dictionary } from "@/lib/dictionaries";
 import { Locale } from "@/lib/locale";
 import Loading from "./Loading";
 import { toast } from "sonner";
-import { DebugWindow } from "@/components/DebugWindow";
+import { DebugWindow, DebugWindowRef } from "@/components/DebugWindow";
+import { Buffer } from "buffer";
 
 interface DataListType {
   name: string;
@@ -30,7 +31,7 @@ interface DataListType {
 
 export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
   const [dict, setDict] = useState<Dictionary>();
-  const debugRef = useRef<any>(null);
+  const debugRef = useRef<DebugWindowRef | null>(null);
 
   const [onlineDataList, setOnlineDataList] = useState<DataListType[]>([]);
 
@@ -74,7 +75,7 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
     loadDictionary();
   }, [lang]);
 
-  const Navigator = navigator as any;
+  const Navigator = navigator as Navigator & { serial?: Serial; usb?: unknown };
   const serialLib =
     !Navigator.serial && Navigator.usb ? serial : Navigator.serial;
 
@@ -129,10 +130,11 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
   };
 
   const createFlashOptions = (buffer: ArrayBuffer): FlashOptions => {
+    const data = Buffer.from(buffer).toString("binary");
     return {
       fileArray: [
         {
-          data: new Uint8Array(buffer),
+          data,
           address: 0x0,
         },
       ],
@@ -191,9 +193,9 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
 
       handleAddInfo("Download complete, starting flash...");
       const flashOptions = createFlashOptions(buffer);
-      await executeFlash(flashOptions).then((e) => {
-        toast.success(dict?.tools.flashSuccess);
-      });
+        await executeFlash(flashOptions).then(() => {
+          toast.success(dict?.tools.flashSuccess);
+        });
     } catch (error) {
       handleAddInfo("Error downloading firmware: " + error);
     }

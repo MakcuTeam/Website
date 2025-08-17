@@ -5,8 +5,13 @@ import { Button } from "./ui/button";
 import { Progress } from "./ui/progress";
 import { useScrollToBottom } from "@/hooks/useScrollToBottom";
 
+export interface DebugWindowRef {
+  addInfo: (newInfo: string) => void;
+  clearInfo: () => void;
+}
+
 export const DebugWindow = forwardRef<
-  {},
+  DebugWindowRef,
   { dict: Dictionary; progress?: number }
 >((props, ref) => {
   const [info, setInfo] = useState(["Welcome!"]);
@@ -55,3 +60,5 @@ export const DebugWindow = forwardRef<
     </div>
   );
 });
+
+DebugWindow.displayName = "DebugWindow";
