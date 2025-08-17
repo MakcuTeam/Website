@@ -159,28 +159,21 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
   useEffect(() => {
     setBrowserSupported(!!(Navigator.serial || Navigator.usb));
   }, []);
-
-  const tryAutoConnect = async () => {
-    connectToDevice();
-  };
-
   useEffect(() => {
     if (!browserSupported) return;
 
     const handleConnect = () => {
-      connectToDevice();
+      setDevice(null);
+      setEsploader(null);
     };
 
     const handleDisconnect = () => {
       setDevice(null);
       setEsploader(null);
-      connectToDevice();
     };
 
     Navigator.serial?.addEventListener("connect", handleConnect);
     Navigator.serial?.addEventListener("disconnect", handleDisconnect);
-
-    tryAutoConnect();
 
     return () => {
       Navigator.serial?.removeEventListener("connect", handleConnect);
@@ -188,15 +181,12 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
     };
   }, [browserSupported]);
 
-  const connectToDevice = async (port?: SerialPortLike) => {
+  const connectToDevice = async () => {
     if (isConnecting.current) return;
     isConnecting.current = true;
     setLoading(true);
     try {
-      let selectedPort = port;
-      if (!selectedPort) {
-        selectedPort = (await serialLib.requestPort()) as unknown as SerialPortLike;
-      }
+      const selectedPort = (await serialLib.requestPort()) as unknown as SerialPortLike;
 
       const transport = new Transport(selectedPort, false, false);
       const flashOptions = {
@@ -396,6 +386,9 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
           className="border w-full h-full rounded flex flex-row items-center justify-between relative backdrop-blur-sm "
         >
           <div className="flex items-left flex-col gap-8 flex-1 p-5 ">
+            <div className="flex items-center gap-3">
+              <Button onClick={connectToDevice}>{dict.tools.connectBtn}</Button>
+            </div>
             <div className="flex items-center gap-2">
               <Label>{dict.tools.flashMode} :</Label>
               <RadioGroup
