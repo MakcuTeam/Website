@@ -16,7 +16,6 @@ import {
 } from "@/components/ui/select";
 import { ESPLoader, FlashOptions, LoaderOptions, Transport } from "esptool-js";
 import { serial } from "web-serial-polyfill";
-import type { SerialPort as PolyfillSerialPort } from "web-serial-polyfill";
 import { getDictionary, Dictionary } from "@/lib/dictionaries";
 import { Locale } from "@/lib/locale";
 import Loading from "./Loading";
@@ -24,7 +23,9 @@ import { toast } from "sonner";
 import { DebugWindow, DebugWindowRef } from "@/components/DebugWindow";
 import { Buffer } from "buffer";
 
-type SerialPortLike = SerialPort | PolyfillSerialPort;
+// Treat both native and polyfilled serial ports as the Web Serial API's
+// SerialPort to satisfy esptool-js' Transport constructor at runtime.
+type SerialPortLike = SerialPort;
 
 interface DataListType {
   name: string;
@@ -188,7 +189,7 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
     (async () => {
       const ports = await serialLib.getPorts();
       if (ports.length > 0) {
-        connectToDevice(ports[0] as SerialPortLike);
+        connectToDevice(ports[0] as unknown as SerialPortLike);
       } else {
         connectToDevice();
       }
@@ -204,7 +205,7 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
     isConnecting.current = true;
     setLoading(true);
     try {
-      const result = (port || (await serialLib.requestPort())) as SerialPortLike;
+      const result = (port || (await serialLib.requestPort())) as unknown as SerialPortLike;
       const transport = new Transport(result, false, false);
       const flashOptions = {
         transport,
