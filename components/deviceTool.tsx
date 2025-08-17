@@ -143,10 +143,13 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
 
   const [progress, setProgress] = useState(0);
   const [onlineSelect, setOnlineSelect] = useState<string>();
+  const [browserSupported, setBrowserSupported] = useState(true);
+  const [showWarning, setShowWarning] = useState(true);
 
   const fileRef = useRef<HTMLInputElement>(null);
   const hasAutoConnected = useRef(false);
   const isConnecting = useRef(false);
+  const warnedUnsupported = useRef(false);
 
   useEffect(() => {
     const loadDictionary = async () => {
@@ -161,15 +164,22 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
     !Navigator.serial && Navigator.usb ? serial : Navigator.serial;
 
   useEffect(() => {
-    if (hasAutoConnected.current) return;
-    hasAutoConnected.current = true;
+    const supported = !!(Navigator.serial || Navigator.usb);
+    setBrowserSupported(supported);
+  }, []);
 
-    if (!Navigator.serial && !Navigator.usb) {
-      alert("Your web browser is not supported; please use Chrome");
+  useEffect(() => {
+    if (!browserSupported) {
+      if (dict && !warnedUnsupported.current) {
+        toast.warning(dict.tools.unsupportedBrowser);
+        warnedUnsupported.current = true;
+      }
       return;
     }
+    if (hasAutoConnected.current) return;
+    hasAutoConnected.current = true;
     connectToDevice();
-  }, []);
+  }, [browserSupported, dict]);
 
   const connectToDevice = async () => {
     if (isConnecting.current) return;
@@ -322,6 +332,18 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
 
   if (!dict) {
     return <Loading loading={true} className="w-full h-64" />;
+  }
+
+  if (!browserSupported) {
+    if (!showWarning) return null;
+    return (
+      <div className="border border-yellow-400 bg-yellow-100 text-yellow-800 p-4 rounded flex items-center justify-between">
+        <span>{dict.tools.unsupportedBrowser}</span>
+        <Button variant="ghost" size="sm" onClick={() => setShowWarning(false)}>
+          ×
+        </Button>
+      </div>
+    );
   }
 
   return (

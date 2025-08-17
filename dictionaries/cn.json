@@ -71,6 +71,7 @@
     "uploadFirmware": "上传固件",
     "connectSuccess": "连接成功",
     "flashSuccess": "固件刷写成功",
+    "unsupportedBrowser": "当前浏览器不支持 Web Serial 或 WebUSB，请使用 Chrome 或 Edge 等兼容浏览器。",
     "usb1Left": "USB1 左侧",
     "usb3Right": "USB3 右侧",
     "noLeftFirmware": "未找到左侧固件",

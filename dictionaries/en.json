@@ -79,6 +79,7 @@
     "uploadFirmware": "Upload Firmware",
     "connectSuccess": "Connect Success",
     "flashSuccess": "Firmware Flash Success",
+    "unsupportedBrowser": "Your browser does not support Web Serial or WebUSB. Please use Chrome or Edge.",
     "usb1Left": "USB1 Left",
     "usb3Right": "USB3 Right",
     "noLeftFirmware": "No left firmware found",
