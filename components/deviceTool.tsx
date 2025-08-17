@@ -156,7 +156,10 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
     };
   };
 
-  const executeFlash = async (flashOptions: FlashOptions) => {
+  const executeFlash = async (
+    flashOptions: FlashOptions,
+    firmwareName: string,
+  ) => {
     if (!esploader) return;
 
     try {
@@ -165,6 +168,7 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
       await esploader.writeFlash(flashOptions);
       await esploader.after();
       handleAddInfo("Flash complete");
+      handleAddInfo(`Flashed ${firmwareName}`);
     } catch (error) {
       handleAddInfo("Flash error: " + error);
       console.error("Flash error:", error);
@@ -178,7 +182,7 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
     try {
       const buffer = await file.arrayBuffer();
       const flashOptions = createFlashOptions(buffer);
-      await executeFlash(flashOptions);
+      await executeFlash(flashOptions, file.name);
     } catch (error) {
       handleAddInfo("Error reading file: " + error);
     }
@@ -202,9 +206,9 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
 
       handleAddInfo("Download complete, starting flash...");
       const flashOptions = createFlashOptions(buffer);
-        await executeFlash(flashOptions).then(() => {
-          toast.success(dict?.tools.flashSuccess);
-        });
+      await executeFlash(flashOptions, selected.name).then(() => {
+        toast.success(dict?.tools.flashSuccess);
+      });
     } catch (error) {
       handleAddInfo("Error downloading firmware: " + error);
     }
