@@ -51,7 +51,7 @@ function RootLayoutContent({
           <main className="sm:container mx-auto w-[90vw] h-auto scroll-smooth">
             {children}
           </main>
-          <Footer dict={dict} />
+            <Footer />
         </ThemeProvider>
       </ClientDictionary>
     </>
