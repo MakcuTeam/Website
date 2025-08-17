@@ -92,7 +92,11 @@ export default function Home() {
                 Icon={IconComponent}
                 title={item.title}
                 number={number}
-                description={item.description}
+                description={
+                  Array.isArray(item.description)
+                    ? item.description
+                    : [item.description]
+                }
               />
             );
           })}

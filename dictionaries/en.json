@@ -30,7 +30,11 @@
         "icon": "cpu",
         "title": "Full Pass-Through",
         "number": "100%",
-        "description": "Full mouse, keyboard and controller pass-through."
+        "description": [
+          "Mouse",
+          "Keyboard (soon)",
+          "Controller (xim needed)"
+        ]
       }
     ]
   },
