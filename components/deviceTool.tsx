@@ -164,24 +164,24 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
   const tryAutoConnect = async () => {
     const ports = await serialLib.getPorts();
     const allowed = ports.filter((p) => isAllowedDevice(p.getInfo()));
-    if (allowed.length > 0) {
-      allowed.sort(
-        (a, b) =>
-          ALLOWED_DEVICES.findIndex(
-            (d) =>
-              d.vendorId === a.getInfo().usbVendorId &&
-              d.productId === a.getInfo().usbProductId,
-          ) -
-          ALLOWED_DEVICES.findIndex(
-            (d) =>
-              d.vendorId === b.getInfo().usbVendorId &&
-              d.productId === b.getInfo().usbProductId,
-          ),
-      );
-      connectToDevice(allowed[0] as unknown as SerialPortLike);
-    } else {
-      connectToDevice();
+    if (allowed.length === 0) {
+      handleAddInfo("No allowed devices found; waiting for manual connection");
+      return;
     }
+    allowed.sort(
+      (a, b) =>
+        ALLOWED_DEVICES.findIndex(
+          (d) =>
+            d.vendorId === a.getInfo().usbVendorId &&
+            d.productId === a.getInfo().usbProductId,
+        ) -
+        ALLOWED_DEVICES.findIndex(
+          (d) =>
+            d.vendorId === b.getInfo().usbVendorId &&
+            d.productId === b.getInfo().usbProductId,
+        ),
+    );
+    connectToDevice(allowed[0] as unknown as SerialPortLike);
   };
 
   useEffect(() => {
@@ -258,8 +258,10 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
     } catch (error) {
       const message =
         error instanceof Error ? error.message : String(error);
-      handleAddInfo(message);
-      toast.error(message);
+      if (!message.includes("Must be handling a user gesture")) {
+        handleAddInfo(message);
+        toast.error(message);
+      }
     } finally {
       setLoading(false);
       isConnecting.current = false;
