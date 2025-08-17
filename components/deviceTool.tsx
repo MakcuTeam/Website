@@ -64,15 +64,15 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
     try {
       const res = await fetch("/api/makcu");
       if (!res.ok) throw new Error("network");
-      const data: DataListType[] = await res.json();
-      data.sort((a, b) =>
+      const dataList: DataListType[] = await res.json();
+      dataList.sort((a, b) =>
         b.name.localeCompare(a.name, undefined, { numeric: true })
       );
-      const left = filterFirmware(data, "left");
-      const right = filterFirmware(data, "right");
+      const left = filterFirmware(dataList, "left");
+      const right = filterFirmware(dataList, "right");
       setLeftFiles(left);
       setRightFiles(right);
-      setOnlineDataList(data);
+      setOnlineDataList(dataList);
     } catch (error) {
       console.error("Failed to fetch online data list", error);
       handleAddInfo(
