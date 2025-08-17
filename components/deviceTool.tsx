@@ -30,6 +30,21 @@ interface DataListType {
   downloadUrl: string;
 }
 
+const FIRMWARE_PATTERNS: Record<"left" | "right", RegExp> = {
+  left: /LEFT/i,
+  right: /RIGHT/i,
+};
+
+const filterFirmware = (
+  files: DataListType[],
+  side: keyof typeof FIRMWARE_PATTERNS,
+) =>
+  files
+    .filter((item) => FIRMWARE_PATTERNS[side].test(item.name))
+    .sort((a, b) =>
+      b.name.localeCompare(a.name, undefined, { numeric: true }),
+    );
+
 export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
   const [dict, setDict] = useState<Dictionary>();
   const debugRef = useRef<DebugWindowRef | null>(null);
@@ -53,16 +68,8 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
       data.sort((a, b) =>
         b.name.localeCompare(a.name, undefined, { numeric: true })
       );
-      const left = data
-        .filter((item) => /LEFT/i.test(item.name))
-        .sort((a, b) =>
-          b.name.localeCompare(a.name, undefined, { numeric: true })
-        );
-      const right = data
-        .filter((item) => /RIGHT/i.test(item.name))
-        .sort((a, b) =>
-          b.name.localeCompare(a.name, undefined, { numeric: true })
-        );
+      const left = filterFirmware(data, "left");
+      const right = filterFirmware(data, "right");
       setLeftFiles(left);
       setRightFiles(right);
       setOnlineDataList(data);
@@ -329,18 +336,30 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectLabel>{dict.tools.usb1Left}</SelectLabel>
-                      {leftFiles.map((item) => (
-                        <SelectItem key={item.name} value={item.name}>
-                          {item.name}
+                      {leftFiles.length === 0 ? (
+                        <SelectItem value="no-left" disabled>
+                          {dict.tools.noLeftFirmware}
                         </SelectItem>
-                      ))}
+                      ) : (
+                        leftFiles.map((item) => (
+                          <SelectItem key={item.name} value={item.name}>
+                            {item.name}
+                          </SelectItem>
+                        ))
+                      )}
                       <SelectSeparator />
                       <SelectLabel>{dict.tools.usb3Right}</SelectLabel>
-                      {rightFiles.map((item) => (
-                        <SelectItem key={item.name} value={item.name}>
-                          {item.name}
+                      {rightFiles.length === 0 ? (
+                        <SelectItem value="no-right" disabled>
+                          {dict.tools.noRightFirmware}
                         </SelectItem>
-                      ))}
+                      ) : (
+                        rightFiles.map((item) => (
+                          <SelectItem key={item.name} value={item.name}>
+                            {item.name}
+                          </SelectItem>
+                        ))
+                      )}
                     </SelectContent>
                   </Select>
                 </div>
