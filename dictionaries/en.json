@@ -80,7 +80,9 @@
     "connectSuccess": "Connect Success",
     "flashSuccess": "Firmware Flash Success",
     "usb1Left": "USB1 Left",
-    "usb3Right": "USB3 Right"
+    "usb3Right": "USB3 Right",
+    "noLeftFirmware": "No left firmware found",
+    "noRightFirmware": "No right firmware found"
   },
   "docs": {
     "on_this_page": "On this page",

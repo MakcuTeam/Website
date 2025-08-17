@@ -72,7 +72,9 @@
     "connectSuccess": "连接成功",
     "flashSuccess": "固件刷写成功",
     "usb1Left": "USB1 左侧",
-    "usb3Right": "USB3 右侧"
+    "usb3Right": "USB3 右侧",
+    "noLeftFirmware": "未找到左侧固件",
+    "noRightFirmware": "未找到右侧固件"
   },
   "docs": {
     "on_this_page": "On this page",
