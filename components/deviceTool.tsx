@@ -143,6 +143,8 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
 
   const [progress, setProgress] = useState(0);
   const [onlineSelect, setOnlineSelect] = useState<string>();
+  const [browserSupported, setBrowserSupported] = useState(true);
+  const [showBrowserWarning, setShowBrowserWarning] = useState(true);
 
   const fileRef = useRef<HTMLInputElement>(null);
   const hasAutoConnected = useRef(false);
@@ -161,13 +163,12 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
     !Navigator.serial && Navigator.usb ? serial : Navigator.serial;
 
   useEffect(() => {
-    if (hasAutoConnected.current) return;
-    hasAutoConnected.current = true;
+    setBrowserSupported(!!(Navigator.serial || Navigator.usb));
+  }, []);
 
-    if (!Navigator.serial && !Navigator.usb) {
-      alert("Your web browser is not supported; please use Chrome");
-      return;
-    }
+  useEffect(() => {
+    if (hasAutoConnected.current || !browserSupported) return;
+    hasAutoConnected.current = true;
 
     const handleConnect = (event: Event) => {
       const port =
@@ -193,7 +194,7 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
     return () => {
       Navigator.serial?.removeEventListener("connect", handleConnect);
     };
-  }, []);
+  }, [browserSupported]);
 
   const connectToDevice = async (port?: SerialPort) => {
     if (isConnecting.current) return;
@@ -344,8 +345,33 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
     setConfig({ mode });
   };
 
+  useEffect(() => {
+    if (dict && !browserSupported) {
+      toast.warning(dict.tools.browserNotSupported);
+    }
+  }, [dict, browserSupported]);
+
   if (!dict) {
     return <Loading loading={true} className="w-full h-64" />;
+  }
+
+  if (!browserSupported) {
+    return (
+      <div>
+        {showBrowserWarning && (
+          <div className="mb-4 flex items-center justify-between rounded border border-yellow-200 bg-yellow-100 p-4 text-yellow-800">
+            <span>{dict.tools.browserNotSupported}</span>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowBrowserWarning(false)}
+            >
+              ×
+            </Button>
+          </div>
+        )}
+      </div>
+    );
   }
 
   return (

@@ -82,7 +82,8 @@
     "usb1Left": "USB1 Left",
     "usb3Right": "USB3 Right",
     "noLeftFirmware": "No left firmware found",
-    "noRightFirmware": "No right firmware found"
+    "noRightFirmware": "No right firmware found",
+    "browserNotSupported": "Your browser does not support Web Serial/WebUSB. Please use Chrome, Edge, or another Chromium-based browser."
   },
   "docs": {
     "on_this_page": "On this page",
