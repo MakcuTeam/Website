@@ -77,7 +77,9 @@
     "clearDebugInfo": "Clear Debug Info",
     "uploadFirmware": "Upload Firmware",
     "connectSuccess": "Connect Success",
-    "flashSuccess": "Firmware Flash Success"
+    "flashSuccess": "Firmware Flash Success",
+    "usb1Left": "USB1 Left",
+    "usb3Right": "USB3 Right"
   },
   "docs": {
     "on_this_page": "On this page",
