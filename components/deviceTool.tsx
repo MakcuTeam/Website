@@ -250,7 +250,7 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
       ],
       flashSize,
       eraseAll: false,
-      compress: true,
+      compress: false,
       flashMode,
       flashFreq,
       reportProgress(fileIndex, written, total) {
