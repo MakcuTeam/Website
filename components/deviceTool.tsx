@@ -350,18 +350,30 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectLabel>{dict.tools.usb1Left}</SelectLabel>
-                      {leftFiles.map((item) => (
-                        <SelectItem key={item.name} value={item.name}>
-                          {item.name}
+                      {leftFiles.length > 0 ? (
+                        leftFiles.map((item) => (
+                          <SelectItem key={item.name} value={item.name}>
+                            {item.name}
+                          </SelectItem>
+                        ))
+                      ) : (
+                        <SelectItem disabled value="no-left">
+                          {dict.tools.noLeftFirmware}
                         </SelectItem>
-                      ))}
+                      )}
                       <SelectSeparator />
                       <SelectLabel>{dict.tools.usb3Right}</SelectLabel>
-                      {rightFiles.map((item) => (
-                        <SelectItem key={item.name} value={item.name}>
-                          {item.name}
+                      {rightFiles.length > 0 ? (
+                        rightFiles.map((item) => (
+                          <SelectItem key={item.name} value={item.name}>
+                            {item.name}
+                          </SelectItem>
+                        ))
+                      ) : (
+                        <SelectItem disabled value="no-right">
+                          {dict.tools.noRightFirmware}
                         </SelectItem>
-                      ))}
+                      )}
                     </SelectContent>
                   </Select>
                 </div>
