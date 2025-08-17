@@ -17,7 +17,6 @@ import {
 import { ESPLoader, FlashOptions, LoaderOptions, Transport } from "esptool-js";
 import { serial } from "web-serial-polyfill";
 import { getDictionary, Dictionary } from "@/lib/dictionaries";
-import { ALLOWED_DEVICES, isAllowedDevice } from "@/lib/serialDevices";
 import { Locale } from "@/lib/locale";
 import Loading from "./Loading";
 import { toast } from "sonner";
@@ -162,49 +161,20 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
   }, []);
 
   const tryAutoConnect = async () => {
-    const ports = await serialLib.getPorts();
-    const allowed = ports.filter((p) => isAllowedDevice(p.getInfo()));
-    if (allowed.length === 0) {
-      handleAddInfo(
-        "MAKCU Not found:\nHold button,\nconnect usb cable,\nlet go of button",
-      );
-      return;
-    }
-    allowed.sort(
-      (a, b) =>
-        ALLOWED_DEVICES.findIndex(
-          (d) =>
-            d.vendorId === a.getInfo().usbVendorId &&
-            d.productId === a.getInfo().usbProductId,
-        ) -
-        ALLOWED_DEVICES.findIndex(
-          (d) =>
-            d.vendorId === b.getInfo().usbVendorId &&
-            d.productId === b.getInfo().usbProductId,
-        ),
-    );
-    connectToDevice(allowed[0] as unknown as SerialPortLike);
+    connectToDevice();
   };
 
   useEffect(() => {
     if (!browserSupported) return;
 
-    const handleConnect = (event: Event) => {
-      const port =
-        (event as unknown as { target?: SerialPortLike; port?: SerialPortLike })
-          .target ||
-        (event as unknown as { port?: SerialPortLike }).port;
-      if (port && isAllowedDevice(port.getInfo())) {
-        connectToDevice(port);
-      } else {
-        connectToDevice();
-      }
+    const handleConnect = () => {
+      connectToDevice();
     };
 
     const handleDisconnect = () => {
       setDevice(null);
       setEsploader(null);
-      tryAutoConnect();
+      connectToDevice();
     };
 
     Navigator.serial?.addEventListener("connect", handleConnect);
@@ -224,14 +194,8 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
     setLoading(true);
     try {
       let selectedPort = port;
-      if (!selectedPort || !isAllowedDevice(selectedPort.getInfo())) {
+      if (!selectedPort) {
         selectedPort = (await serialLib.requestPort()) as unknown as SerialPortLike;
-        if (!isAllowedDevice(selectedPort.getInfo())) {
-          const msg = "Unsupported device";
-          handleAddInfo(msg);
-          toast.error(msg);
-          return;
-        }
       }
 
       const transport = new Transport(selectedPort, false, false);
