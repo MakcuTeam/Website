@@ -30,6 +30,21 @@ interface DataListType {
   downloadUrl: string;
 }
 
+export const sideFilters: Record<"left" | "right", RegExp> = {
+  left: /LEFT/i,
+  right: /RIGHT/i,
+};
+
+export const getFilesBySide = (
+  files: DataListType[],
+  side: keyof typeof sideFilters,
+): DataListType[] =>
+  files
+    .filter((item) => sideFilters[side].test(item.name))
+    .sort((a, b) =>
+      b.name.localeCompare(a.name, undefined, { numeric: true }),
+    );
+
 export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
   const [dict, setDict] = useState<Dictionary>();
   const debugRef = useRef<DebugWindowRef | null>(null);
@@ -60,18 +75,17 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
       dataList.sort((a, b) =>
         b.name.localeCompare(a.name, undefined, { numeric: true })
       );
-      const left = dataList
-        .filter((item) => /LEFT/i.test(item.name))
-        .sort((a, b) =>
-          b.name.localeCompare(a.name, undefined, { numeric: true })
-        );
-      const right = dataList
-        .filter((item) => /RIGHT/i.test(item.name))
-        .sort((a, b) =>
-          b.name.localeCompare(a.name, undefined, { numeric: true })
-        );
-      setLeftFiles(left);
-      setRightFiles(right);
+      const filesBySide = {} as Record<
+        keyof typeof sideFilters,
+        DataListType[]
+      >;
+      (Object.keys(sideFilters) as (keyof typeof sideFilters)[]).forEach(
+        (side) => {
+          filesBySide[side] = getFilesBySide(dataList, side);
+        }
+      );
+      setLeftFiles(filesBySide.left);
+      setRightFiles(filesBySide.right);
       setOnlineDataList(dataList);
     } catch (error) {
       console.error("Failed to fetch online data list", error);
