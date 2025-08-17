@@ -49,23 +49,30 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
     try {
       const res = await fetch("/api/makcu");
       if (!res.ok) throw new Error("network");
-      const data: DataListType[] = await res.json();
-      data.sort((a, b) =>
+      const data: unknown = await res.json();
+      if (!Array.isArray(data)) {
+        const message = "Invalid data format received from server.";
+        handleAddInfo(message);
+        toast.error(message);
+        return;
+      }
+      const dataList = data as DataListType[];
+      dataList.sort((a, b) =>
         b.name.localeCompare(a.name, undefined, { numeric: true })
       );
-      const left = data
+      const left = dataList
         .filter((item) => /LEFT/i.test(item.name))
         .sort((a, b) =>
           b.name.localeCompare(a.name, undefined, { numeric: true })
         );
-      const right = data
+      const right = dataList
         .filter((item) => /RIGHT/i.test(item.name))
         .sort((a, b) =>
           b.name.localeCompare(a.name, undefined, { numeric: true })
         );
       setLeftFiles(left);
       setRightFiles(right);
-      setOnlineDataList(data);
+      setOnlineDataList(dataList);
     } catch (error) {
       console.error("Failed to fetch online data list", error);
       handleAddInfo(
