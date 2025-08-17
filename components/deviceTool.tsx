@@ -143,7 +143,6 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
   const [showBrowserWarning, setShowBrowserWarning] = useState(true);
 
   const fileRef = useRef<HTMLInputElement>(null);
-  const hasAutoConnected = useRef(false);
   const isConnecting = useRef(false);
 
   useEffect(() => {
@@ -162,9 +161,31 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
     setBrowserSupported(!!(Navigator.serial || Navigator.usb));
   }, []);
 
+  const tryAutoConnect = async () => {
+    const ports = await serialLib.getPorts();
+    const allowed = ports.filter((p) => isAllowedDevice(p.getInfo()));
+    if (allowed.length > 0) {
+      allowed.sort(
+        (a, b) =>
+          ALLOWED_DEVICES.findIndex(
+            (d) =>
+              d.vendorId === a.getInfo().usbVendorId &&
+              d.productId === a.getInfo().usbProductId,
+          ) -
+          ALLOWED_DEVICES.findIndex(
+            (d) =>
+              d.vendorId === b.getInfo().usbVendorId &&
+              d.productId === b.getInfo().usbProductId,
+          ),
+      );
+      connectToDevice(allowed[0] as unknown as SerialPortLike);
+    } else {
+      connectToDevice();
+    }
+  };
+
   useEffect(() => {
-    if (hasAutoConnected.current || !browserSupported) return;
-    hasAutoConnected.current = true;
+    if (!browserSupported) return;
 
     const handleConnect = (event: Event) => {
       const port =
@@ -178,33 +199,20 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
       }
     };
 
-    Navigator.serial?.addEventListener("connect", handleConnect);
+    const handleDisconnect = () => {
+      setDevice(null);
+      setEsploader(null);
+      tryAutoConnect();
+    };
 
-    (async () => {
-      const ports = await serialLib.getPorts();
-      const allowed = ports.filter((p) => isAllowedDevice(p.getInfo()));
-      if (allowed.length > 0) {
-        allowed.sort(
-          (a, b) =>
-            ALLOWED_DEVICES.findIndex(
-              (d) =>
-                d.vendorId === a.getInfo().usbVendorId &&
-                d.productId === a.getInfo().usbProductId,
-            ) -
-            ALLOWED_DEVICES.findIndex(
-              (d) =>
-                d.vendorId === b.getInfo().usbVendorId &&
-                d.productId === b.getInfo().usbProductId,
-            ),
-        );
-        connectToDevice(allowed[0] as unknown as SerialPortLike);
-      } else {
-        connectToDevice();
-      }
-    })();
+    Navigator.serial?.addEventListener("connect", handleConnect);
+    Navigator.serial?.addEventListener("disconnect", handleDisconnect);
+
+    tryAutoConnect();
 
     return () => {
       Navigator.serial?.removeEventListener("connect", handleConnect);
+      Navigator.serial?.removeEventListener("disconnect", handleDisconnect);
     };
   }, [browserSupported]);
 
