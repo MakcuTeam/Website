@@ -233,6 +233,14 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
 
   const createFlashOptions = (buffer: ArrayBuffer): FlashOptions => {
     const data = Buffer.from(buffer).toString("binary");
+    const chip = esploader?.chip as {
+      flashMode?: string;
+      flashFreq?: string;
+      flashSize?: string;
+    } | undefined;
+    const flashMode = chip?.flashMode ?? "dio";
+    const flashFreq = chip?.flashFreq ?? "40m";
+    const flashSize = chip?.flashSize ?? "keep";
     return {
       fileArray: [
         {
@@ -240,11 +248,11 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
           address: 0x0,
         },
       ],
-      flashSize: "keep",
+      flashSize,
       eraseAll: false,
       compress: true,
-      flashMode: "dio",
-      flashFreq: "40m",
+      flashMode,
+      flashFreq,
       reportProgress(fileIndex, written, total) {
         setProgress((written / total) * 100);
       },
