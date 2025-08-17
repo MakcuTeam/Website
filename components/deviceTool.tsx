@@ -16,12 +16,15 @@ import {
 } from "@/components/ui/select";
 import { ESPLoader, FlashOptions, LoaderOptions, Transport } from "esptool-js";
 import { serial } from "web-serial-polyfill";
+import type { SerialPort as PolyfillSerialPort } from "web-serial-polyfill";
 import { getDictionary, Dictionary } from "@/lib/dictionaries";
 import { Locale } from "@/lib/locale";
 import Loading from "./Loading";
 import { toast } from "sonner";
 import { DebugWindow, DebugWindowRef } from "@/components/DebugWindow";
 import { Buffer } from "buffer";
+
+type SerialPortLike = SerialPort | PolyfillSerialPort;
 
 interface DataListType {
   name: string;
@@ -172,9 +175,9 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
 
     const handleConnect = (event: Event) => {
       const port =
-        (event as unknown as { target?: SerialPort; port?: SerialPort })
+        (event as unknown as { target?: SerialPortLike; port?: SerialPortLike })
           .target ||
-        (event as unknown as { port?: SerialPort }).port;
+        (event as unknown as { port?: SerialPortLike }).port;
       if (port) {
         connectToDevice(port);
       }
@@ -185,7 +188,7 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
     (async () => {
       const ports = await serialLib.getPorts();
       if (ports.length > 0) {
-        connectToDevice(ports[0]);
+        connectToDevice(ports[0] as SerialPortLike);
       } else {
         connectToDevice();
       }
@@ -196,12 +199,12 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
     };
   }, [browserSupported]);
 
-  const connectToDevice = async (port?: SerialPort) => {
+  const connectToDevice = async (port?: SerialPortLike) => {
     if (isConnecting.current) return;
     isConnecting.current = true;
     setLoading(true);
     try {
-      const result = (port || (await serialLib.requestPort())) as SerialPort;
+      const result = (port || (await serialLib.requestPort())) as SerialPortLike;
       const transport = new Transport(result, false, false);
       const flashOptions = {
         transport,
