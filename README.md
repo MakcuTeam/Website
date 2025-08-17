@@ -50,4 +50,4 @@ pnpm start
 
 The API routes that list firmware files query the GitHub API. If you exceed the
 unauthenticated rate limit (60 requests per hour), set `GITHUB_TOKEN` to a
-personal access token to increase the limit.
+personal access token to increase the limit. 
