@@ -3,15 +3,45 @@ import { NextResponse } from "next/server";
 const GITHUB_CONTENTS_API =
   "https://api.github.com/repos/terrafirma2021/MAKCM_v2_files/contents";
 
+// Simple in-memory cache to avoid repeated HEAD requests which can quickly
+// exhaust GitHub's rate limits. Entries expire after a short TTL so updates
+// are eventually reflected.
+const CACHE_TTL = 1000 * 60 * 10; // 10 minutes
+const lastModifiedCache = new Map<
+  string,
+  { lastModified: string; fetchedAt: number }
+>();
+
+interface RateLimitError extends Error {
+  rateLimited?: boolean;
+}
+
 async function fetchLastModified(url: string, headers: HeadersInit) {
+  const cached = lastModifiedCache.get(url);
+  if (cached && Date.now() - cached.fetchedAt < CACHE_TTL) {
+    return cached.lastModified;
+  }
+
   try {
     const res = await fetch(url, { method: "HEAD", headers });
-    if (res.ok) {
-      return res.headers.get("last-modified") || "";
+    if (res.status === 403) {
+      throw Object.assign(new Error("Rate limit exceeded"), {
+        rateLimited: true,
+      });
     }
-  } catch {
+
+    if (res.ok) {
+      const lastModified = res.headers.get("last-modified") || "";
+      lastModifiedCache.set(url, { lastModified, fetchedAt: Date.now() });
+      return lastModified;
+    }
+  } catch (error) {
+    if ((error as RateLimitError)?.rateLimited) {
+      throw error;
+    }
     // ignore errors and fallback to empty string
   }
+
   return "";
 }
 
@@ -23,6 +53,13 @@ export async function GET() {
     }
 
     const res = await fetch(GITHUB_CONTENTS_API, { headers });
+    if (res.status === 403) {
+      return NextResponse.json(
+        { error: "GitHub rate limit exceeded", rateLimited: true },
+        { status: 403 }
+      );
+    }
+
     if (!res.ok) {
       return NextResponse.json(
         { error: "Failed to fetch repository contents" },
@@ -58,8 +95,16 @@ export async function GET() {
     );
 
     return NextResponse.json(fileDetails);
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Error listing makcu bin files:", error);
+
+    if ((error as RateLimitError)?.rateLimited) {
+      return NextResponse.json(
+        { error: "GitHub rate limit exceeded", rateLimited: true },
+        { status: 403 }
+      );
+    }
+
     return NextResponse.json(
       { error: "Failed to list resource files" },
       { status: 500 }
