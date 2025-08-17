@@ -113,11 +113,15 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
       } as LoaderOptions;
 
       const loader = new ESPLoader(flashOptions);
-      await loader.main().then(() => {
-        toast.success(dict?.tools.connectSuccess);
-      });
+      await loader.main();
+      toast.success(dict?.tools.connectSuccess);
       setDevice(transport);
       setEsploader(loader);
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : String(error);
+      handleAddInfo(message);
+      toast.error(message);
     } finally {
       setLoading(false);
     }
