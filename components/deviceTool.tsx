@@ -209,7 +209,7 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
       const transport = new Transport(result, false, false);
       const flashOptions = {
         transport,
-        baudrate: 115200,
+        baudrate: 921600,
         terminal: {
           clean() {
             handleClearInfo();
