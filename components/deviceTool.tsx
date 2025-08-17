@@ -90,7 +90,7 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
   const connectToDevice = async () => {
     setLoading(true);
     try {
-      const result = await serialLib.requestPort();
+      const result = (await serialLib.requestPort()) as unknown as SerialPort;
       const transport = new Transport(result, false, false);
       const flashOptions = {
         transport,
