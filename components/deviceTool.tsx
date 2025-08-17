@@ -7,6 +7,7 @@ import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectLabel,
   SelectItem,
   SelectSeparator,
@@ -374,31 +375,35 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
                       <SelectValue placeholder={dict.tools.list} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectLabel>{dict.tools.usb1Left}</SelectLabel>
-                      {leftFiles.length > 0 ? (
-                        leftFiles.map((item) => (
-                          <SelectItem key={item.name} value={item.name}>
-                            {item.name}
+                      <SelectGroup>
+                        <SelectLabel>{dict.tools.usb1Left}</SelectLabel>
+                        {leftFiles.length > 0 ? (
+                          leftFiles.map((item) => (
+                            <SelectItem key={item.name} value={item.name}>
+                              {item.name}
+                            </SelectItem>
+                          ))
+                        ) : (
+                          <SelectItem disabled value="no-left">
+                            {dict.tools.noLeftFirmware}
                           </SelectItem>
-                        ))
-                      ) : (
-                        <SelectItem disabled value="no-left">
-                          {dict.tools.noLeftFirmware}
-                        </SelectItem>
-                      )}
+                        )}
+                      </SelectGroup>
                       <SelectSeparator />
-                      <SelectLabel>{dict.tools.usb3Right}</SelectLabel>
-                      {rightFiles.length > 0 ? (
-                        rightFiles.map((item) => (
-                          <SelectItem key={item.name} value={item.name}>
-                            {item.name}
+                      <SelectGroup>
+                        <SelectLabel>{dict.tools.usb3Right}</SelectLabel>
+                        {rightFiles.length > 0 ? (
+                          rightFiles.map((item) => (
+                            <SelectItem key={item.name} value={item.name}>
+                              {item.name}
+                            </SelectItem>
+                          ))
+                        ) : (
+                          <SelectItem disabled value="no-right">
+                            {dict.tools.noRightFirmware}
                           </SelectItem>
-                        ))
-                      ) : (
-                        <SelectItem disabled value="no-right">
-                          {dict.tools.noRightFirmware}
-                        </SelectItem>
-                      )}
+                        )}
+                      </SelectGroup>
                     </SelectContent>
                   </Select>
                 </div>
