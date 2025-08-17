@@ -73,30 +73,15 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
   const fetchOnlineDataList = async () => {
     try {
       const res = await fetch("/api/makcu");
-      handleAddInfo(`Request status: ${res.status}`);
-      console.log("Request status:", res.status);
       if (!res.ok) throw new Error("network");
       try {
         const raw: unknown = await res.json();
-        handleAddInfo(`Raw JSON: ${JSON.stringify(raw)}`);
-        console.log("Raw JSON:", raw);
         if (!Array.isArray(raw)) {
           throw new Error("Invalid data format received from server.");
         }
-        const dataList = (raw as DataListType[]).filter((item) => {
-          if (!item.downloadUrl) {
-            const msg = `Missing downloadUrl for entry: ${JSON.stringify(
-              item,
-            )}`;
-            handleAddInfo(msg);
-            console.log(msg);
-            return false;
-          }
-          const msg = `Download URL for ${item.name}: ${item.downloadUrl}`;
-          handleAddInfo(msg);
-          console.log(msg);
-          return true;
-        });
+        const dataList = (raw as DataListType[]).filter(
+          (item) => !!item.downloadUrl,
+        );
         dataList.sort((a, b) =>
           b.name.localeCompare(a.name, undefined, { numeric: true }),
         );
@@ -109,8 +94,6 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
             filesBySide[side] = getFilesBySide(dataList, side);
           },
         );
-        handleAddInfo(`filesBySide: ${JSON.stringify(filesBySide)}`);
-        console.log("filesBySide:", filesBySide);
         setLeftFiles(filesBySide.left);
         setRightFiles(filesBySide.right);
         setOnlineDataList(dataList);
@@ -311,14 +294,16 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
     }
 
     try {
-      const urlMsg = `Selected firmware URL: ${selected.downloadUrl}`;
-      handleAddInfo(urlMsg);
-      console.log(urlMsg);
+      if (process.env.NODE_ENV !== "production") {
+        console.debug(`Selected firmware URL: ${selected.downloadUrl}`);
+      }
       if (!/^https:\/\/raw\.githubusercontent\.com\//.test(selected.downloadUrl)) {
         const warnMsg =
           "Warning: selected firmware URL may not be a raw.githubusercontent.com resource";
         handleAddInfo(warnMsg);
-        console.warn(warnMsg);
+        if (process.env.NODE_ENV !== "production") {
+          console.warn(warnMsg);
+        }
       }
       handleAddInfo(`Downloading ${selected.name}...`);
       const response = await fetch(selected.downloadUrl);
