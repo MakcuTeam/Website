@@ -383,7 +383,7 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
       <div className="flex flex-row gap-5">
         <Loading
           loading={loading}
-          className="border w-full h-full rounded flex flex-row items-center justify-between relative backdrop-blur-sm "
+          className="border w-full h-64 rounded flex flex-row items-center justify-between relative backdrop-blur-sm "
         >
           <div className="flex items-left flex-col gap-8 flex-1 p-5 ">
             <div className="flex items-center gap-3">
