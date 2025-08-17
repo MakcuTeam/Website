@@ -17,6 +17,7 @@ import {
 import { ESPLoader, FlashOptions, LoaderOptions, Transport } from "esptool-js";
 import { serial } from "web-serial-polyfill";
 import { getDictionary, Dictionary } from "@/lib/dictionaries";
+import { ALLOWED_DEVICES, isAllowedDevice } from "@/lib/serialDevices";
 import { Locale } from "@/lib/locale";
 import Loading from "./Loading";
 import { toast } from "sonner";
@@ -170,8 +171,10 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
         (event as unknown as { target?: SerialPortLike; port?: SerialPortLike })
           .target ||
         (event as unknown as { port?: SerialPortLike }).port;
-      if (port) {
+      if (port && isAllowedDevice(port.getInfo())) {
         connectToDevice(port);
+      } else {
+        connectToDevice();
       }
     };
 
@@ -179,8 +182,22 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
 
     (async () => {
       const ports = await serialLib.getPorts();
-      if (ports.length > 0) {
-        connectToDevice(ports[0] as unknown as SerialPortLike);
+      const allowed = ports.filter((p) => isAllowedDevice(p.getInfo()));
+      if (allowed.length > 0) {
+        allowed.sort(
+          (a, b) =>
+            ALLOWED_DEVICES.findIndex(
+              (d) =>
+                d.vendorId === a.getInfo().usbVendorId &&
+                d.productId === a.getInfo().usbProductId,
+            ) -
+            ALLOWED_DEVICES.findIndex(
+              (d) =>
+                d.vendorId === b.getInfo().usbVendorId &&
+                d.productId === b.getInfo().usbProductId,
+            ),
+        );
+        connectToDevice(allowed[0] as unknown as SerialPortLike);
       } else {
         connectToDevice();
       }
@@ -196,8 +213,18 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
     isConnecting.current = true;
     setLoading(true);
     try {
-      const result = (port || (await serialLib.requestPort())) as unknown as SerialPortLike;
-      const transport = new Transport(result, false, false);
+      let selectedPort = port;
+      if (!selectedPort || !isAllowedDevice(selectedPort.getInfo())) {
+        selectedPort = (await serialLib.requestPort()) as unknown as SerialPortLike;
+        if (!isAllowedDevice(selectedPort.getInfo())) {
+          const msg = "Unsupported device";
+          handleAddInfo(msg);
+          toast.error(msg);
+          return;
+        }
+      }
+
+      const transport = new Transport(selectedPort, false, false);
       const flashOptions = {
         transport,
         baudrate: 921600,
