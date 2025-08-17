@@ -15,8 +15,8 @@ import { RootState } from "@/store";
 
 export default function Home() {
   const dict = useDictionary();
-  const presenceCount = useSelector(
-    (state: RootState) => state.discord.data?.presence_count
+  const memberCount = useSelector(
+    (state: RootState) => state.discord.data?.member_count
   );
 
   const iconMap = {
@@ -84,7 +84,7 @@ export default function Home() {
             const IconComponent = iconMap[item.icon as keyof typeof iconMap];
             const number =
               item.icon === "users_round"
-                ? presenceCount?.toString() ?? ""
+                ? memberCount?.toString() ?? ""
                 : item.number;
             return (
               <InfoCard

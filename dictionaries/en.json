@@ -14,12 +14,12 @@
   "info": {
     "title": "Why are we better?",
     "list": [
-      {
-        "icon": "users_round",
-        "title": "Active Users",
-        "number": "",
-        "description": "We have a large number of active users and a strong technical team built by an excellent user community."
-      },
+        {
+          "icon": "users_round",
+          "title": "Server members",
+          "number": "",
+          "description": "We have a large number of active users and a strong technical team built by an excellent user community."
+        },
       {
         "icon": "mouse",
         "title": "Supported Mice",
