@@ -7,7 +7,7 @@ export type InfoCardProps = {
   >;
   title: string;
   number: string;
-  description: string;
+  description: string[];
 };
 export const InfoCard: React.FC<InfoCardProps> = (props) => {
   return (
@@ -18,7 +18,11 @@ export const InfoCard: React.FC<InfoCardProps> = (props) => {
       </div>
       <div className=" flex flex-col p-3 text-left gap-2">
         <span className="text-xl">{props.number}</span>
-        <p className="pt-2 text-sm">{props.description}</p>
+        <ul className="pt-2 text-sm space-y-1">
+          {props.description.map((line, index) => (
+            <li key={index}>{line}</li>
+          ))}
+        </ul>
       </div>
     </Card>
   );
