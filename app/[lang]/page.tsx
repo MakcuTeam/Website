@@ -3,8 +3,7 @@
 import InfoCard from "@/components/info-card";
 import LocalizedLink from "@/components/localized-link";
 import { buttonVariants } from "@/components/ui/button";
-import { Cpu, MoveUpRightIcon, UsersRound, Mouse } from "lucide-react";
-import Link from "next/link";
+import { Cpu, UsersRound, Mouse } from "lucide-react";
 import ProductImage from "@/assets/makcu.png";
 import Image from "next/image";
 import { DiscordCard } from "@/components/discord";
@@ -29,13 +28,9 @@ export default function Home() {
     <div className="flex flex-col px-2 sm:py-8 py-12 mt-32 gap-12">
       <div className="sm:flex-row flex flex-col gap-8 sm:gap-2 items-center">
         <div className="flex-1">
-          <Link
-            href="#"
-            className="mb-5 sm:text-lg flex items-center gap-2 underline underline-offset-4 sm:-mt-12"
-          >
+          <p className="mb-5 sm:text-lg underline underline-offset-4 sm:-mt-12">
             {dict.home.tips}
-            <MoveUpRightIcon className="w-4 h-4 font-extrabold" />
-          </Link>
+          </p>
           <h1 className=" text-3xl font-extrabold mb-4 sm:text-5xl">
             {dict.home.main_header}
           </h1>
