@@ -168,15 +168,39 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
       alert("Your web browser is not supported; please use Chrome");
       return;
     }
-    connectToDevice();
+
+    const handleConnect = (event: Event) => {
+      const port =
+        (event as unknown as { target?: SerialPort; port?: SerialPort })
+          .target ||
+        (event as unknown as { port?: SerialPort }).port;
+      if (port) {
+        connectToDevice(port);
+      }
+    };
+
+    Navigator.serial?.addEventListener("connect", handleConnect);
+
+    (async () => {
+      const ports = await serialLib.getPorts();
+      if (ports.length > 0) {
+        connectToDevice(ports[0]);
+      } else {
+        connectToDevice();
+      }
+    })();
+
+    return () => {
+      Navigator.serial?.removeEventListener("connect", handleConnect);
+    };
   }, []);
 
-  const connectToDevice = async () => {
+  const connectToDevice = async (port?: SerialPort) => {
     if (isConnecting.current) return;
     isConnecting.current = true;
     setLoading(true);
     try {
-      const result = (await serialLib.requestPort()) as unknown as SerialPort;
+      const result = (port || (await serialLib.requestPort())) as SerialPort;
       const transport = new Transport(result, false, false);
       const flashOptions = {
         transport,
