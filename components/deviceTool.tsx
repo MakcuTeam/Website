@@ -140,7 +140,6 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
     mode: "online",
   });
   const [loading, setLoading] = useState(false);
-  const [device, setDevice] = useState<Transport | null>(null);
   const [esploader, setEsploader] = useState<ESPLoader | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
@@ -226,7 +225,6 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
       const loader = new ESPLoader(flashOptions);
       await loader.main();
       toast.success(dict?.tools.connectSuccess);
-      setDevice(transport);
       setEsploader(loader);
     } catch (error) {
       const message =
@@ -291,8 +289,9 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
     }
   };
 
-  const flashOnline = async () => {
-    const selected = onlineDataList.find((item) => item.name === onlineSelect);
+  const flashOnline = async (selectedName?: string) => {
+    const name = selectedName ?? onlineSelect;
+    const selected = onlineDataList.find((item) => item.name === name);
     if (!selected) {
       handleAddInfo("Selected firmware not found");
       return;
@@ -331,16 +330,9 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
     if (files && files.length > 0) {
       const [firstFile] = files;
       setSelectedFile(firstFile);
+      flashDevice(firstFile);
     } else {
       setSelectedFile(null);
-    }
-  };
-
-  const handleFlashClick = () => {
-    if (config.mode === "offline" && selectedFile) {
-      flashDevice(selectedFile);
-    } else if (config.mode === "online") {
-      flashOnline();
     }
   };
 
@@ -435,7 +427,13 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
               ) : (
                 <div className="flex items-center gap-3">
                   <Label>{dict.tools.onlineFlash}</Label>
-                  <Select value={onlineSelect} onValueChange={setOnlineSelect}>
+                  <Select
+                    value={onlineSelect}
+                    onValueChange={(value) => {
+                      setOnlineSelect(value);
+                      flashOnline(value);
+                    }}
+                  >
                     <SelectTrigger className="w-[180px]">
                       <SelectValue placeholder={dict.tools.list} />
                     </SelectTrigger>
@@ -473,15 +471,6 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
                   </Select>
                 </div>
               )}
-              <Button
-                size="sm"
-                onClick={handleFlashClick}
-                disabled={
-                  !device || (config.mode === "offline" && !selectedFile)
-                }
-              >
-                {dict.tools.flash}
-              </Button>
             </div>
           </div>
         </Loading>
