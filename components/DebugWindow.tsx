@@ -59,7 +59,7 @@ export const DebugWindow = forwardRef<
         ))}
       </div>
       <div className="p-4 border-t">
-        <Progress value={props.progress} max={10} aria-label="Loading..." />
+        <Progress value={props.progress} max={100} aria-label="Loading..." />
       </div>
     </div>
   );

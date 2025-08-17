@@ -73,7 +73,7 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
   const [esploader, setEsploader] = useState<ESPLoader | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
-  const [progress, setProgress] = useState(-1);
+  const [progress, setProgress] = useState(0);
   const [onlineSelect, setOnlineSelect] = useState<string>();
 
   const fileRef = useRef<HTMLInputElement>(null);
@@ -161,6 +161,7 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
 
     try {
       setLoading(true);
+      setProgress(0);
       await esploader.writeFlash(flashOptions);
       await esploader.after();
       handleAddInfo("Flash complete");
@@ -169,6 +170,7 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
       console.error("Flash error:", error);
     } finally {
       setLoading(false);
+      setProgress(0);
     }
   };
 
