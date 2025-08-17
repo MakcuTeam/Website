@@ -82,6 +82,9 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
             console.log(msg);
             return false;
           }
+          const msg = `Download URL for ${item.name}: ${item.downloadUrl}`;
+          handleAddInfo(msg);
+          console.log(msg);
           return true;
         });
         dataList.sort((a, b) =>
@@ -267,6 +270,15 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
     }
 
     try {
+      const urlMsg = `Selected firmware URL: ${selected.downloadUrl}`;
+      handleAddInfo(urlMsg);
+      console.log(urlMsg);
+      if (!/^https:\/\/raw\.githubusercontent\.com\//.test(selected.downloadUrl)) {
+        const warnMsg =
+          "Warning: selected firmware URL may not be a raw.githubusercontent.com resource";
+        handleAddInfo(warnMsg);
+        console.warn(warnMsg);
+      }
       handleAddInfo(`Downloading ${selected.name}...`);
       const response = await fetch(selected.downloadUrl);
       if (!response.ok) {
