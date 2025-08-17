@@ -63,36 +63,61 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
   const fetchOnlineDataList = async () => {
     try {
       const res = await fetch("/api/makcu");
+      handleAddInfo(`Request status: ${res.status}`);
+      console.log("Request status:", res.status);
       if (!res.ok) throw new Error("network");
-      const data: unknown = await res.json();
-      if (!Array.isArray(data)) {
-        const message = "Invalid data format received from server.";
-        handleAddInfo(message);
-        toast.error(message);
-        return;
-      }
-      const dataList = data as DataListType[];
-      dataList.sort((a, b) =>
-        b.name.localeCompare(a.name, undefined, { numeric: true })
-      );
-      const filesBySide = {} as Record<
-        keyof typeof sideFilters,
-        DataListType[]
-      >;
-      (Object.keys(sideFilters) as (keyof typeof sideFilters)[]).forEach(
-        (side) => {
-          filesBySide[side] = getFilesBySide(dataList, side);
+      try {
+        const raw: unknown = await res.json();
+        handleAddInfo(`Raw JSON: ${JSON.stringify(raw)}`);
+        console.log("Raw JSON:", raw);
+        if (!Array.isArray(raw)) {
+          throw new Error("Invalid data format received from server.");
         }
-      );
-      setLeftFiles(filesBySide.left);
-      setRightFiles(filesBySide.right);
-      setOnlineDataList(dataList);
+        const dataList = (raw as DataListType[]).filter((item) => {
+          if (!item.downloadUrl) {
+            const msg = `Missing downloadUrl for entry: ${JSON.stringify(
+              item,
+            )}`;
+            handleAddInfo(msg);
+            console.log(msg);
+            return false;
+          }
+          return true;
+        });
+        dataList.sort((a, b) =>
+          b.name.localeCompare(a.name, undefined, { numeric: true }),
+        );
+        const filesBySide = {} as Record<
+          keyof typeof sideFilters,
+          DataListType[]
+        >;
+        (Object.keys(sideFilters) as (keyof typeof sideFilters)[]).forEach(
+          (side) => {
+            filesBySide[side] = getFilesBySide(dataList, side);
+          },
+        );
+        handleAddInfo(`filesBySide: ${JSON.stringify(filesBySide)}`);
+        console.log("filesBySide:", filesBySide);
+        setLeftFiles(filesBySide.left);
+        setRightFiles(filesBySide.right);
+        setOnlineDataList(dataList);
+      } catch (err) {
+        console.error("Failed to parse online data list", err);
+        handleAddInfo("Failed to parse online data list");
+        toast.error("Failed to parse online data list");
+        setLeftFiles([]);
+        setRightFiles([]);
+        setOnlineDataList([]);
+      }
     } catch (error) {
       console.error("Failed to fetch online data list", error);
       handleAddInfo(
-        "Failed to fetch online data list. Please check your connection and try again."
+        "Failed to fetch online data list. Please check your connection and try again.",
       );
       toast.error("Failed to fetch online data list");
+      setLeftFiles([]);
+      setRightFiles([]);
+      setOnlineDataList([]);
     }
   };
 
