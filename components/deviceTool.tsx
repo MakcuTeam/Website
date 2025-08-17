@@ -445,7 +445,7 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
                       flashOnline(value);
                     }}
                   >
-                    <SelectTrigger className="w-[180px] text-sm">
+                    <SelectTrigger className="w-[12.7em] text-sm">
                       <SelectValue placeholder={dict.tools.list} />
                     </SelectTrigger>
                     <SelectContent>
