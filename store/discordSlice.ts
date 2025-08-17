@@ -43,7 +43,7 @@ export const fetchDiscordData = createAsyncThunk(
       }
       const data = await response.json();
       // 随机
-      data.members = data.members.sort(() => Math.random() - 0.5).slice(0, 19);
+      data.members = data.members.sort(() => Math.random() - 0.5).slice(0, 20);
       return data;
     } catch (error: any) {
       return rejectWithValue(error.message);
