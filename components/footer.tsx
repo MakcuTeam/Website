@@ -6,11 +6,7 @@ export function Footer() {
         <div className="flex items-center gap-3">
         
           <p className="text-center">
-            Copyright &copy; 2024 - 2025
-            <Link className="px-1 underline underline-offset-2" href="https://github.com/makcuTeam">
-              MakcuTeam
-            </Link>
-            .
+            Copyright &copy; 2024 - 2025 Makcu.
           </p>
         </div>
 
