@@ -74,7 +74,8 @@
     "usb1Left": "USB1 左侧",
     "usb3Right": "USB3 右侧",
     "noLeftFirmware": "未找到左侧固件",
-    "noRightFirmware": "未找到右侧固件"
+    "noRightFirmware": "未找到右侧固件",
+    "browserNotSupported": "您的浏览器不支持 Web Serial/WebUSB。请使用 Chrome、Edge 或其他基于 Chromium 的浏览器。"
   },
   "docs": {
     "on_this_page": "On this page",
