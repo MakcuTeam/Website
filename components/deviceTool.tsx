@@ -487,6 +487,18 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
         </Loading>
         <DebugWindow ref={debugRef} dict={dict} progress={progress} />
       </div>
+      <p className="mt-4 text-sm text-left relative z-10">
+        {dict.tools.driverNotice}
+        <a
+          href="https://github.com/terrafirma2021/MAKCM_v2_files/blob/main/CH343SER.EXE"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline text-blue-500"
+        >
+          {dict.tools.driverLink}
+        </a>
+        {dict.tools.driverNoticeEnd}
+      </p>
     </div>
   );
 };
