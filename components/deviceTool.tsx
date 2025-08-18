@@ -490,7 +490,7 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
       <p className="relative z-10 mt-4 text-sm text-left">
         {dict.tools.driverNotice}
         <a
-          href="https://github.com/terrafirma2021/MAKCM_v2_files/blob/main/CH343SER.EXE"
+          href="https://raw.githubusercontent.com/terrafirma2021/MAKCM_v2_files/main/CH343SER.EXE"
           target="_blank"
           rel="noopener noreferrer"
           className="underline text-blue-500"
