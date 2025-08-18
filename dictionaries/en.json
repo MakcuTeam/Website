@@ -82,7 +82,10 @@
     "usb3Right": "USB3 Right",
     "noLeftFirmware": "No left firmware found",
     "noRightFirmware": "No right firmware found",
-    "browserNotSupported": "Your browser does not support Web Serial/WebUSB. Please use Chrome, Edge, or another Chromium-based browser."
+    "browserNotSupported": "Your browser does not support Web Serial/WebUSB. Please use Chrome, Edge, or another Chromium-based browser.",
+    "driverNotice": "If you have not installed the CH343 driver yet then please click ",
+    "driverLink": "this link",
+    "driverNoticeEnd": " to download"
   },
   "docs": {
     "on_this_page": "On this page",
