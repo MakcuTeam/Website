@@ -1,4 +1,4 @@
-km.buttons(0/1)import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import Copy from "@/components/markdown/copy";
 import type { LangProps } from "@/lib/dictionaries";
 import type { Locale } from "@/lib/locale";
