@@ -118,7 +118,13 @@ function SubSection({ id, title, description, children }: SubSectionProps) {
   );
 }
 
-function SpecCard({ entries }: { entries: SpecEntry[] }) {
+function SpecCard({
+  entries,
+  footer,
+}: {
+  entries: SpecEntry[];
+  footer?: React.ReactNode;
+}) {
   return (
     <Card className="border-border/60 bg-card/90 shadow-lg">
       <CardContent className="p-6">
@@ -134,6 +140,11 @@ function SpecCard({ entries }: { entries: SpecEntry[] }) {
             </Fragment>
           ))}
         </div>
+        {footer ? (
+          <div className="mt-6 border-t border-border/60 pt-4 text-sm leading-relaxed text-muted-foreground">
+            {footer}
+          </div>
+        ) : null}
       </CardContent>
     </Card>
   );
@@ -395,6 +406,15 @@ export default async function ApiPage({ params }: LangProps) {
                     content: <CodeBlock code={`km.buttons(0)\r\n>>> `} />,
                   },
                 ]}
+                footer={
+                  <div className="space-y-2">
+                    <p>
+                      when enabled, users mouse buttons will submit a button mask change of
+                      buttons, this will run decoupled from the main command (like km.catch):
+                    </p>
+                    <CodeBlock code={`km.<mask>\r\n>>> `} />
+                  </div>
+                }
               />
             </SubSection>
           </Section>
