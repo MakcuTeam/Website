@@ -144,6 +144,24 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
   const fileRef = useRef<HTMLInputElement>(null);
   const isConnecting = useRef(false);
 
+  const flushWebCaches = async () => {
+    if (typeof window === "undefined" || typeof navigator === "undefined") return;
+    try {
+      if ("caches" in window) {
+        const keys = await caches.keys();
+        await Promise.all(keys.map((key) => caches.delete(key)));
+      }
+      if ("serviceWorker" in navigator && navigator.serviceWorker?.getRegistrations) {
+        const registrations = await navigator.serviceWorker.getRegistrations();
+        await Promise.all(registrations.map((registration) => registration.update()));
+      }
+      handleAddInfo("Cleared cached assets before establishing serial connection.");
+    } catch (error) {
+      console.warn("Failed to flush caches", error);
+      handleAddInfo("Warning: unable to fully clear cached assets before connecting.");
+    }
+  };
+
   useEffect(() => {
     const loadDictionary = async () => {
       const dictionary = await getDictionary(lang);
@@ -186,6 +204,7 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
     isConnecting.current = true;
     setLoading(true);
     try {
+      await flushWebCaches();
       const selectedPort = (await serialLib.requestPort()) as unknown as SerialPortLike;
 
       const transport = new Transport(selectedPort, false, false);

@@ -17,4 +17,6 @@ const Loading = React.forwardRef<HTMLDivElement, LoadingProps>(
   )
 );
 
+Loading.displayName = "Loading";
+
 export default Loading;

@@ -1,10 +1,6 @@
 import type { Metadata } from "next";
-import { ThemeProvider } from "@/components/contexts/theme-provider";
-import { Navbar } from "@/components/navbar";
 import { Space_Mono, Space_Grotesk, Noto_Serif_SC } from "next/font/google";
-import { Footer } from "@/components/footer";
 import { getDictionary, LangProps } from "@/lib/dictionaries";
-import { ClientDictionary } from "@/components/contexts/dictionary-provider";
 import { locales } from "@/lib/locale";
 import "@/styles/globals.css";
 import localFont from "next/font/local";
