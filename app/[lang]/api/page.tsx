@@ -84,8 +84,8 @@ const tocByLang: Record<Locale, TocItem[]> = {
     },
     { id: "echo", label: "Echo control (GET/SET)" },
     { id: "keyboard", label: "Keyboard" },
+    { id: "baud-binary", label: "Baud rate change" },
     { id: "limits", label: "Limits & Parsing" },
-    { id: "baud-binary", label: "Baud rate change ()" },
     { id: "tips", label: "Tips" },
   ],
   cn: [
@@ -139,8 +139,8 @@ const tocByLang: Record<Locale, TocItem[]> = {
     },
     { id: "echo", label: "回显控制 (GET/SET)" },
     { id: "keyboard", label: "键盘" },
+    { id: "baud-binary", label: "波特率变更" },
     { id: "limits", label: "限制与解析" },
-    { id: "baud-binary", label: "波特率（Binary RX）" },
     { id: "tips", label: "提示" },
   ],
 };
@@ -1034,85 +1034,9 @@ export default async function ApiPage({ params }: LangProps) {
           </Section>
 
           <Section
-            id="limits"
-            badge={t("Spec", "规格")}
-            title={t("Limits & Parsing", "限制与解析")}
-          >
-            <Card className="border-border/60 bg-card/90 shadow-lg">
-              <CardContent className="p-6">
-                <ul className="list-disc space-y-2 pl-5 text-sm text-muted-foreground">
-                  <li>
-                    {isCn ? (
-                      <span>
-                        贝塞尔分段：默认 1，<strong>最大 512</strong>
-                      </span>
-                    ) : (
-                      <span>
-                        Bézier segments: default 1, <strong>max 512</strong>
-                      </span>
-                    )}
-                  </li>
-                  <li>
-                    {isCn ? (
-                      <span>
-                        移动数值：<strong>int16</strong>（饱和）
-                      </span>
-                    ) : (
-                      <span>
-                        Movement integers: <strong>int16</strong> with saturation
-                      </span>
-                    )}
-                  </li>
-                  <li>
-                    {isCn ? (
-                      <span>
-                        滚轮：<strong>int8</strong>
-                      </span>
-                    ) : (
-                      <span>
-                        Wheel: <strong>int8</strong>
-                      </span>
-                    )}
-                  </li>
-                  <li>
-                    {t(
-                      "Legacy ASCII terminators: ",
-                      "传统 ASCII 终止符：",
-                    )}
-                    <span className="font-mono">\r</span>, <span className="font-mono">\n</span>,
-                    <span className="font-mono"> ;</span>
-                  </li>
-                  <li>
-                    {isCn ? (
-                      <span>
-                        支持二进制接收：<span className="font-mono">DE AD &lt;lenLE&gt; &lt;payload&gt;</span>
-                      </span>
-                    ) : (
-                      <span>
-                        Binary RX supported: <span className="font-mono">DE AD &lt;lenLE&gt; &lt;payload&gt;</span>
-                      </span>
-                    )}
-                  </li>
-                  <li>
-                    {isCn ? (
-                      <span>
-                        <span className="font-mono">echo(0)</span> 会抑制大多数 setter 回显；GET 仍会返回。
-                      </span>
-                    ) : (
-                      <span>
-                        <span className="font-mono">echo(0)</span> suppresses most setter echoes; GETs still reply
-                      </span>
-                    )}
-                  </li>
-                </ul>
-              </CardContent>
-            </Card>
-          </Section>
-
-          <Section
             id="baud-binary"
-            badge={t("Serial", "串口")}
-            title={t("Baud Rate (Binary RX)", "波特率（Binary RX）")}
+            badge={t("NEW API", "新 API")}
+            title={t("Baud rate change", "波特率变更")}
           >
             <SpecCard
               entries={[
@@ -1197,6 +1121,82 @@ export default async function ApiPage({ params }: LangProps) {
                 },
               ]}
             />
+          </Section>
+
+          <Section
+            id="limits"
+            badge={t("Spec", "规格")}
+            title={t("Limits & Parsing", "限制与解析")}
+          >
+            <Card className="border-border/60 bg-card/90 shadow-lg">
+              <CardContent className="p-6">
+                <ul className="list-disc space-y-2 pl-5 text-sm text-muted-foreground">
+                  <li>
+                    {isCn ? (
+                      <span>
+                        贝塞尔分段：默认 1，<strong>最大 512</strong>
+                      </span>
+                    ) : (
+                      <span>
+                        Bézier segments: default 1, <strong>max 512</strong>
+                      </span>
+                    )}
+                  </li>
+                  <li>
+                    {isCn ? (
+                      <span>
+                        移动数值：<strong>int16</strong>（饱和）
+                      </span>
+                    ) : (
+                      <span>
+                        Movement integers: <strong>int16</strong> with saturation
+                      </span>
+                    )}
+                  </li>
+                  <li>
+                    {isCn ? (
+                      <span>
+                        滚轮：<strong>int8</strong>
+                      </span>
+                    ) : (
+                      <span>
+                        Wheel: <strong>int8</strong>
+                      </span>
+                    )}
+                  </li>
+                  <li>
+                    {t(
+                      "Legacy ASCII terminators: ",
+                      "传统 ASCII 终止符：",
+                    )}
+                    <span className="font-mono">\r</span>, <span className="font-mono">\n</span>,
+                    <span className="font-mono"> ;</span>
+                  </li>
+                  <li>
+                    {isCn ? (
+                      <span>
+                        支持二进制接收：<span className="font-mono">DE AD &lt;lenLE&gt; &lt;payload&gt;</span>
+                      </span>
+                    ) : (
+                      <span>
+                        Binary RX supported: <span className="font-mono">DE AD &lt;lenLE&gt; &lt;payload&gt;</span>
+                      </span>
+                    )}
+                  </li>
+                  <li>
+                    {isCn ? (
+                      <span>
+                        <span className="font-mono">echo(0)</span> 会抑制大多数 setter 回显；GET 仍会返回。
+                      </span>
+                    ) : (
+                      <span>
+                        <span className="font-mono">echo(0)</span> suppresses most setter echoes; GETs still reply
+                      </span>
+                    )}
+                  </li>
+                </ul>
+              </CardContent>
+            </Card>
           </Section>
 
           <Section id="tips" badge={t("Notes", "备注")} title={t("Tips", "提示")}>
