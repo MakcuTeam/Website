@@ -438,7 +438,7 @@ export default async function ApiPage({ params }: LangProps) {
                     label: t("Response (GET)", "响应 (GET)"),
                     content: (
                       <div className="space-y-3">
-                        <CodeBlock code={`km.left(1)\r\n>>> `} />
+                        <CodeBlock code={`km.left(0/1)\r\n>>> `} />
                         <p className="text-xs text-muted-foreground">
                           {t(
                             "State bit view: 0=none, 1=physical, 2=software, 3=both.",
@@ -478,7 +478,7 @@ export default async function ApiPage({ params }: LangProps) {
                     label: t("Response (SET)", "响应 (SET)"),
                     content: (
                       <div className="space-y-3">
-                        <CodeBlock code={`km.left(1)\r\n>>> `} />
+                        <CodeBlock code={`km.left(0/1)\r\n>>> `} />
                         <p className="text-xs text-muted-foreground">
                           {isCn ? (
                             <span>
@@ -513,7 +513,7 @@ export default async function ApiPage({ params }: LangProps) {
                   },
                   {
                     label: t("Response (SET)", "响应 (SET)"),
-                    content: <CodeBlock code={`km.lock_ml(1)\r\n>>> `} />,
+                    content: <CodeBlock code={`km.lock_ml(0/1)\r\n>>> `} />,
                   },
                 ]}
               />
@@ -539,7 +539,7 @@ export default async function ApiPage({ params }: LangProps) {
                   },
                   {
                     label: t("Response (GET)", "响应 (GET)"),
-                    content: <CodeBlock code={`km.catch_ml(0)\n\r\n>>> `} />,
+                    content: <CodeBlock code={`km.catch_ml(0/1)\n\r\n>>> `} />,
                   },
                   {
                     label: t("Response (SET)", "响应 (SET)"),
@@ -610,7 +610,7 @@ export default async function ApiPage({ params }: LangProps) {
                   },
                   {
                     label: t("Response (SET)", "响应 (SET)"),
-                    content: <CodeBlock code={`km.lock_mx(1)\r\n>>> `} />,
+                    content: <CodeBlock code={`km.lock_mx(0/1)\r\n>>> `} />,
                   },
                 ]}
               />
@@ -634,7 +634,7 @@ export default async function ApiPage({ params }: LangProps) {
                   },
                   {
                     label: t("Response (SET)", "响应 (SET)"),
-                    content: <CodeBlock code={`km.lock_my-(0)\r\n>>> `} />,
+                    content: <CodeBlock code={`km.lock_my-(0/1)\r\n>>> `} />,
                   },
                 ]}
               />
