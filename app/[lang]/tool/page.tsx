@@ -3,7 +3,6 @@ import { getDictionary, LangProps } from "@/lib/dictionaries";
 
 const Tools = async ({ params }: LangProps) => {
   const { lang } = await params;
-  const dict = await getDictionary(lang);
 
   return (
     <div className="flex flex-col my-12 gap-6">

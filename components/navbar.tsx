@@ -3,7 +3,6 @@
 import { ModeToggle } from "@/components/theme-toggle";
 
 import { SheetLeftbar } from "./leftbar";
-import { page_routes } from "@/lib/routes-config";
 import { SheetClose } from "@/components/ui/sheet";
 import LangSelect from "./lang-select";
 import { Dictionary } from "@/lib/dictionaries";
@@ -45,7 +44,7 @@ export function Logo() {
     </LocalizedLink>
   );
 }
-import useStore, { RootState } from "@/store";
+import { RootState } from "@/store";
 import { useSelector } from "react-redux";
 export function NavMenu({
   isSheet = false,
@@ -62,6 +61,10 @@ export function NavMenu({
     //   href: `/docs${page_routes[0].href}`,
     //   absolute: true,
     // },
+    {
+      title: "api",
+      href: "/api",
+    },
     {
       title: "makcu_tools",
       href: "/tool",

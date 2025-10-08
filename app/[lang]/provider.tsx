@@ -8,6 +8,7 @@ import { Provider, useDispatch } from "react-redux";
 import store from "@/store";
 import { useEffect } from "react";
 import { fetchDiscordData } from "@/store/discordSlice";
+import { Dictionary } from "@/lib/dictionaries";
 
 export default function RootLayoutProvider({
   children,
@@ -15,7 +16,7 @@ export default function RootLayoutProvider({
 }: Readonly<
   {
     children: React.ReactNode;
-  } & { dict: any }
+  } & { dict: Dictionary }
 >) {
   return (
     <Provider store={store}>
@@ -29,7 +30,7 @@ function RootLayoutContent({
   dict,
 }: {
   children: React.ReactNode;
-  dict: any;
+  dict: Dictionary;
 }) {
   const dispatch = useDispatch<typeof store.dispatch>();
 

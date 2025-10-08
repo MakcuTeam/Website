@@ -46,6 +46,7 @@
   "navbar": {
     "links": {
       "guide": "Guide",
+      "api": "API",
       "blog": "Blog",
       "makcu_tools": "Online Flash Tools",
       "guides": "Guides",
