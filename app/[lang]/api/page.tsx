@@ -558,7 +558,7 @@ export default async function ApiPage({ params }: LangProps) {
 
             <SubSection
               id="buttons-global"
-              title={t("Buttons — global enable (GET/SET)", "按键 — 全局启用 (GET/SET)")}
+              title={t("Buttons streaming (GET/SET)", "按键 — 全局启用 (GET/SET)")}
             >
               <SpecCard
                 entries={[
