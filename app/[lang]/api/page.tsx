@@ -1,4 +1,4 @@
-import { Card, CardContent } from "@/components/ui/card";
+km.buttons(0/1)import { Card, CardContent } from "@/components/ui/card";
 import Copy from "@/components/markdown/copy";
 import type { LangProps } from "@/lib/dictionaries";
 import type { Locale } from "@/lib/locale";
@@ -568,7 +568,7 @@ export default async function ApiPage({ params }: LangProps) {
                   },
                   {
                     label: t("Response (GET)", "响应 (GET)"),
-                    content: <CodeBlock code={`km.buttons(0/1)\n\r\n>>> `} />,
+                    content: <CodeBlock code={`km.buttons(0/1)\r\n>>> `} />,
                   },
                   {
                     label: t("Response (SET)", "响应 (SET)"),
