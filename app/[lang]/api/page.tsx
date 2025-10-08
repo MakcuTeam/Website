@@ -85,7 +85,7 @@ const tocByLang: Record<Locale, TocItem[]> = {
     { id: "echo", label: "Echo control (GET/SET)" },
     { id: "keyboard", label: "Keyboard" },
     { id: "limits", label: "Limits & Parsing" },
-    { id: "baud-binary", label: "Baud Rate (Binary RX)" },
+    { id: "baud-binary", label: "Baud rate change ()" },
     { id: "tips", label: "Tips" },
   ],
   cn: [
