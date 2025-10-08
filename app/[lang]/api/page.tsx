@@ -859,7 +859,7 @@ export default async function ApiPage({ params }: LangProps) {
                   label: t("Response (SET)", "响应 (SET)"),
                   content: (
                     <div className="space-y-3">
-                      <CodeBlock code={`km.abs\r\n>>> `} />
+                      <CodeBlock code={`km.axis(act,1)\r\n>>> `} />
                       <p className="text-xs text-muted-foreground">
                         {t("Mode name only (not an echo).", "仅返回模式名称（非指令回显）。")}
                       </p>
