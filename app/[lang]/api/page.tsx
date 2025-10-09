@@ -424,13 +424,15 @@ export default async function ApiPage({ params }: LangProps) {
                       <li>
                         {isCn ? (
                           <span>
-                            部分流式响应在 <span className="font-mono">km.</span> 前缀后携带<strong>二进制</strong>（如
-                            <span className="font-mono">km.mouse&lt;bytes&gt;</span>）。行尾仍为 <span className="font-mono">CRLF</span> 与提示符。
+                            部分流式响应在 <span className="font-mono">km.</span> 前缀后携带<strong>二进制</strong>：
+                            <span className="font-mono">km.mouse&lt;8字节&gt;</span>、
+                            <span className="font-mono">km.buttons&lt;1字节掩码&gt;</span>。行尾仍为 <span className="font-mono">CRLF</span> 与提示符。
                           </span>
                         ) : (
                           <span>
-                            Some streaming replies carry <strong>binary</strong> after the <span className="font-mono">km.</span> prefix (e.g.
-                            <span className="font-mono">km.mouse&lt;bytes&gt;</span>). Lines still terminate with <span className="font-mono">CRLF</span> and the prompt.
+                            Some streaming replies carry <strong>binary</strong> after the <span className="font-mono">km.</span> prefix:
+                            <span className="font-mono">km.mouse&lt;8 bytes&gt;</span> and
+                            <span className="font-mono">km.buttons&lt;1-byte mask&gt;</span>. Lines still terminate with <span className="font-mono">CRLF</span> and the prompt.
                           </span>
                         )}
                       </li>
@@ -747,7 +749,7 @@ export default async function ApiPage({ params }: LangProps) {
             </SubSection>
           </Section>
 
-          {/* Streaming (moved above Position & Screen) */}
+          {/* Streaming */}
           <Section id="streaming" badge={t("Streaming", "流式")} title={t("Streaming", "流式")}>
             {/* Axis streaming */}
             <SubSection
@@ -764,11 +766,11 @@ export default async function ApiPage({ params }: LangProps) {
                     label: t("Params (SET)", "参数 (SET)"),
                     content: isCn ? (
                       <span className="font-mono">
-                        mode：0=关闭，1=绝对，2=相对，3=活动；period：1..1000（省略则保持不变）
+                        mode：0=关闭（off），1=绝对（abs），2=相对（rel），3=活动（act）；period_ms：1..1000（省略则保持原值）。关闭时可保留 period 但不会使用。
                       </span>
                     ) : (
                       <span className="font-mono">
-                        mode: 0=off, 1=abs, 2=rel, 3=act; period: 1..1000 (kept if omitted)
+                        mode: 0=off, 1=abs, 2=rel, 3=act; period_ms: 1..1000 (kept if omitted). When off, the stored period is retained but not used.
                       </span>
                     ),
                   },
@@ -776,20 +778,11 @@ export default async function ApiPage({ params }: LangProps) {
                     label: t("Response (GET)", "响应 (GET)"),
                     content: (
                       <div className="space-y-3">
-                        <CodeBlock code={`km.rel\r\n>>> `} />
+                        <CodeBlock code={`km.axis(rel,25)\r\n>>> `} />
                         <p className="text-sm text-muted-foreground">
-                          {isCn ? (
-                            <span>
-                              仅返回模式名称：<span className="font-mono">km.off</span> ｜
-                              <span className="font-mono">km.abs</span> ｜ <span className="font-mono">km.rel</span> ｜
-                              <span className="font-mono">km.act</span>。
-                            </span>
-                          ) : (
-                            <span>
-                              Mode name only: <span className="font-mono">km.off</span> |
-                              <span className="font-mono">km.abs</span> | <span className="font-mono">km.rel</span> |
-                              <span className="font-mono">km.act</span>.
-                            </span>
+                          {t(
+                            "Returns the resolved mode and current period.",
+                            "返回解析后的模式与当前周期。"
                           )}
                         </p>
                       </div>
@@ -801,7 +794,10 @@ export default async function ApiPage({ params }: LangProps) {
                       <div className="space-y-3">
                         <CodeBlock code={`km.axis(act,1)\r\n>>> `} />
                         <p className="text-sm text-muted-foreground">
-                          {t("Mode name only (not an echo).", "仅返回模式名称（非指令回显）。")}
+                          {t(
+                            "ACK returns the normalized pair (mode,period); not a verbatim echo; honors echo(0|1).",
+                            "ACK 返回标准化后的 (mode,period)；非原样回显；受 echo(0|1) 影响。"
+                          )}
                         </p>
                       </div>
                     ),
@@ -819,25 +815,25 @@ export default async function ApiPage({ params }: LangProps) {
                 entries={[
                   {
                     label: t("Command", "命令"),
-                    content: <span className="font-mono">buttons() / buttons(0|1|2)</span>,
+                    content: <span className="font-mono">buttons() / buttons(mode[,period_ms])</span>,
                   },
                   {
                     label: t("Params", "参数"),
                     content: isCn ? (
-                      <span className="font-mono">0=关闭（off），1=原始（raw），2=处理后（mut）</span>
+                      <span className="font-mono">mode：0=关闭（off），1=原始（raw/物理），2=处理后（mut/后编辑）；period_ms：1..1000（省略则保持原值；关闭时保留但不使用）。</span>
                     ) : (
-                      <span className="font-mono">0=off, 1=raw (physical), 2=mut (processed)</span>
+                      <span className="font-mono">mode: 0=off, 1=raw (physical), 2=mut (post-edit); period_ms: 1..1000 (kept if omitted; retained when off but not used).</span>
                     ),
                   },
                   {
                     label: t("Response (GET)", "响应 (GET)"),
                     content: (
                       <div className="space-y-3">
-                        <CodeBlock code={`km.buttons(off|raw|mut)\r\n>>> `} />
+                        <CodeBlock code={`km.buttons(mut,25)\r\n>>> `} />
                         <p className="text-xs text-muted-foreground">
                           {t(
-                            "Human-readable mode is returned (not a numeric echo).",
-                            "返回人类可读的模式名称（非数字回显）。",
+                            "Human-readable mode with current period (ms).",
+                            "人类可读模式名称及当前周期（毫秒）。"
                           )}
                         </p>
                       </div>
@@ -847,11 +843,11 @@ export default async function ApiPage({ params }: LangProps) {
                     label: t("Response (SET)", "响应 (SET)"),
                     content: (
                       <div className="space-y-3">
-                        <CodeBlock code={`km.buttons(mut)\r\n>>> `} />
+                        <CodeBlock code={`km.buttons(raw,10)\r\n>>> `} />
                         <p className="text-xs text-muted-foreground">
                           {t(
-                            "ACK reports the resolved mode name, subject to echo(0|1).",
-                            "ACK 返回解析后的模式名称，受 echo(0|1) 影响。",
+                            "ACK reports the normalized (mode,period); honors echo(0|1).",
+                            "ACK 返回标准化后的 (mode,period)；受 echo(0|1) 影响。"
                           )}
                         </p>
                       </div>
@@ -862,15 +858,22 @@ export default async function ApiPage({ params }: LangProps) {
                   <div className="space-y-2">
                     <p className="text-sm">
                       {isCn
-                        ? "启用后，设备在按钮掩码变化时主动上报："
-                        : "When enabled, the device proactively streams on button mask changes:"}
+                        ? "启用后且到达周期时，设备按变化去重后上报 1 字节掩码："
+                        : "When enabled and the period elapses, the device emits a de-duplicated 1-byte mask:"}
                     </p>
-                    <CodeBlock code={`km.buttons<mask>\r\n>>> `} />
-                    <p className="text-xs text-muted-foreground">
-                      {isCn
-                        ? "raw 模式：<mask> 为原始物理掩码；mut 模式：为处理后的有效掩码。"
-                        : "raw mode: <mask> is the physical mask; mut mode: processed/effective mask."}
-                    </p>
+                    <CodeBlock code={`km.buttons<mask_u8>\r\n>>> `} />
+                    <ul className="list-disc pl-5 text-xs text-muted-foreground space-y-1">
+                      <li>
+                        {isCn
+                          ? "raw：掩码为物理（未编辑）；mut：掩码为编辑后的有效状态。"
+                          : "raw: physical (pre-edit) mask; mut: processed (post-edit) mask."}
+                      </li>
+                      <li>
+                        {isCn
+                          ? "严格自门控（self-gated）：仅在达到 period_ms 时检查并发送；每种视图各自去重。"
+                          : "Strictly self-gated: only checks/sends when period_ms has elapsed; per-view de-duplication."}
+                      </li>
+                    </ul>
                   </div>
                 }
               />
@@ -885,7 +888,7 @@ export default async function ApiPage({ params }: LangProps) {
                 entries={[
                   {
                     label: t("Command", "命令"),
-                    content: <span className="font-mono">mouse() / mouse(0|1|2)</span>,
+                    content: <span className="font-mono">mouse() / mouse(mode[,period_ms])</span>,
                   },
                   {
                     label: t("Modes", "模式"),
@@ -896,16 +899,24 @@ export default async function ApiPage({ params }: LangProps) {
                     ),
                   },
                   {
+                    label: t("Params", "参数"),
+                    content: isCn ? (
+                      <span className="font-mono">period_ms：1..1000（省略则保持原值；关闭时保留但不使用）。到期按变化去重零抑制发送。</span>
+                    ) : (
+                      <span className="font-mono">period_ms: 1..1000 (kept if omitted; retained when off but unused). Rate-limited; zero-suppressed with de-dup.</span>
+                    ),
+                  },
+                  {
                     label: t("GET reply", "GET 响应"),
-                    content: <CodeBlock code={`km.mouse(off|raw|mut)\r\n>>> `} />,
+                    content: <CodeBlock code={`km.mouse(mut,25)\r\n>>> `} />,
                   },
                   {
                     label: t("SET reply", "SET 响应"),
                     content: (
                       <div className="space-y-3">
-                        <CodeBlock code={`km.mouse(mut)\r\n>>> `} />
+                        <CodeBlock code={`km.mouse(raw,10)\r\n>>> `} />
                         <p className="text-sm text-muted-foreground">
-                          {t("ACK reports resolved mode name (subject to echo).", "ACK 返回解析后的模式名称（受 echo 影响）。")}
+                          {t("ACK returns normalized (mode,period); honors echo.", "ACK 返回标准化后的 (mode,period)；受 echo 影响。")}
                         </p>
                       </div>
                     ),
@@ -941,14 +952,14 @@ export default async function ApiPage({ params }: LangProps) {
                         </ul>
                         <p className="text-sm text-muted-foreground">
                           {t(
-                            "*Raw mode: x/y are raw deltas. Mut mode: processed/effective after locks/catch. If absolute reporting is active via km.axis(abs), x/y are absolute screen-clamped coordinates.",
-                            "＊raw 模式：x/y 为原始增量。mut 模式：应用锁定/捕获后的有效值。若启用 km.axis(abs)，x/y 为屏幕限制的绝对坐标。",
+                            "*Raw: x/y are raw deltas. Mut: post-edit effective. If km.axis(abs) is active, x/y are absolute, clamped to screen.",
+                            "＊raw：x/y 为原始增量；mut：为编辑后的有效值。若启用 km.axis(abs)，x/y 为屏幕限制的绝对坐标。",
                           )}
                         </p>
                         <p className="text-sm text-muted-foreground">
                           {t(
-                            "If any field is not applicable, it is encoded as 00 to preserve the fixed spacing.",
-                            "若某字段不适用，则编码为 00 以保持固定长度与对齐。",
+                            "Non-applicable fields are encoded as 00 to preserve spacing.",
+                            "不适用字段以 00 编码以保持长度与对齐。",
                           )}
                         </p>
                       </div>
@@ -969,13 +980,9 @@ export default async function ApiPage({ params }: LangProps) {
                     </div>
                     <Tip>
                       {isCn ? (
-                        <span>
-                          所有多字节字段为<strong>小端</strong>；掩码为 u8。每帧固定为 8 字节：1+2+2+1+1+1。
-                        </span>
+                        <span>所有多字节字段为<strong>小端</strong>；每帧 8 字节：1+2+2+1+1+1。</span>
                       ) : (
-                        <span>
-                          All multi-byte fields are <strong>little-endian</strong>; mask is u8. Each frame is 8 bytes: 1+2+2+1+1+1.
-                        </span>
+                        <span>All multi-byte fields are <strong>little-endian</strong>; each frame is 8 bytes: 1+2+2+1+1+1.</span>
                       )}
                     </Tip>
                   </div>
