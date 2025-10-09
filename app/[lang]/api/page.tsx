@@ -43,7 +43,7 @@ const tocByLang: Record<Locale, TocItem[]> = {
         { id: "buttons-actuation", label: "Button actuation (SET)" },
         { id: "buttons-lock", label: "Button lock (GET/SET)" },
         { id: "buttons-catch", label: "Button catch (GET/SET)" },
-        { id: "buttons-global", label: "Global enable (GET/SET)" },
+        { id: "buttons-global", label: "Buttons streaming (GET/SET)" },
       ],
     },
     {
@@ -98,7 +98,7 @@ const tocByLang: Record<Locale, TocItem[]> = {
         { id: "buttons-actuation", label: "按键触发 (SET)" },
         { id: "buttons-lock", label: "按键锁定 (GET/SET)" },
         { id: "buttons-catch", label: "按键捕获 (GET/SET)" },
-        { id: "buttons-global", label: "全局启用 (GET/SET)" },
+        { id: "buttons-global", label: "按键流式 (GET/SET)" },
       ],
     },
     {
@@ -558,31 +558,71 @@ export default async function ApiPage({ params }: LangProps) {
 
             <SubSection
               id="buttons-global"
-              title={t("Buttons streaming (GET/SET)", "按键 — 全局启用 (GET/SET)")}
+              title={t("Buttons streaming (GET/SET)", "按键流式 (GET/SET)")}
             >
               <SpecCard
                 entries={[
                   {
                     label: t("Command", "命令"),
-                    content: <span className="font-mono">buttons() / buttons(0|1)</span>,
+                    content: <span className="font-mono">buttons() / buttons(0|1|2)</span>,
+                  },
+                  {
+                    label: t("Params", "参数"),
+                    content: isCn ? (
+                      <span className="font-mono">0=关闭（off），1=物理（act），2=有效（mut）</span>
+                    ) : (
+                      <span className="font-mono">0=off, 1=act (physical), 2=mut (effective)</span>
+                    ),
                   },
                   {
                     label: t("Response (GET)", "响应 (GET)"),
-                    content: <CodeBlock code={`km.buttons(0/1)\r\n>>> `} />,
+                    content: (
+                      <div className="space-y-3">
+                        <CodeBlock code={`km.buttons(off|act|mut)\r\n>>> `} />
+                        <p className="text-xs text-muted-foreground">
+                          {t(
+                            "Human-readable mode is returned (not a numeric echo).",
+                            "返回人类可读的模式名称（非数字回显）。",
+                          )}
+                        </p>
+                      </div>
+                    ),
                   },
                   {
                     label: t("Response (SET)", "响应 (SET)"),
-                    content: <CodeBlock code={`km.buttons(0/1)\r\n>>> `} />,
+                    content: (
+                      <div className="space-y-3">
+                        <CodeBlock code={`km.buttons(mut)\r\n>>> `} />
+                        <p className="text-xs text-muted-foreground">
+                          {t(
+                            "ACK reports the resolved mode name, subject to echo(0|1).",
+                            "ACK 返回解析后的模式名称，受 echo(0|1) 影响。",
+                          )}
+                        </p>
+                      </div>
+                    ),
                   },
                 ]}
                 footer={
                   <div className="space-y-2">
                     <p>
                       {isCn
-                        ? "启用后，用户按键会提交按钮掩码的变化，该流程与主指令解耦（类似 km.catch）："
-                        : "when enabled, users mouse buttons will submit a button mask change of buttons, this will run decoupled from the main command (like km.catch):"}
+                        ? "启用后，设备会在按钮掩码变化时主动上报："
+                        : "When enabled, the device proactively streams on button mask changes:"}
                     </p>
-                    <CodeBlock code={`km.<mask>\r\n>>> `} />
+                    <div className="space-y-2">
+                      <CodeBlock code={`km.<mask_act>\r\n>>> `} />
+                      <p className="text-xs text-muted-foreground">
+                        {t("In act mode (physical).", "act 模式（物理）。")}
+                      </p>
+                      <CodeBlock code={`km.<mask_mut>\r\n>>> `} />
+                      <p className="text-xs text-muted-foreground">
+                        {t(
+                          "In mut mode (effective after locks/catch/one-shot).",
+                          "mut 模式（应用锁定/捕获/一次性释放后）。",
+                        )}
+                      </p>
+                    </div>
                   </div>
                 }
               />
@@ -836,7 +876,7 @@ export default async function ApiPage({ params }: LangProps) {
                   label: t("Response (GET)", "响应 (GET)"),
                   content: (
                     <div className="space-y-3">
-                      <CodeBlock code={`(km.rel)\r\n>>> `} />
+                      <CodeBlock code={`km.rel\r\n>>> `} />
                       <p className="text-xs text-muted-foreground">
                         {isCn ? (
                           <span>
@@ -847,7 +887,7 @@ export default async function ApiPage({ params }: LangProps) {
                         ) : (
                           <span>
                             Mode name only: <span className="font-mono">km.off</span> |
-                            <span className="font-mono">km.abs</span> | <span className="font-mono"> km.rel</span> |
+                            <span className="font-mono">km.abs</span> | <span className="font-mono">km.rel</span> |
                             <span className="font-mono">km.act</span>.
                           </span>
                         )}
