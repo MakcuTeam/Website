@@ -73,6 +73,7 @@ const tocByLang: Record<Locale, TocItem[]> = {
       ],
     },
     { id: "axisstream", label: "Axis streaming (GET/SET)" },
+    { id: "mouse-composite", label: "Mouse composite streaming (GET/SET)" }, // NEW
     { id: "click-helper", label: "Click helper (SET)" },
     {
       id: "version-serial",
@@ -85,6 +86,7 @@ const tocByLang: Record<Locale, TocItem[]> = {
     { id: "echo", label: "Echo control (GET/SET)" },
     { id: "keyboard", label: "Keyboard" },
     { id: "baud-binary", label: "Baud rate change" },
+    { id: "baud-cmd", label: "Baud rate (GET/SET)" },
     { id: "limits", label: "Limits & Parsing" },
     { id: "tips", label: "Tips" },
   ],
@@ -128,6 +130,7 @@ const tocByLang: Record<Locale, TocItem[]> = {
       ],
     },
     { id: "axisstream", label: "轴数据流 (GET/SET)" },
+    { id: "mouse-composite", label: "鼠标复合流 (GET/SET)" }, // NEW
     { id: "click-helper", label: "点击辅助 (SET)" },
     {
       id: "version-serial",
@@ -140,6 +143,7 @@ const tocByLang: Record<Locale, TocItem[]> = {
     { id: "echo", label: "回显控制 (GET/SET)" },
     { id: "keyboard", label: "键盘" },
     { id: "baud-binary", label: "波特率变更" },
+    { id: "baud-cmd", label: "波特率 (GET/SET)" },
     { id: "limits", label: "限制与解析" },
     { id: "tips", label: "提示" },
   ],
@@ -413,6 +417,20 @@ export default async function ApiPage({ params }: LangProps) {
                           <span>
                             Setters echo the input as ACK unless suppressed by
                             <span className="font-mono">echo(0)</span>.
+                          </span>
+                        )}
+                      </li>
+                      <li>
+                        {isCn ? (
+                          <span>
+                            某些流式响应的 <span className="font-mono">km.</span> 负载是二进制（例如
+                            <span className="font-mono">km.mouse&lt;binary&gt;</span>）。行尾仍为 <span className="font-mono">CRLF</span> 与提示符。
+                          </span>
+                        ) : (
+                          <span>
+                            Some streaming replies carry binary after <span className="font-mono">km.</span> (e.g.
+                            <span className="font-mono">km.mouse&lt;binary&gt;</span>). Line still terminates with
+                            <span className="font-mono"> CRLF</span> and the prompt.
                           </span>
                         )}
                       </li>
@@ -903,6 +921,125 @@ export default async function ApiPage({ params }: LangProps) {
             />
           </Section>
 
+          {/* NEW: Mouse composite streaming */}
+          <Section
+            id="mouse-composite"
+            badge={t("Streaming", "流式")}
+            title={t("Mouse composite streaming (GET/SET)", "鼠标复合流 (GET/SET)")}
+          >
+            <SpecCard
+              entries={[
+                {
+                  label: t("Command", "命令"),
+                  content: <span className="font-mono">mouse() / mouse(0|1|2)</span>,
+                },
+                {
+                  label: t("Modes", "模式"),
+                  content: isCn ? (
+                    <span className="font-mono">0=关闭（off），1=原始（raw），2=处理后（mut）</span>
+                  ) : (
+                    <span className="font-mono">0=off, 1=raw, 2=mut</span>
+                  ),
+                },
+                {
+                  label: t("GET reply", "GET 响应"),
+                  content: <CodeBlock code={`km.mouse(off|raw|mut)\r\n>>> `} />,
+                },
+                {
+                  label: t("SET reply", "SET 响应"),
+                  content: (
+                    <div className="space-y-3">
+                      <CodeBlock code={`km.mouse(mut)\r\n>>> `} />
+                      <p className="text-xs text-muted-foreground">
+                        {t("ACK reports resolved mode name (subject to echo).", "ACK 返回解析后的模式名称（受 echo 影响）。")}
+                      </p>
+                    </div>
+                  ),
+                },
+                {
+                  label: t("Streaming format", "流格式"),
+                  content: (
+                    <div className="space-y-2">
+                      <p className="text-sm">
+                        {t(
+                          "While enabled, device emits one binary frame per event as:",
+                          "启用后，设备对每次事件发送一帧二进制：",
+                        )}
+                      </p>
+                      <CodeBlock code={`km.mouse<binary frame>\r\n>>> `} />
+                      <p className="text-xs text-muted-foreground">
+                        {t(
+                          "The bytes directly follow the ASCII prefix; line still ends with CRLF and prompt.",
+                          "字节紧随 ASCII 前缀之后；行尾仍是 CRLF 与提示符。",
+                        )}
+                      </p>
+                    </div>
+                  ),
+                },
+                {
+                  label: t("Binary layout (LE)", "二进制布局（小端）"),
+                  content: (
+                    <div className="space-y-2">
+                      <ul className="list-disc pl-5">
+                        <li>
+                          {t("mask: u16 — button bitmask", "mask：u16 — 按键位掩码")}
+                        </li>
+                        <li>
+                          {t("x: int16 — X delta/position*", "x：int16 — X 变化/位置*")}
+                        </li>
+                        <li>
+                          {t("y: int16 — Y delta/position*", "y：int16 — Y 变化/位置*")}
+                        </li>
+                        <li>
+                          {t("wheel: int8 — vertical wheel", "wheel：int8 — 垂直滚轮")}
+                        </li>
+                        <li>
+                          {t("pan: int8 — horizontal wheel (tilt-wheel)", "pan：int8 — 水平滚轮（倾斜）")}
+                        </li>
+                        <li>
+                          {t("tilt: int8 — additional tilt/aux axis", "tilt：int8 — 附加倾斜/辅助轴")}
+                        </li>
+                      </ul>
+                      <p className="text-xs text-muted-foreground">
+                        {t(
+                          "*In raw mode, x/y are raw deltas; in mut mode, they are the effective values after locks/catch etc. If absolute reporting is active via km.axis(abs), x/y represent absolute screen-clamped coordinates.",
+                          "＊raw 模式下 x/y 为原始增量；mut 模式下为锁定/捕获等处理后的有效值。若 km.axis(abs) 启用，x/y 报告屏幕限制的绝对坐标。",
+                        )}
+                      </p>
+                    </div>
+                  ),
+                },
+              ]}
+              footer={
+                <div className="space-y-3">
+                  <div>
+                    <div className="font-mono text-xs">Example (hex, raw):</div>
+                    <CodeBlock code={`km.mouse  07 00  05 00  FB FF  01  FF  00\r\n>>> `} />
+                    <p className="text-xs text-muted-foreground">
+                      {t(
+                        "mask=0x0007, x=+5, y=-5, wheel=+1, pan=-1, tilt=0",
+                        "mask=0x0007，x=+5，y=-5，wheel=+1，pan=-1，tilt=0",
+                      )}
+                    </p>
+                  </div>
+                  <Tip>
+                    {isCn ? (
+                      <span>
+                        数据为<strong>小端</strong>；mask 扩展为 u16 以兼容更多按钮。行首固定为{" "}
+                        <span className="font-mono">km.mouse</span> 前缀。
+                      </span>
+                    ) : (
+                      <span>
+                        All multi-byte fields are <strong>little-endian</strong>. The mask is u16 for future expansion. Each
+                        frame is prefixed by <span className="font-mono">km.mouse</span>.
+                      </span>
+                    )}
+                  </Tip>
+                </div>
+              }
+            />
+          </Section>
+
           <Section
             id="click-helper"
             badge={t("Helpers", "辅助")}
@@ -1156,6 +1293,70 @@ export default async function ApiPage({ params }: LangProps) {
             />
           </Section>
 
+          {/* Baud via ASCII command */}
+          <Section
+            id="baud-cmd"
+            badge={t("UART", "串口")}
+            title={t("Baud rate (GET/SET)", "波特率 (GET/SET)")}
+          >
+            <SpecCard
+              entries={[
+                {
+                  label: t("Command", "命令"),
+                  content: <span className="font-mono">baud() / baud(&lt;rate&gt;)</span>,
+                },
+                {
+                  label: t("Params", "参数"),
+                  content: isCn ? (
+                    <span className="font-mono">
+                      rate：115200 – 4000000（有效范围）；使用 <strong>0</strong> 重置为 115200。
+                    </span>
+                  ) : (
+                    <span className="font-mono">
+                      rate: 115200 – 4000000 (valid range); use <strong>0</strong> to reset to 115200.
+                    </span>
+                  ),
+                },
+                {
+                  label: t("Response (GET)", "响应 (GET)"),
+                  content: (
+                    <div className="space-y-3">
+                      <CodeBlock code={`km.baud(115200)\r\n>>> `} />
+                      <p className="text-xs text-muted-foreground">
+                        {t("Returns current baud rate.", "返回当前波特率。")}
+                      </p>
+                    </div>
+                  ),
+                },
+                {
+                  label: t("Response (SET)", "响应 (SET)"),
+                  content: (
+                    <div className="space-y-3">
+                      <CodeBlock code={`km.baud(921600)\r\n>>> `} />
+                      <p className="text-xs text-muted-foreground">
+                        {t(
+                          "Applies immediately; host must re-open serial port at new speed.",
+                          "立即生效；主机需以新波特率重新打开串口。",
+                        )}
+                      </p>
+                    </div>
+                  ),
+                },
+                {
+                  label: t("Reset (SET)", "重置 (SET)"),
+                  content: (
+                    <div className="space-y-3">
+                      <CodeBlock code={`km.baud(0)\r\n>>> `} />
+                      <p className="text-xs text-muted-foreground">
+                        {t("Resets to default 115200 baud.", "重置为默认 115200 波特率。")}
+                      </p>
+                    </div>
+                  ),
+                },
+              ]}
+            />
+          </Section>
+
           <Section
             id="limits"
             badge={t("Spec", "规格")}
@@ -1198,10 +1399,7 @@ export default async function ApiPage({ params }: LangProps) {
                     )}
                   </li>
                   <li>
-                    {t(
-                      "Legacy ASCII terminators: ",
-                      "传统 ASCII 终止符：",
-                    )}
+                    {t("Legacy ASCII terminators: ", "传统 ASCII 终止符：")}
                     <span className="font-mono">\r</span>, <span className="font-mono">\n</span>,
                     <span className="font-mono"> ;</span>
                   </li>
@@ -1224,6 +1422,17 @@ export default async function ApiPage({ params }: LangProps) {
                     ) : (
                       <span>
                         <span className="font-mono">echo(0)</span> suppresses most setter echoes; GETs still reply
+                      </span>
+                    )}
+                  </li>
+                  <li>
+                    {isCn ? (
+                      <span>
+                        波特率范围（ASCII <span className="font-mono">baud()</span>）：<strong>115200–4000000</strong>；<span className="font-mono">baud(0)</span> 重置为 115200。
+                      </span>
+                    ) : (
+                      <span>
+                        Baud range (ASCII <span className="font-mono">baud()</span>): <strong>115200–4000000</strong>; <span className="font-mono">baud(0)</span> resets to 115200.
                       </span>
                     )}
                   </li>
