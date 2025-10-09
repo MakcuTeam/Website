@@ -237,7 +237,7 @@ function CodeBlock({ code }: { code: string }) {
 function Tip({ children }: { children: React.ReactNode }) {
   return (
     <div className="rounded-xl border border-dashed border-border/70 bg-muted/40 px-4 py-3 text-sm text-muted-foreground">
-      {children}
+        {children}
     </div>
   );
 }
@@ -569,16 +569,16 @@ export default async function ApiPage({ params }: LangProps) {
                   {
                     label: t("Params", "参数"),
                     content: isCn ? (
-                      <span className="font-mono">0=关闭（off），1=物理（act），2=有效（mut）</span>
+                      <span className="font-mono">0=关闭（off），1=原始（raw），2=处理后（mut）</span>
                     ) : (
-                      <span className="font-mono">0=off, 1=act (physical), 2=mut (effective)</span>
+                      <span className="font-mono">0=off, 1=raw (physical), 2=mut (processed/mutilated)</span>
                     ),
                   },
                   {
                     label: t("Response (GET)", "响应 (GET)"),
                     content: (
                       <div className="space-y-3">
-                        <CodeBlock code={`km.buttons(off|act|mut)\r\n>>> `} />
+                        <CodeBlock code={`km.buttons(off|raw|mut)\r\n>>> `} />
                         <p className="text-xs text-muted-foreground">
                           {t(
                             "Human-readable mode is returned (not a numeric echo).",
@@ -607,22 +607,15 @@ export default async function ApiPage({ params }: LangProps) {
                   <div className="space-y-2">
                     <p>
                       {isCn
-                        ? "启用后，设备会在按钮掩码变化时主动上报："
-                        : "When enabled, the device proactively streams on button mask changes:"}
+                        ? "启用后，设备在按钮掩码变化时主动上报（前缀更新为）："
+                        : "When enabled, the device proactively streams on button mask changes (updated prefix):"}
                     </p>
-                    <div className="space-y-2">
-                      <CodeBlock code={`km.<mask_act>\r\n>>> `} />
-                      <p className="text-xs text-muted-foreground">
-                        {t("In act mode (physical).", "act 模式（物理）。")}
-                      </p>
-                      <CodeBlock code={`km.<mask_mut>\r\n>>> `} />
-                      <p className="text-xs text-muted-foreground">
-                        {t(
-                          "In mut mode (effective after locks/catch/one-shot).",
-                          "mut 模式（应用锁定/捕获/一次性释放后）。",
-                        )}
-                      </p>
-                    </div>
+                    <CodeBlock code={`km.buttons<mask>\r\n>>> `} />
+                    <p className="text-xs text-muted-foreground">
+                      {isCn
+                        ? "在 raw 模式，<mask> 为原始物理掩码；在 mut 模式，<mask> 为处理后（锁定/捕获等生效后）的掩码。"
+                        : "<mask> is raw physical in raw mode; in mut mode it is the processed/mutilated mask after locks/catch, etc."}
+                    </p>
                   </div>
                 }
               />
