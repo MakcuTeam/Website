@@ -84,9 +84,9 @@ const tocByLang: Record<Locale, TocItem[]> = {
     },
     { id: "echo", label: "Echo control (GET/SET)" },
     { id: "keyboard", label: "Keyboard" },
+    { id: "mouse-composite", label: "Mouse composite streaming (GET/SET)" },
     { id: "baud-binary", label: "Baud rate change (Binary)" },
-    { id: "settings", label: "SETTINGS (GET/SET)" }, // renamed from UART
-    { id: "mouse-composite", label: "Mouse composite streaming (GET/SET)" }, // moved below SETTINGS
+    { id: "uart", label: "UART (GET/SET)" },
     { id: "limits", label: "Limits & Parsing" },
     { id: "tips", label: "Tips" },
   ],
@@ -141,9 +141,9 @@ const tocByLang: Record<Locale, TocItem[]> = {
     },
     { id: "echo", label: "回显控制 (GET/SET)" },
     { id: "keyboard", label: "键盘" },
+    { id: "mouse-composite", label: "鼠标复合流 (GET/SET)" },
     { id: "baud-binary", label: "波特率变更（二进制）" },
-    { id: "settings", label: "设置 (GET/SET)" }, // renamed
-    { id: "mouse-composite", label: "鼠标复合流 (GET/SET)" }, // moved below SETTINGS
+    { id: "uart", label: "UART (GET/SET)" },
     { id: "limits", label: "限制与解析" },
     { id: "tips", label: "提示" },
   ],
@@ -165,9 +165,9 @@ const metadataCopy: Record<Locale, { title: string; description: string }> = {
 function Section({ id, badge, title, lead, children }: SectionProps) {
   return (
     <section id={id} className="scroll-mt-28">
-      <div className="sticky top-24 z-10 mb-6">
+      <div className="sticky top-24 z-10 mb-4">
         {badge ? (
-          <div className="inline-flex items-center gap-2 rounded-full border bg-background/80 px-4 py-1 text-xs uppercase tracking-[0.2em] text-muted-foreground backdrop-blur">
+          <div className="inline-flex items-center gap-2 rounded-full border bg-background/80 px-4 py-1 text-[11px] uppercase tracking-[0.3em] text-muted-foreground backdrop-blur">
             {badge}
           </div>
         ) : null}
@@ -203,13 +203,14 @@ function SpecCard({
   return (
     <Card className="border-border/60 bg-card/90 shadow-lg">
       <CardContent className="p-6">
-        <div className="grid gap-x-8 gap-y-6 lg:grid-cols-[minmax(180px,220px)_1fr]">
+        {/* fixed label rail so rows align across cards */}
+        <div className="grid gap-x-10 gap-y-5 lg:grid-cols-[200px_minmax(0,1fr)]">
           {entries.map((entry, index) => (
             <Fragment key={`${entry.label}-${index}`}>
-              <div className="text-xs font-semibold uppercase tracking-[0.25em] text-emerald-500">
+              <div className="text-[11px] font-semibold uppercase tracking-[0.25em] text-emerald-500">
                 {entry.label}
               </div>
-              <div className="space-y-4 text-sm leading-relaxed text-muted-foreground">
+              <div className="space-y-3 text-sm leading-relaxed text-muted-foreground">
                 {entry.content}
               </div>
             </Fragment>
@@ -232,7 +233,7 @@ function CodeBlock({ code }: { code: string }) {
       <div className="absolute right-2 top-2">
         <Copy content={code} />
       </div>
-      <pre className="whitespace-pre-wrap rounded-xl border border-border/60 bg-stone-950 px-4 pt-8 pb-3 font-mono text-xs text-stone-100 shadow-inner">
+      <pre className="overflow-x-auto whitespace-pre rounded-xl border border-border/60 bg-stone-950 px-4 py-8 font-mono text-xs text-stone-100 shadow-inner">
         {code}
       </pre>
     </div>
@@ -242,7 +243,7 @@ function CodeBlock({ code }: { code: string }) {
 function Tip({ children }: { children: React.ReactNode }) {
   return (
     <div className="rounded-xl border border-dashed border-border/70 bg-muted/40 px-4 py-3 text-sm text-muted-foreground">
-        {children}
+      {children}
     </div>
   );
 }
@@ -457,7 +458,7 @@ export default async function ApiPage({ params }: LangProps) {
                     content: (
                       <div className="space-y-3">
                         <CodeBlock code={`km.left(0/1)\r\n>>> `} />
-                        <p className="text-xs text-muted-foreground">
+                        <p className="text-sm text-muted-foreground">
                           {t(
                             "State bit view: 0=none, 1=physical, 2=software, 3=both.",
                             "状态位含义：0=无，1=物理，2=软件，3=两者。",
@@ -497,7 +498,7 @@ export default async function ApiPage({ params }: LangProps) {
                     content: (
                       <div className="space-y-3">
                         <CodeBlock code={`km.left(0/1)\r\n>>> `} />
-                        <p className="text-xs text-muted-foreground">
+                        <p className="text-sm text-muted-foreground">
                           {isCn ? (
                             <span>
                               回显 ACK（受 <span className="font-mono">echo(0|1)</span> 控制）。
@@ -527,7 +528,7 @@ export default async function ApiPage({ params }: LangProps) {
                   },
                   {
                     label: t("Response (GET)", "响应 (GET)"),
-                    content: <CodeBlock code={`km.lock_ml(0/1/2)\n\r\n>>> `} />,
+                    content: <CodeBlock code={`km.lock_ml(0/1/2)\r\n>>> `} />,
                   },
                   {
                     label: t("Response (SET)", "响应 (SET)"),
@@ -557,7 +558,7 @@ export default async function ApiPage({ params }: LangProps) {
                   },
                   {
                     label: t("Response (GET)", "响应 (GET)"),
-                    content: <CodeBlock code={`km.catch_ml(0/1)\n\r\n>>> `} />,
+                    content: <CodeBlock code={`km.catch_ml(0/1)\r\n>>> `} />,
                   },
                   {
                     label: t("Response (SET)", "响应 (SET)"),
@@ -571,56 +572,6 @@ export default async function ApiPage({ params }: LangProps) {
                     ),
                   },
                 ]}
-              />
-            </SubSection>
-
-            <SubSection
-              id="buttons-global"
-              title={t("Buttons streaming (GET/SET)", "按键流式 (GET/SET)")}
-            >
-              <SpecCard
-                entries={[
-                  {
-                    label: t("Command", "命令"),
-                    content: <span className="font-mono">buttons() / buttons(0|1|2)</span>,
-                  },
-                  {
-                    label: t("Params", "参数"),
-                    content: isCn ? (
-                      <span className="font-mono">0=关闭（off），1=原始（raw），2=处理后（mut）</span>
-                    ) : (
-                      <span className="font-mono">0=off, 1=raw (physical), 2=mut (processed/mutilated)</span>
-                    ),
-                  },
-                  {
-                    label: t("Response (GET)", "响应 (GET)"),
-                    content: (
-                      <div className="space-y-3">
-                        <CodeBlock code={`km.buttons(off|raw|mut)\r\n>>> `} />
-                        <p className="text-xs text-muted-foreground">
-                          {t(
-                            "Human-readable mode is returned (not a numeric echo).",
-                            "返回人类可读的模式名称（非数字回显）。",
-                          )}
-                        </p>
-                      </div>
-                    ),
-                  },
-                  {
-                    label: t("Response (SET)", "响应 (SET)"),
-                    content: (
-                      <div className="space-y-3">
-                        <CodeBlock code={`km.buttons(mut)\r\n>>> `} />
-                        <p className="text-xs text-muted-foreground">
-                          {t(
-                            "ACK reports the resolved mode name, subject to echo(0|1).",
-                            "ACK 返回解析后的模式名称，受 echo(0|1) 影响。",
-                          )}
-                        </p>
-                      </div>
-                    ),
-                  },
-                ]}
                 footer={
                   <div className="space-y-2">
                     <p className="text-sm">
@@ -629,7 +580,7 @@ export default async function ApiPage({ params }: LangProps) {
                         : "When enabled, the device proactively streams on button mask changes (updated prefix):"}
                     </p>
                     <CodeBlock code={`km.buttons<mask>\r\n>>> `} />
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-sm text-muted-foreground">
                       {isCn
                         ? "raw 模式：<mask> 为原始物理掩码；mut 模式：为处理后的有效掩码。"
                         : "raw mode: <mask> is the physical mask; mut mode: processed/effective mask."}
@@ -657,7 +608,7 @@ export default async function ApiPage({ params }: LangProps) {
                   },
                   {
                     label: t("Response (GET)", "响应 (GET)"),
-                    content: <CodeBlock code={`km.lock_mx(0/1)\n\r\n>>> `} />,
+                    content: <CodeBlock code={`km.lock_mx(0/1)\r\n>>> `} />,
                   },
                   {
                     label: t("Response (SET)", "响应 (SET)"),
@@ -681,7 +632,7 @@ export default async function ApiPage({ params }: LangProps) {
                   },
                   {
                     label: t("Response (GET)", "响应 (GET)"),
-                    content: <CodeBlock code={`km.lock_my+(0/1)\n1\r\n>>> `} />,
+                    content: <CodeBlock code={`km.lock_my+(0/1)\r\n>>> `} />,
                   },
                   {
                     label: t("Response (SET)", "响应 (SET)"),
@@ -720,7 +671,7 @@ export default async function ApiPage({ params }: LangProps) {
                       <div className="space-y-3">
                         <CodeBlock code={`km.move(10,-3)\r\n>>> `} />
                         <CodeBlock code={`km.move(100,50,8,40,25,80,10)\r\n>>> `} />
-                        <p className="text-xs text-muted-foreground">{t("Both return the input echo (ACK).", "均回显输入作为 ACK。")}</p>
+                        <p className="text-sm text-muted-foreground">{t("Both return the input echo (ACK).", "均回显输入作为 ACK。")}</p>
                       </div>
                     ),
                   },
@@ -773,7 +724,7 @@ export default async function ApiPage({ params }: LangProps) {
                     content: (
                       <div className="space-y-3">
                         <CodeBlock code={`km.wheel(-5)\r\n>>> `} />
-                        <p className="text-xs text-muted-foreground">{t("Echo ACK.", "回显 ACK。")}</p>
+                        <p className="text-sm text-muted-foreground">{t("Echo ACK.", "回显 ACK。")}</p>
                       </div>
                     ),
                   },
@@ -800,7 +751,7 @@ export default async function ApiPage({ params }: LangProps) {
                     content: (
                       <div className="space-y-3">
                         <CodeBlock code={`km.silent(400,300)\r\n>>> `} />
-                        <p className="text-xs text-muted-foreground">{t("Echo ACK.", "回显 ACK。")}</p>
+                        <p className="text-sm text-muted-foreground">{t("Echo ACK.", "回显 ACK。")}</p>
                       </div>
                     ),
                   },
@@ -822,7 +773,7 @@ export default async function ApiPage({ params }: LangProps) {
                     content: (
                       <div className="space-y-3">
                         <CodeBlock code={`km.(123,456)\r\n>>> `} />
-                        <p className="text-xs text-muted-foreground">
+                        <p className="text-sm text-muted-foreground">
                           {isCn ? (
                             <span>
                               绝对坐标（受 <span className="font-mono">screen(W,H)</span> 限制）。
@@ -888,7 +839,7 @@ export default async function ApiPage({ params }: LangProps) {
                   content: (
                     <div className="space-y-3">
                       <CodeBlock code={`km.rel\r\n>>> `} />
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-sm text-muted-foreground">
                         {isCn ? (
                           <span>
                             仅返回模式名称：<span className="font-mono">km.off</span> ｜
@@ -911,7 +862,7 @@ export default async function ApiPage({ params }: LangProps) {
                   content: (
                     <div className="space-y-3">
                       <CodeBlock code={`km.axis(act,1)\r\n>>> `} />
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-sm text-muted-foreground">
                         {t("Mode name only (not an echo).", "仅返回模式名称（非指令回显）。")}
                       </p>
                     </div>
@@ -979,7 +930,7 @@ export default async function ApiPage({ params }: LangProps) {
                   content: (
                     <div className="space-y-3">
                       <CodeBlock code={`DE AD 05 00 A5 00 C2 01 00`} />
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-sm text-muted-foreground">
                         {isCn ? (
                           <span>
                             解析：<span className="font-mono">DE AD</span> ｜ <span className="font-mono">05 00</span>
@@ -1041,7 +992,7 @@ export default async function ApiPage({ params }: LangProps) {
                     content: (
                       <div className="space-y-3">
                         <CodeBlock code={`km.baud(115200)\r\n>>> `} />
-                        <p className="text-xs text-muted-foreground">
+                        <p className="text-sm text-muted-foreground">
                           {t("Returns current baud rate.", "返回当前波特率。")}
                         </p>
                       </div>
@@ -1052,7 +1003,7 @@ export default async function ApiPage({ params }: LangProps) {
                     content: (
                       <div className="space-y-3">
                         <CodeBlock code={`km.baud(921600)\r\n>>> `} />
-                        <p className="text-xs text-muted-foreground">
+                        <p className="text-sm text-muted-foreground">
                           {t(
                             "Applies immediately; host must re-open serial at new speed.",
                             "立即生效；主机需以新波特率重新打开串口。",
@@ -1066,7 +1017,7 @@ export default async function ApiPage({ params }: LangProps) {
                     content: (
                       <div className="space-y-3">
                         <CodeBlock code={`km.baud(0)\r\n>>> `} />
-                        <p className="text-xs text-muted-foreground">
+                        <p className="text-sm text-muted-foreground">
                           {t("Resets to default 115200 baud.", "重置为默认 115200 波特率。")}
                         </p>
                       </div>
@@ -1106,7 +1057,7 @@ export default async function ApiPage({ params }: LangProps) {
                   content: (
                     <div className="space-y-3">
                       <CodeBlock code={`km.mouse(mut)\r\n>>> `} />
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-sm text-muted-foreground">
                         {t("ACK reports resolved mode name (subject to echo).", "ACK 返回解析后的模式名称（受 echo 影响）。")}
                       </p>
                     </div>
@@ -1120,7 +1071,7 @@ export default async function ApiPage({ params }: LangProps) {
                         {t("While enabled, device emits one fixed-length binary frame per event:", "启用后，设备每次事件发送一帧定长二进制：")}
                       </p>
                       <CodeBlock code={`km.mouse<bytes>\r\n>>> `} />
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-sm text-muted-foreground">
                         {t(
                           "Bytes follow the ASCII prefix directly; line still ends with CRLF and the prompt.",
                           "字节紧随 ASCII 前缀；行尾仍为 CRLF 与提示符。",
@@ -1141,13 +1092,13 @@ export default async function ApiPage({ params }: LangProps) {
                         <li>{t("pan: int8 — horizontal wheel (tilt-wheel)", "pan：int8 — 水平滚轮（倾斜）")}</li>
                         <li>{t("tilt: int8 — additional tilt/aux axis", "tilt：int8 — 附加倾斜/辅助轴")}</li>
                       </ul>
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-sm text-muted-foreground">
                         {t(
                           "*Raw mode: x/y are raw deltas. Mut mode: processed/effective after locks/catch. If absolute reporting is active via km.axis(abs), x/y are absolute screen-clamped coordinates.",
                           "＊raw 模式：x/y 为原始增量。mut 模式：应用锁定/捕获后的有效值。若启用 km.axis(abs)，x/y 为屏幕限制的绝对坐标。",
                         )}
                       </p>
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-sm text-muted-foreground">
                         {t(
                           "If any field is not applicable, it is encoded as 00 to preserve the fixed spacing.",
                           "若某字段不适用，则编码为 00 以保持固定长度与对齐。",
@@ -1160,9 +1111,9 @@ export default async function ApiPage({ params }: LangProps) {
               footer={
                 <div className="space-y-3">
                   <div>
-                    <div className="font-mono text-xs">{t("Example (hex, compact):", "示例（十六进制，紧凑）：")}</div>
-                    <CodeBlock code={`km.mouse070500FBFF01FF00\r\n>>> `} />
-                    <p className="text-xs text-muted-foreground">
+                    <div className="font-mono text-xs">{t("Example (hex, spaced):", "示例（十六进制，分组空格）：")}</div>
+                    <CodeBlock code={`km.mouse  07 00  05 00  FB FF  01  FF  00\r\n>>> `} />
+                    <p className="text-sm text-muted-foreground">
                       {t(
                         "mask=0x07, x=+5 (05 00), y=-5 (FB FF), wheel=+1 (01), pan=-1 (FF), tilt=0 (00)",
                         "mask=0x07，x=+5（05 00），y=-5（FB FF），wheel=+1（01），pan=-1（FF），tilt=0（00）",
