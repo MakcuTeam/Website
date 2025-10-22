@@ -199,6 +199,12 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
     };
   }, [browserSupported]);
 
+  useEffect(() => {
+    if (!device) {
+      setOnlineSelect(undefined);
+    }
+  }, [device]);
+
   const connectToDevice = async () => {
     if (isConnecting.current) return;
     isConnecting.current = true;
@@ -406,7 +412,9 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
         >
           <div className="flex items-left flex-col gap-8 flex-1 p-5 ">
             <div className="flex items-center gap-3">
-              <Button onClick={connectToDevice}>{dict.tools.connectBtn}</Button>
+              <Button onClick={connectToDevice}>
+                {device ? dict.tools.connected : dict.tools.connectBtn}
+              </Button>
             </div>
             <div className="flex items-center gap-2">
               <Label className="text-sm">{dict.tools.flashMode} :</Label>
@@ -458,14 +466,22 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
                 <div className="flex items-center gap-3">
                   <Label className="text-sm">{dict.tools.onlineFlash}</Label>
                   <Select
+                    disabled={!device}
                     value={onlineSelect}
                     onValueChange={(value) => {
                       setOnlineSelect(value);
                       flashOnline(value);
                     }}
                   >
-                    <SelectTrigger className="w-[12.7em] text-sm">
-                      <SelectValue placeholder={dict.tools.list} />
+                    <SelectTrigger
+                      className="w-[12.7em] text-sm"
+                      disabled={!device}
+                    >
+                      <SelectValue
+                        placeholder={
+                          device ? dict.tools.list : dict.tools.connectToSelect
+                        }
+                      />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectGroup>
