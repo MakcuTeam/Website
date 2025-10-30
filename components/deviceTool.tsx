@@ -455,10 +455,12 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
                     />
                     {selectedFile ? (
                       selectedFile.name
-                    ) : (
+                    ) : device ? (
                       <span className=" opacity-50">
                         {dict.tools.uploadFirmware}
                       </span>
+                    ) : (
+                      ""
                     )}
                   </Button>
                 </div>
@@ -478,9 +480,7 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
                       disabled={!device}
                     >
                       <SelectValue
-                        placeholder={
-                          device ? dict.tools.list : dict.tools.connectToSelect
-                        }
+                        placeholder={device ? dict.tools.list : ""}
                       />
                     </SelectTrigger>
                     <SelectContent>
