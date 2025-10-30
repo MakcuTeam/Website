@@ -156,9 +156,25 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
         await Promise.all(registrations.map((registration) => registration.update()));
       }
       handleAddInfo("Cleared cached assets before establishing serial connection.");
+      // Add a small delay to ensure cleanup operations complete
+      await new Promise((resolve) => setTimeout(resolve, 100));
     } catch (error) {
       console.warn("Failed to flush caches", error);
       handleAddInfo("Warning: unable to fully clear cached assets before connecting.");
+    }
+  };
+
+  const disconnectDevice = async () => {
+    try {
+      if (device) {
+        await device.disconnect();
+        setDevice(null);
+      }
+      if (esploader) {
+        setEsploader(null);
+      }
+    } catch (error) {
+      console.warn("Error during disconnect:", error);
     }
   };
 
@@ -181,13 +197,13 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
     if (!browserSupported) return;
 
     const handleConnect = () => {
-      setDevice(null);
-      setEsploader(null);
+      // Don't automatically clear when a new device connects
+      // User needs to explicitly connect
     };
 
-    const handleDisconnect = () => {
-      setDevice(null);
-      setEsploader(null);
+    const handleDisconnect = async () => {
+      await disconnectDevice();
+      handleAddInfo("Device disconnected");
     };
 
     Navigator.serial?.addEventListener("connect", handleConnect);
@@ -209,6 +225,10 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
     if (isConnecting.current) return;
     isConnecting.current = true;
     setLoading(true);
+
+    // Disconnect any existing connection first
+    await disconnectDevice();
+
     try {
       await flushWebCaches();
       const selectedPort = (await serialLib.requestPort()) as unknown as SerialPortLike;
@@ -232,17 +252,50 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
       } as LoaderOptions;
 
       const loader = new ESPLoader(flashOptions);
-      await loader.main();
-      toast.success(dict?.tools.connectSuccess);
-      setDevice(transport);
-      setEsploader(loader);
+
+      // Retry logic for establishing connection with exponential backoff
+      const maxRetries = 3;
+      let lastError: Error | null = null;
+
+      for (let attempt = 0; attempt < maxRetries; attempt++) {
+        try {
+          if (attempt > 0) {
+            const delay = Math.pow(2, attempt - 1) * 500; // 500ms, 1000ms, 2000ms
+            handleAddInfo(`Connection attempt ${attempt + 1}/${maxRetries}, retrying in ${delay}ms...`);
+            await new Promise((resolve) => setTimeout(resolve, delay));
+          }
+
+          await loader.main();
+          toast.success(dict?.tools.connectSuccess);
+          setDevice(transport);
+          setEsploader(loader);
+          return; // Success, exit function
+        } catch (error) {
+          lastError = error instanceof Error ? error : new Error(String(error));
+
+          // If it's the last attempt, don't log retry message
+          if (attempt < maxRetries - 1) {
+            const message = lastError.message;
+            if (message.includes("Failed to open serial port")) {
+              handleAddInfo(`Failed to open port on attempt ${attempt + 1}, retrying...`);
+            }
+          }
+        }
+      }
+
+      // All retries failed
+      if (lastError) {
+        throw lastError;
+      }
     } catch (error) {
       const message =
         error instanceof Error ? error.message : String(error);
       if (!message.includes("Must be handling a user gesture")) {
-        handleAddInfo(message);
+        handleAddInfo("Connection failed: " + message);
         toast.error(message);
       }
+      // Ensure cleanup on failure
+      await disconnectDevice();
     } finally {
       setLoading(false);
       isConnecting.current = false;
