@@ -228,6 +228,8 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
 
     // Disconnect any existing connection first
     await disconnectDevice();
+    // Wait for port to be fully released by the OS
+    await new Promise((resolve) => setTimeout(resolve, 200));
 
     try {
       await flushWebCaches();
@@ -263,6 +265,9 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
             const delay = Math.pow(2, attempt - 1) * 500; // 500ms, 1000ms, 2000ms
             handleAddInfo(`Connection attempt ${attempt + 1}/${maxRetries}, retrying in ${delay}ms...`);
             await new Promise((resolve) => setTimeout(resolve, delay));
+          } else {
+            // Add initial delay before first attempt to ensure port is ready
+            await new Promise((resolve) => setTimeout(resolve, 300));
           }
 
           await loader.main();
