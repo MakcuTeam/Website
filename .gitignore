@@ -42,4 +42,5 @@ next-env.d.ts
 certificates
 
 # flash counter data
-/data
+/data/*
+!/data/.gitkeep
