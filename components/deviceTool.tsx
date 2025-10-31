@@ -134,10 +134,29 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
 
   const incrementFlashCounter = async () => {
     try {
-      const res = await fetch("/api/flash-counter", { method: "POST" });
+      // Step 1: Request a secure token from the server
+      const tokenRes = await fetch("/api/flash-counter?action=token");
+      if (!tokenRes.ok) {
+        console.error("Failed to get flash counter token");
+        return;
+      }
+      const { token } = await tokenRes.json();
+
+      // Step 2: Use the token to increment the counter
+      const res = await fetch("/api/flash-counter", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ token }),
+      });
+
       if (res.ok) {
         const data = await res.json();
         setFlashCounter(data.count || 0);
+      } else {
+        const error = await res.json();
+        console.error("Failed to increment flash counter:", error);
       }
     } catch (error) {
       console.error("Failed to increment flash counter", error);
