@@ -120,9 +120,34 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
     }
   };
 
+  const fetchFlashCounter = async () => {
+    try {
+      const res = await fetch("/api/flash-counter");
+      if (res.ok) {
+        const data = await res.json();
+        setFlashCounter(data.count || 0);
+      }
+    } catch (error) {
+      console.error("Failed to fetch flash counter", error);
+    }
+  };
+
+  const incrementFlashCounter = async () => {
+    try {
+      const res = await fetch("/api/flash-counter", { method: "POST" });
+      if (res.ok) {
+        const data = await res.json();
+        setFlashCounter(data.count || 0);
+      }
+    } catch (error) {
+      console.error("Failed to increment flash counter", error);
+    }
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       await fetchOnlineDataList();
+      await fetchFlashCounter();
     };
 
     fetchData();
@@ -140,6 +165,7 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
   const [onlineSelect, setOnlineSelect] = useState<string>();
   const [browserSupported, setBrowserSupported] = useState(true);
   const [showBrowserWarning, setShowBrowserWarning] = useState(true);
+  const [flashCounter, setFlashCounter] = useState<number>(0);
 
   const fileRef = useRef<HTMLInputElement>(null);
   const isConnecting = useRef(false);
@@ -290,6 +316,8 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
       await esploader.after();
       handleAddInfo("Flash complete");
       handleAddInfo(`Flashed ${firmwareName}`);
+      // Increment the global flash counter
+      await incrementFlashCounter();
     } catch (error) {
       handleAddInfo("Flash error: " + error);
       console.error("Flash error:", error);
@@ -411,10 +439,15 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
           className="border flex-1 h-64 rounded flex flex-row items-center justify-between relative backdrop-blur-sm "
         >
           <div className="flex items-left flex-col gap-8 flex-1 p-5 ">
-            <div className="flex items-center gap-3">
-              <Button onClick={connectToDevice}>
-                {device ? dict.tools.connected : dict.tools.connectBtn}
-              </Button>
+            <div className="flex flex-col gap-4">
+              <div className="text-sm font-medium">
+                {dict.tools.successfulFlashes}: {flashCounter.toLocaleString()}
+              </div>
+              <div className="flex items-center gap-3">
+                <Button onClick={connectToDevice}>
+                  {device ? dict.tools.connected : dict.tools.connectBtn}
+                </Button>
+              </div>
             </div>
             {device && (
               <>

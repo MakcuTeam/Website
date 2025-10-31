@@ -80,7 +80,8 @@
     "browserNotSupported": "您的浏览器不支持 Web Serial/WebUSB。请使用 Chrome、Edge 或其他基于 Chromium 的浏览器。",
     "driverNotice": "如果你还没有安装CH343驱动程序，请点击",
     "driverLink": "此链接",
-    "driverNoticeEnd": "下载"
+    "driverNoticeEnd": "下载",
+    "successfulFlashes": "成功刷写次数"
   },
   "docs": {
     "on_this_page": "On this page",

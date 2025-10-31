@@ -88,7 +88,8 @@
     "browserNotSupported": "Your browser does not support Web Serial/WebUSB. Please use Chrome, Edge, or another Chromium-based browser.",
     "driverNotice": "If you have not installed the CH343 driver yet then please click ",
     "driverLink": "this link",
-    "driverNoticeEnd": " to download"
+    "driverNoticeEnd": " to download",
+    "successfulFlashes": "Successful flashes"
   },
   "docs": {
     "on_this_page": "On this page",
