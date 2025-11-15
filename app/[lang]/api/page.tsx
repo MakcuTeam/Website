@@ -36,114 +36,172 @@ const tocByLang: Record<Locale, TocItem[]> = {
   en: [
     { id: "transport", label: "Transport & Framing" },
     {
-      id: "buttons",
-      label: "Buttons",
+      id: "mouse-buttons",
+      label: "Mouse Buttons",
       children: [
-        { id: "buttons-status", label: "Button status (GET)" },
-        { id: "buttons-actuation", label: "Button actuation (SET)" },
-        { id: "buttons-lock", label: "Button lock (GET/SET)" },
-        { id: "buttons-catch", label: "Button catch (GET/SET)" },
+        { id: "buttons-individual", label: "Individual Buttons (GET/SET)" },
+        { id: "click", label: "Click Scheduling (SET)" },
       ],
     },
     {
-      id: "locks",
-      label: "Locks",
-      children: [
-        { id: "locks-whole", label: "Whole-axis (GET/SET)" },
-        { id: "locks-directional", label: "Directional (GET/SET)" },
-      ],
-    },
-    {
-      id: "motion",
-      label: "Motion",
+      id: "mouse-movement",
+      label: "Mouse Movement",
       children: [
         { id: "move", label: "move() (SET)" },
         { id: "moveto", label: "moveto() (SET)" },
         { id: "wheel", label: "wheel() (SET)" },
+        { id: "pan", label: "pan() (GET/SET)" },
+        { id: "tilt", label: "tilt() (GET/SET)" },
+        { id: "getpos", label: "getpos() (GET)" },
         { id: "silent", label: "silent() (SET)" },
+      ],
+    },
+    {
+      id: "mouse-advanced",
+      label: "Mouse Advanced",
+      children: [
+        { id: "mo", label: "mo() - Raw Mouse Frame (SET)" },
+        { id: "lock", label: "lock_() (GET/SET)" },
+        { id: "catch", label: "catch_() (GET/SET)" },
+      ],
+    },
+    {
+      id: "keyboard",
+      label: "Keyboard",
+      children: [
+        { id: "down", label: "down() (SET)" },
+        { id: "up", label: "up() (SET)" },
+        { id: "press", label: "press() (SET)" },
+        { id: "string", label: "string() (SET)" },
+        { id: "init", label: "init() (SET)" },
+        { id: "isdown", label: "isdown() (GET)" },
+        { id: "mask", label: "mask() (GET/SET)" },
+        { id: "remap", label: "remap() (GET/SET)" },
       ],
     },
     {
       id: "streaming",
       label: "Streaming",
       children: [
-        { id: "axisstream", label: "Axis streaming (GET/SET)" },
-        { id: "buttons-global", label: "Buttons streaming (GET/SET)" },
-        { id: "mouse-composite", label: "Mouse composite streaming (GET/SET)" },
+        { id: "buttons-stream", label: "buttons() (GET/SET)" },
+        { id: "axis-stream", label: "axis() (GET/SET)" },
+        { id: "mouse-stream", label: "mouse() (GET/SET)" },
       ],
     },
     {
-      id: "posscreen",
+      id: "screen",
       label: "Position & Screen",
+      children: [{ id: "screen-cmd", label: "screen() (GET/SET)" }],
+    },
+    {
+      id: "system",
+      label: "System Commands",
       children: [
-        { id: "getpos", label: "getpos() (GET)" },
-        { id: "screen", label: "screen() / screen(W,H)" },
+        { id: "help", label: "help() (GET)" },
+        { id: "info", label: "info() (GET)" },
+        { id: "version", label: "version() (GET)" },
+        { id: "device", label: "device() (GET)" },
+        { id: "reboot", label: "reboot() (SET)" },
+        { id: "serial", label: "serial() (GET/SET)" },
       ],
     },
     {
-      id: "baud",
-      label: "Baud rate",
-      children: [{ id: "baud-cmd", label: "Baud rate (GET/SET)" }],
+      id: "config",
+      label: "Configuration",
+      children: [
+        { id: "log", label: "log() (GET/SET)" },
+        { id: "echo", label: "echo() (GET/SET)" },
+        { id: "baud", label: "baud() (GET/SET)" },
+        { id: "hs", label: "hs() (GET/SET)" },
+      ],
     },
-    { id: "baud-binary", label: "Baud rate change (Binary)" },
+    { id: "baud-binary", label: "Baud Rate (Binary)" },
     { id: "limits", label: "Limits & Parsing" },
-    { id: "tips", label: "Tips" },
   ],
   cn: [
     { id: "transport", label: "传输与封装" },
     {
-      id: "buttons",
-      label: "按键",
+      id: "mouse-buttons",
+      label: "鼠标按键",
       children: [
-        { id: "buttons-status", label: "按键状态 (GET)" },
-        { id: "buttons-actuation", label: "按键触发 (SET)" },
-        { id: "buttons-lock", label: "按键锁定 (GET/SET)" },
-        { id: "buttons-catch", label: "按键捕获 (GET/SET)" },
+        { id: "buttons-individual", label: "单个按键 (GET/SET)" },
+        { id: "click", label: "点击调度 (SET)" },
       ],
     },
     {
-      id: "locks",
-      label: "锁定",
-      children: [
-        { id: "locks-whole", label: "全轴锁定 (GET/SET)" },
-        { id: "locks-directional", label: "方向锁定 (GET/SET)" },
-      ],
-    },
-    {
-      id: "motion",
-      label: "移动",
+      id: "mouse-movement",
+      label: "鼠标移动",
       children: [
         { id: "move", label: "move() (SET)" },
         { id: "moveto", label: "moveto() (SET)" },
         { id: "wheel", label: "wheel() (SET)" },
+        { id: "pan", label: "pan() (GET/SET)" },
+        { id: "tilt", label: "tilt() (GET/SET)" },
+        { id: "getpos", label: "getpos() (GET)" },
         { id: "silent", label: "silent() (SET)" },
+      ],
+    },
+    {
+      id: "mouse-advanced",
+      label: "鼠标高级",
+      children: [
+        { id: "mo", label: "mo() - 原始鼠标帧 (SET)" },
+        { id: "lock", label: "lock_() (GET/SET)" },
+        { id: "catch", label: "catch_() (GET/SET)" },
+      ],
+    },
+    {
+      id: "keyboard",
+      label: "键盘",
+      children: [
+        { id: "down", label: "down() (SET)" },
+        { id: "up", label: "up() (SET)" },
+        { id: "press", label: "press() (SET)" },
+        { id: "string", label: "string() (SET)" },
+        { id: "init", label: "init() (SET)" },
+        { id: "isdown", label: "isdown() (GET)" },
+        { id: "mask", label: "mask() (GET/SET)" },
+        { id: "remap", label: "remap() (GET/SET)" },
       ],
     },
     {
       id: "streaming",
       label: "流式",
       children: [
-        { id: "axisstream", label: "轴数据流 (GET/SET)" },
-        { id: "buttons-global", label: "按键流式 (GET/SET)" },
-        { id: "mouse-composite", label: "鼠标复合流 (GET/SET)" },
+        { id: "buttons-stream", label: "buttons() (GET/SET)" },
+        { id: "axis-stream", label: "axis() (GET/SET)" },
+        { id: "mouse-stream", label: "mouse() (GET/SET)" },
       ],
     },
     {
-      id: "posscreen",
+      id: "screen",
       label: "位置与屏幕",
+      children: [{ id: "screen-cmd", label: "screen() (GET/SET)" }],
+    },
+    {
+      id: "system",
+      label: "系统命令",
       children: [
-        { id: "getpos", label: "getpos() (GET)" },
-        { id: "screen", label: "screen() / screen(W,H)" },
+        { id: "help", label: "help() (GET)" },
+        { id: "info", label: "info() (GET)" },
+        { id: "version", label: "version() (GET)" },
+        { id: "device", label: "device() (GET)" },
+        { id: "reboot", label: "reboot() (SET)" },
+        { id: "serial", label: "serial() (GET/SET)" },
       ],
     },
     {
-      id: "baud",
-      label: "波特率",
-      children: [{ id: "baud-cmd", label: "波特率 (GET/SET)" }],
+      id: "config",
+      label: "配置",
+      children: [
+        { id: "log", label: "log() (GET/SET)" },
+        { id: "echo", label: "echo() (GET/SET)" },
+        { id: "baud", label: "baud() (GET/SET)" },
+        { id: "hs", label: "hs() (GET/SET)" },
+      ],
     },
-    { id: "baud-binary", label: "波特率变更（二进制）" },
+    { id: "baud-binary", label: "波特率（二进制）" },
     { id: "limits", label: "限制与解析" },
-    { id: "tips", label: "提示" },
   ],
 };
 
@@ -151,12 +209,12 @@ const metadataCopy: Record<Locale, { title: string; description: string }> = {
   en: {
     title: "MAKCU API — KM Host Protocol",
     description:
-      "Protocol reference for MAKCU KM Host API, covering transport details, button controls, motion, streaming, and maintenance commands.",
+      "Protocol reference for MAKCU KM Host API v3.9, covering transport, mouse, keyboard, streaming, and system commands.",
   },
   cn: {
     title: "MAKCU API — KM 主机协议",
     description:
-      "MAKCU KM 主机 API 协议参考，涵盖传输细节、按键控制、移动、数据流以及维护指令。",
+      "MAKCU KM 主机 API v3.9 协议参考，涵盖传输、鼠标、键盘、流式以及系统指令。",
   },
 };
 
@@ -275,8 +333,8 @@ export default async function ApiPage({ params }: LangProps) {
           <h1 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">MAKCU API</h1>
           <p className="max-w-2xl text-sm text-white/70 sm:text-base">
             {isCn
-              ? "KM 主机协议 — v3.8 · MAKCU 生态的完整指令参考。"
-              : "KM Host Protocol — v3.8 · Comprehensive command reference for the MAKCU ecosystem."}
+              ? "KM 主机协议 — v3.9 · MAKCU 生态的完整指令参考。"
+              : "KM Host Protocol — v3.9 · Comprehensive command reference for the MAKCU ecosystem."}
           </p>
         </div>
       </header>
@@ -443,63 +501,49 @@ export default async function ApiPage({ params }: LangProps) {
             />
           </Section>
 
-          {/* Buttons */}
-          <Section id="buttons" badge={t("Mouse", "鼠标")} title={t("Buttons", "按键")}>
+          {/* Mouse Buttons */}
+          <Section id="mouse-buttons" badge={t("Mouse", "鼠标")} title={t("Mouse Buttons", "鼠标按键")}>
             <SubSection
-              id="buttons-status"
-              title={t("Button status (GET)", "按键状态 (GET)")}
+              id="buttons-individual"
+              title={t("Individual Buttons (GET/SET)", "单个按键 (GET/SET)")}
             >
               <SpecCard
                 entries={[
                   {
                     label: t("Command", "命令"),
-                    content: <span className="font-mono">left() | right() | middle() | side1() | side2()</span>,
+                    content: <span className="font-mono">left([state[,delay_ms]]) | right([state[,delay_ms]]) | middle([state[,delay_ms]]) | side1([state[,delay_ms]]) | side2([state[,delay_ms]])</span>,
+                  },
+                  {
+                    label: t("Params", "参数"),
+                    content: isCn ? (
+                      <span>
+                        state: 1=按下; delay_ms: 可选延迟
+                      </span>
+                    ) : (
+                      <span>
+                        state: 1=down; delay_ms: optional delay
+                      </span>
+                    ),
                   },
                   {
                     label: t("Response (GET)", "响应 (GET)"),
                     content: (
                       <div className="space-y-3">
-                        <CodeBlock code={`km.left(0/1)\r\n>>> `} />
+                        <CodeBlock code={`km.left(0)\r\n>>> `} />
                         <p className="text-sm text-muted-foreground">
                           {t(
-                            "State bit view: 0=none, 1=physical, 2=software, 3=both.",
-                            "状态位含义：0=无，1=物理，2=软件，3=两者。",
+                            "Returns current button state (0=released, 1=pressed).",
+                            "返回当前按键状态（0=释放，1=按下）。",
                           )}
                         </p>
                       </div>
-                    ),
-                  },
-                ]}
-              />
-            </SubSection>
-
-            <SubSection
-              id="buttons-actuation"
-              title={t("Button actuation (SET)", "按键触发 (SET)")}
-            >
-              <SpecCard
-                entries={[
-                  {
-                    label: t("Command", "命令"),
-                    content: <span className="font-mono">left(n) / right(n) / middle(n) / side1(n) / side2(n)</span>,
-                  },
-                  {
-                    label: t("Params", "参数"),
-                    content: isCn ? (
-                      <span className="font-mono">
-                        首位数字字符会被解析为整数（数字字符映射为对应数值，例如 0→0，1→1）。
-                      </span>
-                    ) : (
-                      <span className="font-mono">
-                        First digit char parsed as int (digits map to their numeric value, e.g. 0→0, 1→1).
-                      </span>
                     ),
                   },
                   {
                     label: t("Response (SET)", "响应 (SET)"),
                     content: (
                       <div className="space-y-3">
-                        <CodeBlock code={`km.left(0/1)\r\n>>> `} />
+                        <CodeBlock code={`km.left(1)\r\n>>> `} />
                         <p className="text-sm text-muted-foreground">
                           {isCn ? (
                             <span>
@@ -519,138 +563,61 @@ export default async function ApiPage({ params }: LangProps) {
             </SubSection>
 
             <SubSection
-              id="buttons-lock"
-              title={t("Button lock (GET/SET)", "按键锁定 (GET/SET)")}
+              id="click"
+              title={t("Click Scheduling (SET)", "点击调度 (SET)")}
             >
               <SpecCard
                 entries={[
                   {
                     label: t("Command", "命令"),
-                    content: <span className="font-mono">lock_ml(), lock_mr(), lock_mm(), lock_ms1(), lock_ms2()</span>,
-                  },
-                  {
-                    label: t("Response (GET)", "响应 (GET)"),
-                    content: <CodeBlock code={`km.lock_ml(0/1/2)\r\n>>> `} />,
-                  },
-                  {
-                    label: t("Response (SET)", "响应 (SET)"),
-                    content: <CodeBlock code={`km.lock_ml(0/1)\r\n>>> `} />,
-                  },
-                ]}
-              />
-            </SubSection>
-
-            <SubSection
-              id="buttons-catch"
-              title={t("Button catch (GET/SET)", "按键捕获 (GET/SET)")}
-            >
-              <SpecCard
-                entries={[
-                  {
-                    label: t("Command", "命令"),
-                    content: <span className="font-mono">catch_ml(), catch_mr(), catch_mm(), catch_ms1(), catch_ms2()</span>,
+                    content: <span className="font-mono">click(button[,count[,delay_ms]])</span>,
                   },
                   {
                     label: t("Params", "参数"),
                     content: isCn ? (
-                      <span className="font-mono">SET：0=自动，1=手动（需先锁定按键）</span>
+                      <span>
+                        button: 按键编号; count: 点击次数（可选）; delay_ms: 延迟（可选，默认随机 20-75ms）
+                      </span>
                     ) : (
-                      <span className="font-mono">SET: 0=auto, 1=manual (button must be locked)</span>
-                    ),
-                  },
-                  {
-                    label: t("Response (GET)", "响应 (GET)"),
-                    content: <CodeBlock code={`km.catch_ml(0/1)\r\n>>> `} />,
-                  },
-                  {
-                    label: t("Response (SET)", "响应 (SET)"),
-                    content: (
-                      <p className="text-sm">
-                        {t(
-                          "No immediate ACK (async). Poll with GET to confirm state.",
-                          "无即时 ACK（异步）。请通过 GET 轮询确认状态。",
-                        )}
-                      </p>
-                    ),
-                  },
-                ]}
-              />
-            </SubSection>
-          </Section>
-
-          {/* Locks */}
-          <Section id="locks" badge={t("Mouse", "鼠标")} title={t("Locks", "锁定")}>
-            <SubSection
-              id="locks-whole"
-              title={t("Whole-axis locks (GET/SET)", "全轴锁定 (GET/SET)")}
-            >
-              <SpecCard
-                entries={[
-                  {
-                    label: t("Command", "命令"),
-                    content: (
-                      <span className="font-mono">
-                        lock_mx(), lock_my() / lock_mx(0|1), lock_my(0|1)
+                      <span>
+                        button: button number; count: click count (optional); delay_ms: delay (optional, defaults to random 20-75ms)
                       </span>
                     ),
                   },
                   {
-                    label: t("Response (GET)", "响应 (GET)"),
-                    content: <CodeBlock code={`km.lock_mx(0/1)\r\n>>> `} />,
-                  },
-                  {
                     label: t("Response (SET)", "响应 (SET)"),
-                    content: <CodeBlock code={`km.lock_mx(0/1)\r\n>>> `} />,
-                  },
-                ]}
-              />
-            </SubSection>
-
-            <SubSection
-              id="locks-directional"
-              title={t("Directional locks (GET/SET)", "方向锁定 (GET/SET)")}
-            >
-              <SpecCard
-                entries={[
-                  {
-                    label: t("Command", "命令"),
                     content: (
-                      <span className="font-mono">lock_mx+(), lock_mx-(), lock_my+(), lock_my-()</span>
+                      <div className="space-y-3">
+                        <CodeBlock code={`km.click(1,3)\r\n>>> `} />
+                        <p className="text-sm text-muted-foreground">
+                          {t("Echo ACK.", "回显 ACK。")}
+                        </p>
+                      </div>
                     ),
-                  },
-                  {
-                    label: t("Response (GET)", "响应 (GET)"),
-                    content: <CodeBlock code={`km.lock_my+(0/1)\r\n>>> `} />,
-                  },
-                  {
-                    label: t("Response (SET)", "响应 (SET)"),
-                    content: <CodeBlock code={`km.lock_my-(0/1)\r\n>>> `} />,
                   },
                 ]}
               />
             </SubSection>
           </Section>
 
-          {/* Motion */}
-          <Section id="motion" badge={t("Motion", "移动")} title={t("Motion", "移动")}>
-            <SubSection id="move" title="move(x,y[,seg][,cx1,cy1[,cx2,cy2]]) — SET">
+          {/* Mouse Movement */}
+          <Section id="mouse-movement" badge={t("Motion", "移动")} title={t("Mouse Movement", "鼠标移动")}>
+            <SubSection id="move" title="move(dx,dy[,segments[,cx1,cy1[,cx2,cy2]]]) — SET">
               <SpecCard
                 entries={[
                   {
                     label: t("Command", "命令"),
-                    content: <span className="font-mono">move(x,y[,seg][,cx1,cy1[,cx2,cy2]])</span>,
+                    content: <span className="font-mono">move(dx,dy[,segments[,cx1,cy1[,cx2,cy2]]])</span>,
                   },
                   {
                     label: t("Params", "参数"),
                     content: isCn ? (
                       <p>
-                        x,y：int16；seg ≥ 1（默认 1，最大 512）；可选三次贝塞尔控制点。如果仅提供段数（无控制点），将随机生成 2 点控制曲线。若只提供 (cx1,cy1)，会自动复制作为第二控制点。
+                        dx,dy: 相对移动距离; segments: 分段数（可选，默认1，最大512）; cx1,cy1,cx2,cy2: 三次贝塞尔控制点（可选）
                       </p>
                     ) : (
                       <p>
-                        x,y: int16; seg ≥ 1 (default 1, max 512); optional cubic Bézier controls. If only segments are
-                        provided (no control points), a random 2-point control curve is generated. If only (cx1,cy1) is
-                        provided it is duplicated.
+                        dx,dy: relative move distance; segments: segment count (optional, default 1, max 512); cx1,cy1,cx2,cy2: cubic Bézier control points (optional)
                       </p>
                     ),
                   },
@@ -660,7 +627,7 @@ export default async function ApiPage({ params }: LangProps) {
                       <div className="space-y-3">
                         <CodeBlock code={`km.move(10,-3)\r\n>>> `} />
                         <CodeBlock code={`km.move(100,50,8,40,25,80,10)\r\n>>> `} />
-                        <p className="text-sm text-muted-foreground">{t("Both return the input echo (ACK).", "均回显输入作为 ACK。")}</p>
+                        <p className="text-sm text-muted-foreground">{t("Echo ACK.", "回显 ACK。")}</p>
                       </div>
                     ),
                   },
@@ -668,24 +635,22 @@ export default async function ApiPage({ params }: LangProps) {
               />
             </SubSection>
 
-            <SubSection id="moveto" title="moveto(X,Y[,seg][,cx1,cy1[,cx2,cy2]]) — SET">
+            <SubSection id="moveto" title="moveto(x,y[,delay_ms]) — SET">
               <SpecCard
                 entries={[
                   {
                     label: t("Command", "命令"),
-                    content: <span className="font-mono">moveto(X,Y[,seg][,cx1,cy1[,cx2,cy2]])</span>,
+                    content: <span className="font-mono">moveto(x,y[,delay_ms])</span>,
                   },
                   {
-                    label: t("Notes", "说明"),
+                    label: t("Params", "参数"),
                     content: isCn ? (
                       <p>
-                        限制在屏幕范围内；以绝对值入队（内部转换为相对）。特殊情况：
-                        <span className="font-mono"> moveto(0,0)</span> 且 seg=1 且无控制点时会触发校准。
+                        x,y: 绝对坐标; delay_ms: 可选延迟
                       </p>
                     ) : (
                       <p>
-                        Clamped to screen; queued as absolute (internally relative). Special:
-                        <span className="font-mono"> moveto(0,0)</span> with seg=1 and no controls triggers calibration.
+                        x,y: absolute coordinates; delay_ms: optional delay
                       </p>
                     ),
                   },
@@ -697,16 +662,20 @@ export default async function ApiPage({ params }: LangProps) {
               />
             </SubSection>
 
-            <SubSection id="wheel" title="wheel(w) — SET">
+            <SubSection id="wheel" title="wheel(delta[,delay_ms]) — SET">
               <SpecCard
                 entries={[
                   {
                     label: t("Command", "命令"),
-                    content: <span className="font-mono">wheel(w)</span>,
+                    content: <span className="font-mono">wheel(delta[,delay_ms])</span>,
                   },
                   {
                     label: t("Params", "参数"),
-                    content: <span className="font-mono">w: int8</span>,
+                    content: isCn ? (
+                      <span>delta: 滚轮步数; delay_ms: 可选延迟</span>
+                    ) : (
+                      <span>delta: scroll steps; delay_ms: optional delay</span>
+                    ),
                   },
                   {
                     label: t("Response (SET)", "响应 (SET)"),
@@ -721,18 +690,89 @@ export default async function ApiPage({ params }: LangProps) {
               />
             </SubSection>
 
-            <SubSection id="silent" title="silent(x,y) — SET">
+            <SubSection id="pan" title="pan([steps]) — GET/SET">
               <SpecCard
                 entries={[
                   {
                     label: t("Command", "命令"),
-                    content: <span className="font-mono">silent(x,y)</span>,
+                    content: <span className="font-mono">pan([steps])</span>,
+                  },
+                  {
+                    label: t("Params", "参数"),
+                    content: isCn ? (
+                      <span>steps: 水平滚动步数（SET）; 无参数时查询待处理数量（GET）</span>
+                    ) : (
+                      <span>steps: horizontal scroll steps (SET); no params to query pending (GET)</span>
+                    ),
+                  },
+                  {
+                    label: t("Response", "响应"),
+                    content: <CodeBlock code={`km.pan(3)\r\n>>> `} />,
+                  },
+                ]}
+              />
+            </SubSection>
+
+            <SubSection id="tilt" title="tilt([steps]) — GET/SET">
+              <SpecCard
+                entries={[
+                  {
+                    label: t("Command", "命令"),
+                    content: <span className="font-mono">tilt([steps])</span>,
+                  },
+                  {
+                    label: t("Params", "参数"),
+                    content: isCn ? (
+                      <span>steps: 倾斜/z轴滚动步数（SET）; 无参数时查询待处理数量（GET）</span>
+                    ) : (
+                      <span>steps: tilt/z-axis scroll steps (SET); no params to query pending (GET)</span>
+                    ),
+                  },
+                  {
+                    label: t("Response", "响应"),
+                    content: <CodeBlock code={`km.tilt(2)\r\n>>> `} />,
+                  },
+                ]}
+              />
+            </SubSection>
+
+            <SubSection id="getpos" title="getpos() — GET">
+              <SpecCard
+                entries={[
+                  {
+                    label: t("Command", "命令"),
+                    content: <span className="font-mono">getpos()</span>,
+                  },
+                  {
+                    label: t("Response (GET)", "响应 (GET)"),
+                    content: (
+                      <div className="space-y-3">
+                        <CodeBlock code={`km.(123,456)\r\n>>> `} />
+                        <p className="text-sm text-muted-foreground">
+                          {t(
+                            "Returns current pointer position.",
+                            "返回当前指针位置。",
+                          )}
+                        </p>
+                      </div>
+                    ),
+                  },
+                ]}
+              />
+            </SubSection>
+
+            <SubSection id="silent" title="silent(x,y[,delay_ms]) — SET">
+              <SpecCard
+                entries={[
+                  {
+                    label: t("Command", "命令"),
+                    content: <span className="font-mono">silent(x,y[,delay_ms])</span>,
                   },
                   {
                     label: t("Params", "参数"),
                     content: t(
-                      "Two-frame silent click at (x,y)",
-                      "在 (x,y) 处执行两帧静默点击",
+                      "Move then perform silent left click at (x,y); delay_ms: optional",
+                      "移动并在 (x,y) 处执行静默左键点击; delay_ms: 可选",
                     ),
                   },
                   {
@@ -749,54 +789,271 @@ export default async function ApiPage({ params }: LangProps) {
             </SubSection>
           </Section>
 
-          {/* Streaming */}
-          <Section id="streaming" badge={t("Streaming", "流式")} title={t("Streaming", "流式")}>
-            {/* Axis streaming */}
+          {/* Mouse Advanced */}
+          <Section id="mouse-advanced" badge={t("Advanced", "高级")} title={t("Mouse Advanced", "鼠标高级")}>
+            <SubSection id="mo" title="mo(buttons,x,y,wheel,pan,tilt[,delay]) — SET">
+              <SpecCard
+                entries={[
+                  {
+                    label: t("Command", "命令"),
+                    content: <span className="font-mono">mo(buttons,x,y,wheel,pan,tilt[,delay])</span>,
+                  },
+                  {
+                    label: t("Description", "描述"),
+                    content: isCn ? (
+                      <p>
+                        发送完整的原始鼠标帧（仅SET，不支持GET）。(0) 清除所有状态。x,y,wheel,pan,tilt 为一次性值；按键掩码镜像按键状态。
+                      </p>
+                    ) : (
+                      <p>
+                        Send complete raw mouse frame (SET only, no GET). (0) clears all; x,y,wheel,pan,tilt are one-shots; button mask mirrors button states.
+                      </p>
+                    ),
+                  },
+                  {
+                    label: t("Params", "参数"),
+                    content: isCn ? (
+                      <span>buttons: 按键掩码; x,y: 移动增量; wheel,pan,tilt: 滚轮值; delay: 可选延迟</span>
+                    ) : (
+                      <span>buttons: button mask; x,y: movement deltas; wheel,pan,tilt: scroll values; delay: optional</span>
+                    ),
+                  },
+                  {
+                    label: t("Response (SET)", "响应 (SET)"),
+                    content: <CodeBlock code={`km.mo(1,10,5,0,0,0)\r\n>>> `} />,
+                  },
+                ]}
+              />
+            </SubSection>
+
             <SubSection
-              id="axisstream"
-              title={t("Axis streaming (GET/SET)", "轴数据流 (GET/SET)")}
+              id="lock"
+              title={t("lock_(target,state) — GET/SET", "lock_(target,state) — GET/SET")}
             >
               <SpecCard
                 entries={[
                   {
                     label: t("Command", "命令"),
-                    content: <span className="font-mono">axis() / axis(mode[,period_ms])</span>,
+                    content: <span className="font-mono">lock_(target[,state])</span>,
                   },
                   {
-                    label: t("Params (SET)", "参数 (SET)"),
+                    label: t("Targets", "目标"),
                     content: isCn ? (
-                      <span className="font-mono">
-                        mode：0=关闭（off），1=绝对（abs），2=相对（rel），3=活动（act）；period_ms：1..1000（省略则保持原值）。关闭时可保留 period 但不会使用。
+                      <span>
+                        按键: ml/mm/mr/ms1/ms2; 轴: mx/my/mx+/mx-/my+/my-
                       </span>
                     ) : (
-                      <span className="font-mono">
-                        mode: 0=off, 1=abs, 2=rel, 3=act; period_ms: 1..1000 (kept if omitted). When off, the stored period is retained but not used.
+                      <span>
+                        Buttons: ml/mm/mr/ms1/ms2; Axes: mx/my/mx+/mx-/my+/my-
                       </span>
+                    ),
+                  },
+                  {
+                    label: t("Response (GET)", "响应 (GET)"),
+                    content: <CodeBlock code={`km.lock_(ml,0)\r\n>>> `} />,
+                  },
+                  {
+                    label: t("Response (SET)", "响应 (SET)"),
+                    content: <CodeBlock code={`km.lock_(mx,1)\r\n>>> `} />,
+                  },
+                ]}
+              />
+            </SubSection>
+
+            <SubSection
+              id="catch"
+              title={t("catch_([mode]) — GET/SET", "catch_([mode]) — GET/SET")}
+            >
+              <SpecCard
+                entries={[
+                  {
+                    label: t("Command", "命令"),
+                    content: <span className="font-mono">catch_([mode])</span>,
+                  },
+                  {
+                    label: t("Params", "参数"),
+                    content: isCn ? (
+                      <span>mode: 0=自动，1=手动（需先锁定按键）; () 返回状态</span>
+                    ) : (
+                      <span>mode: 0=auto, 1=manual (requires button lock); () returns state</span>
+                    ),
+                  },
+                  {
+                    label: t("Response (GET)", "响应 (GET)"),
+                    content: <CodeBlock code={`km.catch_(0)\r\n>>> `} />,
+                  },
+                  {
+                    label: t("Response (SET)", "响应 (SET)"),
+                    content: <CodeBlock code={`km.catch_(1)\r\n>>> `} />,
+                  },
+                ]}
+              />
+            </SubSection>
+          </Section>
+
+          {/* Keyboard */}
+          <Section id="keyboard" badge={t("Keyboard", "键盘")} title={t("Keyboard Commands", "键盘命令")}>
+            <Tip>
+              {isCn ? (
+                <span>
+                  键盘命令支持两种格式：<strong>数字 HID 码</strong>（如 4）或<strong>字符串名称</strong>（如 'a'、"enter"）。
+                  支持的按键名称包括字母、数字、功能键、导航键和修饰键。详见规范。
+                </span>
+              ) : (
+                <span>
+                  Keyboard commands support two formats: <strong>numeric HID code</strong> (e.g., 4) or <strong>string key name</strong> (e.g., 'a', "enter").
+                  Supported key names include letters, numbers, function keys, navigation keys, and modifiers. See specification for details.
+                </span>
+              )}
+            </Tip>
+
+            <SubSection id="down" title="down(key[,delay_ms]) — SET">
+              <SpecCard
+                entries={[
+                  {
+                    label: t("Command", "命令"),
+                    content: <span className="font-mono">down(key[,delay_ms])</span>,
+                  },
+                  {
+                    label: t("Params", "参数"),
+                    content: isCn ? (
+                      <span>key: HID码或字符串（'a'、"shift"）; delay_ms: 可选延迟</span>
+                    ) : (
+                      <span>key: HID code or quoted string ('a', "shift"); delay_ms: optional</span>
+                    ),
+                  },
+                  {
+                    label: t("Response (SET)", "响应 (SET)"),
+                    content: <CodeBlock code={`km.down('shift')\r\n>>> `} />,
+                  },
+                ]}
+              />
+            </SubSection>
+
+            <SubSection id="up" title="up(key[,delay_ms]) — SET">
+              <SpecCard
+                entries={[
+                  {
+                    label: t("Command", "命令"),
+                    content: <span className="font-mono">up(key[,delay_ms])</span>,
+                  },
+                  {
+                    label: t("Params", "参数"),
+                    content: isCn ? (
+                      <span>key: HID码或字符串（'a'、"ctrl"）; delay_ms: 可选延迟</span>
+                    ) : (
+                      <span>key: HID code or quoted string ('a', "ctrl"); delay_ms: optional</span>
+                    ),
+                  },
+                  {
+                    label: t("Response (SET)", "响应 (SET)"),
+                    content: <CodeBlock code={`km.up("ctrl")\r\n>>> `} />,
+                  },
+                ]}
+              />
+            </SubSection>
+
+            <SubSection id="press" title="press(key[,hold_ms[,rand_ms[,delay_ms]]]) — SET">
+              <SpecCard
+                entries={[
+                  {
+                    label: t("Command", "命令"),
+                    content: <span className="font-mono">press(key[,hold_ms[,rand_ms[,delay_ms]]])</span>,
+                  },
+                  {
+                    label: t("Params", "参数"),
+                    content: isCn ? (
+                      <p>
+                        key: HID码或字符串; hold_ms: 按住时间（默认随机35-85ms，记录日志）; rand_ms、delay_ms: 可选
+                      </p>
+                    ) : (
+                      <p>
+                        key: HID code or quoted string; hold_ms: hold duration (defaults to random 35-85ms, logged); rand_ms, delay_ms: optional
+                      </p>
+                    ),
+                  },
+                  {
+                    label: t("Examples", "示例"),
+                    content: (
+                      <div className="space-y-2">
+                        <CodeBlock code={`km.press('a')\r\n>>> `} />
+                        <CodeBlock code={`km.press("enter")\r\n>>> `} />
+                        <CodeBlock code={`km.press('d', 50)\r\n>>> `} />
+                      </div>
+                    ),
+                  },
+                ]}
+              />
+            </SubSection>
+
+            <SubSection id="string" title="string(text) — SET">
+              <SpecCard
+                entries={[
+                  {
+                    label: t("Command", "命令"),
+                    content: <span className="font-mono">string(text)</span>,
+                  },
+                  {
+                    label: t("Params", "参数"),
+                    content: t(
+                      "text: ASCII string to type",
+                      "text: 要输入的 ASCII 字符串",
+                    ),
+                  },
+                  {
+                    label: t("Response (SET)", "响应 (SET)"),
+                    content: <CodeBlock code={`km.string("hello")\r\n>>> `} />,
+                  },
+                ]}
+              />
+            </SubSection>
+
+            <SubSection id="init" title="init() — SET">
+              <SpecCard
+                entries={[
+                  {
+                    label: t("Command", "命令"),
+                    content: <span className="font-mono">init()</span>,
+                  },
+                  {
+                    label: t("Description", "描述"),
+                    content: t(
+                      "Clear keyboard state",
+                      "清除键盘状态",
+                    ),
+                  },
+                  {
+                    label: t("Response (SET)", "响应 (SET)"),
+                    content: <CodeBlock code={`km.init()\r\n>>> `} />,
+                  },
+                ]}
+              />
+            </SubSection>
+
+            <SubSection id="isdown" title="isdown(key) — GET">
+              <SpecCard
+                entries={[
+                  {
+                    label: t("Command", "命令"),
+                    content: <span className="font-mono">isdown(key)</span>,
+                  },
+                  {
+                    label: t("Params", "参数"),
+                    content: isCn ? (
+                      <span>key: HID码或字符串（'a'、"shift"）</span>
+                    ) : (
+                      <span>key: HID code or quoted string ('a', "shift")</span>
                     ),
                   },
                   {
                     label: t("Response (GET)", "响应 (GET)"),
                     content: (
                       <div className="space-y-3">
-                        <CodeBlock code={`km.axis(rel,25)\r\n>>> `} />
+                        <CodeBlock code={`km.isdown("ctrl",1)\r\n>>> `} />
                         <p className="text-sm text-muted-foreground">
                           {t(
-                            "Returns the resolved mode and current period.",
-                            "返回解析后的模式与当前周期。"
-                          )}
-                        </p>
-                      </div>
-                    ),
-                  },
-                  {
-                    label: t("Response (SET)", "响应 (SET)"),
-                    content: (
-                      <div className="space-y-3">
-                        <CodeBlock code={`km.axis(act,1)\r\n>>> `} />
-                        <p className="text-sm text-muted-foreground">
-                          {t(
-                            "ACK returns the normalized pair (mode,period); not a verbatim echo; honors echo(0|1).",
-                            "ACK 返回标准化后的 (mode,period)；非原样回显；受 echo(0|1) 影响。"
+                            "Returns 1 if key is down, 0 if released.",
+                            "如果按键按下返回 1，释放返回 0。",
                           )}
                         </p>
                       </div>
@@ -806,229 +1063,188 @@ export default async function ApiPage({ params }: LangProps) {
               />
             </SubSection>
 
-            {/* Buttons streaming */}
+            <SubSection id="mask" title="mask(key[,mode]) — GET/SET">
+              <SpecCard
+                entries={[
+                  {
+                    label: t("Command", "命令"),
+                    content: <span className="font-mono">mask(key[,mode])</span>,
+                  },
+                  {
+                    label: t("Params", "参数"),
+                    content: isCn ? (
+                      <span>key: HID码或字符串; mode: 0=关闭，1=开启</span>
+                    ) : (
+                      <span>key: HID code or quoted string; mode: 0=off, 1=on</span>
+                    ),
+                  },
+                  {
+                    label: t("Response", "响应"),
+                    content: <CodeBlock code={`km.mask('a',1)\r\n>>> `} />,
+                  },
+                ]}
+              />
+            </SubSection>
+
+            <SubSection id="remap" title="remap(source,target) — GET/SET">
+              <SpecCard
+                entries={[
+                  {
+                    label: t("Command", "命令"),
+                    content: <span className="font-mono">remap(source,target)</span>,
+                  },
+                  {
+                    label: t("Params", "参数"),
+                    content: isCn ? (
+                      <span>source,target: 均可为HID码或字符串; target=0 清除映射（透传）</span>
+                    ) : (
+                      <span>source,target: both can be HID code or quoted string; target=0 clears remap (passthrough)</span>
+                    ),
+                  },
+                  {
+                    label: t("Examples", "示例"),
+                    content: (
+                      <div className="space-y-2">
+                        <CodeBlock code={`km.remap('a','b')\r\n>>> `} />
+                        <CodeBlock code={`km.remap('a',0)\r\n>>> `} />
+                      </div>
+                    ),
+                  },
+                ]}
+              />
+            </SubSection>
+          </Section>
+
+          {/* Streaming */}
+          <Section id="streaming" badge={t("Streaming", "流式")} title={t("Streaming", "流式")}>
             <SubSection
-              id="buttons-global"
-              title={t("Buttons streaming (GET/SET)", "按键流式 (GET/SET)")}
+              id="buttons-stream"
+              title={t("buttons([raw/mut[,time_ms]]) — GET/SET", "buttons([raw/mut[,time_ms]]) — GET/SET")}
             >
               <SpecCard
                 entries={[
                   {
                     label: t("Command", "命令"),
-                    content: <span className="font-mono">buttons() / buttons(mode[,period_ms])</span>,
+                    content: <span className="font-mono">buttons([raw/mut[,time_ms]])</span>,
                   },
                   {
                     label: t("Params", "参数"),
                     content: isCn ? (
-                      <span className="font-mono">mode：0=关闭（off），1=原始（raw/物理），2=处理后（mut/后编辑）；period_ms：1..1000（省略则保持原值；关闭时保留但不使用）。</span>
+                      <span>1=raw（原始），2=mut（处理后）; time_ms: 1-1000ms; (0) 或 (0,0) 重置</span>
                     ) : (
-                      <span className="font-mono">mode: 0=off, 1=raw (physical), 2=mut (post-edit); period_ms: 1..1000 (kept if omitted; retained when off but not used).</span>
+                      <span>1=raw, 2=mut; time_ms: 1-1000ms; (0) or (0,0) to reset</span>
                     ),
                   },
                   {
                     label: t("Response (GET)", "响应 (GET)"),
-                    content: (
-                      <div className="space-y-3">
-                        <CodeBlock code={`km.buttons(mut,25)\r\n>>> `} />
-                        <p className="text-xs text-muted-foreground">
-                          {t(
-                            "Human-readable mode with current period (ms).",
-                            "人类可读模式名称及当前周期（毫秒）。"
-                          )}
-                        </p>
-                      </div>
-                    ),
+                    content: <CodeBlock code={`km.buttons(mut,25)\r\n>>> `} />,
                   },
                   {
                     label: t("Response (SET)", "响应 (SET)"),
-                    content: (
-                      <div className="space-y-3">
-                        <CodeBlock code={`km.buttons(raw,10)\r\n>>> `} />
-                        <p className="text-xs text-muted-foreground">
-                          {t(
-                            "ACK reports the normalized (mode,period); honors echo(0|1).",
-                            "ACK 返回标准化后的 (mode,period)；受 echo(0|1) 影响。"
-                          )}
-                        </p>
-                      </div>
-                    ),
+                    content: <CodeBlock code={`km.buttons(raw,10)\r\n>>> `} />,
                   },
                 ]}
                 footer={
                   <div className="space-y-2">
                     <p className="text-sm">
                       {isCn
-                        ? "启用后且到达周期时，设备按变化去重后上报 1 字节掩码："
-                        : "When enabled and the period elapses, the device emits a de-duplicated 1-byte mask:"}
+                        ? "启用后，设备会发送 1 字节掩码："
+                        : "When enabled, device emits 1-byte mask:"}
                     </p>
                     <CodeBlock code={`km.buttons<mask_u8>\r\n>>> `} />
-                    <ul className="list-disc pl-5 text-xs text-muted-foreground space-y-1">
-                      <li>
-                        {isCn
-                          ? "raw：掩码为物理（未编辑）；mut：掩码为编辑后的有效状态。"
-                          : "raw: physical (pre-edit) mask; mut: processed (post-edit) mask."}
-                      </li>
-                      <li>
-                        {isCn
-                          ? "严格自门控（self-gated）：仅在达到 period_ms 时检查并发送；每种视图各自去重。"
-                          : "Strictly self-gated: only checks/sends when period_ms has elapsed; per-view de-duplication."}
-                      </li>
-                    </ul>
                   </div>
                 }
               />
             </SubSection>
 
-            {/* Mouse composite streaming */}
             <SubSection
-              id="mouse-composite"
-              title={t("Mouse composite streaming (GET/SET)", "鼠标复合流 (GET/SET)")}
+              id="axis-stream"
+              title={t("axis([raw/mut[,time_ms]]) — GET/SET", "axis([raw/mut[,time_ms]]) — GET/SET")}
             >
               <SpecCard
                 entries={[
                   {
                     label: t("Command", "命令"),
-                    content: <span className="font-mono">mouse() / mouse(mode[,period_ms])</span>,
-                  },
-                  {
-                    label: t("Modes", "模式"),
-                    content: isCn ? (
-                      <span className="font-mono">0=关闭（off），1=原始（raw），2=处理后（mut）</span>
-                    ) : (
-                      <span className="font-mono">0=off, 1=raw, 2=mut</span>
-                    ),
+                    content: <span className="font-mono">axis([raw/mut[,time_ms]])</span>,
                   },
                   {
                     label: t("Params", "参数"),
                     content: isCn ? (
-                      <span className="font-mono">period_ms：1..1000（省略则保持原值；关闭时保留但不使用）。到期按变化去重零抑制发送。</span>
+                      <span>1=raw（原始），2=mut（处理后）; time_ms: 1-1000ms; (0) 或 (0,0) 重置</span>
                     ) : (
-                      <span className="font-mono">period_ms: 1..1000 (kept if omitted; retained when off but unused). Rate-limited; zero-suppressed with de-dup.</span>
+                      <span>1=raw, 2=mut; time_ms: 1-1000ms; (0) or (0,0) to reset</span>
                     ),
                   },
                   {
-                    label: t("GET reply", "GET 响应"),
+                    label: t("Response (GET)", "响应 (GET)"),
+                    content: <CodeBlock code={`km.axis(raw,25)\r\n>>> `} />,
+                  },
+                  {
+                    label: t("Response (SET)", "响应 (SET)"),
+                    content: <CodeBlock code={`km.axis(mut,10)\r\n>>> `} />,
+                  },
+                ]}
+              />
+            </SubSection>
+
+            <SubSection
+              id="mouse-stream"
+              title={t("mouse([mode[,period_ms]]) — GET/SET", "mouse([mode[,period_ms]]) — GET/SET")}
+            >
+              <SpecCard
+                entries={[
+                  {
+                    label: t("Command", "命令"),
+                    content: <span className="font-mono">mouse([mode[,period_ms]])</span>,
+                  },
+                  {
+                    label: t("Modes", "模式"),
+                    content: isCn ? (
+                      <span>1=raw（原始），2=mut（处理后）; period_ms: 1-1000ms; () 查询; (0) 或 (0,0) 重置</span>
+                    ) : (
+                      <span>1=raw, 2=mut; period_ms: 1-1000ms; () to query; (0) or (0,0) to reset</span>
+                    ),
+                  },
+                  {
+                    label: t("Response (GET)", "响应 (GET)"),
                     content: <CodeBlock code={`km.mouse(mut,25)\r\n>>> `} />,
                   },
                   {
-                    label: t("SET reply", "SET 响应"),
-                    content: (
-                      <div className="space-y-3">
-                        <CodeBlock code={`km.mouse(raw,10)\r\n>>> `} />
-                        <p className="text-sm text-muted-foreground">
-                          {t("ACK returns normalized (mode,period); honors echo.", "ACK 返回标准化后的 (mode,period)；受 echo 影响。")}
-                        </p>
-                      </div>
-                    ),
+                    label: t("Response (SET)", "响应 (SET)"),
+                    content: <CodeBlock code={`km.mouse(raw,10)\r\n>>> `} />,
                   },
                   {
                     label: t("Streaming format", "流格式"),
                     content: (
                       <div className="space-y-2">
                         <p className="text-sm">
-                          {t("While enabled, device emits one fixed-length binary frame per event:", "启用后，设备每次事件发送一帧定长二进制：")}
+                          {t("Device emits 8-byte binary frame (x,y as int16):", "设备发送 8 字节二进制帧（x,y 为 int16）：")}
                         </p>
-                        <CodeBlock code={`km.mouse<bytes>\r\n>>> `} />
-                        <p className="text-sm text-muted-foreground">
-                          {t(
-                            "Bytes follow the ASCII prefix directly; line still ends with CRLF and the prompt.",
-                            "字节紧随 ASCII 前缀；行尾仍为 CRLF 与提示符。",
-                          )}
-                        </p>
-                      </div>
-                    ),
-                  },
-                  {
-                    label: t("Binary layout (LE)", "二进制布局（小端）"),
-                    content: (
-                      <div className="space-y-2">
-                        <ul className="list-disc pl-5">
-                          <li>{t("mask: u8 — button bitmask", "mask：u8 — 按键位掩码")}</li>
-                          <li>{t("x: int16 — X delta/position*", "x：int16 — X 变化/位置*")}</li>
-                          <li>{t("y: int16 — Y delta/position*", "y：int16 — Y 变化/位置*")}</li>
-                          <li>{t("wheel: int8 — vertical wheel", "wheel：int8 — 垂直滚轮")}</li>
-                          <li>{t("pan: int8 — horizontal wheel (tilt-wheel)", "pan：int8 — 水平滚轮（倾斜）")}</li>
-                          <li>{t("tilt: int8 — additional tilt/aux axis", "tilt：int8 — 附加倾斜/辅助轴")}</li>
-                        </ul>
-                        <p className="text-sm text-muted-foreground">
-                          {t(
-                            "*Raw: x/y are raw deltas. Mut: post-edit effective. If km.axis(abs) is active, x/y are absolute, clamped to screen.",
-                            "＊raw：x/y 为原始增量；mut：为编辑后的有效值。若启用 km.axis(abs)，x/y 为屏幕限制的绝对坐标。",
-                          )}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          {t(
-                            "Non-applicable fields are encoded as 00 to preserve spacing.",
-                            "不适用字段以 00 编码以保持长度与对齐。",
-                          )}
-                        </p>
+                        <CodeBlock code={`km.mouse<8 bytes>\r\n>>> `} />
                       </div>
                     ),
                   },
                 ]}
-                footer={
-                  <div className="space-y-3">
-                    <div>
-                      <div className="font-mono text-xs">{t("Example (hex, spaced):", "示例（十六进制，分组空格）：")}</div>
-                      <CodeBlock code={`km.mouse  07 00  05 00  FB FF  01  FF  00\r\n>>> `} />
-                      <p className="text-sm text-muted-foreground">
-                        {t(
-                          "mask=0x07, x=+5 (05 00), y=-5 (FB FF), wheel=+1 (01), pan=-1 (FF), tilt=0 (00)",
-                          "mask=0x07，x=+5（05 00），y=-5（FB FF），wheel=+1（01），pan=-1（FF），tilt=0（00）",
-                        )}
-                      </p>
-                    </div>
-                    <Tip>
-                      {isCn ? (
-                        <span>所有多字节字段为<strong>小端</strong>；每帧 8 字节：1+2+2+1+1+1。</span>
-                      ) : (
-                        <span>All multi-byte fields are <strong>little-endian</strong>; each frame is 8 bytes: 1+2+2+1+1+1.</span>
-                      )}
-                    </Tip>
-                  </div>
-                }
               />
             </SubSection>
           </Section>
 
           {/* Position & Screen */}
-          <Section id="posscreen" badge={t("Screen", "屏幕")} title={t("Position & Screen", "位置与屏幕")}>
-            <SubSection id="getpos" title="getpos() — GET">
+          <Section id="screen" badge={t("Screen", "屏幕")} title={t("Position & Screen", "位置与屏幕")}>
+            <SubSection id="screen-cmd" title="screen([W,H]) — GET/SET">
               <SpecCard
                 entries={[
                   {
                     label: t("Command", "命令"),
-                    content: <span className="font-mono">getpos()</span>,
+                    content: <span className="font-mono">screen([width,height])</span>,
                   },
                   {
-                    label: t("Response (GET)", "响应 (GET)"),
-                    content: (
-                      <div className="space-y-3">
-                        <CodeBlock code={`km.(123,456)\r\n>>> `} />
-                        <p className="text-sm text-muted-foreground">
-                          {isCn ? (
-                            <span>
-                              绝对坐标（受 <span className="font-mono">screen(W,H)</span> 限制）。
-                            </span>
-                          ) : (
-                            <span>
-                              Absolute position (clamped to <span className="font-mono">screen(W,H)</span>).
-                            </span>
-                          )}
-                        </p>
-                      </div>
+                    label: t("Params", "参数"),
+                    content: isCn ? (
+                      <span>() 查询; (width,height) 设置虚拟屏幕尺寸</span>
+                    ) : (
+                      <span>() to query; (width,height) to set virtual screen size</span>
                     ),
-                  },
-                ]}
-              />
-            </SubSection>
-
-            <SubSection id="screen" title="screen() / screen(W,H) — GET/SET">
-              <SpecCard
-                entries={[
-                  {
-                    label: t("Command", "命令"),
-                    content: <span className="font-mono">screen() / screen(W,H)</span>,
                   },
                   {
                     label: t("Response (GET)", "响应 (GET)"),
@@ -1043,41 +1259,212 @@ export default async function ApiPage({ params }: LangProps) {
             </SubSection>
           </Section>
 
-          {/* Baud (user-facing ASCII) */}
-          <Section
-            id="baud"
-            badge={t("SETTINGS", "设置")}
-            title={t("Baud rate", "波特率")}
-          >
-            <SubSection id="baud-cmd" title={t("Baud rate (GET/SET)", "波特率 (GET/SET)")}>
+          {/* System Commands */}
+          <Section id="system" badge={t("System", "系统")} title={t("System Commands", "系统命令")}>
+            <SubSection id="help" title="help() — GET">
               <SpecCard
                 entries={[
                   {
                     label: t("Command", "命令"),
-                    content: <span className="font-mono">baud() / baud(&lt;rate&gt;)</span>,
+                    content: <span className="font-mono">help()</span>,
+                  },
+                  {
+                    label: t("Description", "描述"),
+                    content: t(
+                      "Show command list",
+                      "显示命令列表",
+                    ),
+                  },
+                  {
+                    label: t("Response (GET)", "响应 (GET)"),
+                    content: <CodeBlock code={`km.help()\r\n>>> `} />,
+                  },
+                ]}
+              />
+            </SubSection>
+
+            <SubSection id="info" title="info() — GET">
+              <SpecCard
+                entries={[
+                  {
+                    label: t("Command", "命令"),
+                    content: <span className="font-mono">info()</span>,
+                  },
+                  {
+                    label: t("Description", "描述"),
+                    content: t(
+                      "Report system info: temperature, RAM, firmware, CPU, uptime",
+                      "报告系统信息：温度、RAM、固件、CPU、运行时间",
+                    ),
+                  },
+                  {
+                    label: t("Response (GET)", "响应 (GET)"),
+                    content: <CodeBlock code={`km.info()\r\n>>> `} />,
+                  },
+                ]}
+              />
+            </SubSection>
+
+            <SubSection id="version" title="version() — GET">
+              <SpecCard
+                entries={[
+                  {
+                    label: t("Command", "命令"),
+                    content: <span className="font-mono">version()</span>,
+                  },
+                  {
+                    label: t("Description", "描述"),
+                    content: t(
+                      "Report firmware version",
+                      "报告固件版本",
+                    ),
+                  },
+                  {
+                    label: t("Response (GET)", "响应 (GET)"),
+                    content: <CodeBlock code={`km.version()\r\n>>> `} />,
+                  },
+                ]}
+              />
+            </SubSection>
+
+            <SubSection id="device" title="device() — GET">
+              <SpecCard
+                entries={[
+                  {
+                    label: t("Command", "命令"),
+                    content: <span className="font-mono">device()</span>,
+                  },
+                  {
+                    label: t("Description", "描述"),
+                    content: t(
+                      "Report which device is used more: (keyboard), (mouse), or (none)",
+                      "报告使用较多的设备：(keyboard)、(mouse) 或 (none)",
+                    ),
+                  },
+                  {
+                    label: t("Response (GET)", "响应 (GET)"),
+                    content: <CodeBlock code={`km.device()\r\n>>> `} />,
+                  },
+                ]}
+              />
+            </SubSection>
+
+            <SubSection id="reboot" title="reboot() — SET">
+              <SpecCard
+                entries={[
+                  {
+                    label: t("Command", "命令"),
+                    content: <span className="font-mono">reboot()</span>,
+                  },
+                  {
+                    label: t("Description", "描述"),
+                    content: t(
+                      "Reboot device (reboots after response)",
+                      "重启设备（响应后重启）",
+                    ),
+                  },
+                  {
+                    label: t("Response (SET)", "响应 (SET)"),
+                    content: <CodeBlock code={`km.reboot()\r\n>>> `} />,
+                  },
+                ]}
+              />
+            </SubSection>
+
+            <SubSection id="serial" title="serial([text]) — GET/SET">
+              <SpecCard
+                entries={[
+                  {
+                    label: t("Command", "命令"),
+                    content: <span className="font-mono">serial([text])</span>,
                   },
                   {
                     label: t("Params", "参数"),
                     content: isCn ? (
-                      <span className="font-mono">
-                        rate：115200 – 4000000；使用 <strong>0</strong> 重置为 115200。
+                      <span>() 查询; (text) 设置序列号</span>
+                    ) : (
+                      <span>() to query; (text) to set serial value</span>
+                    ),
+                  },
+                  {
+                    label: t("Response", "响应"),
+                    content: <CodeBlock code={`km.serial("MAKCU001")\r\n>>> `} />,
+                  },
+                ]}
+              />
+            </SubSection>
+          </Section>
+
+          {/* Configuration */}
+          <Section id="config" badge={t("Config", "配置")} title={t("Configuration", "配置")}>
+            <SubSection id="log" title="log([level]) — GET/SET">
+              <SpecCard
+                entries={[
+                  {
+                    label: t("Command", "命令"),
+                    content: <span className="font-mono">log([level])</span>,
+                  },
+                  {
+                    label: t("Params", "参数"),
+                    content: isCn ? (
+                      <span>level: 0-5; 空参数时查询当前级别</span>
+                    ) : (
+                      <span>level: 0-5; empty to query current level</span>
+                    ),
+                  },
+                  {
+                    label: t("Response", "响应"),
+                    content: <CodeBlock code={`km.log(3)\r\n>>> `} />,
+                  },
+                ]}
+              />
+            </SubSection>
+
+            <SubSection id="echo" title="echo([enable]) — GET/SET">
+              <SpecCard
+                entries={[
+                  {
+                    label: t("Command", "命令"),
+                    content: <span className="font-mono">echo([enable])</span>,
+                  },
+                  {
+                    label: t("Params", "参数"),
+                    content: isCn ? (
+                      <span>enable: 1=开启，0=关闭; 空参数时查询</span>
+                    ) : (
+                      <span>enable: 1=on, 0=off; empty to query</span>
+                    ),
+                  },
+                  {
+                    label: t("Response", "响应"),
+                    content: <CodeBlock code={`km.echo(1)\r\n>>> `} />,
+                  },
+                ]}
+              />
+            </SubSection>
+
+            <SubSection id="baud" title="baud([rate]) — GET/SET">
+              <SpecCard
+                entries={[
+                  {
+                    label: t("Command", "命令"),
+                    content: <span className="font-mono">baud([rate])</span>,
+                  },
+                  {
+                    label: t("Params", "参数"),
+                    content: isCn ? (
+                      <span>
+                        rate: 115200 – 4000000; 0=重置为默认115200; 空参数时查询
                       </span>
                     ) : (
-                      <span className="font-mono">
-                        rate: 115200 – 4000000; use <strong>0</strong> to reset to 115200.
+                      <span>
+                        rate: 115200 – 4000000; 0=reset to default 115200; empty to query
                       </span>
                     ),
                   },
                   {
                     label: t("Response (GET)", "响应 (GET)"),
-                    content: (
-                      <div className="space-y-3">
-                        <CodeBlock code={`km.baud(115200)\r\n>>> `} />
-                        <p className="text-sm text-muted-foreground">
-                          {t("Returns current baud rate.", "返回当前波特率。")}
-                        </p>
-                      </div>
-                    ),
+                    content: <CodeBlock code={`km.baud(115200)\r\n>>> `} />,
                   },
                   {
                     label: t("Response (SET)", "响应 (SET)"),
@@ -1093,75 +1480,65 @@ export default async function ApiPage({ params }: LangProps) {
                       </div>
                     ),
                   },
+                ]}
+              />
+            </SubSection>
+
+            <SubSection id="hs" title="hs([enable]) — GET/SET">
+              <SpecCard
+                entries={[
                   {
-                    label: t("Reset (SET)", "重置 (SET)"),
-                    content: (
-                      <div className="space-y-3">
-                        <CodeBlock code={`km.baud(0)\r\n>>> `} />
-                        <p className="text-sm text-muted-foreground">
-                          {t("Resets to default 115200 baud.", "重置为默认 115200 波特率。")}
-                        </p>
-                      </div>
+                    label: t("Command", "命令"),
+                    content: <span className="font-mono">hs([enable])</span>,
+                  },
+                  {
+                    label: t("Description", "描述"),
+                    content: isCn ? (
+                      <span>
+                        USB 高速兼容性（用于可能不正确报告轮询率的设备）*持久化设置
+                      </span>
+                    ) : (
+                      <span>
+                        USB high-speed compatibility for devices that may not report poll rate correctly *persistent
+                      </span>
                     ),
+                  },
+                  {
+                    label: t("Params", "参数"),
+                    content: isCn ? (
+                      <span>() 查询; (1/0) 启用/禁用</span>
+                    ) : (
+                      <span>() query; (1/0) enable/disable</span>
+                    ),
+                  },
+                  {
+                    label: t("Response", "响应"),
+                    content: <CodeBlock code={`km.hs(1)\r\n>>> `} />,
                   },
                 ]}
               />
             </SubSection>
           </Section>
 
-          {/* NEW API below Streaming, above SPEC */}
+          {/* Baud Binary */}
           <Section
             id="baud-binary"
-            badge={t("NEW API", "新 API")}
-            title={t("Baud rate change (Binary)", "波特率变更（二进制）")}
+            badge={t("Binary", "二进制")}
+            title={t("Baud Rate Change (Binary)", "波特率变更（二进制）")}
           >
             <SpecCard
               entries={[
                 {
                   label: t("Purpose", "用途"),
                   content: isCn ? (
-                    <span className="font-mono">通过二进制帧设置 UART 波特率（无 ASCII 指令）。</span>
+                    <span>通过二进制帧设置 UART 波特率（无 ASCII 指令）。</span>
                   ) : (
-                    <span className="font-mono">
-                      Set UART baud rate using a binary frame (no ASCII command).
-                    </span>
+                    <span>Set UART baud rate using a binary frame (no ASCII command).</span>
                   ),
                 },
                 {
                   label: t("Frame", "帧格式"),
                   content: <span className="font-mono">DE AD &lt;lenLE:2&gt; &lt;cmd:0xA5&gt; &lt;baud_rate:LE32&gt;</span>,
-                },
-                {
-                  label: t("Header", "头部"),
-                  content: <span className="font-mono">DE AD</span>,
-                },
-                {
-                  label: t("Length", "长度"),
-                  content: isCn ? (
-                    <span className="font-mono">
-                      小端 u16（仅负载字节）。此命令固定为 <strong>5</strong>（1 字节指令 + 4 字节波特率）。
-                    </span>
-                  ) : (
-                    <span className="font-mono">
-                      u16 little-endian (payload bytes only). For this command: <strong>5</strong> (1 cmd + 4 baud)
-                    </span>
-                  ),
-                },
-                {
-                  label: t("Command", "命令"),
-                  content: <span className="font-mono">0xA5 (baud rate set)</span>,
-                },
-                {
-                  label: t("Payload", "负载"),
-                  content: isCn ? (
-                    <span className="font-mono">
-                      uint32_t <strong>baud_rate</strong>（小端）。示例：115200 → 00 C2 01 00
-                    </span>
-                  ) : (
-                    <span className="font-mono">
-                      uint32_t <strong>baud_rate</strong> (little-endian). Example: 115200 → 00 C2 01 00
-                    </span>
-                  ),
                 },
                 {
                   label: t("Example (115200)", "示例 (115200)"),
@@ -1178,7 +1555,7 @@ export default async function ApiPage({ params }: LangProps) {
                         ) : (
                           <span>
                             Breakdown: <span className="font-mono">DE AD</span> | <span className="font-mono">05 00</span>
-                            (len=5) | <span className="font-mono"> A5</span> (cmd) |
+                            (len=5) | <span className="font-mono">A5</span> (cmd) |
                             <span className="font-mono">00 C2 01 00</span> (115200 LE)
                           </span>
                         )}
@@ -1186,21 +1563,11 @@ export default async function ApiPage({ params }: LangProps) {
                     </div>
                   ),
                 },
-                {
-                  label: t("Effect", "生效"),
-                  content: isCn ? (
-                    <span className="font-mono">立即生效；主机需以新波特率重新同步串口。</span>
-                  ) : (
-                    <span className="font-mono">
-                      Applies immediately; host must re-sync serial port at the new speed.
-                    </span>
-                  ),
-                },
               ]}
             />
           </Section>
 
-          {/* Limits & Parsing (SPEC) */}
+          {/* Limits & Parsing */}
           <Section
             id="limits"
             badge={t("Spec", "规格")}
@@ -1209,6 +1576,17 @@ export default async function ApiPage({ params }: LangProps) {
             <Card className="border-border/60 bg-card/90 shadow-lg">
               <CardContent className="p-6">
                 <ul className="list-disc space-y-2 pl-5 text-sm text-muted-foreground">
+                  <li>
+                    {isCn ? (
+                      <span>
+                        所有命令均以 <span className="font-mono">km.</span> 开头
+                      </span>
+                    ) : (
+                      <span>
+                        All commands prefixed with <span className="font-mono">km.</span>
+                      </span>
+                    )}
+                  </li>
                   <li>
                     {isCn ? (
                       <span>
@@ -1243,24 +1621,35 @@ export default async function ApiPage({ params }: LangProps) {
                     )}
                   </li>
                   <li>
-                    {t("Legacy ASCII terminators: ", "传统 ASCII 终止符：")}
-                    <span className="font-mono">\r</span>, <span className="font-mono">\n</span>, <span className="font-mono"> ;</span>
+                    {t("ASCII terminators: ", "ASCII 终止符：")}
+                    <span className="font-mono">\r</span>, <span className="font-mono">\n</span>, <span className="font-mono">;</span>
                   </li>
                   <li>
                     {isCn ? (
                       <span>
-                        支持二进制接收：<span className="font-mono">DE AD &lt;lenLE&gt; &lt;payload&gt;</span>
+                        键盘命令支持数字 HID 码或引号字符串（'a', "enter"）
                       </span>
                     ) : (
                       <span>
-                        Binary RX supported: <span className="font-mono">DE AD &lt;lenLE&gt; &lt;payload&gt;</span>
+                        Keyboard commands support numeric HID codes or quoted strings ('a', "enter")
                       </span>
                     )}
                   </li>
                   <li>
                     {isCn ? (
                       <span>
-                        <span className="font-mono">echo(0)</span> 会抑制大多数 setter 回显；GET 仍会返回。
+                        支持的按键名称：a-z, 0-9, enter, esc, tab, space, shift, ctrl, alt, gui, F1-F12, 方向键等
+                      </span>
+                    ) : (
+                      <span>
+                        Supported key names: a-z, 0-9, enter, esc, tab, space, shift, ctrl, alt, gui, F1-F12, arrow keys, etc.
+                      </span>
+                    )}
+                  </li>
+                  <li>
+                    {isCn ? (
+                      <span>
+                        <span className="font-mono">echo(0)</span> 会抑制大多数 setter 回显；GET 仍会返回
                       </span>
                     ) : (
                       <span>
@@ -1271,11 +1660,22 @@ export default async function ApiPage({ params }: LangProps) {
                   <li>
                     {isCn ? (
                       <span>
-                        波特率范围（<span className="font-mono">baud()</span>）：<strong>115200–4000000</strong>；<span className="font-mono">baud(0)</span> 重置为 115200。
+                        波特率范围：<strong>115200–4000000</strong>; <span className="font-mono">baud(0)</span> 重置为 115200
                       </span>
                     ) : (
                       <span>
-                        Baud range (<span className="font-mono">baud()</span>): <strong>115200–4000000</strong>; <span className="font-mono">baud(0)</span> resets to 115200.
+                        Baud range: <strong>115200–4000000</strong>; <span className="font-mono">baud(0)</span> resets to 115200
+                      </span>
+                    )}
+                  </li>
+                  <li>
+                    {isCn ? (
+                      <span>
+                        大多数命令在未连接 USB 设备时也能工作（详见命令参考）
+                      </span>
+                    ) : (
+                      <span>
+                        Most commands work without USB device attached (see command reference)
                       </span>
                     )}
                   </li>
@@ -1284,26 +1684,8 @@ export default async function ApiPage({ params }: LangProps) {
             </Card>
           </Section>
 
-          {/* Tips */}
-          <Section id="tips" badge={t("Notes", "备注")} title={t("Tips", "提示")}>
-            <Card className="border-border/60 bg-card/90 shadow-lg">
-              <CardContent className="p-6 text-sm text-muted-foreground">
-                {isCn ? (
-                  <span>
-                    <span className="font-mono">km.axis</span> 函数可完全解耦鼠标移动。配合 X/Y 轴锁定，可将用户输入与主机隔离，实现平滑的程序化控制。
-                  </span>
-                ) : (
-                  <span>
-                    The <span className="font-mono">km.axis</span> function can fully decouple mouse movement. Combined with
-                    X/Y axis locks, this isolates user inputs from the host for seamless programmatic control.
-                  </span>
-                )}
-              </CardContent>
-            </Card>
-          </Section>
-
           <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-border/60 bg-muted/30 px-6 py-4 text-xs uppercase tracking-[0.3em] text-muted-foreground">
-            <span>{t("API version 3.8", "API 版本 3.8")}</span>
+            <span>{t("API version 3.9", "API 版本 3.9")}</span>
             <span>makcu 2025</span>
           </div>
         </div>
