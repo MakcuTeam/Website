@@ -1836,33 +1836,22 @@ export default async function ApiPage({ params }: LangProps) {
                   <li>
                     {isCn ? (
                       <span>
-                        所有命令均以 <span className="font-mono">km.</span> 开头
+                        贝塞尔分段：<strong>最大 512</strong>
                       </span>
                     ) : (
                       <span>
-                        All commands prefixed with <span className="font-mono">km.</span>
+                        Bézier segments: <strong>max 512</strong>
                       </span>
                     )}
                   </li>
                   <li>
                     {isCn ? (
                       <span>
-                        贝塞尔分段：默认 1，<strong>最大 512</strong>
+                        移动：<strong>int16</strong>
                       </span>
                     ) : (
                       <span>
-                        Bézier segments: default 1, <strong>max 512</strong>
-                      </span>
-                    )}
-                  </li>
-                  <li>
-                    {isCn ? (
-                      <span>
-                        移动数值：<strong>int16</strong>（饱和）
-                      </span>
-                    ) : (
-                      <span>
-                        Movement integers: <strong>int16</strong> with saturation
+                        Movement: <strong>int16</strong>
                       </span>
                     )}
                   </li>
@@ -1876,10 +1865,6 @@ export default async function ApiPage({ params }: LangProps) {
                         Wheel: <strong>int8</strong>
                       </span>
                     )}
-                  </li>
-                  <li>
-                    {t("ASCII terminators: ", "ASCII 终止符：")}
-                    <span className="font-mono">\r</span>, <span className="font-mono">\n</span>, <span className="font-mono">;</span>
                   </li>
                   <li>
                     {isCn ? (
@@ -1922,17 +1907,6 @@ export default async function ApiPage({ params }: LangProps) {
                     ) : (
                       <span>
                         Baud range: <strong>115200–4000000</strong>; <span className="font-mono">baud(0)</span> resets to 115200
-                      </span>
-                    )}
-                  </li>
-                  <li>
-                    {isCn ? (
-                      <span>
-                        大多数命令在未连接 USB 设备时也能工作（详见命令参考）
-                      </span>
-                    ) : (
-                      <span>
-                        Most commands work without USB device attached (see command reference)
                       </span>
                     )}
                   </li>
