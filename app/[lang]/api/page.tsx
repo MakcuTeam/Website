@@ -530,17 +530,17 @@ export default async function ApiPage({ params }: LangProps) {
                 entries={[
                   {
                     label: t("Command", "命令"),
-                    content: <span className="font-mono">left([state[,delay_ms]]) | right([state[,delay_ms]]) | middle([state[,delay_ms]]) | side1([state[,delay_ms]]) | side2([state[,delay_ms]])</span>,
+                    content: <span className="font-mono">left([state]) | right([state]) | middle([state]) | side1([state]) | side2([state])</span>,
                   },
                   {
                     label: t("Params", "参数"),
                     content: isCn ? (
                       <span>
-                        state: 0=释放（发送帧），1=按下，2=静默释放（设为0但不发送帧）; delay_ms: 可选延迟
+                        state: 0=释放（发送帧），1=按下，2=静默释放（设为0但不发送帧）
                       </span>
                     ) : (
                       <span>
-                        state: 0=release (sends frame), 1=down, 2=silent_release (sets to 0 but doesn't send frame); delay_ms: optional delay
+                        state: 0=release (sends frame), 1=down, 2=silent_release (sets to 0 but doesn't send frame)
                       </span>
                     ),
                   },
