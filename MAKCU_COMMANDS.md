@@ -19,7 +19,7 @@ Welcome to the Makcu help. All commands shown are listed below. For more info, s
 | `km.info(help)` | Report system info | `()` - MAC, temp, ram, fw, cpu, uptime |
 | `km.log(help)` | Set log level | `(level)` - 0-5, empty to query |
 | `km.reboot(help)` | Reboot device | `()` - reboots after response |
-| `km.release(help)` | Auto-release timer | `()` get status (0=disabled, else time ms); `(timer_ms)` set timer 500-300000ms (5 min), (0) disables; releases all active locks/buttons/keys when expired |
+| `km.release(help)` | Auto-release monitoring system | `()` get status (0=disabled, else time ms); `(timer_ms)` set timer 500-300000ms (5 min), (0) disables; monitors independent lock/button/key values and releases only active ones when expired; setting is persistently saved and enabled on startup/boot |
 | `km.screen(help)` | Query or set virtual screen size | `()` to query, `(width,height)` to set |
 | `km.serial(help)` | Manage serial number | `()` query, `(0)` reset, `(text)` set sanitized value |
 | `km.version(help)` | Report firmware version | `()` |
@@ -31,7 +31,7 @@ Welcome to the Makcu help. All commands shown are listed below. For more info, s
 | `km.down(help)` | Press key down | `(key)` - HID code or quoted key name |
 | `km.init(help)` | Clear keyboard state | `()` |
 | `km.isdown(help)` | Query key down state | `(key)` - key: numeric HID code or quoted string ('a', "shift") |
-| `km.keys(help)` | Stream keyboard keys | `(mode,period_ms)` - mode 1=raw 2=mut; period 1-1000ms; () to query; use (0) or (0,0) to reset |
+| `km.keys(help)` | Stream keyboard keys | `(mode,period_ms)` - mode 1=raw 2=constructed frame; period 1-1000ms; () to query; use (0) or (0,0) to reset |
 | `km.mask(help)` | Mask key | `(key,mode)` - key: numeric HID code or quoted string; mode: 0=off, 1=on |
 | `km.press(help)` | Tap key | `(key,hold_ms,rand_ms)` - HID code or key name; hold defaults to random 35-75ms (logged); rand optional |
 | `km.remap(help)` | Remap keycode | `(source,target)` - both can be numeric or quoted strings; target=0 clears remap (passthrough) |
@@ -42,8 +42,8 @@ Welcome to the Makcu help. All commands shown are listed below. For more info, s
 
 | Command | Description | Parameters |
 |---------|-------------|------------|
-| `km.axis(help)` | Stream X/Y axis deltas | `(mode,period_ms)` - 1=raw, 2=mut; period 1-1000ms; use (0) or (0,0) to reset |
-| `km.buttons(help)` | Stream button states | `(mode,period_ms)` - 1=raw, 2=mut; period 1-1000ms; use (0) or (0,0) to reset |
+| `km.axis(help)` | Stream X/Y axis deltas | `(mode,period_ms)` - 1=raw, 2=constructed frame; period 1-1000ms; use (0) or (0,0) to reset |
+| `km.buttons(help)` | Stream button states | `(mode,period_ms)` - 1=raw, 2=constructed frame; period 1-1000ms; use (0) or (0,0) to reset |
 | `km.catch_(help)` | Catch locked button state | `(mode)` - 0=auto 1=manual; requires button lock; () to query state |
 | `km.click(help)` | Schedule mouse clicks | `(button,count,delay_ms)` - count/delay optional; delay random 35-75ms if omitted (internal timing) |
 | `km.getpos(help)` | Report current pointer position | `()` |
@@ -51,7 +51,7 @@ Welcome to the Makcu help. All commands shown are listed below. For more info, s
 | `km.lock_(help)` | Lock button or axis | `(target,state)` - ml/mm/mr/ms1/ms2 or mx/my/mx+/mx-/my+/my-; () to query |
 | `km.middle(help)` | Set middle button / query lock state | `(state)` - 0=release 1=down 2=silent_release; () returns 0=none 1=raw 2=injected 3=both |
 | `km.mo(help)` | Queue raw mouse frame (set only) | `(buttons,x,y,wheel,pan,tilt)` - (0) clears all; x,y,wheel,pan,tilt are one-shots; button mask mirrors button states |
-| `km.mouse(help)` | Stream full mouse data | `(mode,period_ms)` - mode 1=raw 2=mut; period 1-1000ms; () to query; use (0) or (0,0) to reset |
+| `km.mouse(help)` | Stream full mouse data | `(mode,period_ms)` - mode 1=raw 2=constructed frame; period 1-1000ms; () to query; use (0) or (0,0) to reset |
 | `km.move(help)` | Queue relative move | `(dx,dy,segments,cx1,cy1,cx2,cy2)` - segments/control points optional |
 | `km.moveto(help)` | Move pointer absolute | `(x,y,segments,cx1,cy1,cx2,cy2)` - parameters align with km.move |
 | `km.pan(help)` | Horizontal scroll/pan | `(steps)` - () to query pending |
@@ -95,7 +95,7 @@ The following commands work without a USB device attached to USB 3:
 - **km.info()** - Report MAC address, MCU temperature (when available), RAM stats, firmware info, CPU, and uptime.
 - **km.log(level)** - Set log level 0-5. Empty to query current level.
 - **km.reboot()** - Reboot the device after acknowledging the request.
-- **km.release()** or **km.release(timer_ms)** - Auto-release timer. `()` get status (0=disabled, else time ms); `(timer_ms)` set timer 500-300000ms (5 min), (0) disables; releases all active locks/buttons/keys when expired.
+- **km.release()** or **km.release(timer_ms)** - Auto-release monitoring system. Continuously monitors independent lock, button, and key states. When the timer expires, it releases only the corresponding values that remain active (not all at once). This setting is persistently saved to storage and automatically enabled on startup/boot. `()` get status (0=disabled, else time ms); `(timer_ms)` set timer 500-300000ms (5 min), (0) disables.
 - **km.screen(width,height)** - Query or update the virtual screen dimensions. `()` to query, `(width,height)` to set.
 - **km.serial(text)** - Query, reset, or set the stored serial number. `()` query, `(0)` reset, `(text)` set sanitized value.
 - **km.version()** - Report firmware version.
@@ -105,7 +105,7 @@ The following commands work without a USB device attached to USB 3:
 - **km.down(key)** - Press a key down.
 - **km.init()** - Clear keyboard state and release pressed keys.
 - **km.isdown(key)** - Query whether a key is currently held.
-- **km.keys(mode,period_ms)** - Stream keyboard keys with human-readable names. Mode 1=raw (physical input), 2=mut (after remapping/masking); period clamped 1-1000 ms. Use `(0)` or `(0,0)` to reset. Output format: `keys(raw,shift,'h')` or `keys(mut,ctrl,shift,'a')` - modifiers and keys shown as names (e.g., 'shift', 'ctrl', 'h', 'a') instead of HID numbers.
+- **km.keys(mode,period_ms)** - Stream keyboard keys with human-readable names. Mode 1=raw (physical input), 2=constructed frame (after remapping/masking); period clamped 1-1000 ms. Use `(0)` or `(0,0)` to reset. Output format: `keys(raw,shift,'h')` or `keys(constructed,ctrl,shift,'a')` - modifiers and keys shown as names (e.g., 'shift', 'ctrl', 'h', 'a') instead of HID numbers.
 - **km.mask(key,mode)** - Mask or unmask a key (mode 0=off, 1=on).
 - **km.press(key,hold_ms,rand_ms)** - Tap a key with optional hold duration and randomization window. Hold defaults to a logged random 35-75 ms.
 - **km.remap(source,target)** - Remap a key. Accepts HID codes or names; `target=0` clears the remap (passthrough).
@@ -139,7 +139,7 @@ km.remap('a', 'b')     # Remap 'a' to type 'b'
 km.remap('a', 0)       # Clear remap for 'a' (passthrough)
 km.isdown("ctrl")      # Check if Ctrl is pressed
 km.keys(1, 100)        # Stream RAW keyboard keys every 100ms (shows physical input)
-km.keys(2, 50)         # Stream MUT keyboard keys every 50ms (shows after remapping/masking)
+km.keys(2, 50)         # Stream constructed frame keyboard keys every 50ms (shows after remapping/masking)
 km.keys(0)             # Disable keyboard key streaming
 ```
 
@@ -182,14 +182,15 @@ km.keys(0)             # Disable keyboard key streaming
 - **km.catch_(mode)** - Enable catch on a locked button (0=auto, 1=manual). Requires corresponding `km.lock_`. Call with `()` to query state.
 
 #### Mouse Streaming Commands
-- **km.buttons(mode,period_ms)** - Stream button states. Mode 1=raw, 2=mut; period clamped 1-1000 ms. Use `(0)` or `(0,0)` to reset.
-- **km.axis(mode,period_ms)** - Stream axis deltas only. Mode 1=raw, 2=mut; period clamped 1-1000 ms. Use `(0)` or `(0,0)` to reset.
-- **km.mouse(mode,period_ms)** - Stream full mouse data (buttons + axis + wheel/pan/tilt). Mode 1=raw, 2=mut; period clamped 1-1000 ms. Use `(0)` or `(0,0)` to reset.
+- **km.buttons(mode,period_ms)** - Stream button states. Mode 1=raw, 2=constructed frame; period clamped 1-1000 ms. Use `(0)` or `(0,0)` to reset.
+- **km.axis(mode,period_ms)** - Stream axis deltas only. Mode 1=raw, 2=constructed frame; period clamped 1-1000 ms. Use `(0)` or `(0,0)` to reset.
+- **km.mouse(mode,period_ms)** - Stream full mouse data (buttons + axis + wheel/pan/tilt). Mode 1=raw, 2=constructed frame; period clamped 1-1000 ms. Use `(0)` or `(0,0)` to reset.
 
 ---
 
 ## Notes
 
+- **Command Format**: Commands no longer require the `km.` prefix when sending. The new format starts with `.` and ends with `)`. Other values (such as `km`, `\r\n`, etc.) are ignored. Example: `.move(1,1,)`. Responses still use the `km.` prefix for compatibility: `km.<response>\r\n>>> .`
 - **km.mo** is the command for sending raw mouse frames (set only, does not support get). Parameters: buttons, x, y, wheel, pan, tilt.
 - All commands support the `(help)` parameter to get detailed usage information.
 - Optional parameters are noted in the descriptions above.

@@ -431,15 +431,22 @@ export default async function ApiPage({ params }: LangProps) {
                       <li>
                         {isCn ? (
                           <span>
-                            ASCII 指令，例如 <span className="font-mono">move(10,-3)</span>，以
-                            <span className="font-mono"> \r</span>/<span className="font-mono">\n</span>/
-                            <span className="font-mono">;</span> 结尾。
+                            命令格式：以 <span className="font-mono">.</span> 开头，以 <span className="font-mono">)</span> 结尾。不再需要 <span className="font-mono">km.</span> 前缀。
                           </span>
                         ) : (
                           <span>
-                            ASCII commands, e.g. <span className="font-mono">move(10,-3)</span>, terminated by
-                            <span className="font-mono"> \r</span>/<span className="font-mono">\n</span>/
-                            <span className="font-mono">;</span>
+                            Command format: Start with <span className="font-mono">.</span> and end with <span className="font-mono">)</span>. The <span className="font-mono">km.</span> prefix is no longer required.
+                          </span>
+                        )}
+                      </li>
+                      <li>
+                        {isCn ? (
+                          <span>
+                            其他值（如 <span className="font-mono">km</span>、<span className="font-mono">\r\n</span> 等）会被忽略。示例：<span className="font-mono">.move(1,1,)</span>
+                          </span>
+                        ) : (
+                          <span>
+                            Other values (such as <span className="font-mono">km</span>, <span className="font-mono">\r\n</span>, etc.) are ignored. Example: <span className="font-mono">.move(1,1,)</span>
                           </span>
                         )}
                       </li>
@@ -467,12 +474,14 @@ export default async function ApiPage({ params }: LangProps) {
                             格式：<span className="font-mono">km.</span>
                             <em>payload</em>
                             <span className="font-mono">\r\n&gt;&gt;&gt; </span>
+                            （为兼容性保留 <span className="font-mono">km.</span> 前缀）
                           </span>
                         ) : (
                           <span>
                             Format: <span className="font-mono">km.</span>
                             <em>payload</em>
                             <span className="font-mono">\r\n&gt;&gt;&gt; </span>
+                            (the <span className="font-mono">km.</span> prefix is retained for compatibility)
                           </span>
                         )}
                       </li>
@@ -749,19 +758,19 @@ export default async function ApiPage({ params }: LangProps) {
               />
             </SubSection>
 
-            <SubSection id="wheel" title="wheel(delta[,delay_ms]) — SET">
+            <SubSection id="wheel" title="wheel(delta) — SET">
               <SpecCard
                 entries={[
                   {
                     label: t("Command", "命令"),
-                    content: <span className="font-mono">wheel(delta[,delay_ms])</span>,
+                    content: <span className="font-mono">wheel(delta)</span>,
                   },
                   {
                     label: t("Params", "参数"),
                     content: isCn ? (
-                      <span>delta: 滚轮步数; delay_ms: 可选延迟</span>
+                      <span>delta: 滚轮步数</span>
                     ) : (
-                      <span>delta: scroll steps; delay_ms: optional delay</span>
+                      <span>delta: scroll steps</span>
                     ),
                   },
                   {
@@ -848,18 +857,18 @@ export default async function ApiPage({ params }: LangProps) {
               />
             </SubSection>
 
-            <SubSection id="silent" title="silent(x,y[,delay_ms]) — SET">
+            <SubSection id="silent" title="silent(x,y) — SET">
               <SpecCard
                 entries={[
                   {
                     label: t("Command", "命令"),
-                    content: <span className="font-mono">silent(x,y[,delay_ms])</span>,
+                    content: <span className="font-mono">silent(x,y)</span>,
                   },
                   {
                     label: t("Params", "参数"),
                     content: t(
-                      "Move then perform silent left click at (x,y); delay_ms: optional",
-                      "移动并在 (x,y) 处执行静默左键点击; delay_ms: 可选",
+                      "Move then perform silent left click at (x,y)",
+                      "移动并在 (x,y) 处执行静默左键点击",
                     ),
                   },
                   {
@@ -878,12 +887,12 @@ export default async function ApiPage({ params }: LangProps) {
 
           {/* Mouse Advanced */}
           <Section id="mouse-advanced" badge={t("Advanced", "高级")} title={t("Mouse Advanced", "鼠标高级")}>
-            <SubSection id="mo" title="mo(buttons,x,y,wheel,pan,tilt[,delay]) — SET">
+            <SubSection id="mo" title="mo(buttons,x,y,wheel,pan,tilt) — SET">
               <SpecCard
                 entries={[
                   {
                     label: t("Command", "命令"),
-                    content: <span className="font-mono">mo(buttons,x,y,wheel,pan,tilt[,delay])</span>,
+                    content: <span className="font-mono">mo(buttons,x,y,wheel,pan,tilt)</span>,
                   },
                   {
                     label: t("Description", "描述"),
@@ -900,9 +909,9 @@ export default async function ApiPage({ params }: LangProps) {
                   {
                     label: t("Params", "参数"),
                     content: isCn ? (
-                      <span>buttons: 按键掩码; x,y: 移动增量; wheel,pan,tilt: 滚轮值; delay: 可选延迟</span>
+                      <span>buttons: 按键掩码; x,y: 移动增量; wheel,pan,tilt: 滚轮值</span>
                     ) : (
-                      <span>buttons: button mask; x,y: movement deltas; wheel,pan,tilt: scroll values; delay: optional</span>
+                      <span>buttons: button mask; x,y: movement deltas; wheel,pan,tilt: scroll values</span>
                     ),
                   },
                   {
@@ -994,19 +1003,19 @@ export default async function ApiPage({ params }: LangProps) {
               )}
             </Tip>
 
-            <SubSection id="down" title="down(key[,delay_ms]) — SET">
+            <SubSection id="down" title="down(key) — SET">
               <SpecCard
                 entries={[
                   {
                     label: t("Command", "命令"),
-                    content: <span className="font-mono">down(key[,delay_ms])</span>,
+                    content: <span className="font-mono">down(key)</span>,
                   },
                   {
                     label: t("Params", "参数"),
                     content: isCn ? (
-                      <span>key: HID码或字符串（'a'、"shift"）; delay_ms: 可选延迟</span>
+                      <span>key: HID码或字符串（'a'、"shift"）</span>
                     ) : (
-                      <span>key: HID code or quoted string ('a', "shift"); delay_ms: optional</span>
+                      <span>key: HID code or quoted string ('a', "shift")</span>
                     ),
                   },
                   {
@@ -1017,19 +1026,19 @@ export default async function ApiPage({ params }: LangProps) {
               />
             </SubSection>
 
-            <SubSection id="up" title="up(key[,delay_ms]) — SET">
+            <SubSection id="up" title="up(key) — SET">
               <SpecCard
                 entries={[
                   {
                     label: t("Command", "命令"),
-                    content: <span className="font-mono">up(key[,delay_ms])</span>,
+                    content: <span className="font-mono">up(key)</span>,
                   },
                   {
                     label: t("Params", "参数"),
                     content: isCn ? (
-                      <span>key: HID码或字符串（'a'、"ctrl"）; delay_ms: 可选延迟</span>
+                      <span>key: HID码或字符串（'a'、"ctrl"）</span>
                     ) : (
-                      <span>key: HID code or quoted string ('a', "ctrl"); delay_ms: optional</span>
+                      <span>key: HID code or quoted string ('a', "ctrl")</span>
                     ),
                   },
                   {
@@ -1699,11 +1708,11 @@ export default async function ApiPage({ params }: LangProps) {
                     label: t("Description", "描述"),
                     content: isCn ? (
                       <p>
-                        自动释放计时器。当计时器到期时，释放所有活动的锁定/按键/键。`()` 获取状态（0=禁用，否则为时间 ms）；`(timer_ms)` 设置计时器 500-300000ms（5 分钟），(0) 禁用。
+                        自动释放监控系统。持续监控独立的锁定、按键和键状态。当计时器到期时，仅释放仍处于活动状态的相应值（不是全部）。该设置会持久保存到存储中，并在启动/引导时自动启用。`()` 获取状态（0=禁用，否则为时间 ms）；`(timer_ms)` 设置计时器 500-300000ms（5 分钟），(0) 禁用。
                       </p>
                     ) : (
                       <p>
-                        Auto-release timer. Releases all active locks/buttons/keys when expired. `()` get status (0=disabled, else time ms); `(timer_ms)` set timer 500-300000ms (5 min), (0) disables.
+                        Auto-release monitoring system. Continuously monitors independent lock, button, and key states. When the timer expires, it releases only the corresponding values that remain active (not all at once). This setting is persistently saved to storage and automatically enabled on startup/boot. `()` get status (0=disabled, else time ms); `(timer_ms)` set timer 500-300000ms (5 min), (0) disables.
                       </p>
                     ),
                   },
