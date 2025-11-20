@@ -350,7 +350,7 @@ export default async function ApiPage({ params }: LangProps) {
       </header>
 
       <div className="mt-10 grid gap-8 lg:grid-cols-[260px_minmax(0,1fr)]">
-        <aside className="lg:sticky lg:top-24">
+        <aside>
           <Card className="border-border/60 bg-card/90 shadow-lg">
             <CardContent className="p-5">
               <div className="text-xs font-semibold uppercase tracking-[0.3em] text-muted-foreground">
