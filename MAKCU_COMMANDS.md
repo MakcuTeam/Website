@@ -53,7 +53,7 @@ Welcome to the Makcu help. All commands shown are listed below. For more info, s
 | `km.mo(help)` | Queue raw mouse frame (set only) | `(buttons,x,y,wheel,pan,tilt)` - (0) clears all; x,y,wheel,pan,tilt are one-shots; button mask mirrors button states |
 | `km.mouse(help)` | Stream full mouse data | `(mode,period_ms)` - mode 1=raw 2=constructed frame; period 1-1000ms; () to query; use (0) or (0,0) to reset |
 | `km.move(help)` | Queue relative move | `(dx,dy,segments,cx1,cy1,cx2,cy2)` - segments/control points optional |
-| `km.moveto(help)` | Move pointer absolute | `(x,y,segments,cx1,cy1,cx2,cy2)` - parameters align with km.move |
+| `km.moveto(help)` | Move pointer absolute | `(x,y,segments,cx1,cy1,cx2,cy2)` - internally calculates needed x,y movement to reach requested screen position; parameters align with km.move |
 | `km.pan(help)` | Horizontal scroll/pan | `(steps)` - () to query pending |
 | `km.right(help)` | Set right button / query lock state | `(state)` - 0=release 1=down 2=silent_release; () returns 0=none 1=raw 2=injected 3=both |
 | `km.side1(help)` | Set side1 button / query lock state | `(state)` - 0=release 1=down 2=silent_release; () returns 0=none 1=raw 2=injected 3=both |
@@ -169,7 +169,7 @@ km.keys(0)             # Disable keyboard key streaming
 
 #### Mouse Movement Commands
 - **km.move(dx,dy,segments,cx1,cy1,cx2,cy2)** - Queue relative movement. Provide `segments` and optional control points to generate segmented or Bézier paths.
-- **km.moveto(x,y,segments,cx1,cy1,cx2,cy2)** - Absolute positioning that accepts the same optional segments/control points as `km.move`.
+- **km.moveto(x,y,segments,cx1,cy1,cx2,cy2)** - Move pointer to absolute position. Internally calculates the needed x,y movement to reach the requested position on the screen. Parameters align with `km.move`.
 - **km.wheel(delta)** - Scroll the wheel.
 - **km.pan(steps)** - Horizontal scroll/pan. `km.pan()` queries pending horizontal scroll.
 - **km.tilt(steps)** - Z-axis tilt. `km.tilt()` queries pending tilt.
