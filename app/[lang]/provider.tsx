@@ -9,6 +9,8 @@ import store from "@/store";
 import { useEffect } from "react";
 import { fetchDiscordData } from "@/store/discordSlice";
 import { Dictionary } from "@/lib/dictionaries";
+import { AudioProvider } from "@/components/contexts/audio-provider";
+import { AudioPlayer } from "@/components/audio-player";
 
 export default function RootLayoutProvider({
   children,
@@ -41,20 +43,23 @@ function RootLayoutContent({
   return (
     <>
       <Toaster />
-      <ClientDictionary dict={dict}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <Navbar dict={dict} />
-          <main className="sm:container mx-auto w-[90vw] h-auto scroll-smooth">
-            {children}
-          </main>
+      <AudioProvider>
+        <AudioPlayer />
+        <ClientDictionary dict={dict}>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <Navbar dict={dict} />
+            <main className="sm:container mx-auto w-[90vw] h-auto scroll-smooth">
+              {children}
+            </main>
             <Footer />
-        </ThemeProvider>
-      </ClientDictionary>
+          </ThemeProvider>
+        </ClientDictionary>
+      </AudioProvider>
     </>
   );
 }

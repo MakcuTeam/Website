@@ -1,6 +1,7 @@
 "use client";
 
 import { ModeToggle } from "@/components/theme-toggle";
+import { AudioToggle } from "@/components/audio-toggle";
 
 import { SheetLeftbar } from "./leftbar";
 import { SheetClose } from "@/components/ui/sheet";
@@ -31,6 +32,7 @@ export function Navbar({ dict }: { dict: Dictionary }) {
               <ModeToggle dict={dict} />
             </div>
           </div>
+          <AudioToggle />
         </div>
       </div>
     </nav>
