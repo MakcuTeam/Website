@@ -48,9 +48,10 @@
       "guide": "Guide",
       "api": "API",
       "blog": "Blog",
-      "makcu_tools": "Online Flash Tools",
+      "makcu_tools": "Firmware Flashing",
       "guides": "Guides",
-      "discord": "Discord"
+      "discord": "Discord",
+      "troubleshooting": "Troubleshooting"
     },
     "search": {
       "search_guide": "Search Guide...",
@@ -112,5 +113,147 @@
     "sub_text": "We're sorry, but an error occurred while processing your request.",
     "reload_page": "Reload Page",
     "back_to_homepage": "Back to homepage"
+  },
+  "troubleshooting": {
+    "title": "MAKCU Troubleshooting",
+    "description": "LED status guide and troubleshooting steps for MAKCU device issues.",
+    "prerequisites": {
+      "title": "Prerequisites",
+      "ch343_driver": "CH343 Driver Installed",
+      "ch343_desc": "MAKCU requires the CH343 USB-to-serial driver to be loaded on your computer. Please see the flash page for the download link and installation instructions.",
+      "com_port": "Correct COM Port",
+      "com_port_desc": "The COM port for USB 2 should be below 10. If your COM port number is 10 or higher, you may experience connection issues.",
+      "both_sides": "Both Sides Flashed",
+      "both_sides_desc": "Make sure you have correctly set up and flashed MAKCU on both the left side (device) and right side (host).",
+      "supported_device": "Supported Device",
+      "supported_device_desc": "Ensure you have a supported mouse or keyboard connected. MAKCU supports both keyboard and mouse devices."
+    },
+    "led_guide": {
+      "title": "LED Status Guide",
+      "description": "MAKCU uses LEDs on both sides to indicate system status and help you troubleshoot issues. The LEDs can be solid (on or off) or blinking at different speeds.",
+      "left_side": {
+        "title": "Left Side (Device Side)",
+        "description": "The left side LED shows the status of the USB device connection to your computer.",
+        "solid_on": {
+          "title": "Solid ON (Green)",
+          "meaning": "USB device is connected and working correctly",
+          "action": "No action needed - everything is working"
+        },
+        "solid_off": {
+          "title": "Solid OFF",
+          "meaning": "No USB device connected",
+          "action": "Check USB cable connection and ensure device is powered on"
+        },
+        "slow_blink": {
+          "title": "Slow Blink (500ms on, 500ms off)",
+          "meaning": "Warning - system is adjusting settings",
+          "when": "Baud rate is being changed or system is reconfiguring",
+          "action": "Wait a few seconds - this should resolve automatically. If it persists, try restarting MAKCU."
+        },
+        "fast_blink": {
+          "title": "Fast Blink (100ms on, 100ms off)",
+          "meaning": "Error - connection problem detected",
+          "when": "USB host (right side) has stopped responding, bridge connection between left and right sides is broken, or host crash/timeout detected",
+          "action": "Check the connection between left and right sides, check the right side LED status, try unplugging and reconnecting both USB cables, or reflash both sides if problem persists"
+        }
+      },
+      "right_side": {
+        "title": "Right Side (Host Side)",
+        "description": "The right side LED shows the status of the USB host connection to your mouse/keyboard.",
+        "solid_on": {
+          "title": "Solid ON (Green)",
+          "meaning": "USB host is connected and working correctly",
+          "action": "No action needed - everything is working"
+        },
+        "solid_off": {
+          "title": "Solid OFF",
+          "meaning": "No USB device connected to host",
+          "action": "Connect a supported mouse or keyboard to the right side USB port"
+        },
+        "slow_blink": {
+          "title": "Slow Blink (500ms on, 500ms off)",
+          "meaning": "Warning - temporary issue detected",
+          "when": "USB request is busy (normal during operation) or system is handling a temporary condition",
+          "action": "Usually resolves automatically. If it persists, check device connection."
+        },
+        "fast_blink": {
+          "title": "Fast Blink (100ms on, 100ms off)",
+          "meaning": "Error - serious problem detected",
+          "when": "USB device (left side) has stopped responding, bridge connection between left and right sides is broken, timer or USB request failures, or device crash/timeout detected",
+          "action": "Check the connection between left and right sides, check the left side LED status, try unplugging and reconnecting both USB cables, or reflash both sides if problem persists"
+        }
+      }
+    },
+    "troubleshooting_steps": {
+      "title": "Troubleshooting Steps",
+      "both_fast": {
+        "title": "Both LEDs Fast Blinking",
+        "problem": "Both left and right sides show fast blink (error state)",
+        "causes": "Bridge connection between sides is broken, UART communication failure, or one side has crashed or reset",
+        "steps": "Power cycle both sides (unplug and replug USB cables), check physical connections between left and right sides, verify both sides are powered correctly, or reflash both sides if problem persists"
+      },
+      "left_fast": {
+        "title": "Left Side Fast Blink, Right Side Normal",
+        "problem": "Left side shows error, right side is working",
+        "causes": "Right side (host) has crashed or stopped responding, or bridge heartbeat timeout on left side",
+        "steps": "Check right side LED - if it's also showing error, see 'Both LEDs Fast Blinking', try restarting the right side, or reflash the right side if needed"
+      },
+      "right_fast": {
+        "title": "Right Side Fast Blink, Left Side Normal",
+        "problem": "Right side shows error, left side is working",
+        "causes": "Left side (device) has crashed or stopped responding, or bridge heartbeat timeout on right side",
+        "steps": "Check left side LED - if it's also showing error, see 'Both LEDs Fast Blinking', try restarting the left side, or reflash the left side if needed"
+      },
+      "slow_persists": {
+        "title": "Slow Blink Persists",
+        "problem": "LED keeps blinking slowly and doesn't resolve",
+        "causes": "System stuck in configuration state, baud rate change didn't complete, or warning condition not clearing",
+        "steps": "Wait 10 seconds - some operations take time, power cycle the affected side, check for any error messages in device manager, or reflash if problem continues"
+      },
+      "led_not_responding": {
+        "title": "LED Not Responding",
+        "problem": "LED doesn't turn on or change state at all",
+        "causes": "LED hardware issue, firmware not running, or power issue",
+        "steps": "Verify device is powered (check USB connection), check if device is recognized in device manager, try reflashing the firmware, or if still not working, there may be a hardware issue"
+      },
+      "device_not_working": {
+        "title": "Device Not Working Despite Green LED",
+        "problem": "LED shows solid ON (green) but mouse/keyboard doesn't work",
+        "causes": "Device driver issue on computer, USB port problem, or device compatibility issue",
+        "steps": "Check device manager for any error icons, try a different USB port, verify CH343 driver is installed correctly, check if COM port number is below 10, or try a different mouse or keyboard to test"
+      }
+    },
+    "quick_reference": {
+      "title": "Quick Reference",
+      "led_state": "LED State",
+      "left_meaning": "Left Side Meaning",
+      "right_meaning": "Right Side Meaning",
+      "action": "Action",
+      "solid_on": "Solid ON",
+      "solid_off": "Solid OFF",
+      "slow_blink": "Slow Blink",
+      "fast_blink": "Fast Blink",
+      "working": "Working - no action needed",
+      "connect_device": "Connect device",
+      "wait_resolves": "Wait, usually resolves",
+      "check_connections": "Check connections, restart, reflash"
+    },
+    "still_issues": {
+      "title": "Still Having Issues?",
+      "description": "If you've tried all troubleshooting steps and the problem persists:",
+      "verify_setup": "Verify Setup",
+      "verify_setup_desc": "Ensure both sides are correctly flashed and configured",
+      "check_connections": "Check Connections",
+      "check_connections_desc": "Verify all USB cables and connections are secure",
+      "driver_check": "Driver Check",
+      "driver_check_desc": "Confirm CH343 driver is installed and COM port is below 10",
+      "supported_device": "Supported Device",
+      "supported_device_desc": "Ensure you're using a supported mouse or keyboard",
+      "reflash": "Reflash",
+      "reflash_desc": "Try reflashing both sides with the latest firmware",
+      "hardware_check": "Hardware Check",
+      "hardware_check_desc": "If LEDs don't respond at all, there may be a hardware issue",
+      "remember": "Remember: MAKCU supports both keyboard and mouse devices. If one type works but the other doesn't, check device compatibility."
+    }
   }
 }

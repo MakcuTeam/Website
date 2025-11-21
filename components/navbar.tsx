@@ -66,13 +66,17 @@ export function NavMenu({
       href: "/api",
     },
     {
+      title: "discord",
+      href: data?.instant_invite ?? "",
+      target: "_blank",
+    },
+    {
       title: "makcu_tools",
       href: "/tool",
     },
     {
-      title: "discord",
-      href: data?.instant_invite ?? "",
-      target: "_blank",
+      title: "troubleshooting",
+      href: "/troubleshooting",
     },
   ];
   return (
