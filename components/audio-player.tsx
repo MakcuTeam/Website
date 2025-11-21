@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useAudio } from "@/components/contexts/audio-provider";
 
 export function AudioPlayer() {
-  const { audioRef, hasInteracted, setHasInteracted } = useAudio();
+  const { audioRef, hasInteracted, setHasInteracted, setIsMuted } = useAudio();
 
   useEffect(() => {
     // Set volume to 30% and start muted
@@ -25,11 +25,23 @@ export function AudioPlayer() {
   }, [audioRef]);
 
   useEffect(() => {
-    // Listen for first user interaction to unmute
-    const handleInteraction = () => {
+    // Listen for first user interaction to unmute and play
+    const handleInteraction = async () => {
       if (!hasInteracted && audioRef.current) {
-        audioRef.current.muted = false;
-        setHasInteracted(true);
+        try {
+          // Unmute and play
+          audioRef.current.muted = false;
+          setIsMuted(false);
+          
+          // Ensure audio is playing
+          if (audioRef.current.paused) {
+            await audioRef.current.play();
+          }
+          
+          setHasInteracted(true);
+        } catch (error) {
+          console.error("Error playing audio:", error);
+        }
       }
     };
 
@@ -43,7 +55,7 @@ export function AudioPlayer() {
       document.removeEventListener("keydown", handleInteraction);
       document.removeEventListener("touchstart", handleInteraction);
     };
-  }, [hasInteracted, audioRef, setHasInteracted]);
+  }, [hasInteracted, audioRef, setHasInteracted, setIsMuted]);
 
   return (
     <audio ref={audioRef} loop style={{ display: "none" }}>

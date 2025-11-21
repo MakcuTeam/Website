@@ -8,6 +8,7 @@ interface AudioContextType {
   toggleMute: () => void;
   hasInteracted: boolean;
   setHasInteracted: (value: boolean) => void;
+  setIsMuted: (value: boolean) => void;
 }
 
 const AudioContext = createContext<AudioContextType | undefined>(undefined);
@@ -17,11 +18,20 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
   const [isMuted, setIsMuted] = useState(true);
   const [hasInteracted, setHasInteracted] = useState(false);
 
-  const toggleMute = () => {
+  const toggleMute = async () => {
     if (audioRef.current) {
       const newMutedState = !isMuted;
       audioRef.current.muted = newMutedState;
       setIsMuted(newMutedState);
+      
+      // If unmuting, ensure audio is playing
+      if (!newMutedState && audioRef.current.paused) {
+        try {
+          await audioRef.current.play();
+        } catch (error) {
+          console.error("Error playing audio:", error);
+        }
+      }
     }
   };
 
@@ -33,6 +43,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
         toggleMute,
         hasInteracted,
         setHasInteracted,
+        setIsMuted,
       }}
     >
       {children}
