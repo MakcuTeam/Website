@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useRef, useState, useEffect } from "react";
 
 interface AudioContextType {
-  audioRef: React.RefObject<HTMLAudioElement>;
+  audioRef: React.RefObject<HTMLAudioElement | null>;
   isMuted: boolean;
   toggleMute: () => void;
   hasInteracted: boolean;
