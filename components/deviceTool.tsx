@@ -411,13 +411,6 @@ export const DeviceTool: React.FC<{ lang: Locale; dict: Dictionary }> = ({ lang,
                 </p>
               </div>
             )}
-            {contextBrowserSupported && !device && status !== "connected" && (
-              <div className="p-4 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
-                <p className="text-sm text-yellow-600 dark:text-yellow-400">
-                  {dict.tools.connectToSelect}
-                </p>
-              </div>
-            )}
           </div>
         </CardContent>
       </Card>
