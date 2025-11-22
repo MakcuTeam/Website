@@ -21,6 +21,7 @@ interface MakcuConnectionContextType extends MakcuConnectionState {
   connect: () => Promise<void>;
   disconnect: () => Promise<void>;
   isConnecting: boolean;
+  browserSupported: boolean;
 }
 
 const MakcuConnectionContext = createContext<MakcuConnectionContextType | undefined>(undefined);
@@ -35,13 +36,22 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
     comPort: null,
   });
   const [isConnecting, setIsConnecting] = useState(false);
+  const [browserSupported, setBrowserSupported] = useState(true);
   const readerRef = useRef<ReadableStreamDefaultReader<Uint8Array> | null>(null);
   const writerRef = useRef<WritableStreamDefaultWriter<Uint8Array> | null>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const healthCheckRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Check browser support on mount
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const Navigator = navigator as Navigator & { serial?: Serial };
+      setBrowserSupported(!!Navigator.serial);
+    }
+  }, []);
+
   // Cleanup function
-  const cleanup = useCallback(() => {
+  const cleanup = useCallback(async () => {
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
       timeoutRef.current = null;
@@ -51,12 +61,24 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
       healthCheckRef.current = null;
     }
     if (readerRef.current) {
-      readerRef.current.cancel().catch(() => {});
-      readerRef.current.releaseLock();
+      try {
+        await readerRef.current.cancel();
+      } catch (e) {
+        // Ignore
+      }
+      try {
+        readerRef.current.releaseLock();
+      } catch (e) {
+        // Ignore
+      }
       readerRef.current = null;
     }
     if (writerRef.current) {
-      writerRef.current.releaseLock();
+      try {
+        writerRef.current.releaseLock();
+      } catch (e) {
+        // Ignore
+      }
       writerRef.current = null;
     }
   }, []);
@@ -175,18 +197,12 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
   };
 
   // Get COM port name (if available)
-  const getComPort = (port: SerialPort): string | null => {
-    // WebSerial API doesn't directly expose COM port, but we can try to get it from port info
-    // This is a workaround - the actual COM port might not be accessible via WebSerial
-    try {
-      // @ts-ignore - port.getInfo() might have vendor/product info
-      const info = port.getInfo?.();
-      if (info) {
-        return `COM${info.usbVendorId || '?'}`;
-      }
-    } catch (e) {
-      // Ignore
-    }
+  // Note: WebSerial API doesn't expose COM port numbers for security/privacy reasons
+  // This function returns null as COM port information is not available via WebSerial
+  const getComPort = (_port: SerialPort): string | null => {
+    // WebSerial API specification doesn't provide COM port information
+    // The port selection dialog shows the device name, but not the COM port number
+    // This is by design for security and privacy reasons
     return null;
   };
 
@@ -233,7 +249,7 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
       }
 
       // Normal mode failed, try flash mode
-      cleanup();
+      await cleanup();
       const flashResult = await tryFlashMode(selectedPort);
 
       if (flashResult) {
@@ -274,8 +290,10 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
   }, [isConnecting, state.status, cleanup]);
 
   const disconnect = useCallback(async () => {
-    cleanup();
+    // First cleanup all readers/writers
+    await cleanup();
     
+    // Close loader if exists
     if (state.loader) {
       try {
         await state.loader.after();
@@ -284,14 +302,51 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
       }
     }
 
-    if (state.port) {
+    // Close transport if exists
+    if (state.transport) {
       try {
-        await state.port.close();
+        // Transport might have its own cleanup
+        if (state.transport.close) {
+          await state.transport.close();
+        }
       } catch (e) {
         // Ignore
       }
     }
 
+    // Close port - this is critical
+    if (state.port) {
+      try {
+        // Make sure port is closed properly
+        if (state.port.readable) {
+          const reader = state.port.readable.getReader();
+          try {
+            await reader.cancel();
+          } catch (e) {
+            // Ignore
+          }
+          try {
+            reader.releaseLock();
+          } catch (e) {
+            // Ignore
+          }
+        }
+        if (state.port.writable) {
+          const writer = state.port.writable.getWriter();
+          try {
+            writer.releaseLock();
+          } catch (e) {
+            // Ignore
+          }
+        }
+        await state.port.close();
+      } catch (e) {
+        // Ignore - port might already be closed
+        console.warn("Error closing port:", e);
+      }
+    }
+
+    // Reset state
     setState({
       status: "disconnected",
       mode: null,
@@ -334,6 +389,7 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
     connect,
     disconnect,
     isConnecting,
+    browserSupported,
   };
 
   return (

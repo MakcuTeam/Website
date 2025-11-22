@@ -13,7 +13,7 @@ interface MakcuSettingsProps {
 }
 
 export const MakcuSettings: React.FC<MakcuSettingsProps> = ({ lang, dict }) => {
-  const { status, mode, comPort } = useMakcuConnection();
+  const { status, mode } = useMakcuConnection();
   const isCn = lang === "cn";
 
   // Check if device is in flash mode on load
@@ -36,7 +36,7 @@ export const MakcuSettings: React.FC<MakcuSettingsProps> = ({ lang, dict }) => {
     }
     if (status === "connected") {
       if (mode === "normal") {
-        return `${dict.settings.status.connected_normal}${comPort ? ` (${comPort})` : ""}`;
+        return dict.settings.status.connected_normal;
       }
       if (mode === "flash") {
         return dict.settings.status.connected_flash;

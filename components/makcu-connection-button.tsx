@@ -7,7 +7,7 @@ import useLocale from "./hooks/useLocale";
 import { Plug, PlugZap, AlertCircle } from "lucide-react";
 
 export function MakcuConnectionButton({ dict }: { dict: Dictionary }) {
-  const { status, mode, connect, disconnect, isConnecting, comPort } = useMakcuConnection();
+  const { status, mode, connect, disconnect, isConnecting, browserSupported } = useMakcuConnection();
   const locale = useLocale();
   const isCn = locale === "cn";
 
@@ -63,6 +63,16 @@ export function MakcuConnectionButton({ dict }: { dict: Dictionary }) {
     }
   };
 
+  if (!browserSupported) {
+    return (
+      <div className="flex items-center gap-2">
+        <div className="text-xs text-muted-foreground hidden md:inline">
+          <span className="font-medium">MAKCU:</span> {dict.settings.connection.browser_not_supported}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex items-center gap-2">
       <Button
@@ -79,7 +89,6 @@ export function MakcuConnectionButton({ dict }: { dict: Dictionary }) {
       </Button>
       <div className={`text-xs ${getStatusColor()} hidden md:inline`}>
         <span className="font-medium">MAKCU:</span> {getStatusText()}
-        {comPort && status === "connected" && ` (${comPort})`}
       </div>
     </div>
   );
