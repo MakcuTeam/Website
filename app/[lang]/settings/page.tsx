@@ -224,62 +224,13 @@ export default async function SettingsPage({ params }: LangProps) {
           >
             <Card className="border-border/60 bg-card/90 shadow-lg">
               <CardContent className="p-6">
-                <div className="space-y-6">
-                  <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/20">
-                    <p className="text-sm text-red-600 dark:text-red-400">
-                      <strong>{t("Important Warning", "重要警告")}:</strong> {dict.settings.baud_rate.warning}
-                    </p>
-                  </div>
-
-                  <div>
-                    <h4 className="font-semibold mb-2">{t("How to Change Baud Rate", "如何更改波特率")}</h4>
-                    <p className="text-sm leading-relaxed text-muted-foreground mb-3">
-                      {dict.settings.baud_rate.how_to_change}
-                    </p>
-                    <div className="p-4 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
-                      <p className="text-sm text-yellow-600 dark:text-yellow-400">
-                        <strong>{t("Note", "注意")}:</strong> {dict.settings.baud_rate.led_indicator}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div>
-                    <h4 className="font-semibold mb-2">{t("Baud Rate Indicator", "波特率指示器")}</h4>
-                    <p className="text-sm leading-relaxed text-muted-foreground">
-                      {dict.settings.baud_rate.startup_indicator}
-                    </p>
-                  </div>
-
-                  <div>
-                    <h4 className="font-semibold mb-2">{t("Website and Tool Requirements", "网站和工具要求")}</h4>
-                    <p className="text-sm leading-relaxed text-muted-foreground">
-                      {dict.settings.baud_rate.website_requirement}
-                    </p>
-                  </div>
-
-                  <div>
-                    <h4 className="font-semibold mb-2">{t("Setting Baud Rate", "设置波特率")}</h4>
-                    <p className="text-sm leading-relaxed text-muted-foreground">
-                      {dict.settings.baud_rate.setting_methods}
-                    </p>
-                    <p className="text-sm leading-relaxed text-muted-foreground mt-2">
-                      {t("For API usage, please refer to the", "对于 API 使用，请参考")}{" "}
-                      <Link
-                        href={`/${lang}/api#baud`}
-                        className="text-blue-600 dark:text-blue-400 hover:underline"
-                      >
-                        {t("baud rate section in the API page", "API 页面中的波特率部分")}
-                      </Link>
-                      .
-                    </p>
-                  </div>
-
-                  <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/20">
-                    <p className="text-sm text-red-600 dark:text-red-400">
-                      <strong>{t("Critical", "关键")}:</strong> {dict.settings.baud_rate.power_requirement}
-                    </p>
-                  </div>
-                </div>
+                <p className="text-sm leading-relaxed text-muted-foreground">
+                  <Link href={`/${lang}/setup#baud-rate`} className="text-blue-600 dark:text-blue-400 hover:underline">
+                    {t("Please refer to the setup page", "请参考设置页面")}
+                  </Link>
+                  {" "}
+                  {t("for detailed information on baud rate configuration.", "了解波特率配置的详细信息。")}
+                </p>
               </CardContent>
             </Card>
           </Section>

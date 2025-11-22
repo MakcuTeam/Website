@@ -29,13 +29,13 @@ export default function Home() {
       <div className="flex flex-col gap-6">
         <div className="flex justify-center">
           <div className="relative scale-[2]">
-            <Image
-              src={ProductImage}
+          <Image
+            src={ProductImage}
               className="grayscale contrast-[100%] invert dark:invert-0 brightness-[.9]"
-              alt="product_image"
-              loading="eager"
-              priority
-            />
+            alt="product_image"
+            loading="eager"
+            priority
+          />
           </div>
         </div>
       </div>
