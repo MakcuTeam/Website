@@ -125,6 +125,43 @@
   "troubleshooting": {
     "title": "MAKCU Troubleshooting",
     "description": "LED status guide and troubleshooting steps for MAKCU device issues.",
+    "connection_status": {
+      "title": "Connection Status",
+      "description": "The MAKCU connection status is displayed in the top right of the navbar, next to the audio toggle. The status shows the current connection state and mode of your MAKCU device.",
+      "statuses": {
+        "not_supported": {
+          "label": "Not Supported",
+          "description": "Your browser does not support Web Serial API. Please use Chrome/Edge 89+, Opera 76+, or another Chromium-based browser.",
+          "color": "Gray (muted)"
+        },
+        "disconnected": {
+          "label": "Disconnected",
+          "description": "MAKCU is not connected. Click the Connect button to establish a connection.",
+          "color": "Gray (muted)"
+        },
+        "connecting": {
+          "label": "Connecting...",
+          "description": "The system is attempting to connect to MAKCU and detect which mode it is in (normal or flash mode).",
+          "color": "Yellow"
+        },
+        "normal_mode": {
+          "label": "Normal mode",
+          "description": "MAKCU is connected and running in normal mode. You can use the settings page to configure and test MAKCU. USB 1 is connected to gaming PC, USB 2 is the COM port, and USB 3 is connected to your mouse.",
+          "color": "Green (emerald)"
+        },
+        "flash_mode": {
+          "label": "Flash mode",
+          "description": "MAKCU is connected in flash mode. This mode is used for firmware updates only. Settings cannot be used in this mode. Only one USB cable should be connected (USB 1 or USB 3).",
+          "color": "Red"
+        },
+        "fault": {
+          "label": "Fault",
+          "description": "Connection failed or device is not responding. Check your USB connections and try again.",
+          "color": "Red"
+        }
+      },
+      "com_port_note": "Note: The COM port number is not displayed as it is not available via the Web Serial API for security reasons. The connection status will show the mode (normal or flash) instead."
+    },
     "prerequisites": {
       "title": "Prerequisites",
       "ch343_driver": "CH343 Driver Installed",

@@ -34,7 +34,13 @@ export function MakcuConnectionButton({ dict }: { dict: Dictionary }) {
 
   const getStatusColor = () => {
     if (status === "connected") {
-      return "text-green-500 dark:text-green-400";
+      if (mode === "normal") {
+        return "text-emerald-500 dark:text-emerald-400";
+      }
+      if (mode === "flash") {
+        return "text-red-500 dark:text-red-400";
+      }
+      return "text-emerald-500 dark:text-emerald-400";
     }
     if (status === "fault") {
       return "text-red-500 dark:text-red-400";

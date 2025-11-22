@@ -118,6 +118,43 @@
   "troubleshooting": {
     "title": "MAKCU 故障排除",
     "description": "LED 状态指南和 MAKCU 设备问题的故障排除步骤。",
+    "connection_status": {
+      "title": "连接状态",
+      "description": "MAKCU 连接状态显示在导航栏右上角，音频切换旁边。状态显示您 MAKCU 设备的当前连接状态和模式。",
+      "statuses": {
+        "not_supported": {
+          "label": "不支持",
+          "description": "您的浏览器不支持 Web Serial API。请使用 Chrome/Edge 89+、Opera 76+ 或其他基于 Chromium 的浏览器。",
+          "color": "灰色（静音）"
+        },
+        "disconnected": {
+          "label": "未连接",
+          "description": "MAKCU 未连接。点击连接按钮以建立连接。",
+          "color": "灰色（静音）"
+        },
+        "connecting": {
+          "label": "连接中...",
+          "description": "系统正在尝试连接到 MAKCU 并检测其处于哪种模式（正常模式或刷写模式）。",
+          "color": "黄色"
+        },
+        "normal_mode": {
+          "label": "正常模式",
+          "description": "MAKCU 已连接并在正常模式下运行。您可以使用设置页面配置和测试 MAKCU。USB 1 连接到游戏 PC，USB 2 是 COM 端口，USB 3 连接到您的鼠标。",
+          "color": "绿色（翠绿色）"
+        },
+        "flash_mode": {
+          "label": "刷写模式",
+          "description": "MAKCU 在刷写模式下连接。此模式仅用于固件更新。此模式下无法使用设置。只应连接一根 USB 线（USB 1 或 USB 3）。",
+          "color": "红色"
+        },
+        "fault": {
+          "label": "故障",
+          "description": "连接失败或设备无响应。检查您的 USB 连接并重试。",
+          "color": "红色"
+        }
+      },
+      "com_port_note": "注意：COM 端口号不显示，因为出于安全原因，Web Serial API 不提供此信息。连接状态将显示模式（正常或刷写）代替。"
+    },
     "prerequisites": {
       "title": "前提条件",
       "ch343_driver": "已安装 CH343 驱动程序",

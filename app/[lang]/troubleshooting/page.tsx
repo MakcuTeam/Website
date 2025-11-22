@@ -37,6 +37,13 @@ const tocByLang: Record<Locale, TocItem[]> = {
         { id: "normal-mode", label: "Normal Mode" },
       ],
     },
+    {
+      id: "connection-status",
+      label: "Connection Status",
+      children: [
+        { id: "connection-status-overview", label: "Connection Status Overview" },
+      ],
+    },
     { id: "prerequisites", label: "Prerequisites" },
     {
       id: "led-guide",
@@ -69,6 +76,13 @@ const tocByLang: Record<Locale, TocItem[]> = {
         { id: "makcu-structure", label: "MAKCU 结构" },
         { id: "flash-mode", label: "刷写模式" },
         { id: "normal-mode", label: "正常模式" },
+      ],
+    },
+    {
+      id: "connection-status",
+      label: "连接状态",
+      children: [
+        { id: "connection-status-overview", label: "连接状态概述" },
       ],
     },
     { id: "prerequisites", label: "前提条件" },
@@ -333,6 +347,132 @@ export default async function TroubleshootingPage({ params }: LangProps) {
                 </div>
               </CardContent>
             </Card>
+          </Section>
+
+          {/* Connection Status */}
+          <Section
+            id="connection-status"
+            badge={t("Connection", "连接")}
+            title={dict.troubleshooting.connection_status.title}
+            lead={
+              <p className="text-base leading-relaxed text-muted-foreground">
+                {dict.troubleshooting.connection_status.description}
+              </p>
+            }
+          >
+            <SubSection
+              id="connection-status-overview"
+              title={t("Connection Status Overview", "连接状态概述")}
+            >
+              <Card className="border-border/60 bg-card/90 shadow-lg">
+                <CardContent className="p-6">
+                  <div className="space-y-6">
+                    {/* Not Supported */}
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full bg-muted-foreground"></div>
+                        <h4 className="font-semibold text-foreground">
+                          {dict.troubleshooting.connection_status.statuses.not_supported.label}
+                        </h4>
+                        <span className="text-xs text-muted-foreground">
+                          ({dict.troubleshooting.connection_status.statuses.not_supported.color})
+                        </span>
+                      </div>
+                      <p className="text-sm leading-relaxed text-muted-foreground pl-5">
+                        {dict.troubleshooting.connection_status.statuses.not_supported.description}
+                      </p>
+                    </div>
+
+                    {/* Disconnected */}
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full bg-muted-foreground"></div>
+                        <h4 className="font-semibold text-foreground">
+                          {dict.troubleshooting.connection_status.statuses.disconnected.label}
+                        </h4>
+                        <span className="text-xs text-muted-foreground">
+                          ({dict.troubleshooting.connection_status.statuses.disconnected.color})
+                        </span>
+                      </div>
+                      <p className="text-sm leading-relaxed text-muted-foreground pl-5">
+                        {dict.troubleshooting.connection_status.statuses.disconnected.description}
+                      </p>
+                    </div>
+
+                    {/* Connecting */}
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                        <h4 className="font-semibold text-foreground">
+                          {dict.troubleshooting.connection_status.statuses.connecting.label}
+                        </h4>
+                        <span className="text-xs text-muted-foreground">
+                          ({dict.troubleshooting.connection_status.statuses.connecting.color})
+                        </span>
+                      </div>
+                      <p className="text-sm leading-relaxed text-muted-foreground pl-5">
+                        {dict.troubleshooting.connection_status.statuses.connecting.description}
+                      </p>
+                    </div>
+
+                    {/* Normal Mode */}
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full bg-emerald-500"></div>
+                        <h4 className="font-semibold text-foreground">
+                          {dict.troubleshooting.connection_status.statuses.normal_mode.label}
+                        </h4>
+                        <span className="text-xs text-muted-foreground">
+                          ({dict.troubleshooting.connection_status.statuses.normal_mode.color})
+                        </span>
+                      </div>
+                      <p className="text-sm leading-relaxed text-muted-foreground pl-5">
+                        {dict.troubleshooting.connection_status.statuses.normal_mode.description}
+                      </p>
+                    </div>
+
+                    {/* Flash Mode */}
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                        <h4 className="font-semibold text-foreground">
+                          {dict.troubleshooting.connection_status.statuses.flash_mode.label}
+                        </h4>
+                        <span className="text-xs text-muted-foreground">
+                          ({dict.troubleshooting.connection_status.statuses.flash_mode.color})
+                        </span>
+                      </div>
+                      <p className="text-sm leading-relaxed text-muted-foreground pl-5">
+                        {dict.troubleshooting.connection_status.statuses.flash_mode.description}
+                      </p>
+                    </div>
+
+                    {/* Fault */}
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                        <h4 className="font-semibold text-foreground">
+                          {dict.troubleshooting.connection_status.statuses.fault.label}
+                        </h4>
+                        <span className="text-xs text-muted-foreground">
+                          ({dict.troubleshooting.connection_status.statuses.fault.color})
+                        </span>
+                      </div>
+                      <p className="text-sm leading-relaxed text-muted-foreground pl-5">
+                        {dict.troubleshooting.connection_status.statuses.fault.description}
+                      </p>
+                    </div>
+
+                    {/* COM Port Note */}
+                    <div className="mt-6 p-4 rounded-lg bg-blue-500/10 border border-blue-500/20">
+                      <p className="text-sm text-blue-600 dark:text-blue-400">
+                        {dict.troubleshooting.connection_status.com_port_note}
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </SubSection>
           </Section>
 
           {/* Prerequisites */}
