@@ -1,0 +1,87 @@
+"use client";
+
+import { Button } from "./ui/button";
+import { useMakcuConnection } from "./contexts/makcu-connection-provider";
+import { Dictionary } from "@/lib/dictionaries";
+import useLocale from "./hooks/useLocale";
+import { Plug, PlugZap, AlertCircle } from "lucide-react";
+
+export function MakcuConnectionButton({ dict }: { dict: Dictionary }) {
+  const { status, mode, connect, disconnect, isConnecting, comPort } = useMakcuConnection();
+  const locale = useLocale();
+  const isCn = locale === "cn";
+
+  const getStatusText = () => {
+    if (status === "disconnected") {
+      return dict.navbar.makcu_status.disconnected;
+    }
+    if (status === "connecting") {
+      return dict.navbar.makcu_status.connecting;
+    }
+    if (status === "fault") {
+      return dict.navbar.makcu_status.fault;
+    }
+    if (status === "connected") {
+      if (mode === "normal") {
+        return dict.navbar.makcu_status.connected_normal;
+      }
+      if (mode === "flash") {
+        return dict.navbar.makcu_status.connected_flash;
+      }
+    }
+    return dict.navbar.makcu_status.disconnected;
+  };
+
+  const getStatusColor = () => {
+    if (status === "connected") {
+      return "text-green-500 dark:text-green-400";
+    }
+    if (status === "fault") {
+      return "text-red-500 dark:text-red-400";
+    }
+    if (status === "connecting") {
+      return "text-yellow-500 dark:text-yellow-400";
+    }
+    return "text-muted-foreground";
+  };
+
+  const getStatusIcon = () => {
+    if (status === "connected") {
+      return <PlugZap className="h-3 w-3" />;
+    }
+    if (status === "fault") {
+      return <AlertCircle className="h-3 w-3" />;
+    }
+    return <Plug className="h-3 w-3" />;
+  };
+
+  const handleClick = () => {
+    if (status === "connected") {
+      disconnect();
+    } else {
+      connect();
+    }
+  };
+
+  return (
+    <div className="flex items-center gap-2">
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={handleClick}
+        disabled={isConnecting}
+        className="h-8 px-2 text-xs"
+      >
+        {getStatusIcon()}
+        <span className="ml-1 hidden sm:inline">
+          {status === "connected" ? dict.settings.connection.disconnect : dict.settings.connection.connect}
+        </span>
+      </Button>
+      <div className={`text-xs ${getStatusColor()} hidden md:inline`}>
+        <span className="font-medium">MAKCU:</span> {getStatusText()}
+        {comPort && status === "connected" && ` (${comPort})`}
+      </div>
+    </div>
+  );
+}
+

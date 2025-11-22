@@ -58,9 +58,45 @@ The page must implement the same browser compatibility check as the MAKCU flashe
 
 ### Status Location / 状态位置
 
-The MAKCU connection status must be displayed at the **very top** of the page, before any other content.
+The MAKCU connection status must be displayed **globally across all pages** in the navbar area (top right, next to audio toggle), and also prominently on pages that require connection (Settings and Flash Tool pages).
 
-MAKCU 连接状态必须显示在页面的**最顶部**，在任何其他内容之前。
+MAKCU 连接状态必须在所有页面的导航栏区域（右上角，音频切换旁边）全局显示，并在需要连接的页面（设置和刷写工具页面）上突出显示。
+
+### Mode Detection / 模式检测
+
+**CRITICAL**: ESP32-S3 cannot run in both flash mode and normal mode simultaneously. The system must detect which mode the device is in and prevent incompatible operations.
+
+**重要**：ESP32-S3 无法同时运行在刷写模式和正常模式下。系统必须检测设备处于哪种模式并防止不兼容的操作。
+
+#### Flash Mode Detection / 刷写模式检测
+
+- **When detected**: Device responds to ESPLoader protocol (esptool-js `loader.main()` succeeds)
+- **Status**: `Connected in Flash mode (settings cannot be used in this mode)`
+- **Behavior**: 
+  - Settings page should NOT attempt to send `km.version()`
+  - Settings functionality is disabled
+  - Flash tool can operate normally
+- **何时检测到**：设备响应 ESPLoader 协议（esptool-js `loader.main()` 成功）
+- **状态**：`已连接在刷写模式（此模式下无法使用设置）`
+- **行为**：
+  - 设置页面不应尝试发送 `km.version()`
+  - 设置功能被禁用
+  - 刷写工具可以正常操作
+
+#### Normal Mode Detection / 正常模式检测
+
+- **When detected**: Device responds to `km.version()` command with `"km.MAKCU()\r\n>>> "`
+- **Status**: `Connected in Normal mode`
+- **Behavior**:
+  - Settings page can operate normally
+  - Flash tool should NOT attempt flashing
+  - Show message: "Flashing must be completed on USB 1 or 3 only. Please remove all cables to set MAKCU into flash mode."
+- **何时检测到**：设备响应 `km.version()` 命令并返回 `"km.MAKCU()\r\n>>> "`
+- **状态**：`已连接在正常模式`
+- **行为**：
+  - 设置页面可以正常操作
+  - 刷写工具不应尝试刷写
+  - 显示消息："刷写只能在 USB 1 或 3 上完成。请拔掉所有线缆以将 MAKCU 设置为刷写模式。"
 
 ### Status States / 状态
 
@@ -68,33 +104,124 @@ The status display must show one of the following states:
 
 状态显示必须显示以下状态之一：
 
-#### 1. Not Connected / 未连接
+#### 1. Disconnected / 未连接
 
-- **English**: `MAKCU status : Not connected`
+- **English**: `MAKCU status : Disconnected`
 - **中文**: `MAKCU 状态：未连接`
 - **When shown**: Initial state when page loads, or after disconnection
 - **何时显示**：页面加载时的初始状态，或断开连接后
 
 #### 2. Connecting / 连接中
 
-- **English**: `MAKCU status : Connecting`
-- **中文**: `MAKCU 状态：连接中`
-- **When shown**: When the connection process has started (after user clicks connect and WebSerial port is opening)
-- **何时显示**：连接过程已开始时（用户点击连接且 WebSerial 端口正在打开）
+- **English**: `MAKCU status : Connecting...`
+- **中文**: `MAKCU 状态：连接中...`
+- **When shown**: When the connection process has started
+- **何时显示**：连接过程已开始时
 
-#### 3. Connected / 已连接
+#### 3. Connected in Normal Mode / 已连接在正常模式
 
-- **English**: `MAKCU status : Connected`
-- **中文**: `MAKCU 状态：已连接`
-- **When shown**: After successfully validating the device response (see Connection Protocol section)
-- **何时显示**：成功验证设备响应后（参见连接协议部分）
+- **English**: `MAKCU status : Connected in Normal mode` (with COM port: `COM3`)
+- **中文**: `MAKCU 状态：已连接在正常模式` (带 COM 端口：`COM3`)
+- **When shown**: After successfully validating `km.version()` response
+- **何时显示**：成功验证 `km.version()` 响应后
 
-#### 4. Fault / 故障
+#### 4. Connected in Flash Mode / 已连接在刷写模式
+
+- **English**: `MAKCU status : Connected in Flash mode (settings cannot be used in this mode)`
+- **中文**: `MAKCU 状态：已连接在刷写模式（此模式下无法使用设置）`
+- **When shown**: When ESPLoader successfully connects (flash mode detected)
+- **何时显示**：当 ESPLoader 成功连接时（检测到刷写模式）
+
+#### 5. Fault / 故障
 
 - **English**: `MAKCU status : Fault`
 - **中文**: `MAKCU 状态：故障`
-- **When shown**: When no response is received after sending the version command, or when an invalid response is received
-- **何时显示**：发送版本命令后未收到响应，或收到无效响应时
+- **When shown**: 
+  - When `km.version()` command fails (no response or invalid response) when connecting from settings page
+  - When both normal mode and flash mode detection fail
+- **何时显示**：
+  - 从设置页面连接时 `km.version()` 命令失败（无响应或无效响应）
+  - 正常模式和刷写模式检测都失败时
+
+### Connection Detection Flow / 连接检测流程
+
+When a user clicks "Connect" (from navbar or page), the system should:
+
+当用户点击"连接"（从导航栏或页面）时，系统应该：
+
+1. **Try Normal Mode First / 首先尝试正常模式**
+   - Open serial port at 115200 baud
+   - Send `km.version()\r`
+   - Wait for response (timeout: 3-5 seconds)
+   - If response contains `"km.MAKCU()\r\n>>> "` → **Normal Mode Connected**
+
+2. **If Normal Mode Fails, Try Flash Mode / 如果正常模式失败，尝试刷写模式**
+   - Close the serial port
+   - Attempt ESPLoader connection (`loader.main()`)
+   - If ESPLoader succeeds → **Flash Mode Connected**
+
+3. **If Both Fail / 如果两者都失败**
+   - Set status to **Fault**
+   - Show error message to user
+
+### COM Port Display / COM 端口显示
+
+The status display should also show the connected COM port when available:
+
+状态显示还应在可用时显示连接的 COM 端口：
+
+- **Format**: `MAKCU status : Connected in Normal mode (COM3)`
+- **Format (CN)**: `MAKCU 状态：已连接在正常模式 (COM3)`
+- **When shown**: Only when device is connected and port information is available
+- **何时显示**：仅在设备已连接且端口信息可用时
+
+## Global Status System / 全局状态系统
+
+### Shared Status Context / 共享状态上下文
+
+The MAKCU connection status should be shared across all pages using a React Context or global state management:
+
+MAKCU 连接状态应使用 React Context 或全局状态管理在所有页面之间共享：
+
+- **Status persists** when navigating between pages
+- **Connection button** available in navbar (top right, next to audio toggle)
+- **Status indicator** visible on all pages
+- **状态持久化**：在页面之间导航时保持
+- **连接按钮**：在导航栏中可用（右上角，音频切换旁边）
+- **状态指示器**：在所有页面上可见
+
+### Navbar Integration / 导航栏集成
+
+- **Connection Button**: Small button next to audio toggle in navbar
+- **Status Text**: Display current status next to connection button
+- **Visual Indicator**: Color-coded status (green=connected, red=fault, gray=disconnected)
+- **连接按钮**：导航栏中音频切换旁边的小按钮
+- **状态文本**：在连接按钮旁边显示当前状态
+- **视觉指示器**：颜色编码的状态（绿色=已连接，红色=故障，灰色=未连接）
+
+## Page-Specific Behavior / 页面特定行为
+
+### Settings Page / 设置页面
+
+- **On Load**: Check if device is in flash mode
+  - If flash mode: Show "Flash mode (settings cannot be used in this mode)" and disable settings
+  - If normal mode: Enable all settings functionality
+- **Connection**: Only attempt `km.version()` if not in flash mode
+- **加载时**：检查设备是否处于刷写模式
+  - 如果刷写模式：显示"刷写模式（此模式下无法使用设置）"并禁用设置
+  - 如果正常模式：启用所有设置功能
+- **连接**：仅在非刷写模式时尝试 `km.version()`
+
+### Flash Tool Page / 刷写工具页面
+
+- **On Load**: Check if device is in normal mode
+  - If normal mode: Show warning "Flashing must be completed on USB 1 or 3 only. Please remove all cables to set MAKCU into flash mode." and disable flashing
+  - If flash mode: Enable flashing functionality
+- **Connection**: Use ESPLoader to detect flash mode
+- **加载时**：检查设备是否处于正常模式
+  - 如果正常模式：显示警告"刷写只能在 USB 1 或 3 上完成。请拔掉所有线缆以将 MAKCU 设置为刷写模式。"并禁用刷写
+  - 如果刷写模式：启用刷写功能
+- **连接**：使用 ESPLoader 检测刷写模式
 
 ---
 
@@ -410,6 +537,34 @@ This is a simple start of the UI. Future enhancements may include:
 
 ---
 
+## Troubleshooting Section Addition / 故障排除部分补充
+
+Add a new section to the troubleshooting page explaining the flash mode vs normal mode distinction:
+
+在故障排除页面添加新部分，解释刷写模式与正常模式的区别：
+
+### Flash Mode vs Normal Mode / 刷写模式与正常模式
+
+**Problem / 问题**: Cannot use settings when device is in flash mode, or cannot flash when device is in normal mode.
+
+**问题**：设备处于刷写模式时无法使用设置，或设备处于正常模式时无法刷写。
+
+**Explanation / 说明**: 
+- ESP32-S3 cannot run both modes simultaneously
+- Flash mode: Device is ready for firmware flashing (USB 1 or 3 only, all cables removed)
+- Normal mode: Device is running firmware and can accept `km.version()` commands
+
+**说明**：
+- ESP32-S3 无法同时运行两种模式
+- 刷写模式：设备准备好进行固件刷写（仅 USB 1 或 3，所有线缆已拔掉）
+- 正常模式：设备正在运行固件并可以接受 `km.version()` 命令
+
+**Solution / 解决方法**:
+- To enter flash mode: Remove all USB cables, then connect only USB 1 or USB 3 to your PC
+- To enter normal mode: Connect USB 1 and USB 2 to the same PC (normal operation)
+- 要进入刷写模式：拔掉所有 USB 线缆，然后仅将 USB 1 或 USB 3 连接到您的 PC
+- 要进入正常模式：将 USB 1 和 USB 2 连接到同一台 PC（正常操作）
+
 ## References / 参考资料
 
 - [MAKCU Commands Reference](./MAKCU_COMMANDS.md) - For available commands
@@ -420,7 +575,8 @@ This is a simple start of the UI. Future enhancements may include:
 
 ## Version / 版本
 
-- **Document Version**: 1.0
+- **Document Version**: 2.0
 - **Firmware Requirement**: 3.9+
 - **Last Updated**: 2024
+- **Changes**: Added mode detection, global status system, and COM port display
 

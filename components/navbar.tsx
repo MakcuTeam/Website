@@ -2,6 +2,7 @@
 
 import { ModeToggle } from "@/components/theme-toggle";
 import { AudioToggle } from "@/components/audio-toggle";
+import { MakcuConnectionButton } from "./makcu-connection-button";
 
 import { SheetLeftbar } from "./leftbar";
 import { SheetClose } from "@/components/ui/sheet";
@@ -32,6 +33,7 @@ export function Navbar({ dict }: { dict: Dictionary }) {
               <ModeToggle dict={dict} />
             </div>
           </div>
+          <MakcuConnectionButton dict={dict} />
           <AudioToggle />
         </div>
       </div>

@@ -11,6 +11,7 @@ import { fetchDiscordData } from "@/store/discordSlice";
 import { Dictionary } from "@/lib/dictionaries";
 import { AudioProvider } from "@/components/contexts/audio-provider";
 import { AudioPlayer } from "@/components/audio-player";
+import { MakcuConnectionProvider } from "@/components/contexts/makcu-connection-provider";
 
 export default function RootLayoutProvider({
   children,
@@ -22,7 +23,9 @@ export default function RootLayoutProvider({
 >) {
   return (
     <Provider store={store}>
-      <RootLayoutContent dict={dict}>{children}</RootLayoutContent>
+      <MakcuConnectionProvider>
+        <RootLayoutContent dict={dict}>{children}</RootLayoutContent>
+      </MakcuConnectionProvider>
     </Provider>
   );
 }

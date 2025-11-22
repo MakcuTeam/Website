@@ -50,6 +50,7 @@ const tocByLang: Record<Locale, TocItem[]> = {
       ],
     },
     { id: "quick-reference", label: "Quick Reference" },
+    { id: "flash-vs-normal-mode", label: "Flash Mode vs Normal Mode" },
     { id: "still-issues", label: "Still Having Issues?" },
   ],
   cn: [
@@ -75,6 +76,7 @@ const tocByLang: Record<Locale, TocItem[]> = {
       ],
     },
     { id: "quick-reference", label: "快速参考" },
+    { id: "flash-vs-normal-mode", label: "刷写模式与正常模式" },
     { id: "still-issues", label: "仍有问题？" },
   ],
 };
@@ -788,6 +790,49 @@ export default async function TroubleshootingPage({ params }: LangProps) {
                       </tr>
                     </tbody>
                   </table>
+                </div>
+              </CardContent>
+            </Card>
+          </Section>
+
+          {/* Flash Mode vs Normal Mode */}
+          <Section
+            id="flash-vs-normal-mode"
+            badge={t("Mode", "模式")}
+            title={dict.troubleshooting.flash_vs_normal_mode?.title || t("Flash Mode vs Normal Mode", "刷写模式与正常模式")}
+            lead={
+              <p className="text-base leading-relaxed text-muted-foreground">
+                {dict.troubleshooting.flash_vs_normal_mode?.description || t("Understanding the difference between flash mode and normal mode.", "了解刷写模式与正常模式的区别。")}
+              </p>
+            }
+          >
+            <Card className="border-border/60 bg-card/90 shadow-lg">
+              <CardContent className="p-6">
+                <div className="space-y-4">
+                  <div>
+                    <h4 className="font-semibold text-foreground mb-2">
+                      {t("Problem", "问题")}:
+                    </h4>
+                    <p className="text-sm leading-relaxed text-muted-foreground">
+                      {dict.troubleshooting.flash_vs_normal_mode?.problem || t("Cannot use settings when device is in flash mode, or cannot flash when device is in normal mode.", "设备处于刷写模式时无法使用设置，或设备处于正常模式时无法刷写。")}
+                    </p>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-foreground mb-2">
+                      {t("Explanation", "说明")}:
+                    </h4>
+                    <p className="text-sm leading-relaxed text-muted-foreground">
+                      {dict.troubleshooting.flash_vs_normal_mode?.explanation || t("ESP32-S3 cannot run both modes simultaneously. Flash mode: Device is ready for firmware flashing (USB 1 or 3 only, all cables removed). Normal mode: Device is running firmware and can accept km.version() commands.", "ESP32-S3 无法同时运行两种模式。刷写模式：设备准备好进行固件刷写（仅 USB 1 或 3，所有线缆已拔掉）。正常模式：设备正在运行固件并可以接受 km.version() 命令。")}
+                    </p>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-foreground mb-2">
+                      {t("Solution", "解决方法")}:
+                    </h4>
+                    <p className="text-sm leading-relaxed text-muted-foreground">
+                      {dict.troubleshooting.flash_vs_normal_mode?.solution || t("To enter flash mode: Remove all USB cables, then connect only USB 1 or USB 3 to your PC. To enter normal mode: Connect USB 1 and USB 2 to the same PC (normal operation).", "要进入刷写模式：拔掉所有 USB 线缆，然后仅将 USB 1 或 USB 3 连接到您的 PC。要进入正常模式：将 USB 1 和 USB 2 连接到同一台 PC（正常操作）。")}
+                    </p>
+                  </div>
                 </div>
               </CardContent>
             </Card>

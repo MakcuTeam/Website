@@ -55,6 +55,13 @@
       "light": "亮色",
       "dark": "暗色",
       "system": "系统默认"
+    },
+    "makcu_status": {
+      "disconnected": "未连接",
+      "connecting": "连接中...",
+      "connected_normal": "正常模式",
+      "connected_flash": "刷写模式",
+      "fault": "故障"
     }
   },
   "tools": {
@@ -248,16 +255,29 @@
       "hardware_check": "硬件检查",
       "hardware_check_desc": "如果 LED 完全没有响应，可能存在硬件问题",
       "remember": "记住：MAKCU 支持键盘和鼠标设备。如果一种类型工作但另一种不工作，请检查设备兼容性。"
+    },
+    "flash_vs_normal_mode": {
+      "title": "刷写模式与正常模式",
+      "description": "了解刷写模式与正常模式的区别。",
+      "problem": "设备处于刷写模式时无法使用设置，或设备处于正常模式时无法刷写。",
+      "explanation": "ESP32-S3 无法同时运行两种模式。刷写模式：设备准备好进行固件刷写（仅 USB 1 或 3，所有线缆已拔掉）。正常模式：设备正在运行固件并可以接受 km.version() 命令。",
+      "solution": "要进入刷写模式：拔掉所有 USB 线缆，然后仅将 USB 1 或 USB 3 连接到您的 PC。要进入正常模式：将 USB 1 和 USB 2 连接到同一台 PC（正常操作）。"
     }
   },
   "settings": {
     "title": "MAKCU 设置",
     "description": "通过 WebSerial 连接配置和交互您的 MAKCU 设备。",
     "status": {
-      "not_connected": "未连接",
-      "connecting": "连接中",
-      "connected": "已连接",
+      "disconnected": "未连接",
+      "connecting": "连接中...",
+      "connected_normal": "已连接在正常模式",
+      "connected_flash": "已连接在刷写模式（此模式下无法使用设置）",
       "fault": "故障"
+    },
+    "connection": {
+      "connect": "连接",
+      "disconnect": "断开连接",
+      "connecting": "连接中..."
     },
     "prerequisites": {
       "title": "前提条件",
@@ -273,7 +293,12 @@
       "title": "连接",
       "connect": "连接",
       "disconnect": "断开连接",
+      "connecting": "连接中...",
       "browser_not_supported": "您的浏览器不支持 Web Serial API。请使用 Chrome/Edge 89+、Opera 76+ 或其他基于 Chromium 的浏览器。"
+    },
+    "warnings": {
+      "flash_mode_detected": "检测到刷写模式。此模式下无法使用设置。",
+      "normal_mode_detected": "检测到正常模式。刷写只能在 USB 1 或 3 上完成。请拔掉所有线缆以将 MAKCU 设置为刷写模式。"
     }
   }
 }

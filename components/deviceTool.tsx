@@ -22,6 +22,8 @@ import Loading from "./Loading";
 import { toast } from "sonner";
 import { DebugWindow, DebugWindowRef } from "@/components/DebugWindow";
 import { Buffer } from "buffer";
+import { useMakcuConnection } from "./contexts/makcu-connection-provider";
+import { useEffect } from "react";
 
 // Treat both native and polyfilled serial ports as the Web Serial API's
 // SerialPort to satisfy esptool-js' Transport constructor at runtime.
@@ -206,47 +208,8 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
   }, [device]);
 
   const connectToDevice = async () => {
-    if (isConnecting.current) return;
-    isConnecting.current = true;
-    setLoading(true);
-    try {
-      await flushWebCaches();
-      const selectedPort = (await serialLib.requestPort()) as unknown as SerialPortLike;
-
-      const transport = new Transport(selectedPort, false, false);
-      const flashOptions = {
-        transport,
-        baudrate: 921600,
-        terminal: {
-          clean() {
-            handleClearInfo();
-          },
-          writeLine(data) {
-            handleAddInfo(data);
-          },
-          write(data) {
-            handleAddInfo(data);
-          },
-        },
-        debugLogging: false,
-      } as LoaderOptions;
-
-      const loader = new ESPLoader(flashOptions);
-      await loader.main();
-      toast.success(dict?.tools.connectSuccess);
-      setDevice(transport);
-      setEsploader(loader);
-    } catch (error) {
-      const message =
-        error instanceof Error ? error.message : String(error);
-      if (!message.includes("Must be handling a user gesture")) {
-        handleAddInfo(message);
-        toast.error(message);
-      }
-    } finally {
-      setLoading(false);
-      isConnecting.current = false;
-    }
+    // Use global connection - it will try normal mode first, then flash mode
+    await connect();
   };
 
   const createFlashOptions = (buffer: ArrayBuffer): FlashOptions => {
@@ -282,6 +245,12 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
     firmwareName: string,
   ) => {
     if (!esploader) return;
+    
+    // Check if device is in normal mode
+    if (status === "connected" && mode === "normal") {
+      toast.error(dict?.settings.warnings.normal_mode_detected || "Cannot flash in normal mode. Please disconnect and reconnect in flash mode.");
+      return;
+    }
 
     try {
       setLoading(true);

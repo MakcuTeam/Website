@@ -63,6 +63,13 @@
       "light": "Light",
       "dark": "Dark",
       "system": "System"
+    },
+    "makcu_status": {
+      "disconnected": "Disconnected",
+      "connecting": "Connecting...",
+      "connected_normal": "Normal mode",
+      "connected_flash": "Flash mode",
+      "fault": "Fault"
     }
   },
   "tools": {
@@ -255,16 +262,31 @@
       "hardware_check": "Hardware Check",
       "hardware_check_desc": "If LEDs don't respond at all, there may be a hardware issue",
       "remember": "Remember: MAKCU supports both keyboard and mouse devices. If one type works but the other doesn't, check device compatibility."
+    },
+    "flash_vs_normal_mode": {
+      "title": "Flash Mode vs Normal Mode",
+      "description": "Understanding the difference between flash mode and normal mode.",
+      "problem": "Cannot use settings when device is in flash mode, or cannot flash when device is in normal mode.",
+      "explanation": "ESP32-S3 cannot run both modes simultaneously. Flash mode: Device is ready for firmware flashing (USB 1 or 3 only, all cables removed). Normal mode: Device is running firmware and can accept km.version() commands.",
+      "solution": "To enter flash mode: Remove all USB cables, then connect only USB 1 or USB 3 to your PC. To enter normal mode: Connect USB 1 and USB 2 to the same PC (normal operation)."
     }
   },
   "settings": {
     "title": "MAKCU Settings",
     "description": "Configure and interact with your MAKCU device via WebSerial connection.",
     "status": {
-      "not_connected": "Not connected",
-      "connecting": "Connecting",
-      "connected": "Connected",
+      "disconnected": "Disconnected",
+      "connecting": "Connecting...",
+      "connected_normal": "Connected in Normal mode",
+      "connected_flash": "Connected in Flash mode (settings cannot be used in this mode)",
       "fault": "Fault"
+    },
+    "connection": {
+      "title": "Connection",
+      "connect": "Connect",
+      "disconnect": "Disconnect",
+      "connecting": "Connecting...",
+      "browser_not_supported": "Your browser does not support Web Serial API. Please use Chrome/Edge 89+, Opera 76+, or another Chromium-based browser."
     },
     "prerequisites": {
       "title": "Prerequisites",
@@ -276,11 +298,9 @@
       "usb2_desc": "USB 2 must be connected to the same computer. Otherwise, MAKCU is not functional.",
       "note": "Note: If you encounter connection issues, please see the troubleshooting page for detailed setup instructions."
     },
-    "connection": {
-      "title": "Connection",
-      "connect": "Connect",
-      "disconnect": "Disconnect",
-      "browser_not_supported": "Your browser does not support Web Serial API. Please use Chrome/Edge 89+, Opera 76+, or another Chromium-based browser."
+    "warnings": {
+      "flash_mode_detected": "Flash mode detected. Settings cannot be used in this mode.",
+      "normal_mode_detected": "Normal mode detected. Flashing must be completed on USB 1 or 3 only. Please remove all cables to set MAKCU into flash mode."
     }
   }
 }
