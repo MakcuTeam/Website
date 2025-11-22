@@ -80,6 +80,10 @@ export function NavMenu({
       title: "troubleshooting",
       href: "/troubleshooting",
     },
+    {
+      title: "settings",
+      href: "/settings",
+    },
   ];
   return (
     <>

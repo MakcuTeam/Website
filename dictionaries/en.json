@@ -51,7 +51,8 @@
       "makcu_tools": "Firmware Flashing",
       "guides": "Guides",
       "discord": "Discord",
-      "troubleshooting": "Troubleshooting"
+      "troubleshooting": "Troubleshooting",
+      "settings": "Settings"
     },
     "search": {
       "search_guide": "Search Guide...",
@@ -254,6 +255,32 @@
       "hardware_check": "Hardware Check",
       "hardware_check_desc": "If LEDs don't respond at all, there may be a hardware issue",
       "remember": "Remember: MAKCU supports both keyboard and mouse devices. If one type works but the other doesn't, check device compatibility."
+    }
+  },
+  "settings": {
+    "title": "MAKCU Settings",
+    "description": "Configure and interact with your MAKCU device via WebSerial connection.",
+    "status": {
+      "not_connected": "Not connected",
+      "connecting": "Connecting",
+      "connected": "Connected",
+      "fault": "Fault"
+    },
+    "prerequisites": {
+      "title": "Prerequisites",
+      "firmware": "MAKCU flashed with 3.9 firmware",
+      "firmware_desc": "The settings page requires firmware version 3.9 or later",
+      "usb1": "USB 1 connected to your PC",
+      "usb1_desc": "USB 1 must be connected to the computer running the webpage",
+      "usb2": "USB 2 connected to this PC",
+      "usb2_desc": "USB 2 must be connected to the same computer. Otherwise, MAKCU is not functional.",
+      "note": "Note: If you encounter connection issues, please see the troubleshooting page for detailed setup instructions."
+    },
+    "connection": {
+      "title": "Connection",
+      "connect": "Connect",
+      "disconnect": "Disconnect",
+      "browser_not_supported": "Your browser does not support Web Serial API. Please use Chrome/Edge 89+, Opera 76+, or another Chromium-based browser."
     }
   }
 }

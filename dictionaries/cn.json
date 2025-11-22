@@ -43,7 +43,8 @@
       "api": "API 文档",
       "makcu_tools": "固件刷写",
       "discord": "Discord",
-      "troubleshooting": "故障排除"
+      "troubleshooting": "故障排除",
+      "settings": "设置"
     },
     "search": {
       "search_guide": "搜索指南...",
@@ -247,6 +248,32 @@
       "hardware_check": "硬件检查",
       "hardware_check_desc": "如果 LED 完全没有响应，可能存在硬件问题",
       "remember": "记住：MAKCU 支持键盘和鼠标设备。如果一种类型工作但另一种不工作，请检查设备兼容性。"
+    }
+  },
+  "settings": {
+    "title": "MAKCU 设置",
+    "description": "通过 WebSerial 连接配置和交互您的 MAKCU 设备。",
+    "status": {
+      "not_connected": "未连接",
+      "connecting": "连接中",
+      "connected": "已连接",
+      "fault": "故障"
+    },
+    "prerequisites": {
+      "title": "前提条件",
+      "firmware": "MAKCU 已刷入 3.9 固件",
+      "firmware_desc": "设置页面需要固件版本 3.9 或更高版本",
+      "usb1": "USB 1 连接到您的 PC",
+      "usb1_desc": "USB 1 必须连接到运行网页的计算机",
+      "usb2": "USB 2 连接到本 PC",
+      "usb2_desc": "USB 2 必须连接到同一台计算机。否则，MAKCU 无法正常工作。",
+      "note": "注意：如果遇到连接问题，请参阅故障排除页面以获取详细的设置说明。"
+    },
+    "connection": {
+      "title": "连接",
+      "connect": "连接",
+      "disconnect": "断开连接",
+      "browser_not_supported": "您的浏览器不支持 Web Serial API。请使用 Chrome/Edge 89+、Opera 76+ 或其他基于 Chromium 的浏览器。"
     }
   }
 }
