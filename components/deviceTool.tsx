@@ -4,6 +4,7 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
+import { Card, CardContent } from "./ui/card";
 import {
   Select,
   SelectContent,
@@ -16,7 +17,7 @@ import {
 } from "@/components/ui/select";
 import { ESPLoader, FlashOptions, LoaderOptions, Transport } from "esptool-js";
 import { serial } from "web-serial-polyfill";
-import { getDictionary, Dictionary } from "@/lib/dictionaries";
+import { Dictionary } from "@/lib/dictionaries";
 import { Locale } from "@/lib/locale";
 import Loading from "./Loading";
 import { toast } from "sonner";
@@ -51,8 +52,7 @@ export const getFilesBySide = (
       b.name.localeCompare(a.name, undefined, { numeric: true }),
     );
 
-export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
-  const [dict, setDict] = useState<Dictionary>();
+export const DeviceTool: React.FC<{ lang: Locale; dict: Dictionary }> = ({ lang, dict }) => {
   const debugRef = useRef<DebugWindowRef | null>(null);
   const handleAddInfo = (info: string) => {
     const suppressedDiagnostics = [
@@ -185,13 +185,6 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
     }
   };
 
-  useEffect(() => {
-    const loadDictionary = async () => {
-      const dictionary = await getDictionary(lang);
-      setDict(dictionary);
-    };
-    loadDictionary();
-  }, [lang]);
 
   const Navigator = navigator as Navigator & { serial?: Serial; usb?: unknown };
   const serialLib =
@@ -364,14 +357,10 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
   };
 
   useEffect(() => {
-    if (dict && !browserSupported) {
+    if (!browserSupported) {
       toast.warning(dict.tools.browserNotSupported);
     }
   }, [dict, browserSupported]);
-
-  if (!dict) {
-    return <Loading loading={true} className="w-full h-64" />;
-  }
 
   if (!browserSupported) {
     return (
@@ -393,124 +382,138 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
   }
 
   return (
-    <div>
-      <h1 className="text-5xl text-center font-logo mb-12">Makcu Flash Tool</h1>
-      <div className="flex flex-row gap-5">
-        <Loading
-          loading={loading}
-          className="border flex-1 h-64 rounded flex flex-row items-center justify-between relative backdrop-blur-sm "
-        >
-          <div className="flex items-left flex-col gap-8 flex-1 p-5 ">
-            {device && (
-              <>
-                <div className="flex items-center gap-2">
-                  <Label className="text-sm">{dict.tools.flashMode} :</Label>
-                  <RadioGroup
-                    value={config.mode}
-                    onValueChange={handleModeChange}
-                    className="flex items-center gap-6"
+    <div className="space-y-6">
+      {!device && (
+        <div className="p-4 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
+          <p className="text-sm text-yellow-600 dark:text-yellow-400">
+            {dict.tools.connectToSelect}
+          </p>
+        </div>
+      )}
+      
+      {device && (
+        <Card className="border-border/60 bg-card/90 shadow-lg">
+          <CardContent className="p-6">
+            <div className="space-y-6">
+              <div className="space-y-2">
+                <Label className="text-base font-semibold">{dict.tools.flashMode}</Label>
+                <RadioGroup
+                  value={config.mode}
+                  onValueChange={handleModeChange}
+                  className="flex items-center gap-6"
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="online" id="online" />
+                    <Label className="cursor-pointer text-sm" htmlFor="online">
+                      {dict.tools.online}
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="offline" id="offline" />
+                    <Label className="cursor-pointer text-sm" htmlFor="offline">
+                      {dict.tools.offline}
+                    </Label>
+                  </div>
+                </RadioGroup>
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-base font-semibold">
+                  {config.mode === "offline" ? dict.tools.offlineFlash : dict.tools.onlineFlash}
+                </Label>
+                {config.mode === "offline" ? (
+                  <div className="flex items-center gap-3">
+                    <Button
+                      variant="outline"
+                      onClick={() => fileRef.current?.click()}
+                      className="w-full sm:w-auto"
+                    >
+                      <Input
+                        type="file"
+                        className="hidden"
+                        accept=".bin"
+                        ref={fileRef}
+                        onChange={handleFileChange}
+                      />
+                      {selectedFile ? (
+                        <span className="truncate max-w-[200px]">{selectedFile.name}</span>
+                      ) : (
+                        <span className="opacity-50">
+                          {dict.tools.uploadFirmware}
+                        </span>
+                      )}
+                    </Button>
+                  </div>
+                ) : (
+                  <Select
+                    disabled={!device}
+                    value={onlineSelect}
+                    onValueChange={(value) => {
+                      setOnlineSelect(value);
+                      flashOnline(value);
+                    }}
                   >
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="online" id="online" />
-                      <Label className="cursor-pointer text-sm" htmlFor="online">
-                        {dict.tools.online}
-                      </Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="offline" id="offline" />
-                      <Label className="cursor-pointer text-sm" htmlFor="offline">
-                        {dict.tools.offline}
-                      </Label>
-                    </div>
-                  </RadioGroup>
-                </div>
-                <div className="flex items-center gap-3">
-                  {config.mode === "offline" ? (
-                    <div className="flex items-center gap-3">
-                      <Label className="text-sm">{dict.tools.offlineFlash}</Label>
-                      <Button
-                        variant={"outline"}
-                        onClick={() => fileRef.current?.click()}
-                        className="w-[12.7em]"
-                      >
-                        <Input
-                          type="file"
-                          className="hidden"
-                          accept=".bin"
-                          ref={fileRef}
-                          onChange={handleFileChange}
-                        />
-                        {selectedFile ? (
-                          selectedFile.name
+                    <SelectTrigger
+                      className="w-full sm:w-[300px]"
+                      disabled={!device}
+                    >
+                      <SelectValue
+                        placeholder={
+                          device ? dict.tools.list : dict.tools.connectToSelect
+                        }
+                      />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectLabel>{dict.tools.usb1Left}</SelectLabel>
+                        {leftFiles.length > 0 ? (
+                          leftFiles.map((item) => (
+                            <SelectItem key={item.name} value={item.name}>
+                              {item.name}
+                            </SelectItem>
+                          ))
                         ) : (
-                          <span className=" opacity-50">
-                            {dict.tools.uploadFirmware}
-                          </span>
+                          <SelectItem disabled value="no-left">
+                            {dict.tools.noLeftFirmware}
+                          </SelectItem>
                         )}
-                      </Button>
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-3">
-                      <Label className="text-sm">{dict.tools.onlineFlash}</Label>
-                      <Select
-                        disabled={!device}
-                        value={onlineSelect}
-                        onValueChange={(value) => {
-                          setOnlineSelect(value);
-                          flashOnline(value);
-                        }}
-                      >
-                        <SelectTrigger
-                          className="w-[12.7em] text-sm"
-                          disabled={!device}
-                        >
-                          <SelectValue
-                            placeholder={
-                              device ? dict.tools.list : dict.tools.connectToSelect
-                            }
-                          />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectGroup>
-                            <SelectLabel>{dict.tools.usb1Left}</SelectLabel>
-                            {leftFiles.length > 0 ? (
-                              leftFiles.map((item) => (
-                                <SelectItem key={item.name} value={item.name}>
-                                  {item.name}
-                                </SelectItem>
-                              ))
-                            ) : (
-                              <SelectItem disabled value="no-left">
-                                {dict.tools.noLeftFirmware}
-                              </SelectItem>
-                            )}
-                          </SelectGroup>
-                          <SelectSeparator />
-                          <SelectGroup>
-                            <SelectLabel>{dict.tools.usb3Right}</SelectLabel>
-                            {rightFiles.length > 0 ? (
-                              rightFiles.map((item) => (
-                                <SelectItem key={item.name} value={item.name}>
-                                  {item.name}
-                                </SelectItem>
-                              ))
-                            ) : (
-                              <SelectItem disabled value="no-right">
-                                {dict.tools.noRightFirmware}
-                              </SelectItem>
-                            )}
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  )}
-                </div>
-              </>
-            )}
+                      </SelectGroup>
+                      <SelectSeparator />
+                      <SelectGroup>
+                        <SelectLabel>{dict.tools.usb3Right}</SelectLabel>
+                        {rightFiles.length > 0 ? (
+                          rightFiles.map((item) => (
+                            <SelectItem key={item.name} value={item.name}>
+                              {item.name}
+                            </SelectItem>
+                          ))
+                        ) : (
+                          <SelectItem disabled value="no-right">
+                            {dict.tools.noRightFirmware}
+                          </SelectItem>
+                        )}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                )}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      <Card className="border-border/60 bg-card/90 shadow-lg">
+        <CardContent className="p-6">
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <Label className="text-base font-semibold">{lang === "cn" ? "刷写日志" : "Flash Log"}</Label>
+            </div>
+            <Loading loading={loading} className="w-full">
+              <DebugWindow ref={debugRef} dict={dict} progress={progress} />
+            </Loading>
           </div>
-        </Loading>
-        <DebugWindow ref={debugRef} dict={dict} progress={progress} />
-      </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };

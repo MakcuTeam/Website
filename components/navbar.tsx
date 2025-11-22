@@ -48,8 +48,6 @@ export function Logo() {
     </LocalizedLink>
   );
 }
-import { RootState } from "@/store";
-import { useSelector } from "react-redux";
 export function NavMenu({
   isSheet = false,
   dict,
@@ -57,7 +55,6 @@ export function NavMenu({
   isSheet?: boolean;
   dict: Dictionary;
 }) {
-  const { data } = useSelector((state: RootState) => state.discord);
 
   const NAVLINKS = [
     {
@@ -66,7 +63,7 @@ export function NavMenu({
     },
     {
       title: "discord",
-      href: data?.instant_invite ?? "",
+      href: "/discord",
       target: "_blank",
     },
     {

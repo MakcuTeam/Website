@@ -1,7 +1,7 @@
 {
   "metadata": {
     "title": "Makcu Official",
-    "description": "Experience seamless mouse and keyboard control with MAKCU, the next generation KMBOX replacement."
+    "description": "Experience seamless mouse and keyboard control with MAKCU, the next generation."
   },
   "home": {
     "main_header": "Experience security and speed with the next generation.",
@@ -73,7 +73,8 @@
     }
   },
   "tools": {
-    "title": "Online Flash Tool",
+    "title": "Firmware Flashing",
+    "description": "Flash firmware to your MAKCU device. Follow the steps carefully to ensure successful flashing.",
     "status": "Status",
     "connectBtn": "Connect Device",
     "connected": "Connected",
@@ -97,7 +98,32 @@
     "browserNotSupported": "Your browser does not support Web Serial/WebUSB. Please use Chrome, Edge, or another Chromium-based browser.",
     "driverNotice": "If you have not installed the CH343 driver yet then please click ",
     "driverLink": "this link",
-    "driverNoticeEnd": " to download"
+    "driverNoticeEnd": " to download",
+    "sections": {
+      "steps": {
+        "title": "Flashing Steps",
+        "description": "Follow these steps carefully to flash your MAKCU device.",
+        "step1": "Hold the button closest to the side you want to flash (left button for USB 1/left side, right button for USB 3/right side)",
+        "step2": "Connect the USB cable to the corresponding port (USB 1 for left, USB 3 for right)",
+        "step3": "Listen for the USB connection sound on your PC",
+        "step4": "Release the button after you hear the sound",
+        "step5": "Click the Connect button at the top right of the page",
+        "step6": "Select the firmware from the dropdown that matches the side you're flashing (check the numbers on the MAKCU board to match USB 1/3 with left/right)",
+        "step7": "Wait for the flashing process to complete",
+        "step8": "When told to disconnect, remove the USB cable and repeat the process for the other side"
+      },
+      "flashing_tool": {
+        "title": "Flashing Tool",
+        "description": "Use the tool below to flash firmware to your MAKCU device."
+      },
+      "firmware_selection": {
+        "title": "Firmware Selection",
+        "description": "Select the appropriate firmware for the side you are flashing.",
+        "left_note": "USB 1 corresponds to the left side - select firmware with 'LEFT' in the name",
+        "right_note": "USB 3 corresponds to the right side - select firmware with 'RIGHT' in the name",
+        "matching_note": "Check the numbers printed on the MAKCU board to ensure you match the correct USB port to the correct side"
+      }
+    }
   },
   "docs": {
     "on_this_page": "On this page",

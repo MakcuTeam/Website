@@ -1,7 +1,7 @@
 {
   "metadata": {
     "title": "Makcu 官方网站",
-    "description": "Experience seamless mouse and keyboard control with MAKCU, the next generation KMBOX replacement."
+    "description": "Experience seamless mouse and keyboard control with MAKCU, the next generation."
   },
   "home": {
     "main_header": "体验下一代的安全性和速度。",
@@ -89,7 +89,32 @@
     "browserNotSupported": "您的浏览器不支持 Web Serial/WebUSB。请使用 Chrome、Edge 或其他基于 Chromium 的浏览器。",
     "driverNotice": "如果你还没有安装CH343驱动程序，请点击",
     "driverLink": "此链接",
-    "driverNoticeEnd": "下载"
+    "driverNoticeEnd": "下载",
+    "sections": {
+      "steps": {
+        "title": "刷写步骤",
+        "description": "仔细按照这些步骤刷写您的 MAKCU 设备。",
+        "step1": "按住要刷写一侧最近的按钮（左侧按钮对应 USB 1/左侧，右侧按钮对应 USB 3/右侧）",
+        "step2": "将 USB 线连接到相应的端口（左侧使用 USB 1，右侧使用 USB 3）",
+        "step3": "在 PC 上听到 USB 连接声音",
+        "step4": "听到声音后松开按钮",
+        "step5": "点击页面右上角的连接按钮",
+        "step6": "从下拉菜单中选择与您正在刷写的一侧匹配的固件（检查 MAKCU 板上的数字以匹配 USB 1/3 与左/右）",
+        "step7": "等待刷写过程完成",
+        "step8": "当提示断开连接时，移除 USB 线并重复另一侧的过程"
+      },
+      "flashing_tool": {
+        "title": "刷写工具",
+        "description": "使用下面的工具将固件刷写到您的 MAKCU 设备。"
+      },
+      "firmware_selection": {
+        "title": "固件选择",
+        "description": "选择适合您正在刷写的一侧的固件。",
+        "left_note": "USB 1 对应左侧 - 选择名称中包含 'LEFT' 的固件",
+        "right_note": "USB 3 对应右侧 - 选择名称中包含 'RIGHT' 的固件",
+        "matching_note": "检查 MAKCU 板上打印的数字，确保将正确的 USB 端口与正确的一侧匹配"
+      }
+    }
   },
   "docs": {
     "on_this_page": "On this page",
