@@ -84,7 +84,7 @@ export function MakcuConnectionButton({ dict }: { dict: Dictionary }) {
           </span>
         </Button>
         <div className="text-xs text-muted-foreground hidden md:inline">
-          <span className="font-medium">MAKCU:</span> Not Supported
+          Not Supported
         </div>
       </div>
     );
@@ -105,7 +105,7 @@ export function MakcuConnectionButton({ dict }: { dict: Dictionary }) {
         </span>
       </Button>
       <div className={`text-xs ${getStatusColor()} hidden md:inline`}>
-        <span className="font-medium">MAKCU:</span> {getStatusText()}
+        {getStatusText()}
       </div>
     </div>
   );
