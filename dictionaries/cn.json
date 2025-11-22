@@ -4,9 +4,7 @@
     "description": "Experience seamless mouse and keyboard control with MAKCU, the next generation KMBOX replacement."
   },
   "home": {
-    "tips": "硬件瞄准的未来.",
-    "main_header": "通过下一代 KMBOX 杀手体验安全性和速度。",
-    "get_started": "下载",
+    "main_header": "体验下一代的安全性和速度，",
     "read_guide": "指南",
     "name": "Makcu"
   },
@@ -44,7 +42,8 @@
       "makcu_tools": "固件刷写",
       "discord": "Discord",
       "troubleshooting": "故障排除",
-      "settings": "设置"
+      "settings": "设置",
+      "home": "首页"
     },
     "search": {
       "search_guide": "搜索指南...",
@@ -345,8 +344,8 @@
       "title": "前提条件",
       "firmware": "MAKCU 已刷入 3.9 固件",
       "firmware_desc": "设置页面需要固件版本 3.9 或更高版本",
-      "usb1": "USB 1 连接到您的 PC",
-      "usb1_desc": "USB 1 必须连接到运行网页的计算机",
+      "usb1": "USB 1 连接到您的游戏 PC",
+      "usb1_desc": "USB 1 必须连接到您的游戏 PC",
       "usb2": "USB 2 连接到本 PC",
       "usb2_desc": "USB 2 必须连接到同一台计算机。否则，MAKCU 无法正常工作。",
       "note": "注意：如果遇到连接问题，请参阅故障排除页面以获取详细的设置说明。"

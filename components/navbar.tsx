@@ -60,11 +60,6 @@ export function NavMenu({
   const { data } = useSelector((state: RootState) => state.discord);
 
   const NAVLINKS = [
-    // {
-    //   title: "guide",
-    //   href: `/docs${page_routes[0].href}`,
-    //   absolute: true,
-    // },
     {
       title: "api",
       href: "/api",
@@ -76,15 +71,19 @@ export function NavMenu({
     },
     {
       title: "makcu_tools",
-      href: "/tool",
+      href: "/firmware",
     },
     {
-      title: "troubleshooting",
-      href: "/troubleshooting",
+      title: "home",
+      href: "/",
     },
     {
       title: "settings",
       href: "/settings",
+    },
+    {
+      title: "troubleshooting",
+      href: "/troubleshooting",
     },
   ];
   return (

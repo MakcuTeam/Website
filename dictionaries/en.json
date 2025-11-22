@@ -4,10 +4,8 @@
     "description": "Experience seamless mouse and keyboard control with MAKCU, the next generation KMBOX replacement."
   },
   "home": {
-    "tips": "The Future of hardware aiming",
-    "main_header": "Experience security and speed with the next generation KMBOX killer.",
+    "main_header": "Experience security and speed with the next generation,",
 
-    "get_started": "Get Started",
     "read_guide": "Read Guide",
     "name": "Makcu"
   },
@@ -52,7 +50,8 @@
       "guides": "Guides",
       "discord": "Discord",
       "troubleshooting": "Troubleshooting",
-      "settings": "Settings"
+      "settings": "Settings",
+      "home": "Home"
     },
     "search": {
       "search_guide": "Search Guide...",
@@ -354,8 +353,8 @@
       "title": "Prerequisites",
       "firmware": "MAKCU flashed with 3.9 firmware",
       "firmware_desc": "The settings page requires firmware version 3.9 or later",
-      "usb1": "USB 1 connected to your PC",
-      "usb1_desc": "USB 1 must be connected to the computer running the webpage",
+      "usb1": "USB 1 connected to your gaming PC",
+      "usb1_desc": "USB 1 must be connected to your gaming PC",
       "usb2": "USB 2 connected to this PC",
       "usb2_desc": "USB 2 must be connected to the same computer. Otherwise, MAKCU is not functional.",
       "note": "Note: If you encounter connection issues, please see the troubleshooting page for detailed setup instructions."

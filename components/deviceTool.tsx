@@ -401,11 +401,6 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
           className="border flex-1 h-64 rounded flex flex-row items-center justify-between relative backdrop-blur-sm "
         >
           <div className="flex items-left flex-col gap-8 flex-1 p-5 ">
-            <div className="flex items-center gap-3">
-              <Button onClick={connectToDevice}>
-                {device ? dict.tools.connected : dict.tools.connectBtn}
-              </Button>
-            </div>
             {device && (
               <>
                 <div className="flex items-center gap-2">

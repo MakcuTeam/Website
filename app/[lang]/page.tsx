@@ -28,30 +28,9 @@ export default function Home() {
     <div className="flex flex-col px-2 sm:py-8 py-12 mt-32 gap-12">
       <div className="sm:flex-row flex flex-col gap-8 sm:gap-2 items-center">
         <div className="flex-1">
-          <p className="mb-5 sm:text-lg underline underline-offset-4 sm:-mt-12">
-            {dict.home.tips}
-          </p>
           <h1 className=" text-3xl font-extrabold mb-4 sm:text-5xl">
             {dict.home.main_header}
           </h1>
-          <div className="flex flex-row items-center gap-5 pt-8">
-            <LocalizedLink
-              href={`/tool`}
-              className={buttonVariants({ className: "px-6", size: "lg" })}
-            >
-              {dict.home.get_started}
-            </LocalizedLink>
-            {/* <LocalizedLink
-              href={`/docs${page_routes[0].href}`}
-              className={buttonVariants({
-                variant: "secondary",
-                className: "px-6",
-                size: "lg",
-              })}
-            >
-              {dict.home.read_guide}
-            </LocalizedLink> */}
-          </div>
         </div>
 
         <div className="relative">
