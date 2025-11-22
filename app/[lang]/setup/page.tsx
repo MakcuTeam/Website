@@ -117,10 +117,20 @@ export default async function SetupPage({ params }: LangProps) {
   const t = (en: string, cn: string) => (isCn ? cn : en);
 
   return (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 max-w-7xl">
-      <header className="mb-12">
-        <h1 className="text-4xl font-bold mb-4">{dict.setup.title}</h1>
-        <p className="text-lg text-muted-foreground">{dict.setup.description}</p>
+    <div className="flex flex-col pb-20">
+      <header className="relative overflow-hidden rounded-3xl border border-border/60 bg-gradient-to-br from-stone-900 via-stone-800 to-stone-900 px-8 py-10 text-white shadow-xl">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.1),_transparent_60%)]" />
+        <div className="relative flex flex-col gap-3">
+          <span className="inline-flex w-max items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1 text-xs uppercase tracking-[0.3em] text-white/80">
+            {isCn ? "指南" : "Guide"}
+          </span>
+          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
+            {dict.setup.title}
+          </h1>
+          <p className="max-w-2xl text-sm text-white/70 sm:text-base">
+            {dict.setup.description}
+          </p>
+        </div>
       </header>
 
       <div className="mt-10 grid gap-8 lg:grid-cols-[280px_minmax(0,1fr)] xl:grid-cols-[300px_minmax(0,1fr)]">

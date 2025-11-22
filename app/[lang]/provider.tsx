@@ -56,7 +56,7 @@ function RootLayoutContent({
             disableTransitionOnChange
           >
             <Navbar dict={dict} />
-            <main className="sm:container mx-auto w-[90vw] h-auto scroll-smooth">
+            <main className="w-full h-auto scroll-smooth px-4 sm:px-6 lg:px-8">
               {children}
             </main>
             <Footer />

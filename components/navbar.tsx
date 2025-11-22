@@ -13,7 +13,7 @@ import LocalizedLink from "./localized-link";
 export function Navbar({ dict }: { dict: Dictionary }) {
   return (
     <nav className="w-full border-b h-16 sticky top-0 z-50  backdrop-blur bg-black/10">
-      <div className="sm:container mx-auto w-[95vw] h-full flex items-center justify-between md:gap-2">
+      <div className="w-full h-full flex items-center justify-between px-4 sm:px-6 lg:px-8">
         <div className="flex items-center gap-5">
           <SheetLeftbar dict={dict} />
           <div className="flex items-center gap-6">
@@ -26,7 +26,7 @@ export function Navbar({ dict }: { dict: Dictionary }) {
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 ml-auto">
           <div className="flex items-center gap-2">
             <div className="flex ml-2.5 sm:ml-0">
               <LangSelect />
