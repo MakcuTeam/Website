@@ -65,7 +65,8 @@
     }
   },
   "tools": {
-    "title": "在线刷写工具",
+    "title": "固件刷写",
+    "description": "将固件刷写到您的 MAKCU 设备。仔细按照步骤操作以确保成功刷写。",
     "status": "状态",
     "connectBtn": "连接设备",
     "connected": "已连接",
