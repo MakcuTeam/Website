@@ -141,6 +141,28 @@ export const DeviceTool: React.FC<{ lang: Locale }> = ({ lang }) => {
   const [onlineSelect, setOnlineSelect] = useState<string>();
   const [browserSupported, setBrowserSupported] = useState(true);
   const [showBrowserWarning, setShowBrowserWarning] = useState(true);
+  
+  // Use global connection context
+  const { status, mode, transport, loader, connect } = useMakcuConnection();
+  const isCn = lang === "cn";
+  
+  // Sync global connection state with local state
+  useEffect(() => {
+    if (status === "connected" && mode === "flash") {
+      setDevice(transport);
+      setEsploader(loader);
+    } else {
+      setDevice(null);
+      setEsploader(null);
+    }
+  }, [status, mode, transport, loader]);
+  
+  // Check if device is in normal mode on load
+  useEffect(() => {
+    if (status === "connected" && mode === "normal" && dict) {
+      toast.warning(dict.settings.warnings.normal_mode_detected);
+    }
+  }, [status, mode, dict]);
 
   const fileRef = useRef<HTMLInputElement>(null);
   const isConnecting = useRef(false);
