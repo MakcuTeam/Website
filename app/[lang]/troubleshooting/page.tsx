@@ -413,9 +413,6 @@ export default async function TroubleshootingPage({ params }: LangProps) {
                         <h4 className="font-semibold text-foreground">
                           {dict.troubleshooting.connection_status.statuses.not_supported.label}
                         </h4>
-                        <span className="text-xs text-muted-foreground">
-                          ({dict.troubleshooting.connection_status.statuses.not_supported.color})
-                        </span>
                       </div>
                       <p className="text-sm leading-relaxed text-muted-foreground pl-5">
                         {dict.troubleshooting.connection_status.statuses.not_supported.description}
@@ -429,9 +426,6 @@ export default async function TroubleshootingPage({ params }: LangProps) {
                         <h4 className="font-semibold text-foreground">
                           {dict.troubleshooting.connection_status.statuses.disconnected.label}
                         </h4>
-                        <span className="text-xs text-muted-foreground">
-                          ({dict.troubleshooting.connection_status.statuses.disconnected.color})
-                        </span>
                       </div>
                       <p className="text-sm leading-relaxed text-muted-foreground pl-5">
                         {dict.troubleshooting.connection_status.statuses.disconnected.description}
@@ -445,9 +439,6 @@ export default async function TroubleshootingPage({ params }: LangProps) {
                         <h4 className="font-semibold text-foreground">
                           {dict.troubleshooting.connection_status.statuses.connecting.label}
                         </h4>
-                        <span className="text-xs text-muted-foreground">
-                          ({dict.troubleshooting.connection_status.statuses.connecting.color})
-                        </span>
                       </div>
                       <p className="text-sm leading-relaxed text-muted-foreground pl-5">
                         {dict.troubleshooting.connection_status.statuses.connecting.description}
@@ -461,9 +452,6 @@ export default async function TroubleshootingPage({ params }: LangProps) {
                         <h4 className="font-semibold text-foreground">
                           {dict.troubleshooting.connection_status.statuses.normal_mode.label}
                         </h4>
-                        <span className="text-xs text-muted-foreground">
-                          ({dict.troubleshooting.connection_status.statuses.normal_mode.color})
-                        </span>
                       </div>
                       <p className="text-sm leading-relaxed text-muted-foreground pl-5">
                         {dict.troubleshooting.connection_status.statuses.normal_mode.description}
@@ -477,9 +465,6 @@ export default async function TroubleshootingPage({ params }: LangProps) {
                         <h4 className="font-semibold text-foreground">
                           {dict.troubleshooting.connection_status.statuses.flash_mode.label}
                         </h4>
-                        <span className="text-xs text-muted-foreground">
-                          ({dict.troubleshooting.connection_status.statuses.flash_mode.color})
-                        </span>
                       </div>
                       <p className="text-sm leading-relaxed text-muted-foreground pl-5">
                         {dict.troubleshooting.connection_status.statuses.flash_mode.description}
@@ -493,9 +478,6 @@ export default async function TroubleshootingPage({ params }: LangProps) {
                         <h4 className="font-semibold text-foreground">
                           {dict.troubleshooting.connection_status.statuses.fault.label}
                         </h4>
-                        <span className="text-xs text-muted-foreground">
-                          ({dict.troubleshooting.connection_status.statuses.fault.color})
-                        </span>
                       </div>
                       <p className="text-sm leading-relaxed text-muted-foreground pl-5">
                         {dict.troubleshooting.connection_status.statuses.fault.description}
