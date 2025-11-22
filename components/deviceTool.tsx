@@ -188,9 +188,6 @@ export const DeviceTool: React.FC<{ lang: Locale; dict: Dictionary }> = ({ lang,
   const serialLib =
     !Navigator.serial && Navigator.usb ? serial : Navigator.serial;
 
-  useEffect(() => {
-    setBrowserSupported(!!(Navigator.serial || Navigator.usb));
-  }, []);
   // No need for local disconnect handlers - the global connection provider handles everything
   // The device and esploader will automatically update when the global state changes
 
