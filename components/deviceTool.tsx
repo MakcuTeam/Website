@@ -143,7 +143,7 @@ export const DeviceTool: React.FC<{ lang: Locale; dict: Dictionary }> = ({ lang,
   const [showBrowserWarning, setShowBrowserWarning] = useState(true);
   
   // Use global connection context
-  const { status, mode, transport, loader, connect } = useMakcuConnection();
+  const { status, mode, transport, loader, connect, disconnect } = useMakcuConnection();
   const isCn = lang === "cn";
   
   // Sync global connection state with local state
@@ -193,27 +193,8 @@ export const DeviceTool: React.FC<{ lang: Locale; dict: Dictionary }> = ({ lang,
   useEffect(() => {
     setBrowserSupported(!!(Navigator.serial || Navigator.usb));
   }, []);
-  useEffect(() => {
-    if (!browserSupported) return;
-
-    const handleConnect = () => {
-      setDevice(null);
-      setEsploader(null);
-    };
-
-    const handleDisconnect = () => {
-      setDevice(null);
-      setEsploader(null);
-    };
-
-    Navigator.serial?.addEventListener("connect", handleConnect);
-    Navigator.serial?.addEventListener("disconnect", handleDisconnect);
-
-    return () => {
-      Navigator.serial?.removeEventListener("connect", handleConnect);
-      Navigator.serial?.removeEventListener("disconnect", handleDisconnect);
-    };
-  }, [browserSupported]);
+  // No need for local disconnect handlers - the global connection provider handles everything
+  // The device and esploader will automatically update when the global state changes
 
   useEffect(() => {
     if (!device) {

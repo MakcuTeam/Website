@@ -41,6 +41,12 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
   const writerRef = useRef<WritableStreamDefaultWriter<Uint8Array> | null>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const healthCheckRef = useRef<NodeJS.Timeout | null>(null);
+  const stateRef = useRef<MakcuConnectionState>(state);
+
+  // Keep stateRef in sync with state
+  useEffect(() => {
+    stateRef.current = state;
+  }, [state]);
 
   // Check browser support on mount
   useEffect(() => {
@@ -289,14 +295,17 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
     }
   }, [isConnecting, state.status, cleanup]);
 
-  const disconnect = useCallback(async () => {
+  // Internal disconnect function that uses stateRef to avoid stale closures
+  const performDisconnect = useCallback(async () => {
+    const currentState = stateRef.current;
+    
     // First cleanup all readers/writers
     await cleanup();
     
     // Close loader if exists
-    if (state.loader) {
+    if (currentState.loader) {
       try {
-        await state.loader.after();
+        await currentState.loader.after();
       } catch (e) {
         // Ignore
       }
@@ -306,11 +315,11 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
     // No need to explicitly close transport
 
     // Close port - this is critical
-    if (state.port) {
+    if (currentState.port) {
       try {
         // Make sure port is closed properly
-        if (state.port.readable) {
-          const reader = state.port.readable.getReader();
+        if (currentState.port.readable) {
+          const reader = currentState.port.readable.getReader();
           try {
             await reader.cancel();
           } catch (e) {
@@ -322,15 +331,15 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
             // Ignore
           }
         }
-        if (state.port.writable) {
-          const writer = state.port.writable.getWriter();
+        if (currentState.port.writable) {
+          const writer = currentState.port.writable.getWriter();
           try {
             writer.releaseLock();
           } catch (e) {
             // Ignore
           }
         }
-        await state.port.close();
+        await currentState.port.close();
       } catch (e) {
         // Ignore - port might already be closed
         console.warn("Error closing port:", e);
@@ -348,17 +357,62 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
     });
     
     toast.info("Disconnected");
-  }, [state, cleanup]);
+  }, [cleanup]);
 
-  // Health check for connection
+  // Public disconnect function
+  const disconnect = useCallback(async () => {
+    await performDisconnect();
+  }, [performDisconnect]);
+
+  // Listen for physical disconnection events - this is the MAIN handler for all disconnect events
+  // All pages (settings, firmware, navbar) will automatically update via the global state
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    
+    const Navigator = navigator as Navigator & { serial?: Serial };
+    if (!Navigator.serial) return;
+
+    const handleDisconnect = async (event: Event) => {
+      // Use stateRef to get the latest state
+      const currentState = stateRef.current;
+      // Check if we have an active connection
+      if (currentState.status === "connected" && currentState.port) {
+        // The port has been physically disconnected - use the main disconnect function
+        // This will update the global state, which will automatically update:
+        // - The navbar button (via MakcuConnectionButton)
+        // - The settings page (via MakcuSettings component)
+        // - The firmware page (via DeviceTool component)
+        await performDisconnect();
+      }
+    };
+
+    Navigator.serial.addEventListener("disconnect", handleDisconnect);
+
+    return () => {
+      Navigator.serial?.removeEventListener("disconnect", handleDisconnect);
+    };
+  }, [performDisconnect]);
+
+  // Health check for connection - detects when port becomes inaccessible
+  // Uses performDisconnect to ensure all components are updated
   useEffect(() => {
     if (state.status === "connected" && state.port) {
-      healthCheckRef.current = setInterval(() => {
-        if (state.port && state.port.readable && state.port.writable) {
-          // Connection is still alive
-        } else {
-          setState((prev) => ({ ...prev, status: "fault" }));
-          cleanup();
+      healthCheckRef.current = setInterval(async () => {
+        // Use stateRef to get the latest state
+        const currentState = stateRef.current;
+        if (currentState.port) {
+          try {
+            // Try to check if port is still accessible
+            if (currentState.port.readable && currentState.port.writable) {
+              // Connection is still alive
+            } else {
+              // Port is no longer accessible - use main disconnect function
+              await performDisconnect();
+            }
+          } catch (error) {
+            // Port is likely disconnected - use main disconnect function
+            await performDisconnect();
+          }
         }
       }, 1000);
     } else {
@@ -373,7 +427,7 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
         clearInterval(healthCheckRef.current);
       }
     };
-  }, [state.status, state.port, cleanup]);
+  }, [state.status, state.port, performDisconnect]);
 
   const value: MakcuConnectionContextType = {
     ...state,
