@@ -44,11 +44,11 @@ Welcome to the Makcu help. All commands shown are listed below. For more info, s
 |---------|-------------|------------|
 | `km.axis(help)` | Stream X/Y/Wheel axis deltas | `(mode,period_ms)` - 1=raw, 2=constructed frame; period 1-1000ms; use (0) or (0,0) to reset; output format: raw(x,y,w) or mut(x,y,w) |
 | `km.buttons(help)` | Stream button states | `(mode,period_ms)` - 1=raw, 2=constructed frame; period 1-1000ms; use (0) or (0,0) to reset |
-| `km.catch_mx(help)` / `km.catch_ml(help)` / etc. | Catch locked button or axis state | `(mode)` - 0=auto 1=manual; requires corresponding lock; `()` to query state; targets: mx/my/mw/ml/mm/mr/ms1/ms2 |
+| `km.catch_ml(help)` / `km.catch_mm(help)` / etc. | Catch locked button state | `(mode)` - 0=auto 1=manual; requires corresponding button lock; `()` to query state; targets: ml/mm/mr/ms1/ms2 (buttons only, not axes) |
 | `km.click(help)` | Schedule mouse clicks | `(button,count,delay_ms)` - count/delay optional; delay random 35-75ms if omitted (internal timing) |
 | `km.getpos(help)` | Report current pointer position | `()` |
 | `km.left(help)` | Set left button / query lock state | `(state)` - 0=release 1=down 2=silent_release; () returns 0=none 1=raw 2=injected 3=both |
-| `km.lock_mx(help)` / `km.lock_my(help)` / `km.lock_mw(help)` / etc. | Lock button or axis | `(state)` - state: 1=lock, 0=unlock; `()` returns 0=none 1=phy 2=inj 3=both; targets: mx/my/mw (axes), mx+/mx-/my+/my-/mw+/mw- (directional axes), ml/mm/mr/ms1/ms2 (buttons) |
+| `km.lock_mx(help)` / `km.lock_my(help)` / `km.lock_mw(help)` / etc. | Lock button or axis | `(state)` - state: 1=lock, 0=unlock; `()` returns 1=locked, 0=unlocked; targets: mx/my/mw (axes), mx+/mx-/my+/my-/mw+/mw- (directional axes), ml/mm/mr/ms1/ms2 (buttons) |
 | `km.middle(help)` | Set middle button / query lock state | `(state)` - 0=release 1=down 2=silent_release; () returns 0=none 1=raw 2=injected 3=both |
 | `km.mo(help)` | Queue raw mouse frame (set only) | `(buttons,x,y,wheel,pan,tilt)` - (0) clears all; x,y,wheel,pan,tilt are one-shots; button mask mirrors button states |
 | `km.mouse(help)` | Stream full mouse data | `(mode,period_ms)` - mode 1=raw 2=constructed frame; period 1-1000ms; () to query; use (0) or (0,0) to reset |
@@ -181,7 +181,7 @@ km.keys(0)             # Disable keyboard key streaming
 - **km.lock_<target>(state)** - Lock button or axis. The target is part of the command name, not a parameter.
   - **Format**: `km.lock_<target>(state)` where target is appended to `lock_`
   - **State**: `1`=lock, `0`=unlock
-  - **Query**: Call with `()` (e.g., `km.lock_mx()`) returns: `0`=none, `1`=phy (physical), `2`=inj (injected), `3`=both
+  - **Query**: Call with `()` (e.g., `km.lock_mx()`) returns: `1`=locked, `0`=unlocked
   - **Button lock targets**: 
     - `ml` - Left mouse button
     - `mm` - Middle mouse button  
@@ -201,17 +201,17 @@ km.keys(0)             # Disable keyboard key streaming
     - `km.lock_mw+(1)` - Lock only positive wheel movement (scroll up)
     - `km.lock_mw-(1)` - Lock only negative wheel movement (scroll down)
     - `km.lock_ml(1)` - Lock left mouse button
-    - `km.lock_mx()` - Query X-axis lock state (returns 0/1/2/3)
-- **km.catch_<target>(mode)** - Enable catch on a locked button or axis. The target is part of the command name, not a parameter.
+    - `km.lock_mx()` - Query X-axis lock state (returns 1=locked, 0=unlocked)
+- **km.catch_<target>(mode)** - Enable catch on a locked button. The target is part of the command name, not a parameter. **Note: Catch only works for buttons, not axes.**
   - **Format**: `km.catch_<target>(mode)` where target is appended to `catch_`
-  - **Mode**: `0`=auto, `1`=manual
-  - **Query**: Call with `()` (e.g., `km.catch_ml()`) to query state
-  - **Requires**: Corresponding `km.lock_<target>` must be set first
-  - **Targets**: `mx`, `my`, `mw`, `ml`, `mm`, `mr`, `ms1`, `ms2`
+  - **Mode**: `0`=auto (report on changes), `1`=manual (query only)
+  - **Query**: Call with `()` (e.g., `km.catch_ml()`) returns: `1`=button down (if catch enabled), `0`=button up or catch not enabled
+  - **Requires**: Corresponding `km.lock_<target>` must be set first (button must be locked)
+  - **Targets**: `ml`, `mm`, `mr`, `ms1`, `ms2` (buttons only, not axes)
   - **Examples**:
     - `km.catch_ml(1)` - Enable manual catch for left mouse button
-    - `km.catch_mx(0)` - Enable auto catch for X-axis
-    - `km.catch_ml()` - Query catch state for left mouse button
+    - `km.catch_ml(0)` - Enable auto catch for left mouse button (reports on changes)
+    - `km.catch_ml()` - Query catch state for left mouse button (returns 1=down, 0=up or not enabled)
 
 #### Mouse Streaming Commands
 - **km.buttons(mode,period_ms)** - Stream button states. Mode 1=raw, 2=constructed frame; period clamped 1-1000 ms. Use `(0)` or `(0,0)` to reset.

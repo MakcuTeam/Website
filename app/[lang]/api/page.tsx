@@ -866,11 +866,11 @@ export default async function ApiPage({ params }: LangProps) {
                     label: t("Response (GET)", "响应 (GET)"),
                     content: (
                       <div className="space-y-3">
-                        <CodeBlock code={`km.getpos(123,456)\r\n>>> `} />
+                        <CodeBlock code={`km.getpos()\r\n>>> km.getpos(123,456)\r\n>>> `} />
                         <p className="text-sm text-muted-foreground">
                           {t(
-                            "Returns current pointer position.",
-                            "返回当前指针位置。",
+                            "Returns current pointer position as (x,y).",
+                            "返回当前指针位置 (x,y)。",
                           )}
                         </p>
                       </div>
@@ -1009,15 +1009,15 @@ export default async function ApiPage({ params }: LangProps) {
                     label: t("Response (GET)", "响应 (GET)"),
                     content: (
                       <div className="space-y-3">
-                        <CodeBlock code={`km.lock_mx()\r\n>>> km.lock_mx(0)\r\n>>> `} />
+                        <CodeBlock code={`km.lock_mx()\r\n>>> km.lock_mx(1)\r\n>>> `} />
                         <p className="text-sm text-muted-foreground">
                           {isCn ? (
                             <span>
-                              返回值：<strong>0</strong>=none（无），<strong>1</strong>=phy（物理），<strong>2</strong>=inj（注入），<strong>3</strong>=both（两者）
+                              返回值：<strong>1</strong>=已锁定，<strong>0</strong>=未锁定
                             </span>
                           ) : (
                             <span>
-                              Returns: <strong>0</strong>=none, <strong>1</strong>=phy (physical), <strong>2</strong>=inj (injected), <strong>3</strong>=both
+                              Returns: <strong>1</strong>=locked, <strong>0</strong>=unlocked
                             </span>
                           )}
                         </p>
@@ -1081,20 +1081,20 @@ export default async function ApiPage({ params }: LangProps) {
                     label: t("Description", "描述"),
                     content: isCn ? (
                       <p>
-                        在锁定的按钮或轴上启用捕获。目标（target）是命令名的一部分，不是参数。需要先设置对应的 <span className="font-mono">km.lock_&lt;target&gt;</span>。
+                        在锁定的按钮上启用捕获。目标（target）是命令名的一部分，不是参数。<strong>注意：捕获仅适用于按钮，不适用于轴。</strong>需要先设置对应的 <span className="font-mono">km.lock_&lt;target&gt;</span>。
                       </p>
                     ) : (
                       <p>
-                        Enable catch on a locked button or axis. The target is part of the command name, not a parameter. Requires corresponding <span className="font-mono">km.lock_&lt;target&gt;</span> to be set first.
+                        Enable catch on a locked button. The target is part of the command name, not a parameter. <strong>Note: Catch only works for buttons, not axes.</strong> Requires corresponding <span className="font-mono">km.lock_&lt;target&gt;</span> to be set first.
                       </p>
                     ),
                   },
                   {
                     label: t("Targets", "目标"),
                     content: isCn ? (
-                      <span>mx, my, mw, ml, mm, mr, ms1, ms2</span>
+                      <span>ml, mm, mr, ms1, ms2（仅按钮，不适用于轴）</span>
                     ) : (
-                      <span>mx, my, mw, ml, mm, mr, ms1, ms2</span>
+                      <span>ml, mm, mr, ms1, ms2 (buttons only, not axes)</span>
                     ),
                   },
                   {
@@ -1124,9 +1124,9 @@ export default async function ApiPage({ params }: LangProps) {
                         <p className="text-xs text-muted-foreground">
                           {isCn ? "为左键启用手动捕获" : "Enable manual catch for left mouse button"}
                         </p>
-                        <CodeBlock code={`km.catch_mx(0)\r\n>>> `} />
+                        <CodeBlock code={`km.catch_ml(0)\r\n>>> `} />
                         <p className="text-xs text-muted-foreground">
-                          {isCn ? "为 X 轴启用自动捕获" : "Enable auto catch for X-axis"}
+                          {isCn ? "为左键启用自动捕获" : "Enable auto catch for left mouse button"}
                         </p>
                       </div>
                     ),
@@ -1294,7 +1294,7 @@ export default async function ApiPage({ params }: LangProps) {
                     label: t("Response (GET)", "响应 (GET)"),
                     content: (
                       <div className="space-y-3">
-                        <CodeBlock code={`km.isdown("ctrl",1)\r\n>>> `} />
+                        <CodeBlock code={`km.isdown("ctrl")\r\n>>> km.isdown(1)\r\n>>> `} />
                         <p className="text-sm text-muted-foreground">
                           {t(
                             "Returns 1 if key is down, 0 if released.",
