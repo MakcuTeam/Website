@@ -419,7 +419,7 @@
     },
     "baud_rate": {
       "title": "Baud Rate",
-      "description": "Configure the communication speed between MAKCU and your cheat software.",
+      "description": "Ensure makcu is configured with 115200 baud rate to use the settings, otherwise makcu will fail to function",
       "warning": "Baud rate change is PERMANENT and should only be set if your cheat has told you to use a different baud rate. A mismatched baud rate will stop your cheat from communicating with MAKCU.",
       "how_to_change": "Press the left button on MAKCU 4 times fast to change the baud rate from 115200 to 4mbps. The LED will flash 1 or 4 times and the baud rate will be saved.",
       "led_indicator": "When MAKCU starts, the baud rate indicator LED (left) will show what speed MAKCU is running at.",

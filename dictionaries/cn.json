@@ -410,7 +410,7 @@
     },
     "baud_rate": {
       "title": "波特率",
-      "description": "配置 MAKCU 与您的作弊软件之间的通信速度。",
+      "description": "确保 makcu 配置为 115200 波特率以使用设置，否则 makcu 将无法正常工作",
       "warning": "波特率更改是永久性的，只有在您的作弊软件告诉您使用不同波特率时才应设置。不匹配的波特率将阻止您的作弊软件与 MAKCU 通信。",
       "how_to_change": "快速按下 MAKCU 上的左侧按钮 4 次，将波特率从 115200 更改为 4mbps。LED 将闪烁 1 次或 4 次，波特率将被保存。",
       "led_indicator": "当 MAKCU 启动时，波特率指示器 LED（左侧）将显示 MAKCU 运行的速度。",

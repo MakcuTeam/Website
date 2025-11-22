@@ -225,7 +225,7 @@ export default async function SettingsPage({ params }: LangProps) {
             <Card className="border-border/60 bg-card/90 shadow-lg">
               <CardContent className="p-6">
                 <p className="text-sm leading-relaxed text-muted-foreground">
-                  <Link href={`/${lang}/setup#baud-rate`} className="text-blue-600 dark:text-blue-400 hover:underline">
+                  <Link href={`https://www.makcu.com/${lang}/setup#baud-rate`} className="text-blue-600 dark:text-blue-400 hover:underline">
                     {t("Please refer to the setup page", "请参考设置页面")}
                   </Link>
                   {" "}
