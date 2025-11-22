@@ -265,10 +265,35 @@
     },
     "flash_vs_normal_mode": {
       "title": "Flash Mode vs Normal Mode",
-      "description": "Understanding the difference between flash mode and normal mode.",
+      "description": "Understanding how MAKCU works with its 2 chips and 3 USB ports.",
+      "makcu_structure": {
+        "title": "MAKCU Structure",
+        "content": "MAKCU has 2 chips and 3 USB ports. USB port 1 and USB port 3 are connected to the 2 chips. USB port 2 is the COM port used to send commands to MAKCU while in normal use mode."
+      },
+      "flash_mode": {
+        "title": "Flash Mode",
+        "description": "Flash mode is used only when updating the firmware on MAKCU.",
+        "steps": {
+          "1": "Hold down the button closest to MAKCU (left chip = left button, right chip = right button)",
+          "2": "Connect the USB cable to the corresponding USB port (USB 1 for left chip, USB 3 for right chip)",
+          "3": "Once you hear the USB connection sound on your PC, release the button",
+          "4": "The device will now appear on your PC in flash mode"
+        },
+        "important": "If the button is NOT held down when the cable is connected, the device will NOT show up on your PC.",
+        "cable_note": "In flash mode, you should only use ONE cable to perform flashing. Do not connect multiple USB cables at the same time."
+      },
+      "normal_mode": {
+        "title": "Normal Mode",
+        "description": "This is how MAKCU is used during normal operation.",
+        "connections": {
+          "usb1": "USB 1 → Connected to your gaming PC",
+          "usb2": "USB 2 → COM port (used for sending commands to MAKCU)",
+          "usb3": "USB 3 → Connected to your mouse"
+        },
+        "important": "In normal mode, MAKCU can be tested and adjusted. You do NOT need to flash USB 2, and you do NOT hold any buttons down to use normal mode."
+      },
       "problem": "Cannot use settings when device is in flash mode, or cannot flash when device is in normal mode.",
-      "explanation": "ESP32-S3 cannot run both modes simultaneously. Flash mode: Device is ready for firmware flashing (USB 1 or 3 only, all cables removed). Normal mode: Device is running firmware and can accept km.version() commands.",
-      "solution": "To enter flash mode: Remove all USB cables, then connect only USB 1 or USB 3 to your PC. To enter normal mode: Connect USB 1 and USB 2 to the same PC (normal operation)."
+      "solution": "To enter flash mode: Hold the button, connect USB cable, wait for USB sound, then release button. To use normal mode: Connect USB 1 to gaming PC, USB 2 for COM port, and USB 3 to mouse - no buttons need to be held."
     }
   },
   "settings": {

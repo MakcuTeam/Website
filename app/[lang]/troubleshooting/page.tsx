@@ -28,6 +28,15 @@ type SubSectionProps = {
 
 const tocByLang: Record<Locale, TocItem[]> = {
   en: [
+    {
+      id: "flash-vs-normal-mode",
+      label: "Flash Mode vs Normal Mode",
+      children: [
+        { id: "makcu-structure", label: "MAKCU Structure" },
+        { id: "flash-mode", label: "Flash Mode" },
+        { id: "normal-mode", label: "Normal Mode" },
+      ],
+    },
     { id: "prerequisites", label: "Prerequisites" },
     {
       id: "led-guide",
@@ -50,10 +59,18 @@ const tocByLang: Record<Locale, TocItem[]> = {
       ],
     },
     { id: "quick-reference", label: "Quick Reference" },
-    { id: "flash-vs-normal-mode", label: "Flash Mode vs Normal Mode" },
     { id: "still-issues", label: "Still Having Issues?" },
   ],
   cn: [
+    {
+      id: "flash-vs-normal-mode",
+      label: "刷写模式与正常模式",
+      children: [
+        { id: "makcu-structure", label: "MAKCU 结构" },
+        { id: "flash-mode", label: "刷写模式" },
+        { id: "normal-mode", label: "正常模式" },
+      ],
+    },
     { id: "prerequisites", label: "前提条件" },
     {
       id: "led-guide",
@@ -76,7 +93,6 @@ const tocByLang: Record<Locale, TocItem[]> = {
       ],
     },
     { id: "quick-reference", label: "快速参考" },
-    { id: "flash-vs-normal-mode", label: "刷写模式与正常模式" },
     { id: "still-issues", label: "仍有问题？" },
   ],
 };
@@ -205,6 +221,120 @@ export default async function TroubleshootingPage({ params }: LangProps) {
         </aside>
 
         <div className="space-y-20">
+          {/* Flash Mode vs Normal Mode */}
+          <Section
+            id="flash-vs-normal-mode"
+            badge={t("Mode", "模式")}
+            title={dict.troubleshooting.flash_vs_normal_mode.title}
+            lead={
+              <p className="text-base leading-relaxed text-muted-foreground">
+                {dict.troubleshooting.flash_vs_normal_mode.description}
+              </p>
+            }
+          >
+            {/* MAKCU Structure */}
+            <SubSection
+              id="makcu-structure"
+              title={dict.troubleshooting.flash_vs_normal_mode.makcu_structure.title}
+            >
+              <Card className="border-border/60 bg-card/90 shadow-lg">
+                <CardContent className="p-6">
+                  <p className="text-sm leading-relaxed text-muted-foreground">
+                    {dict.troubleshooting.flash_vs_normal_mode.makcu_structure.content}
+                  </p>
+                </CardContent>
+              </Card>
+            </SubSection>
+
+            {/* Flash Mode */}
+            <SubSection
+              id="flash-mode"
+              title={dict.troubleshooting.flash_vs_normal_mode.flash_mode.title}
+              description={dict.troubleshooting.flash_vs_normal_mode.flash_mode.description}
+            >
+              <Card className="border-border/60 bg-card/90 shadow-lg">
+                <CardContent className="p-6">
+                  <div className="space-y-4">
+                    <div>
+                      <h4 className="font-semibold text-foreground mb-2">
+                        {t("How to Enter Flash Mode", "如何进入刷写模式")}:
+                      </h4>
+                      <ol className="list-decimal list-inside space-y-2 text-sm leading-relaxed text-muted-foreground">
+                        <li>{dict.troubleshooting.flash_vs_normal_mode.flash_mode.steps["1"]}</li>
+                        <li>{dict.troubleshooting.flash_vs_normal_mode.flash_mode.steps["2"]}</li>
+                        <li>{dict.troubleshooting.flash_vs_normal_mode.flash_mode.steps["3"]}</li>
+                        <li>{dict.troubleshooting.flash_vs_normal_mode.flash_mode.steps["4"]}</li>
+                      </ol>
+                    </div>
+                    <div className="p-4 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
+                      <p className="text-sm text-yellow-600 dark:text-yellow-400">
+                        <strong>{t("Important", "重要")}:</strong> {dict.troubleshooting.flash_vs_normal_mode.flash_mode.important}
+                      </p>
+                    </div>
+                    <div className="p-4 rounded-lg bg-blue-500/10 border border-blue-500/20">
+                      <p className="text-sm text-blue-600 dark:text-blue-400">
+                        <strong>{t("Note", "注意")}:</strong> {dict.troubleshooting.flash_vs_normal_mode.flash_mode.cable_note}
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </SubSection>
+
+            {/* Normal Mode */}
+            <SubSection
+              id="normal-mode"
+              title={dict.troubleshooting.flash_vs_normal_mode.normal_mode.title}
+              description={dict.troubleshooting.flash_vs_normal_mode.normal_mode.description}
+            >
+              <Card className="border-border/60 bg-card/90 shadow-lg">
+                <CardContent className="p-6">
+                  <div className="space-y-4">
+                    <div>
+                      <h4 className="font-semibold text-foreground mb-2">
+                        {t("Normal Mode Connections", "正常模式连接")}:
+                      </h4>
+                      <ul className="list-disc list-inside space-y-2 text-sm leading-relaxed text-muted-foreground">
+                        <li>{dict.troubleshooting.flash_vs_normal_mode.normal_mode.connections.usb1}</li>
+                        <li>{dict.troubleshooting.flash_vs_normal_mode.normal_mode.connections.usb2}</li>
+                        <li>{dict.troubleshooting.flash_vs_normal_mode.normal_mode.connections.usb3}</li>
+                      </ul>
+                    </div>
+                    <div className="p-4 rounded-lg bg-blue-500/10 border border-blue-500/20">
+                      <p className="text-sm text-blue-600 dark:text-blue-400">
+                        <strong>{t("Important", "重要")}:</strong> {dict.troubleshooting.flash_vs_normal_mode.normal_mode.important}
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </SubSection>
+
+            {/* Problem and Solution */}
+            <Card className="border-border/60 bg-card/90 shadow-lg">
+              <CardContent className="p-6">
+                <div className="space-y-4">
+                  <div>
+                    <h4 className="font-semibold text-foreground mb-2">
+                      {t("Problem", "问题")}:
+                    </h4>
+                    <p className="text-sm leading-relaxed text-muted-foreground">
+                      {dict.troubleshooting.flash_vs_normal_mode.problem}
+                    </p>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-foreground mb-2">
+                      {t("Solution", "解决方法")}:
+                    </h4>
+                    <p className="text-sm leading-relaxed text-muted-foreground">
+                      {dict.troubleshooting.flash_vs_normal_mode.solution}
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </Section>
+
           {/* Prerequisites */}
           <Section
             id="prerequisites"
@@ -790,49 +920,6 @@ export default async function TroubleshootingPage({ params }: LangProps) {
                       </tr>
                     </tbody>
                   </table>
-                </div>
-              </CardContent>
-            </Card>
-          </Section>
-
-          {/* Flash Mode vs Normal Mode */}
-          <Section
-            id="flash-vs-normal-mode"
-            badge={t("Mode", "模式")}
-            title={dict.troubleshooting.flash_vs_normal_mode?.title || t("Flash Mode vs Normal Mode", "刷写模式与正常模式")}
-            lead={
-              <p className="text-base leading-relaxed text-muted-foreground">
-                {dict.troubleshooting.flash_vs_normal_mode?.description || t("Understanding the difference between flash mode and normal mode.", "了解刷写模式与正常模式的区别。")}
-              </p>
-            }
-          >
-            <Card className="border-border/60 bg-card/90 shadow-lg">
-              <CardContent className="p-6">
-                <div className="space-y-4">
-                  <div>
-                    <h4 className="font-semibold text-foreground mb-2">
-                      {t("Problem", "问题")}:
-                    </h4>
-                    <p className="text-sm leading-relaxed text-muted-foreground">
-                      {dict.troubleshooting.flash_vs_normal_mode?.problem || t("Cannot use settings when device is in flash mode, or cannot flash when device is in normal mode.", "设备处于刷写模式时无法使用设置，或设备处于正常模式时无法刷写。")}
-                    </p>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-foreground mb-2">
-                      {t("Explanation", "说明")}:
-                    </h4>
-                    <p className="text-sm leading-relaxed text-muted-foreground">
-                      {dict.troubleshooting.flash_vs_normal_mode?.explanation || t("ESP32-S3 cannot run both modes simultaneously. Flash mode: Device is ready for firmware flashing (USB 1 or 3 only, all cables removed). Normal mode: Device is running firmware and can accept km.version() commands.", "ESP32-S3 无法同时运行两种模式。刷写模式：设备准备好进行固件刷写（仅 USB 1 或 3，所有线缆已拔掉）。正常模式：设备正在运行固件并可以接受 km.version() 命令。")}
-                    </p>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-foreground mb-2">
-                      {t("Solution", "解决方法")}:
-                    </h4>
-                    <p className="text-sm leading-relaxed text-muted-foreground">
-                      {dict.troubleshooting.flash_vs_normal_mode?.solution || t("To enter flash mode: Remove all USB cables, then connect only USB 1 or USB 3 to your PC. To enter normal mode: Connect USB 1 and USB 2 to the same PC (normal operation).", "要进入刷写模式：拔掉所有 USB 线缆，然后仅将 USB 1 或 USB 3 连接到您的 PC。要进入正常模式：将 USB 1 和 USB 2 连接到同一台 PC（正常操作）。")}
-                    </p>
-                  </div>
                 </div>
               </CardContent>
             </Card>

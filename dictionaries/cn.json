@@ -258,10 +258,35 @@
     },
     "flash_vs_normal_mode": {
       "title": "刷写模式与正常模式",
-      "description": "了解刷写模式与正常模式的区别。",
+      "description": "了解 MAKCU 如何与其 2 个芯片和 3 个 USB 端口配合工作。",
+      "makcu_structure": {
+        "title": "MAKCU 结构",
+        "content": "MAKCU 有 2 个芯片和 3 个 USB 端口。USB 端口 1 和 USB 端口 3 连接到 2 个芯片。USB 端口 2 是用于在正常使用模式下向 MAKCU 发送命令的 COM 端口。"
+      },
+      "flash_mode": {
+        "title": "刷写模式",
+        "description": "刷写模式仅在更新 MAKCU 固件时使用。",
+        "steps": {
+          "1": "按住最靠近 MAKCU 的按钮（左侧芯片 = 左侧按钮，右侧芯片 = 右侧按钮）",
+          "2": "将 USB 线连接到相应的 USB 端口（左侧芯片使用 USB 1，右侧芯片使用 USB 3）",
+          "3": "听到 PC 上的 USB 连接声音后，松开按钮",
+          "4": "设备现在将以刷写模式出现在您的 PC 上"
+        },
+        "important": "如果在连接线缆时未按住按钮，设备将不会在您的 PC 上显示。",
+        "cable_note": "在刷写模式下，您应该只使用一根线缆进行刷写。不要同时连接多根 USB 线缆。"
+      },
+      "normal_mode": {
+        "title": "正常模式",
+        "description": "这是 MAKCU 在正常操作期间的使用方式。",
+        "connections": {
+          "usb1": "USB 1 → 连接到您的游戏 PC",
+          "usb2": "USB 2 → COM 端口（用于向 MAKCU 发送命令）",
+          "usb3": "USB 3 → 连接到您的鼠标"
+        },
+        "important": "在正常模式下，可以测试和调整 MAKCU。您不需要刷写 USB 2，也不需要按住任何按钮来使用正常模式。"
+      },
       "problem": "设备处于刷写模式时无法使用设置，或设备处于正常模式时无法刷写。",
-      "explanation": "ESP32-S3 无法同时运行两种模式。刷写模式：设备准备好进行固件刷写（仅 USB 1 或 3，所有线缆已拔掉）。正常模式：设备正在运行固件并可以接受 km.version() 命令。",
-      "solution": "要进入刷写模式：拔掉所有 USB 线缆，然后仅将 USB 1 或 USB 3 连接到您的 PC。要进入正常模式：将 USB 1 和 USB 2 连接到同一台 PC（正常操作）。"
+      "solution": "要进入刷写模式：按住按钮，连接 USB 线，等待 USB 声音，然后松开按钮。要使用正常模式：将 USB 1 连接到游戏 PC，USB 2 用于 COM 端口，USB 3 连接到鼠标 - 无需按住任何按钮。"
     }
   },
   "settings": {
