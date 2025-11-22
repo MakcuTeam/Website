@@ -78,6 +78,10 @@ export function NavMenu({
       href: "/",
     },
     {
+      title: "setup",
+      href: "/setup",
+    },
+    {
       title: "settings",
       href: "/settings",
     },

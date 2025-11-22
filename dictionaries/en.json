@@ -51,7 +51,8 @@
       "discord": "Discord",
       "troubleshooting": "Troubleshooting",
       "settings": "Settings",
-      "home": "Home"
+      "home": "Home",
+      "setup": "Setup"
     },
     "search": {
       "search_guide": "Search Guide...",
@@ -362,6 +363,39 @@
     "warnings": {
       "flash_mode_detected": "Flash mode detected. Settings cannot be used in this mode.",
       "normal_mode_detected": "Normal mode detected. Flashing must be completed on USB 1 or 3 only. Please remove all cables to set MAKCU into flash mode."
+    }
+  },
+  "setup": {
+    "title": "Setup Guide",
+    "description": "Follow these steps to get your MAKCU device up and running.",
+    "sections": {
+      "install_driver": {
+        "title": "1. Install CH343 Driver",
+        "description": "Install the CH343 driver on your cheat PC (the computer you will use for flashing).",
+        "steps": [
+          "Download the CH343 driver from the link below",
+          "Run the installer on your cheat PC",
+          "Follow the installation wizard to complete the setup"
+        ],
+        "driver_link": "Download CH343 Driver"
+      },
+      "flash_makcu": {
+        "title": "2. Flash MAKCU Firmware",
+        "description": "Flash the firmware to your MAKCU device using the firmware flashing page.",
+        "dropdown_explanation": "The flash page has a dropdown menu that shows the left and right firmwares. You should match USB1 to the left side and USB3 to the right side of the USB port. Under the MAKCU board, there is text to explain the numbers.",
+        "flashing_process": {
+          "title": "How Flashing Works",
+          "flash_mode": "First, you need to enter flash mode. Hold down the button closest to the side you want to flash (left button for left side/USB1, right button for right side/USB3), then connect the USB cable. Once you hear the USB sound on your PC, release the button.",
+          "connecting": "After entering flash mode, connect to the device using the connection button at the top right of the page. The system will automatically detect that the device is in flash mode.",
+          "selecting_firmware": "Select the appropriate firmware from the dropdown menu. Make sure to select the left firmware for USB1 and the right firmware for USB3.",
+          "flashing": "Click on the firmware in the dropdown to start flashing. The progress will be shown in the log window.",
+          "completing": "When the flash has completed, remove the USB cable. Then repeat the process with the other side (hold the other button down, connect USB cable, wait for USB sound, release button, connect at top right, and flash)."
+        },
+        "baud_rate": {
+          "title": "Baud Rate",
+          "description": "The baud rate is usually 115200. Please refer to the troubleshooting page for information on how to change the baud rate if needed."
+        }
+      }
     }
   }
 }

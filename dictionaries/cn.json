@@ -43,7 +43,8 @@
       "discord": "Discord",
       "troubleshooting": "故障排除",
       "settings": "设置",
-      "home": "首页"
+      "home": "首页",
+      "setup": "设置"
     },
     "search": {
       "search_guide": "搜索指南...",
@@ -360,6 +361,39 @@
     "warnings": {
       "flash_mode_detected": "检测到刷写模式。此模式下无法使用设置。",
       "normal_mode_detected": "检测到正常模式。刷写只能在 USB 1 或 3 上完成。请拔掉所有线缆以将 MAKCU 设置为刷写模式。"
+    }
+  },
+  "setup": {
+    "title": "设置指南",
+    "description": "按照以下步骤设置您的 MAKCU 设备。",
+    "sections": {
+      "install_driver": {
+        "title": "1. 安装 CH343 驱动程序",
+        "description": "在您的作弊 PC（用于刷写的计算机）上安装 CH343 驱动程序。",
+        "steps": [
+          "从下面的链接下载 CH343 驱动程序",
+          "在您的作弊 PC 上运行安装程序",
+          "按照安装向导完成设置"
+        ],
+        "driver_link": "下载 CH343 驱动程序"
+      },
+      "flash_makcu": {
+        "title": "2. 刷写 MAKCU 固件",
+        "description": "使用固件刷写页面将固件刷写到您的 MAKCU 设备。",
+        "dropdown_explanation": "刷写页面有一个下拉菜单，显示左侧和右侧固件。您应该将 USB1 匹配到 USB 端口的左侧，将 USB3 匹配到右侧。在 MAKCU 板下方，有文字说明数字。",
+        "flashing_process": {
+          "title": "刷写过程",
+          "flash_mode": "首先，您需要进入刷写模式。按住最靠近要刷写一侧的按钮（左侧按钮用于左侧/USB1，右侧按钮用于右侧/USB3），然后连接 USB 线。一旦您听到 PC 上的 USB 声音，释放按钮。",
+          "connecting": "进入刷写模式后，使用页面右上角的连接按钮连接到设备。系统将自动检测设备处于刷写模式。",
+          "selecting_firmware": "从下拉菜单中选择相应的固件。确保为 USB1 选择左侧固件，为 USB3 选择右侧固件。",
+          "flashing": "点击下拉菜单中的固件开始刷写。进度将显示在日志窗口中。",
+          "completing": "刷写完成后，拔掉 USB 线。然后对另一侧重复该过程（按住另一个按钮，连接 USB 线，等待 USB 声音，释放按钮，在右上角连接，然后刷写）。"
+        },
+        "baud_rate": {
+          "title": "波特率",
+          "description": "波特率通常为 115200。如果需要更改波特率，请参考故障排除页面。"
+        }
+      }
     }
   }
 }
