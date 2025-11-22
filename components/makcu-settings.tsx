@@ -12,7 +12,7 @@ interface MakcuSettingsProps {
 }
 
 export const MakcuSettings: React.FC<MakcuSettingsProps> = ({ lang, dict }) => {
-  const { status, mode } = useMakcuConnection();
+  const { status, mode, browserSupported } = useMakcuConnection();
   const isCn = lang === "cn";
 
   // Check if device is in flash mode on load
@@ -24,6 +24,9 @@ export const MakcuSettings: React.FC<MakcuSettingsProps> = ({ lang, dict }) => {
 
   // Get status text based on current language and mode
   const getStatusText = () => {
+    if (!browserSupported) {
+      return dict.troubleshooting.connection_status.statuses.not_supported.label;
+    }
     if (status === "disconnected") {
       return dict.settings.status.disconnected;
     }
@@ -46,6 +49,9 @@ export const MakcuSettings: React.FC<MakcuSettingsProps> = ({ lang, dict }) => {
 
   // Get status color dot - matching Connection Status Overview colors
   const getStatusColor = () => {
+    if (!browserSupported) {
+      return "bg-muted-foreground"; // Gray for not supported
+    }
     if (status === "connected") {
       if (mode === "normal") {
         return "bg-emerald-500"; // Green for normal mode
@@ -81,7 +87,14 @@ export const MakcuSettings: React.FC<MakcuSettingsProps> = ({ lang, dict }) => {
               </p>
             </div>
           </div>
-          {isSettingsDisabled && (
+          {!browserSupported && (
+            <div className="p-4 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
+              <p className="text-sm text-yellow-600 dark:text-yellow-400">
+                {dict.troubleshooting.connection_status.statuses.not_supported.description}
+              </p>
+            </div>
+          )}
+          {browserSupported && isSettingsDisabled && (
             <div className="p-4 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
               <p className="text-sm text-yellow-600 dark:text-yellow-400">
                 {dict.settings.warnings.flash_mode_detected}

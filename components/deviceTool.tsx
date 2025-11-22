@@ -139,11 +139,9 @@ export const DeviceTool: React.FC<{ lang: Locale; dict: Dictionary }> = ({ lang,
 
   const [progress, setProgress] = useState(0);
   const [onlineSelect, setOnlineSelect] = useState<string>();
-  const [browserSupported, setBrowserSupported] = useState(true);
-  const [showBrowserWarning, setShowBrowserWarning] = useState(true);
   
   // Use global connection context
-  const { status, mode, transport, loader, connect, disconnect } = useMakcuConnection();
+  const { status, mode, transport, loader, connect, disconnect, browserSupported: contextBrowserSupported } = useMakcuConnection();
   const isCn = lang === "cn";
   
   // Sync global connection state with local state
@@ -337,33 +335,11 @@ export const DeviceTool: React.FC<{ lang: Locale; dict: Dictionary }> = ({ lang,
     setConfig({ mode });
   };
 
-  useEffect(() => {
-    if (!browserSupported) {
-      toast.warning(dict.tools.browserNotSupported);
-    }
-  }, [dict, browserSupported]);
-
-  if (!browserSupported) {
-    return (
-      <div>
-        {showBrowserWarning && (
-          <div className="mb-4 flex items-center justify-between rounded border border-yellow-200 bg-yellow-100 p-4 text-yellow-800">
-            <span>{dict.tools.browserNotSupported}</span>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setShowBrowserWarning(false)}
-            >
-              ×
-            </Button>
-          </div>
-        )}
-      </div>
-    );
-  }
-
   // Get status text based on current language and mode
   const getStatusText = () => {
+    if (!contextBrowserSupported) {
+      return dict.troubleshooting.connection_status.statuses.not_supported.label;
+    }
     if (status === "disconnected") {
       return dict.settings.status.disconnected;
     }
@@ -386,6 +362,9 @@ export const DeviceTool: React.FC<{ lang: Locale; dict: Dictionary }> = ({ lang,
 
   // Get status color dot - matching Connection Status Overview colors
   const getStatusColor = () => {
+    if (!contextBrowserSupported) {
+      return "bg-muted-foreground"; // Gray for not supported
+    }
     if (status === "connected") {
       if (mode === "normal") {
         return "bg-emerald-500"; // Green for normal mode
@@ -421,14 +400,21 @@ export const DeviceTool: React.FC<{ lang: Locale; dict: Dictionary }> = ({ lang,
                 </p>
               </div>
             </div>
-            {status === "connected" && mode === "normal" && (
+            {!contextBrowserSupported && (
+              <div className="p-4 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
+                <p className="text-sm text-yellow-600 dark:text-yellow-400">
+                  {dict.troubleshooting.connection_status.statuses.not_supported.description}
+                </p>
+              </div>
+            )}
+            {contextBrowserSupported && status === "connected" && mode === "normal" && (
               <div className="p-4 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
                 <p className="text-sm text-yellow-600 dark:text-yellow-400">
                   {dict.settings.warnings.normal_mode_detected}
                 </p>
               </div>
             )}
-            {!device && status !== "connected" && (
+            {contextBrowserSupported && !device && status !== "connected" && (
               <div className="p-4 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
                 <p className="text-sm text-yellow-600 dark:text-yellow-400">
                   {dict.tools.connectToSelect}
