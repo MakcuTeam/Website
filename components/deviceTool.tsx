@@ -23,7 +23,6 @@ import { toast } from "sonner";
 import { DebugWindow, DebugWindowRef } from "@/components/DebugWindow";
 import { Buffer } from "buffer";
 import { useMakcuConnection } from "./contexts/makcu-connection-provider";
-import { useEffect } from "react";
 
 // Treat both native and polyfilled serial ports as the Web Serial API's
 // SerialPort to satisfy esptool-js' Transport constructor at runtime.
