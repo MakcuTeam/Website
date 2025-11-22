@@ -25,22 +25,22 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col px-2 sm:py-8 py-12 mt-32 gap-12">
-      <div className="sm:flex-row flex flex-col gap-8 sm:gap-2 items-center">
-        <div className="flex-1">
-          <h1 className=" text-3xl font-extrabold mb-4 sm:text-5xl">
-            {dict.home.main_header}
-          </h1>
-        </div>
-
-        <div className="relative">
-          <Image
-            src={ProductImage}
-            className=" grayscale contrast-[100%] invert dark:invert-0 brightness-[.9]"
-            alt="product_image"
-            loading="eager"
-            priority
-          />
+    <div className="flex flex-col px-2 sm:py-8 py-12 gap-12">
+      <div className="flex flex-col gap-6">
+        <h1 className="text-2xl sm:text-3xl font-extrabold">
+          {dict.home.main_header}
+        </h1>
+        
+        <div className="flex justify-center">
+          <div className="relative scale-[2]">
+            <Image
+              src={ProductImage}
+              className="grayscale contrast-[100%] invert dark:invert-0 brightness-[.9]"
+              alt="product_image"
+              loading="eager"
+              priority
+            />
+          </div>
         </div>
       </div>
 

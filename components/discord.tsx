@@ -12,10 +12,10 @@ export const DiscordCard = () => {
   return (
     <div className="flex flex-col gap-5">
       <span className="flex gap-3 items-center mb-8">
-        <div className="w-full border-b dark:border-b-[hsl(var(--border))] rounded flex-1" />
-        <div className="w-auto text-center flex-grow-1 flex-2 text-xl font-logo">
+        <div className="w-auto text-left flex-grow-1 flex-2 text-xl font-logo">
           Online Customer ({discordStore?.data?.presence_count})
         </div>
+        <div className="w-full border-b dark:border-b-[hsl(var(--border))] rounded flex-1" />
       </span>
 
       <div className="flex flex-wrap gap-3 justify-between overflow-hidden relative text-sm">
