@@ -117,13 +117,13 @@ export default async function SetupPage({ params }: LangProps) {
   const t = (en: string, cn: string) => (isCn ? cn : en);
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-5xl">
+    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 max-w-7xl">
       <header className="mb-12">
         <h1 className="text-4xl font-bold mb-4">{dict.setup.title}</h1>
         <p className="text-lg text-muted-foreground">{dict.setup.description}</p>
       </header>
 
-      <div className="mt-10 grid gap-8 lg:grid-cols-[260px_minmax(0,1fr)]">
+      <div className="mt-10 grid gap-8 lg:grid-cols-[280px_minmax(0,1fr)] xl:grid-cols-[300px_minmax(0,1fr)]">
         <aside>
           <Card className="border-border/60 bg-card/90 shadow-lg">
             <CardContent className="p-5">
