@@ -266,6 +266,26 @@
         "problem": "LED shows solid ON (green) but mouse/keyboard doesn't work",
         "causes": "Device driver issue on computer, USB port problem, or device compatibility issue",
         "steps": "Check device manager for any error icons, try a different USB port, verify CH343 driver is installed correctly, check if COM port number is below 10, or try a different mouse or keyboard to test"
+      },
+      "baud_rate_mismatch": {
+        "title": "Baud Rate Mismatch / Cheat Not Connecting",
+        "problem": "MAKCU is not changing baud rate or cheat is not connecting to MAKCU.",
+        "symptoms": [
+          "Cheat software cannot communicate with MAKCU",
+          "MAKCU not responding to commands",
+          "Connection timeouts",
+          "Device appears connected but no data exchange"
+        ],
+        "solution": "Change COM port to 10 and ensure baud rate is matched to the cheat's expectations. The MAKCU.com website and the AIO tool expect MAKCU to be running at 115200 (1 flash mode). Users must ensure that baud rate 115200 is enabled to communicate with the website and tools.",
+        "steps": [
+          "Check the baud rate indicator LED (left) when MAKCU starts - it should flash 1 time for 115200",
+          "If baud rate is incorrect, press the left button 4 times fast to change it",
+          "Ensure USB 1 + USB 2 are connected for MAKCU to have power to change baud rate",
+          "Change COM port to 10 in your cheat software settings",
+          "Verify baud rate matches between MAKCU and your cheat software",
+          "If using MAKCU website or AIO tool, ensure baud rate is set to 115200"
+        ],
+        "important": "USB 1 + USB 2 must be connected for MAKCU to take power. USB 2 does not provide power to MAKCU - this prevents back feeding to the main PC and 2nd PC from both USB ports."
       }
     },
     "quick_reference": {
@@ -329,6 +349,13 @@
         },
         "important": "In normal mode, MAKCU can be tested and adjusted. You do NOT need to flash USB 2, and you do NOT hold any buttons down to use normal mode."
       },
+      "power_requirements": {
+        "title": "Power Requirements",
+        "description": "Understanding how MAKCU receives power is critical for proper operation.",
+        "normal_mode": "In normal mode, USB 1 + USB 2 must be connected to power MAKCU. USB 2 does not provide power to MAKCU - this is done to ensure there is no back feeding to the main PC and the 2nd PC from both USB ports.",
+        "flash_mode": "Flash mode uses 1 cable at a time. Only connect USB 1 OR USB 3, not both simultaneously.",
+        "warning": "Failing to follow these power requirements will lead to incorrect usage, MAKCU showing signs of not being functional, and being unable to flash. These broken symptoms are due to not understanding the power requirements."
+      },
       "problem": "Cannot use settings when device is in flash mode, or cannot flash when device is in normal mode.",
       "solution": "To enter flash mode: Hold the button, connect USB cable, wait for USB sound, then release button. To use normal mode: Connect USB 1 to gaming PC, USB 2 for COM port, and USB 3 to mouse - no buttons need to be held."
     }
@@ -363,6 +390,17 @@
     "warnings": {
       "flash_mode_detected": "Flash mode detected. Settings cannot be used in this mode.",
       "normal_mode_detected": "Normal mode detected. Flashing must be completed on USB 1 or 3 only. Please remove all cables to set MAKCU into flash mode."
+    },
+    "baud_rate": {
+      "title": "Baud Rate",
+      "description": "Configure the communication speed between MAKCU and your cheat software.",
+      "warning": "Baud rate change is PERMANENT and should only be set if your cheat has told you to use a different baud rate. A mismatched baud rate will stop your cheat from communicating with MAKCU.",
+      "how_to_change": "Press the left button on MAKCU 4 times fast to change the baud rate from 115200 to 4mbps. The LED will flash 1 or 4 times and the baud rate will be saved.",
+      "led_indicator": "When MAKCU starts, the baud rate indicator LED (left) will show what speed MAKCU is running at.",
+      "startup_indicator": "When MAKCU starts, the baud rate indicator LED (left) will flash to indicate the current baud rate: 1 flash = 115200, 4 flashes = 4mbps.",
+      "website_requirement": "The MAKCU website expects to use 115200 baud rate. Ensure if you are trying to use normal mode with the MAKCU website, you set the baud rate to 115200.",
+      "setting_methods": "The baud rate can be set by the user (using the button method), or by the developer in code.",
+      "power_requirement": "USB 1 + USB 2 must be connected for MAKCU to take power to change the baud rate. USB 2 does not provide power to MAKCU - this is done to ensure there is no back feeding to the main PC and the 2nd PC from both USB ports."
     }
   },
   "setup": {
@@ -394,6 +432,13 @@
         "baud_rate": {
           "title": "Baud Rate",
           "description": "The baud rate is usually 115200. Please refer to the troubleshooting page for information on how to change the baud rate if needed."
+        },
+        "power_requirements": {
+          "title": "Power Requirements",
+          "description": "Understanding how MAKCU receives power is critical for proper operation.",
+          "normal_mode": "In normal mode, USB 1 + USB 2 must be connected to power MAKCU. USB 2 does not provide power to MAKCU - this is done to ensure there is no back feeding to the main PC and the 2nd PC from both USB ports.",
+          "flash_mode": "Flash mode uses 1 cable at a time. Only connect USB 1 OR USB 3, not both simultaneously.",
+          "warning": "Failing to follow these power requirements will lead to incorrect usage, MAKCU showing signs of not being functional, and being unable to flash. These broken symptoms are due to not understanding the power requirements."
         }
       }
     }

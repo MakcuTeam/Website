@@ -52,6 +52,7 @@ const tocByLang: Record<Locale, TocItem[]> = {
       children: [
         { id: "flashing-process", label: "刷写过程" },
         { id: "baud-rate", label: "波特率" },
+        { id: "power-requirements", label: "电源要求" },
       ],
     },
   ],
@@ -246,6 +247,32 @@ export default async function SetupPage({ params }: LangProps) {
                   {" "}
                   {t("for information on how to change the baud rate if needed.", "了解如何更改波特率（如需要）。")}
                 </p>
+              </SubSection>
+
+              <SubSection
+                id="power-requirements"
+                title={dict.setup.sections.flash_makcu.power_requirements.title}
+                description={dict.setup.sections.flash_makcu.power_requirements.description}
+              >
+                <div className="space-y-4">
+                  <div>
+                    <h4 className="font-semibold mb-2">{t("Normal Mode", "正常模式")}</h4>
+                    <p className="text-sm leading-relaxed text-muted-foreground">
+                      {dict.setup.sections.flash_makcu.power_requirements.normal_mode}
+                    </p>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold mb-2">{t("Flash Mode", "刷写模式")}</h4>
+                    <p className="text-sm leading-relaxed text-muted-foreground">
+                      {dict.setup.sections.flash_makcu.power_requirements.flash_mode}
+                    </p>
+                  </div>
+                  <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/20">
+                    <p className="text-sm text-red-600 dark:text-red-400">
+                      <strong>{t("Warning", "警告")}:</strong> {dict.setup.sections.flash_makcu.power_requirements.warning}
+                    </p>
+                  </div>
+                </div>
               </SubSection>
             </div>
           </Section>

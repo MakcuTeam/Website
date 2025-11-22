@@ -35,6 +35,7 @@ const tocByLang: Record<Locale, TocItem[]> = {
         { id: "makcu-structure", label: "MAKCU Structure" },
         { id: "flash-mode", label: "Flash Mode" },
         { id: "normal-mode", label: "Normal Mode" },
+        { id: "power-requirements", label: "Power Requirements" },
       ],
     },
     {
@@ -63,6 +64,7 @@ const tocByLang: Record<Locale, TocItem[]> = {
         { id: "slow-persists", label: "Slow Blink Persists" },
         { id: "led-not-responding", label: "LED Not Responding" },
         { id: "device-not-working", label: "Device Not Working" },
+        { id: "baud-rate-mismatch", label: "Baud Rate Mismatch" },
       ],
     },
     { id: "quick-reference", label: "Quick Reference" },
@@ -76,6 +78,7 @@ const tocByLang: Record<Locale, TocItem[]> = {
         { id: "makcu-structure", label: "MAKCU 结构" },
         { id: "flash-mode", label: "刷写模式" },
         { id: "normal-mode", label: "正常模式" },
+        { id: "power-requirements", label: "电源要求" },
       ],
     },
     {
@@ -104,6 +107,7 @@ const tocByLang: Record<Locale, TocItem[]> = {
         { id: "slow-persists", label: "慢闪持续" },
         { id: "led-not-responding", label: "LED 无响应" },
         { id: "device-not-working", label: "设备不工作" },
+        { id: "baud-rate-mismatch", label: "波特率不匹配" },
       ],
     },
     { id: "quick-reference", label: "快速参考" },
@@ -317,6 +321,41 @@ export default async function TroubleshootingPage({ params }: LangProps) {
                     <div className="p-4 rounded-lg bg-blue-500/10 border border-blue-500/20">
                       <p className="text-sm text-blue-600 dark:text-blue-400">
                         <strong>{t("Important", "重要")}:</strong> {dict.troubleshooting.flash_vs_normal_mode.normal_mode.important}
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </SubSection>
+
+            {/* Power Requirements */}
+            <SubSection
+              id="power-requirements"
+              title={dict.troubleshooting.flash_vs_normal_mode.power_requirements.title}
+              description={dict.troubleshooting.flash_vs_normal_mode.power_requirements.description}
+            >
+              <Card className="border-border/60 bg-card/90 shadow-lg">
+                <CardContent className="p-6">
+                  <div className="space-y-4">
+                    <div>
+                      <h4 className="font-semibold text-foreground mb-2">
+                        {t("Normal Mode", "正常模式")}:
+                      </h4>
+                      <p className="text-sm leading-relaxed text-muted-foreground">
+                        {dict.troubleshooting.flash_vs_normal_mode.power_requirements.normal_mode}
+                      </p>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-foreground mb-2">
+                        {t("Flash Mode", "刷写模式")}:
+                      </h4>
+                      <p className="text-sm leading-relaxed text-muted-foreground">
+                        {dict.troubleshooting.flash_vs_normal_mode.power_requirements.flash_mode}
+                      </p>
+                    </div>
+                    <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/20">
+                      <p className="text-sm text-red-600 dark:text-red-400">
+                        <strong>{t("Warning", "警告")}:</strong> {dict.troubleshooting.flash_vs_normal_mode.power_requirements.warning}
                       </p>
                     </div>
                   </div>
@@ -995,6 +1034,55 @@ export default async function TroubleshootingPage({ params }: LangProps) {
                       </h4>
                       <p className="text-sm leading-relaxed text-muted-foreground">
                         {dict.troubleshooting.troubleshooting_steps.device_not_working.steps}
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </SubSection>
+
+            {/* Baud Rate Mismatch */}
+            <SubSection
+              id="baud-rate-mismatch"
+              title={dict.troubleshooting.troubleshooting_steps.baud_rate_mismatch.title}
+            >
+              <Card className="border-border/60 bg-card/90 shadow-lg">
+                <CardContent className="p-6">
+                  <div className="space-y-4">
+                    <div>
+                      <h4 className="font-semibold text-foreground mb-2">
+                        {t("Problem", "问题")}:
+                      </h4>
+                      <p className="text-sm leading-relaxed text-muted-foreground">
+                        {dict.troubleshooting.troubleshooting_steps.baud_rate_mismatch.problem}
+                      </p>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-foreground mb-2">
+                        {t("Symptoms", "症状")}:
+                      </h4>
+                      <ul className="list-disc list-inside space-y-1 text-sm leading-relaxed text-muted-foreground">
+                        {dict.troubleshooting.troubleshooting_steps.baud_rate_mismatch.symptoms.map((symptom, index) => (
+                          <li key={index}>{symptom}</li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-foreground mb-2">
+                        {t("Solution", "解决方案")}:
+                      </h4>
+                      <p className="text-sm leading-relaxed text-muted-foreground mb-3">
+                        {dict.troubleshooting.troubleshooting_steps.baud_rate_mismatch.solution}
+                      </p>
+                      <ol className="list-decimal list-inside space-y-2 text-sm leading-relaxed text-muted-foreground">
+                        {dict.troubleshooting.troubleshooting_steps.baud_rate_mismatch.steps.map((step, index) => (
+                          <li key={index}>{step}</li>
+                        ))}
+                      </ol>
+                    </div>
+                    <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/20">
+                      <p className="text-sm text-red-600 dark:text-red-400">
+                        <strong>{t("Important", "重要")}:</strong> {dict.troubleshooting.troubleshooting_steps.baud_rate_mismatch.important}
                       </p>
                     </div>
                   </div>
