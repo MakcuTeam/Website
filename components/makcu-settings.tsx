@@ -44,6 +44,26 @@ export const MakcuSettings: React.FC<MakcuSettingsProps> = ({ lang, dict }) => {
     return dict.settings.status.disconnected;
   };
 
+  // Get status color dot - matching Connection Status Overview colors
+  const getStatusColor = () => {
+    if (status === "connected") {
+      if (mode === "normal") {
+        return "bg-emerald-500"; // Green for normal mode
+      }
+      if (mode === "flash") {
+        return "bg-blue-500"; // Blue for flash mode
+      }
+      return "bg-emerald-500";
+    }
+    if (status === "fault") {
+      return "bg-red-500"; // Red for fault
+    }
+    if (status === "connecting") {
+      return "bg-yellow-500"; // Yellow for connecting
+    }
+    return "bg-muted-foreground"; // Gray for disconnected/not supported
+  };
+
   const isSettingsDisabled = status === "connected" && mode === "flash";
 
   return (
@@ -54,9 +74,12 @@ export const MakcuSettings: React.FC<MakcuSettingsProps> = ({ lang, dict }) => {
             <h2 className="text-2xl font-semibold tracking-tight">
               {isCn ? "MAKCU 状态" : "MAKCU Status"}
             </h2>
-            <p className="text-lg mt-2 text-muted-foreground">
-              {isCn ? "MAKCU 状态" : "MAKCU status"} : {getStatusText()}
-            </p>
+            <div className="flex items-center gap-2 mt-2">
+              <div className={`w-3 h-3 rounded-full ${getStatusColor()}`}></div>
+              <p className="text-lg text-muted-foreground">
+                {isCn ? "MAKCU 状态" : "MAKCU status"} : {getStatusText()}
+              </p>
+            </div>
           </div>
           {isSettingsDisabled && (
             <div className="p-4 rounded-lg bg-yellow-500/10 border border-yellow-500/20">

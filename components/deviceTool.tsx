@@ -362,15 +362,82 @@ export const DeviceTool: React.FC<{ lang: Locale; dict: Dictionary }> = ({ lang,
     );
   }
 
+  // Get status text based on current language and mode
+  const getStatusText = () => {
+    if (status === "disconnected") {
+      return dict.settings.status.disconnected;
+    }
+    if (status === "connecting") {
+      return dict.settings.status.connecting;
+    }
+    if (status === "fault") {
+      return dict.settings.status.fault;
+    }
+    if (status === "connected") {
+      if (mode === "normal") {
+        return dict.settings.status.connected_normal;
+      }
+      if (mode === "flash") {
+        return dict.settings.status.connected_flash;
+      }
+    }
+    return dict.settings.status.disconnected;
+  };
+
+  // Get status color dot - matching Connection Status Overview colors
+  const getStatusColor = () => {
+    if (status === "connected") {
+      if (mode === "normal") {
+        return "bg-emerald-500"; // Green for normal mode
+      }
+      if (mode === "flash") {
+        return "bg-blue-500"; // Blue for flash mode
+      }
+      return "bg-emerald-500";
+    }
+    if (status === "fault") {
+      return "bg-red-500"; // Red for fault
+    }
+    if (status === "connecting") {
+      return "bg-yellow-500"; // Yellow for connecting
+    }
+    return "bg-muted-foreground"; // Gray for disconnected/not supported
+  };
+
   return (
     <div className="space-y-6">
-      {!device && (
-        <div className="p-4 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
-          <p className="text-sm text-yellow-600 dark:text-yellow-400">
-            {dict.tools.connectToSelect}
-          </p>
-        </div>
-      )}
+      {/* Status Display - matching settings page style */}
+      <Card className="border-border/60 bg-card/90 shadow-lg">
+        <CardContent className="p-6">
+          <div className="space-y-4">
+            <div>
+              <h2 className="text-2xl font-semibold tracking-tight">
+                {isCn ? "MAKCU 状态" : "MAKCU Status"}
+              </h2>
+              <div className="flex items-center gap-2 mt-2">
+                <div className={`w-3 h-3 rounded-full ${getStatusColor()}`}></div>
+                <p className="text-lg text-muted-foreground">
+                  {isCn ? "MAKCU 状态" : "MAKCU status"} : {getStatusText()}
+                </p>
+              </div>
+            </div>
+            {status === "connected" && mode === "normal" && (
+              <div className="p-4 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
+                <p className="text-sm text-yellow-600 dark:text-yellow-400">
+                  {dict.settings.warnings.normal_mode_detected}
+                </p>
+              </div>
+            )}
+            {!device && status !== "connected" && (
+              <div className="p-4 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
+                <p className="text-sm text-yellow-600 dark:text-yellow-400">
+                  {dict.tools.connectToSelect}
+                </p>
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
       
       {device && (
         <Card className="border-border/60 bg-card/90 shadow-lg">
