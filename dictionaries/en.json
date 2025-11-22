@@ -276,12 +276,12 @@
           "Connection timeouts",
           "Device appears connected but no data exchange"
         ],
-        "solution": "Change COM port to 10 and ensure baud rate is matched to the cheat's expectations. The MAKCU.com website and the AIO tool expect MAKCU to be running at 115200 (1 flash mode). Users must ensure that baud rate 115200 is enabled to communicate with the website and tools.",
+        "solution": "Open device manager and change the com port to be any number below 10 (you may force a com port number if all are in use). Ensure baud rate is matched to the cheat's expectations. The MAKCU.com website and the AIO tool expect MAKCU to be running at 115200 (1 flash mode). Users must ensure that baud rate 115200 is enabled to communicate with the website and tools.",
         "steps": [
           "Check the baud rate indicator LED (left) when MAKCU starts - it should flash 1 time for 115200",
           "If baud rate is incorrect, press the left button 4 times fast to change it",
           "Ensure USB 1 + USB 2 are connected for MAKCU to have power to change baud rate",
-          "Change COM port to 10 in your cheat software settings",
+          "Change COM port in your cheat software settings to match MAKCU's",
           "Verify baud rate matches between MAKCU and your cheat software",
           "If using MAKCU website or AIO tool, ensure baud rate is set to 115200"
         ],
