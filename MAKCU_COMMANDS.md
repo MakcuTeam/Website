@@ -42,13 +42,13 @@ Welcome to the Makcu help. All commands shown are listed below. For more info, s
 
 | Command | Description | Parameters |
 |---------|-------------|------------|
-| `km.axis(help)` | Stream X/Y axis deltas | `(mode,period_ms)` - 1=raw, 2=constructed frame; period 1-1000ms; use (0) or (0,0) to reset |
+| `km.axis(help)` | Stream X/Y/Wheel axis deltas | `(mode,period_ms)` - 1=raw, 2=constructed frame; period 1-1000ms; use (0) or (0,0) to reset; output format: raw(x,y,w) or mut(x,y,w) |
 | `km.buttons(help)` | Stream button states | `(mode,period_ms)` - 1=raw, 2=constructed frame; period 1-1000ms; use (0) or (0,0) to reset |
 | `km.catch_(help)` | Catch locked button state | `(mode)` - 0=auto 1=manual; requires button lock; () to query state |
 | `km.click(help)` | Schedule mouse clicks | `(button,count,delay_ms)` - count/delay optional; delay random 35-75ms if omitted (internal timing) |
 | `km.getpos(help)` | Report current pointer position | `()` |
 | `km.left(help)` | Set left button / query lock state | `(state)` - 0=release 1=down 2=silent_release; () returns 0=none 1=raw 2=injected 3=both |
-| `km.lock_(help)` | Lock button or axis | `(target,state)` - ml/mm/mr/ms1/ms2 or mx/my/mx+/mx-/my+/my-; () to query |
+| `km.lock_(help)` | Lock button or axis | `(target,state)` - ml/mm/mr/ms1/ms2 or mx/my/mx+/mx-/my+/my-/mw/mw+/mw-; () to query; state: 1=lock, 0=unlock |
 | `km.middle(help)` | Set middle button / query lock state | `(state)` - 0=release 1=down 2=silent_release; () returns 0=none 1=raw 2=injected 3=both |
 | `km.mo(help)` | Queue raw mouse frame (set only) | `(buttons,x,y,wheel,pan,tilt)` - (0) clears all; x,y,wheel,pan,tilt are one-shots; button mask mirrors button states |
 | `km.mouse(help)` | Stream full mouse data | `(mode,period_ms)` - mode 1=raw 2=constructed frame; period 1-1000ms; () to query; use (0) or (0,0) to reset |
@@ -178,12 +178,22 @@ km.keys(0)             # Disable keyboard key streaming
 
 #### Mouse Advanced Commands
 - **km.mo(buttons,x,y,wheel,pan,tilt)** - Queue a raw mouse frame. `(0)` clears all stored values. x, y, wheel, pan, tilt are one-shots (single-use). Button mask mirrors button states.
-- **km.lock_(target,state)** - Lock button (ml/mm/mr/ms1/ms2) or axis (mx/my/mx+/mx-/my+/my-). Call with `()` to read lock state.
+- **km.lock_(target,state)** - Lock button (ml/mm/mr/ms1/ms2) or axis (mx/my/mx+/mx-/my+/my-/mw/mw+/mw-). `state`: 1=lock, 0=unlock. Call with `()` to read lock state.
+  - **Button locks**: `ml` (left), `mm` (middle), `mr` (right), `ms1` (side1), `ms2` (side2)
+  - **Axis locks**: 
+    - `mx` / `my` / `mw` - Full lock (blocks all movement in that axis)
+    - `mx+` / `my+` / `mw+` - Positive direction lock (blocks positive movement only)
+    - `mx-` / `my-` / `mw-` - Negative direction lock (blocks negative movement only)
+  - **Examples**: 
+    - `km.lock_mx(1)` - Lock all X-axis movement
+    - `km.lock_mx+(1)` - Lock only positive X movement (right)
+    - `km.lock_mw(1)` - Lock all wheel movement
+    - `km.lock_mw-(1)` - Lock only negative wheel movement (scroll down)
 - **km.catch_(mode)** - Enable catch on a locked button (0=auto, 1=manual). Requires corresponding `km.lock_`. Call with `()` to query state.
 
 #### Mouse Streaming Commands
 - **km.buttons(mode,period_ms)** - Stream button states. Mode 1=raw, 2=constructed frame; period clamped 1-1000 ms. Use `(0)` or `(0,0)` to reset.
-- **km.axis(mode,period_ms)** - Stream axis deltas only. Mode 1=raw, 2=constructed frame; period clamped 1-1000 ms. Use `(0)` or `(0,0)` to reset.
+- **km.axis(mode,period_ms)** - Stream axis deltas (X, Y, Wheel). Mode 1=raw, 2=constructed frame; period clamped 1-1000 ms. Use `(0)` or `(0,0)` to reset. Output format: `raw(x,y,w)` or `mut(x,y,w)` where w is the wheel delta.
 - **km.mouse(mode,period_ms)** - Stream full mouse data (buttons + axis + wheel/pan/tilt). Mode 1=raw, 2=constructed frame; period clamped 1-1000 ms. Use `(0)` or `(0,0)` to reset.
 
 ---

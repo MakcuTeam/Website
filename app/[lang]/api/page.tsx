@@ -933,24 +933,74 @@ export default async function ApiPage({ params }: LangProps) {
                     content: <span className="font-mono">lock_(target[,state])</span>,
                   },
                   {
+                    label: t("Description", "描述"),
+                    content: isCn ? (
+                      <p>
+                        锁定按钮或轴。state: 1=锁定，0=解锁。调用时使用 `()` 可读取锁定状态。
+                      </p>
+                    ) : (
+                      <p>
+                        Lock button or axis. state: 1=lock, 0=unlock. Call with `()` to read lock state.
+                      </p>
+                    ),
+                  },
+                  {
                     label: t("Targets", "目标"),
                     content: isCn ? (
-                      <span>
-                        按键: ml/mm/mr/ms1/ms2; 轴: mx/my/mx+/mx-/my+/my-
-                      </span>
+                      <div className="space-y-2">
+                        <p><strong>按键:</strong> ml/mm/mr/ms1/ms2</p>
+                        <p><strong>轴:</strong> mx/my/mx+/mx-/my+/my-/mw/mw+/mw-</p>
+                        <ul className="list-disc space-y-1 pl-5 text-xs">
+                          <li>mx/my/mw - 完全锁定（阻止该轴的所有移动）</li>
+                          <li>mx+/my+/mw+ - 正向锁定（仅阻止正向移动）</li>
+                          <li>mx-/my-/mw- - 负向锁定（仅阻止负向移动）</li>
+                        </ul>
+                      </div>
                     ) : (
-                      <span>
-                        Buttons: ml/mm/mr/ms1/ms2; Axes: mx/my/mx+/mx-/my+/my-
-                      </span>
+                      <div className="space-y-2">
+                        <p><strong>Buttons:</strong> ml/mm/mr/ms1/ms2</p>
+                        <p><strong>Axes:</strong> mx/my/mx+/mx-/my+/my-/mw/mw+/mw-</p>
+                        <ul className="list-disc space-y-1 pl-5 text-xs">
+                          <li>mx/my/mw - Full lock (blocks all movement in that axis)</li>
+                          <li>mx+/my+/mw+ - Positive direction lock (blocks positive movement only)</li>
+                          <li>mx-/my-/mw- - Negative direction lock (blocks negative movement only)</li>
+                        </ul>
+                      </div>
                     ),
                   },
                   {
                     label: t("Response (GET)", "响应 (GET)"),
-                    content: <CodeBlock code={`km.lock_(ml,0)\r\n>>> `} />,
+                    content: (
+                      <div className="space-y-3">
+                        <CodeBlock code={`km.lock_(ml)\r\n>>> `} />
+                        <p className="text-sm text-muted-foreground">
+                          {isCn ? "使用 `()` 查询锁定状态" : "Use `()` to query lock state"}
+                        </p>
+                      </div>
+                    ),
                   },
                   {
                     label: t("Response (SET)", "响应 (SET)"),
-                    content: <CodeBlock code={`km.lock_(mx,1)\r\n>>> `} />,
+                    content: (
+                      <div className="space-y-2">
+                        <CodeBlock code={`km.lock_(mx,1)\r\n>>> `} />
+                        <p className="text-xs text-muted-foreground">
+                          {isCn ? "锁定所有 X 轴移动" : "Lock all X-axis movement"}
+                        </p>
+                        <CodeBlock code={`km.lock_(mx+,1)\r\n>>> `} />
+                        <p className="text-xs text-muted-foreground">
+                          {isCn ? "仅锁定正向 X 移动（向右）" : "Lock only positive X movement (right)"}
+                        </p>
+                        <CodeBlock code={`km.lock_(mw,1)\r\n>>> `} />
+                        <p className="text-xs text-muted-foreground">
+                          {isCn ? "锁定所有滚轮移动" : "Lock all wheel movement"}
+                        </p>
+                        <CodeBlock code={`km.lock_(mw-,1)\r\n>>> `} />
+                        <p className="text-xs text-muted-foreground">
+                          {isCn ? "仅锁定负向滚轮移动（向下滚动）" : "Lock only negative wheel movement (scroll down)"}
+                        </p>
+                      </div>
+                    ),
                   },
                 ]}
               />
@@ -1324,6 +1374,18 @@ export default async function ApiPage({ params }: LangProps) {
                       <span>1=raw（原始），2=constructed frame（构造帧）; period_ms: 1-1000ms; (0) 或 (0,0) 重置</span>
                     ) : (
                       <span>1=raw, 2=constructed frame; period_ms: 1-1000ms; (0) or (0,0) to reset</span>
+                    ),
+                  },
+                  {
+                    label: t("Output Format", "输出格式"),
+                    content: isCn ? (
+                      <p>
+                        输出格式：<span className="font-mono">raw(x,y,w)</span> 或 <span className="font-mono">mut(x,y,w)</span>，其中 w 是滚轮增量。
+                      </p>
+                    ) : (
+                      <p>
+                        Output format: <span className="font-mono">raw(x,y,w)</span> or <span className="font-mono">mut(x,y,w)</span> where w is the wheel delta.
+                      </p>
                     ),
                   },
                   {
