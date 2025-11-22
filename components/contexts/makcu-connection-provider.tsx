@@ -81,7 +81,7 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
       readerRef.current = reader;
 
       // Read response with timeout
-      let timeoutId: NodeJS.Timeout;
+      let timeoutId: NodeJS.Timeout | null = null;
       const timeoutPromise = new Promise<string>((_, reject) => {
         timeoutId = setTimeout(() => {
           reader.cancel().catch(() => {});
@@ -99,12 +99,16 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
             
             // Check if we have the expected response
             if (receivedData.includes("km.MAKCU()\r\n>>> ")) {
-              clearTimeout(timeoutId);
+              if (timeoutId) {
+                clearTimeout(timeoutId);
+              }
               return receivedData;
             }
           }
         } catch (error) {
-          clearTimeout(timeoutId);
+          if (timeoutId) {
+            clearTimeout(timeoutId);
+          }
           throw error;
         }
         return receivedData;
