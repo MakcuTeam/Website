@@ -21,7 +21,7 @@ Welcome to the Makcu help. All commands shown are listed below. For more info, s
 | `km.reboot(help)` | Reboot device | `()` - reboots after response |
 | `km.release(help)` | Auto-release monitoring system | `()` get status (0=disabled, else time ms); `(timer_ms)` set timer 500-300000ms (5 min), (0) disables; monitors independent lock/button/key values and releases only active ones when expired; setting is persistently saved and enabled on startup/boot |
 | `km.screen(help)` | Query or set virtual screen size | `()` to query, `(width,height)` to set |
-| `km.serial(help)` | Manage serial number | `()` query, `(0)` reset, `(text)` set sanitized value |
+| `km.serial(help)` | Manage serial number | `()` query, `(0)` reset, `(text)` set sanitized value; used to change serial number of attached mouse/keyboard while connected to MAKCU; change is persistent and remains after firmware updates; MAKCU does not allow changing serial numbers for devices that do not contain one |
 | `km.version(help)` | Report firmware version | `()` |
 
 #### Keyboard Commands
@@ -61,7 +61,7 @@ Welcome to the Makcu help. All commands shown are listed below. For more info, s
 | `km.silent(help)` | Move then silent left click | `(x,y)` |
 | `km.tilt(help)` | Tilt/z-axis scroll | `(steps)` - () to query pending |
 | `km.turbo(help)` | Rapid-fire mode for mouse buttons | `(button,delay_ms)` - button: 1-5 (mouse buttons) or 0 to disable all - delay_ms: 1-5000ms (0=disable) - () returns only active settings as (m1=200, m2=400) - (button) uses random 35-75ms - (0) disables all turbo - **multiple buttons can be enabled simultaneously** - when enabled, holding button triggers rapid press/release cycle |
-| `km.wheel(help)` | Scroll wheel | `(delta)` - scroll steps |
+| `km.wheel(help)` | Scroll wheel | `(delta)` - scroll step (Windows limits to ±1 step, so delta is clamped to -1 or +1) |
 
 ---
 
@@ -97,7 +97,7 @@ The following commands work without a USB device attached to USB 3:
 - **km.reboot()** - Reboot the device after acknowledging the request.
 - **km.release()** or **km.release(timer_ms)** - Auto-release monitoring system. Continuously monitors independent lock, button, and key states. When the timer expires, it releases only the corresponding values that remain active (not all at once). This setting is persistently saved to storage and automatically enabled on startup/boot. `()` get status (0=disabled, else time ms); `(timer_ms)` set timer 500-300000ms (5 min), (0) disables.
 - **km.screen(width,height)** - Query or update the virtual screen dimensions. `()` to query, `(width,height)` to set.
-- **km.serial(text)** - Query, reset, or set the stored serial number. `()` query, `(0)` reset, `(text)` set sanitized value.
+- **km.serial(text)** - Query, reset, or set the serial number of an attached mouse or keyboard while connected to MAKCU. `()` query, `(0)` reset, `(text)` set sanitized value. This change is persistent and remains even after future firmware changes. Note: MAKCU does not allow changing serial numbers for a device that does not contain one.
 - **km.version()** - Report firmware version.
 
 ### Keyboard Commands
@@ -170,7 +170,7 @@ km.keys(0)             # Disable keyboard key streaming
 #### Mouse Movement Commands
 - **km.move(dx,dy,segments,cx1,cy1,cx2,cy2)** - Queue relative movement. Provide `segments` and optional control points to generate segmented or Bézier paths.
 - **km.moveto(x,y,segments,cx1,cy1,cx2,cy2)** - Move pointer to absolute position. Internally calculates the needed x,y movement to reach the requested position on the screen. Parameters align with `km.move`.
-- **km.wheel(delta)** - Scroll the wheel.
+- **km.wheel(delta)** - Scroll the wheel. Note: Windows does not allow multiple scroll steps in a single command. The delta is clamped to ±1 step (positive for scroll up, negative for scroll down). Values greater than 1 are treated as 1, values less than -1 are treated as -1.
 - **km.pan(steps)** - Horizontal scroll/pan. `km.pan()` queries pending horizontal scroll.
 - **km.tilt(steps)** - Z-axis tilt. `km.tilt()` queries pending tilt.
 - **km.getpos()** - Report current pointer position.

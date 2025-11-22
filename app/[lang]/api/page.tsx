@@ -766,19 +766,42 @@ export default async function ApiPage({ params }: LangProps) {
                     content: <span className="font-mono">wheel(delta)</span>,
                   },
                   {
+                    label: t("Description", "描述"),
+                    content: isCn ? (
+                      <p>
+                        Windows 不允许在单个命令中执行多个滚轮步数。delta 值会被限制为 ±1 步（正数向上滚动，负数向下滚动）。大于 1 的值视为 1，小于 -1 的值视为 -1。
+                      </p>
+                    ) : (
+                      <p>
+                        Windows does not allow multiple scroll steps in a single command. The delta value is clamped to ±1 step (positive for scroll up, negative for scroll down). Values greater than 1 are treated as 1, values less than -1 are treated as -1.
+                      </p>
+                    ),
+                  },
+                  {
                     label: t("Params", "参数"),
                     content: isCn ? (
-                      <span>delta: 滚轮步数</span>
+                      <span>delta: 滚轮步数（限制为 ±1）</span>
                     ) : (
-                      <span>delta: scroll steps</span>
+                      <span>delta: scroll step (clamped to ±1)</span>
                     ),
                   },
                   {
                     label: t("Response (SET)", "响应 (SET)"),
                     content: (
                       <div className="space-y-3">
-                        <CodeBlock code={`km.wheel(-5)\r\n>>> `} />
-                        <p className="text-sm text-muted-foreground">{t("Echo ACK.", "回显 ACK。")}</p>
+                        <CodeBlock code={`km.wheel(-1)\r\n>>> `} />
+                        <CodeBlock code={`km.wheel(1)\r\n>>> `} />
+                        <p className="text-sm text-muted-foreground">
+                          {isCn ? (
+                            <span>
+                              回显 ACK。注意：<span className="font-mono">km.wheel(-5)</span> 只会向下滚动 1 步，<span className="font-mono">km.wheel(5)</span> 只会向上滚动 1 步。
+                            </span>
+                          ) : (
+                            <span>
+                              Echo ACK. Note: <span className="font-mono">km.wheel(-5)</span> will only scroll down 1 step, <span className="font-mono">km.wheel(5)</span> will only scroll up 1 step.
+                            </span>
+                          )}
+                        </p>
                       </div>
                     ),
                   },
@@ -1695,6 +1718,18 @@ export default async function ApiPage({ params }: LangProps) {
                     content: <span className="font-mono">serial([text])</span>,
                   },
                   {
+                    label: t("Description", "描述"),
+                    content: isCn ? (
+                      <p>
+                        用于更改连接到 MAKCU 的鼠标或键盘的序列号。此更改是持久的，即使在未来的固件更新后也会保留。注意：MAKCU 不允许为不包含序列号的设备更改序列号。
+                      </p>
+                    ) : (
+                      <p>
+                        Used to change the serial number of an attached mouse or keyboard while connected to MAKCU. This change is persistent and remains even after future firmware changes. Note: MAKCU does not allow changing serial numbers for a device that does not contain one.
+                      </p>
+                    ),
+                  },
+                  {
                     label: t("Params", "参数"),
                     content: isCn ? (
                       <span>() 查询; (0) 重置; (text) 设置清理后的序列号</span>
@@ -1703,8 +1738,27 @@ export default async function ApiPage({ params }: LangProps) {
                     ),
                   },
                   {
-                    label: t("Response", "响应"),
-                    content: <CodeBlock code={`km.serial("MAKCU001")\r\n>>> `} />,
+                    label: t("Response (GET)", "响应 (GET)"),
+                    content: (
+                      <div className="space-y-3">
+                        <CodeBlock code={`km.serial()\r\n>>> km.serial("MAKCU001")\r\n>>> `} />
+                        <p className="text-sm text-muted-foreground">
+                          {t("Returns current serial number.", "返回当前序列号。")}
+                        </p>
+                      </div>
+                    ),
+                  },
+                  {
+                    label: t("Response (SET)", "响应 (SET)"),
+                    content: (
+                      <div className="space-y-3">
+                        <CodeBlock code={`km.serial("MAKCU001")\r\n>>> `} />
+                        <CodeBlock code={`km.serial(0)\r\n>>> `} />
+                        <p className="text-sm text-muted-foreground">
+                          {t("Echo ACK. The change is persistent across firmware updates.", "回显 ACK。更改在固件更新后仍然保留。")}
+                        </p>
+                      </div>
+                    ),
                   },
                 ]}
               />
