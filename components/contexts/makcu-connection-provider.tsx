@@ -156,6 +156,7 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
       const flashOptions: LoaderOptions = {
         transport,
         baudrate: 921600,
+        romBaudrate: 115200,
         terminal: {
           clean() {},
           writeLine() {},
