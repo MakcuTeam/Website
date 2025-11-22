@@ -66,8 +66,19 @@ export function MakcuConnectionButton({ dict }: { dict: Dictionary }) {
   if (!browserSupported) {
     return (
       <div className="flex items-center gap-2">
+        <Button
+          variant="ghost"
+          size="sm"
+          disabled
+          className="h-8 px-2 text-xs"
+        >
+          <Plug className="h-3 w-3" />
+          <span className="ml-1 hidden sm:inline">
+            Disabled
+          </span>
+        </Button>
         <div className="text-xs text-muted-foreground hidden md:inline">
-          <span className="font-medium">MAKCU:</span> {dict.settings.connection.browser_not_supported}
+          <span className="font-medium">MAKCU:</span> Not Supported
         </div>
       </div>
     );
