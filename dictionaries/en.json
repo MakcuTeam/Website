@@ -4,7 +4,7 @@
     "description": "Experience seamless mouse and keyboard control with MAKCU, the next generation KMBOX replacement."
   },
   "home": {
-    "main_header": "Experience security and speed with the next generation,",
+    "main_header": "Experience security and speed with the next generation.",
 
     "read_guide": "Read Guide",
     "name": "Makcu"
@@ -151,7 +151,7 @@
         "flash_mode": {
           "label": "Flash mode",
           "description": "MAKCU is connected in flash mode. This mode is used for firmware updates only. Settings cannot be used in this mode. Only one USB cable should be connected (USB 1 or USB 3).",
-          "color": "Red"
+          "color": "Blue"
         },
         "fault": {
           "label": "Fault",

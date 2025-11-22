@@ -434,7 +434,7 @@ export default async function TroubleshootingPage({ params }: LangProps) {
                     {/* Flash Mode */}
                     <div className="space-y-2">
                       <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                        <div className="w-3 h-3 rounded-full bg-blue-500"></div>
                         <h4 className="font-semibold text-foreground">
                           {dict.troubleshooting.connection_status.statuses.flash_mode.label}
                         </h4>

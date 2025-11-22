@@ -4,7 +4,7 @@
     "description": "Experience seamless mouse and keyboard control with MAKCU, the next generation KMBOX replacement."
   },
   "home": {
-    "main_header": "体验下一代的安全性和速度，",
+    "main_header": "体验下一代的安全性和速度。",
     "read_guide": "指南",
     "name": "Makcu"
   },
@@ -144,7 +144,7 @@
         "flash_mode": {
           "label": "刷写模式",
           "description": "MAKCU 在刷写模式下连接。此模式仅用于固件更新。此模式下无法使用设置。只应连接一根 USB 线（USB 1 或 USB 3）。",
-          "color": "红色"
+          "color": "蓝色"
         },
         "fault": {
           "label": "故障",

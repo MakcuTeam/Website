@@ -38,7 +38,7 @@ export function MakcuConnectionButton({ dict }: { dict: Dictionary }) {
         return "text-emerald-500 dark:text-emerald-400";
       }
       if (mode === "flash") {
-        return "text-red-500 dark:text-red-400";
+        return "text-blue-600 dark:text-blue-400";
       }
       return "text-emerald-500 dark:text-emerald-400";
     }
