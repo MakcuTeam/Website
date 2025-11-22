@@ -126,7 +126,9 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
           return true;
         }
       } catch (error) {
-        clearTimeout(timeoutId);
+        if (timeoutId) {
+          clearTimeout(timeoutId);
+        }
         throw error;
       } finally {
         // Don't release reader - keep it for monitoring
