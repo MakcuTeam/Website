@@ -302,17 +302,8 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
       }
     }
 
-    // Close transport if exists
-    if (state.transport) {
-      try {
-        // Transport might have its own cleanup
-        if (state.transport.close) {
-          await state.transport.close();
-        }
-      } catch (e) {
-        // Ignore
-      }
-    }
+    // Transport cleanup is handled by closing the port
+    // No need to explicitly close transport
 
     // Close port - this is critical
     if (state.port) {
