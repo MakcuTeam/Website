@@ -62,8 +62,8 @@ const tocByLang: Record<Locale, TocItem[]> = {
       label: "Mouse Advanced",
       children: [
         { id: "mo", label: "mo() - Raw Mouse Frame (SET)" },
-        { id: "lock", label: "lock_() (GET/SET)" },
-        { id: "catch", label: "catch_() (GET/SET)" },
+        { id: "lock", label: "lock_<target>() (GET/SET)" },
+        { id: "catch", label: "catch_<target>() (GET/SET)" },
       ],
     },
     {
@@ -152,8 +152,8 @@ const tocByLang: Record<Locale, TocItem[]> = {
       label: "鼠标高级",
       children: [
         { id: "mo", label: "mo() - 原始鼠标帧 (SET)" },
-        { id: "lock", label: "lock_() (GET/SET)" },
-        { id: "catch", label: "catch_() (GET/SET)" },
+        { id: "lock", label: "lock_<target>() (GET/SET)" },
+        { id: "catch", label: "catch_<target>() (GET/SET)" },
       ],
     },
     {
@@ -924,23 +924,23 @@ export default async function ApiPage({ params }: LangProps) {
 
             <SubSection
               id="lock"
-              title={t("lock_(target,state) — GET/SET", "lock_(target,state) — GET/SET")}
+              title={t("lock_<target>(state) — GET/SET", "lock_<target>(state) — GET/SET")}
             >
               <SpecCard
                 entries={[
                   {
-                    label: t("Command", "命令"),
-                    content: <span className="font-mono">lock_(target[,state])</span>,
+                    label: t("Command Format", "命令格式"),
+                    content: <span className="font-mono">lock_&lt;target&gt;([state])</span>,
                   },
                   {
                     label: t("Description", "描述"),
                     content: isCn ? (
                       <p>
-                        锁定按钮或轴。state: 1=锁定，0=解锁。调用时使用 `()` 可读取锁定状态。
+                        锁定按钮或轴。目标（target）是命令名的一部分，不是参数。state: 1=锁定，0=解锁。调用时使用 `()` 可读取锁定状态。
                       </p>
                     ) : (
                       <p>
-                        Lock button or axis. state: 1=lock, 0=unlock. Call with `()` to read lock state.
+                        Lock button or axis. The target is part of the command name, not a parameter. state: 1=lock, 0=unlock. Call with `()` to read lock state.
                       </p>
                     ),
                   },
@@ -949,7 +949,14 @@ export default async function ApiPage({ params }: LangProps) {
                     content: isCn ? (
                       <div className="space-y-2">
                         <p><strong>按键:</strong> ml/mm/mr/ms1/ms2</p>
-                        <p><strong>轴:</strong> mx/my/mx+/mx-/my+/my-/mw/mw+/mw-</p>
+                        <ul className="list-disc space-y-1 pl-5 text-xs">
+                          <li>ml - 左键</li>
+                          <li>mm - 中键</li>
+                          <li>mr - 右键</li>
+                          <li>ms1 - 侧键1</li>
+                          <li>ms2 - 侧键2</li>
+                        </ul>
+                        <p><strong>轴:</strong> mx/my/mw/mx+/mx-/my+/my-/mw+/mw-</p>
                         <ul className="list-disc space-y-1 pl-5 text-xs">
                           <li>mx/my/mw - 完全锁定（阻止该轴的所有移动）</li>
                           <li>mx+/my+/mw+ - 正向锁定（仅阻止正向移动）</li>
@@ -959,7 +966,14 @@ export default async function ApiPage({ params }: LangProps) {
                     ) : (
                       <div className="space-y-2">
                         <p><strong>Buttons:</strong> ml/mm/mr/ms1/ms2</p>
-                        <p><strong>Axes:</strong> mx/my/mx+/mx-/my+/my-/mw/mw+/mw-</p>
+                        <ul className="list-disc space-y-1 pl-5 text-xs">
+                          <li>ml - Left mouse button</li>
+                          <li>mm - Middle mouse button</li>
+                          <li>mr - Right mouse button</li>
+                          <li>ms1 - Side button 1</li>
+                          <li>ms2 - Side button 2</li>
+                        </ul>
+                        <p><strong>Axes:</strong> mx/my/mw/mx+/mx-/my+/my-/mw+/mw-</p>
                         <ul className="list-disc space-y-1 pl-5 text-xs">
                           <li>mx/my/mw - Full lock (blocks all movement in that axis)</li>
                           <li>mx+/my+/mw+ - Positive direction lock (blocks positive movement only)</li>
@@ -972,9 +986,17 @@ export default async function ApiPage({ params }: LangProps) {
                     label: t("Response (GET)", "响应 (GET)"),
                     content: (
                       <div className="space-y-3">
-                        <CodeBlock code={`km.lock_(ml)\r\n>>> `} />
+                        <CodeBlock code={`km.lock_mx()\r\n>>> km.lock_mx(0)\r\n>>> `} />
                         <p className="text-sm text-muted-foreground">
-                          {isCn ? "使用 `()` 查询锁定状态" : "Use `()` to query lock state"}
+                          {isCn ? (
+                            <span>
+                              返回值：<strong>0</strong>=none（无），<strong>1</strong>=phy（物理），<strong>2</strong>=inj（注入），<strong>3</strong>=both（两者）
+                            </span>
+                          ) : (
+                            <span>
+                              Returns: <strong>0</strong>=none, <strong>1</strong>=phy (physical), <strong>2</strong>=inj (injected), <strong>3</strong>=both
+                            </span>
+                          )}
                         </p>
                       </div>
                     ),
@@ -983,21 +1005,37 @@ export default async function ApiPage({ params }: LangProps) {
                     label: t("Response (SET)", "响应 (SET)"),
                     content: (
                       <div className="space-y-2">
-                        <CodeBlock code={`km.lock_(mx,1)\r\n>>> `} />
+                        <CodeBlock code={`km.lock_mx(1)\r\n>>> `} />
                         <p className="text-xs text-muted-foreground">
                           {isCn ? "锁定所有 X 轴移动" : "Lock all X-axis movement"}
                         </p>
-                        <CodeBlock code={`km.lock_(mx+,1)\r\n>>> `} />
+                        <CodeBlock code={`km.lock_mx+(1)\r\n>>> `} />
                         <p className="text-xs text-muted-foreground">
                           {isCn ? "仅锁定正向 X 移动（向右）" : "Lock only positive X movement (right)"}
                         </p>
-                        <CodeBlock code={`km.lock_(mw,1)\r\n>>> `} />
+                        <CodeBlock code={`km.lock_mx-(1)\r\n>>> `} />
+                        <p className="text-xs text-muted-foreground">
+                          {isCn ? "仅锁定负向 X 移动（向左）" : "Lock only negative X movement (left)"}
+                        </p>
+                        <CodeBlock code={`km.lock_my(1)\r\n>>> `} />
+                        <p className="text-xs text-muted-foreground">
+                          {isCn ? "锁定所有 Y 轴移动" : "Lock all Y-axis movement"}
+                        </p>
+                        <CodeBlock code={`km.lock_mw(1)\r\n>>> `} />
                         <p className="text-xs text-muted-foreground">
                           {isCn ? "锁定所有滚轮移动" : "Lock all wheel movement"}
                         </p>
-                        <CodeBlock code={`km.lock_(mw-,1)\r\n>>> `} />
+                        <CodeBlock code={`km.lock_mw+(1)\r\n>>> `} />
+                        <p className="text-xs text-muted-foreground">
+                          {isCn ? "仅锁定正向滚轮移动（向上滚动）" : "Lock only positive wheel movement (scroll up)"}
+                        </p>
+                        <CodeBlock code={`km.lock_mw-(1)\r\n>>> `} />
                         <p className="text-xs text-muted-foreground">
                           {isCn ? "仅锁定负向滚轮移动（向下滚动）" : "Lock only negative wheel movement (scroll down)"}
+                        </p>
+                        <CodeBlock code={`km.lock_ml(1)\r\n>>> `} />
+                        <p className="text-xs text-muted-foreground">
+                          {isCn ? "锁定左键" : "Lock left mouse button"}
                         </p>
                       </div>
                     ),
@@ -1008,29 +1046,67 @@ export default async function ApiPage({ params }: LangProps) {
 
             <SubSection
               id="catch"
-              title={t("catch_([mode]) — GET/SET", "catch_([mode]) — GET/SET")}
+              title={t("catch_<target>(mode) — GET/SET", "catch_<target>(mode) — GET/SET")}
             >
               <SpecCard
                 entries={[
                   {
-                    label: t("Command", "命令"),
-                    content: <span className="font-mono">catch_([mode])</span>,
+                    label: t("Command Format", "命令格式"),
+                    content: <span className="font-mono">catch_&lt;target&gt;([mode])</span>,
+                  },
+                  {
+                    label: t("Description", "描述"),
+                    content: isCn ? (
+                      <p>
+                        在锁定的按钮或轴上启用捕获。目标（target）是命令名的一部分，不是参数。需要先设置对应的 <span className="font-mono">km.lock_&lt;target&gt;</span>。
+                      </p>
+                    ) : (
+                      <p>
+                        Enable catch on a locked button or axis. The target is part of the command name, not a parameter. Requires corresponding <span className="font-mono">km.lock_&lt;target&gt;</span> to be set first.
+                      </p>
+                    ),
+                  },
+                  {
+                    label: t("Targets", "目标"),
+                    content: isCn ? (
+                      <span>mx, my, mw, ml, mm, mr, ms1, ms2</span>
+                    ) : (
+                      <span>mx, my, mw, ml, mm, mr, ms1, ms2</span>
+                    ),
                   },
                   {
                     label: t("Params", "参数"),
                     content: isCn ? (
-                      <span>mode: 0=自动，1=手动（需先锁定按键）; () 返回状态</span>
+                      <span>mode: 0=自动，1=手动; () 返回状态</span>
                     ) : (
-                      <span>mode: 0=auto, 1=manual (requires button lock); () returns state</span>
+                      <span>mode: 0=auto, 1=manual; () returns state</span>
                     ),
                   },
                   {
                     label: t("Response (GET)", "响应 (GET)"),
-                    content: <CodeBlock code={`km.catch_(0)\r\n>>> `} />,
+                    content: (
+                      <div className="space-y-3">
+                        <CodeBlock code={`km.catch_ml()\r\n>>> `} />
+                        <p className="text-sm text-muted-foreground">
+                          {isCn ? "使用 `()` 查询捕获状态" : "Use `()` to query catch state"}
+                        </p>
+                      </div>
+                    ),
                   },
                   {
                     label: t("Response (SET)", "响应 (SET)"),
-                    content: <CodeBlock code={`km.catch_(1)\r\n>>> `} />,
+                    content: (
+                      <div className="space-y-2">
+                        <CodeBlock code={`km.catch_ml(1)\r\n>>> `} />
+                        <p className="text-xs text-muted-foreground">
+                          {isCn ? "为左键启用手动捕获" : "Enable manual catch for left mouse button"}
+                        </p>
+                        <CodeBlock code={`km.catch_mx(0)\r\n>>> `} />
+                        <p className="text-xs text-muted-foreground">
+                          {isCn ? "为 X 轴启用自动捕获" : "Enable auto catch for X-axis"}
+                        </p>
+                      </div>
+                    ),
                   },
                 ]}
               />
