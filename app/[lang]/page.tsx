@@ -27,10 +27,6 @@ export default function Home() {
   return (
     <div className="flex flex-col px-2 sm:py-8 py-12 gap-12">
       <div className="flex flex-col gap-6">
-        <h1 className="text-2xl sm:text-3xl font-extrabold">
-          {dict.home.main_header}
-        </h1>
-        
         <div className="flex justify-center">
           <div className="relative scale-[2]">
             <Image
