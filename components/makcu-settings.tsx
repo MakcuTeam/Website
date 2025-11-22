@@ -117,6 +117,11 @@ export const MakcuSettings: React.FC<MakcuSettingsProps> = ({ lang, dict }) => {
 
       setPort(selectedPort);
 
+      // Check if port is writable and readable
+      if (!selectedPort.writable || !selectedPort.readable) {
+        throw new Error(isCn ? "端口不可用" : "Port is not available");
+      }
+
       // Get writer
       const writer = selectedPort.writable.getWriter();
       writerRef.current = writer;
