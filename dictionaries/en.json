@@ -480,5 +480,64 @@
         "supported_device_desc": "Ensure you have a supported mouse or keyboard connected. MAKCU supports both keyboard and mouse devices."
       }
     }
+  },
+  "api": {
+    "sections": {
+      "transport": "Transport & Framing",
+      "mouse_buttons": "Mouse Buttons",
+      "mouse_buttons.buttons_individual": "Individual Buttons (GET/SET)",
+      "mouse_buttons.click": "Click Scheduling (SET)",
+      "mouse_buttons.turbo": "turbo() (GET/SET)",
+      "mouse_movement": "Mouse Movement",
+      "mouse_movement.move": "move() (SET)",
+      "mouse_movement.moveto": "moveto() (SET)",
+      "mouse_movement.wheel": "wheel() (SET)",
+      "mouse_movement.pan": "pan() (GET/SET)",
+      "mouse_movement.tilt": "tilt() (GET/SET)",
+      "mouse_movement.getpos": "getpos() (GET)",
+      "mouse_movement.silent": "silent() (SET)",
+      "mouse_advanced": "Mouse Advanced",
+      "mouse_advanced.mo": "mo() - Raw Mouse Frame (SET)",
+      "mouse_advanced.lock": "lock_<target>() (GET/SET)",
+      "mouse_advanced.catch": "catch_<target>() (GET/SET)",
+      "keyboard": "Keyboard",
+      "keyboard.down": "down() (SET)",
+      "keyboard.up": "up() (SET)",
+      "keyboard.press": "press() (SET)",
+      "keyboard.string": "string() (SET)",
+      "keyboard.init": "init() (SET)",
+      "keyboard.isdown": "isdown() (GET)",
+      "keyboard.mask": "mask() (GET/SET)",
+      "keyboard.remap": "remap() (GET/SET)",
+      "streaming": "Streaming",
+      "streaming.keys": "keys() (GET/SET)",
+      "streaming.buttons": "buttons() (GET/SET)",
+      "streaming.axis": "axis() (GET/SET)",
+      "streaming.mouse": "mouse() (GET/SET)",
+      "screen": "Position & Screen",
+      "screen.screen_cmd": "screen() (GET/SET)",
+      "system": "System Commands",
+      "system.help": "help() (GET)",
+      "system.info": "info() (GET)",
+      "system.version": "version() (GET)",
+      "system.device": "device() (GET)",
+      "system.fault": "fault() (GET)",
+      "system.reboot": "reboot() (SET)",
+      "system.serial": "serial() (GET/SET)",
+      "config": "Configuration",
+      "config.log": "log() (GET/SET)",
+      "config.echo": "echo() (GET/SET)",
+      "config.baud": "baud() (GET/SET)",
+      "config.hs": "hs() (GET/SET)",
+      "config.release": "release() (GET/SET)",
+      "baud_binary": "Baud Rate (Binary)",
+      "no_usb": "Functions Without USB Device",
+      "limits": "Limits & Parsing"
+    }
+  },
+  "settings": {
+    "sections": {
+      "status": "Status"
+    }
   }
 }

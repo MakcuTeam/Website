@@ -471,5 +471,64 @@
         "supported_device_desc": "确保您已连接支持的鼠标或键盘。MAKCU 支持键盘和鼠标设备。"
       }
     }
+  },
+  "api": {
+    "sections": {
+      "transport": "传输与封装",
+      "mouse_buttons": "鼠标按键",
+      "mouse_buttons.buttons_individual": "单个按键 (GET/SET)",
+      "mouse_buttons.click": "点击调度 (SET)",
+      "mouse_buttons.turbo": "turbo() (GET/SET)",
+      "mouse_movement": "鼠标移动",
+      "mouse_movement.move": "move() (SET)",
+      "mouse_movement.moveto": "moveto() (SET)",
+      "mouse_movement.wheel": "wheel() (SET)",
+      "mouse_movement.pan": "pan() (GET/SET)",
+      "mouse_movement.tilt": "tilt() (GET/SET)",
+      "mouse_movement.getpos": "getpos() (GET)",
+      "mouse_movement.silent": "silent() (SET)",
+      "mouse_advanced": "鼠标高级",
+      "mouse_advanced.mo": "mo() - 原始鼠标帧 (SET)",
+      "mouse_advanced.lock": "lock_<target>() (GET/SET)",
+      "mouse_advanced.catch": "catch_<target>() (GET/SET)",
+      "keyboard": "键盘",
+      "keyboard.down": "down() (SET)",
+      "keyboard.up": "up() (SET)",
+      "keyboard.press": "press() (SET)",
+      "keyboard.string": "string() (SET)",
+      "keyboard.init": "init() (SET)",
+      "keyboard.isdown": "isdown() (GET)",
+      "keyboard.mask": "mask() (GET/SET)",
+      "keyboard.remap": "remap() (GET/SET)",
+      "streaming": "流式",
+      "streaming.keys": "keys() (GET/SET)",
+      "streaming.buttons": "buttons() (GET/SET)",
+      "streaming.axis": "axis() (GET/SET)",
+      "streaming.mouse": "mouse() (GET/SET)",
+      "screen": "位置与屏幕",
+      "screen.screen_cmd": "screen() (GET/SET)",
+      "system": "系统命令",
+      "system.help": "help() (GET)",
+      "system.info": "info() (GET)",
+      "system.version": "version() (GET)",
+      "system.device": "device() (GET)",
+      "system.fault": "fault() (GET)",
+      "system.reboot": "reboot() (SET)",
+      "system.serial": "serial() (GET/SET)",
+      "config": "配置",
+      "config.log": "log() (GET/SET)",
+      "config.echo": "echo() (GET/SET)",
+      "config.baud": "baud() (GET/SET)",
+      "config.hs": "hs() (GET/SET)",
+      "config.release": "release() (GET/SET)",
+      "baud_binary": "波特率（二进制）",
+      "no_usb": "无需 USB 设备的函数",
+      "limits": "限制与解析"
+    }
+  },
+  "settings": {
+    "sections": {
+      "status": "状态"
+    }
   }
 }

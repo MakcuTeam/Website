@@ -104,16 +104,6 @@ export default function HomeSidebar({ lang, dict }: HomeSidebarProps) {
     <aside>
       <Card className="border-border/60 bg-card/90 shadow-lg">
         <CardContent className="p-5">
-          {/* Top Navigation Links */}
-          <div className="mb-6 pb-4 border-b border-border/60">
-            <div className="text-xs font-semibold uppercase tracking-[0.3em] text-muted-foreground mb-3">
-              {isCn ? "导航" : "Navigation"}
-            </div>
-            <div className="flex flex-col gap-2 text-sm">
-              <NavMenu isSheet={false} dict={dict} />
-            </div>
-          </div>
-
           {/* All Sections from All Pages */}
           <div className="text-xs font-semibold uppercase tracking-[0.3em] text-muted-foreground mb-4">
             {isCn ? "所有章节" : "All Sections"}
