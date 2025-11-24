@@ -82,7 +82,7 @@ export default function HomeSidebar({ lang, dict }: HomeSidebarProps) {
           )}
           <span>{label}</span>
         </Link>
-        {hasChildren && isHovered && (
+        {hasChildren && isHovered && section.children && (
           <ul className="space-y-1.5 border-l border-border/60 pl-4 mt-2 ml-1.5">
             {section.children.map((child) => (
               <li key={child.id}>
