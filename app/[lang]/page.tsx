@@ -10,10 +10,13 @@ import { DiscordCard } from "@/components/discord";
 import { useDictionary } from "@/components/contexts/dictionary-provider";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
+import HomeSidebar from "@/components/home-sidebar";
+import useLocale from "@/components/hooks/useLocale";
 
 
 export default function Home() {
   const dict = useDictionary();
+  const lang = useLocale();
   const memberCount = useSelector(
     (state: RootState) => state.discord.data?.member_count
   );
@@ -25,7 +28,9 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col px-2 sm:py-8 py-12 gap-12">
+    <div className="mt-10 grid gap-8 lg:grid-cols-[280px_minmax(0,1fr)] xl:grid-cols-[300px_minmax(0,1fr)]">
+      <HomeSidebar lang={lang} dict={dict} />
+      <div className="flex flex-col px-2 sm:py-8 py-12 gap-12">
       <div className="flex flex-col gap-6">
         <div className="flex justify-center">
           <div className="relative scale-[2]">
@@ -75,18 +80,19 @@ export default function Home() {
 
       <DiscordCard />
 
-      {/* <div className="flex gap-8 flex-col">
-        <span className="flex gap-3 items-center">
-          <div className="w-auto text-center flex-grow-1 flex-2 text-xl font-logo">
-            {dict.contributions.title}
-          </div>
-          <div className="w-full border-b dark:border-b-[hsl(var(--border))] rounded flex-1" />
-        </span>
+        {/* <div className="flex gap-8 flex-col">
+          <span className="flex gap-3 items-center">
+            <div className="w-auto text-center flex-grow-1 flex-2 text-xl font-logo">
+              {dict.contributions.title}
+            </div>
+            <div className="w-full border-b dark:border-b-[hsl(var(--border))] rounded flex-1" />
+          </span>
 
-        <div className="flex gap-3 items-center flex-wrap">
-          
-        </div>
-      </div> */}
+          <div className="flex gap-3 items-center flex-wrap">
+            
+          </div>
+        </div> */}
+      </div>
     </div>
   );
 }

@@ -179,7 +179,8 @@
           "color": "红色"
         }
       },
-      "com_port_note": "注意：COM 端口号不显示，因为出于安全原因，Web Serial API 不提供此信息。连接状态将显示模式（正常或刷写）代替。"
+      "com_port_note": "注意：COM 端口号不显示，因为出于安全原因，Web Serial API 不提供此信息。连接状态将显示模式（正常或刷写）代替。",
+      "overview": "连接状态概述"
     },
     "prerequisites": {
       "title": "前提条件",

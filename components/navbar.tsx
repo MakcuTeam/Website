@@ -9,6 +9,7 @@ import { SheetClose } from "@/components/ui/sheet";
 import LangSelect from "./lang-select";
 import { Dictionary } from "@/lib/dictionaries";
 import LocalizedLink from "./localized-link";
+import SearchBar from "./search-bar";
 
 export function Navbar({ dict }: { dict: Dictionary }) {
   return (
@@ -27,6 +28,9 @@ export function Navbar({ dict }: { dict: Dictionary }) {
         </div>
 
         <div className="flex items-center gap-3 ml-auto">
+          <div className="hidden md:block">
+            <SearchBar />
+          </div>
           <div className="flex items-center gap-2">
             <div className="flex ml-2.5 sm:ml-0">
               <LangSelect />

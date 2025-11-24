@@ -186,7 +186,8 @@
           "color": "Red"
         }
       },
-      "com_port_note": "Note: The COM port number is not displayed as it is not available via the Web Serial API for security reasons. The connection status will show the mode (normal or flash) instead."
+      "com_port_note": "Note: The COM port number is not displayed as it is not available via the Web Serial API for security reasons. The connection status will show the mode (normal or flash) instead.",
+      "overview": "Connection Status Overview"
     },
     "prerequisites": {
       "title": "Prerequisites",
