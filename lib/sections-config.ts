@@ -37,14 +37,14 @@ export const SECTIONS_CONFIG: PageSections[] = [
             labelKey: "setup.sections.flash_makcu.flashing_process.title",
           },
           {
-            id: "baud-rate",
-            labelKey: "setup.sections.flash_makcu.baud_rate.title",
-          },
-          {
             id: "power-requirements",
             labelKey: "setup.sections.flash_makcu.power_requirements.title",
           },
         ],
+      },
+      {
+        id: "baud-rate",
+        labelKey: "setup.sections.flash_makcu.baud_rate.title",
       },
       // These sections will be moved from troubleshooting page
       {

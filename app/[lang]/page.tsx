@@ -32,7 +32,7 @@ export default function Home() {
       <HomeSidebar lang={lang} dict={dict} />
       <div className="relative flex flex-col px-2 sm:py-8 py-12 gap-12">
         {/* Background Image */}
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none -z-10 opacity-20">
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-10" style={{ zIndex: 0 }}>
           <div className="relative scale-[2]">
             <Image
               src={ProductImage}
@@ -45,7 +45,7 @@ export default function Home() {
         </div>
 
         {/* Content */}
-        <div className="relative z-10 flex gap-3 flex-col">
+        <div className="relative flex gap-3 flex-col" style={{ zIndex: 1 }}>
         <span className="flex gap-3 items-center mb-12 ">
           <div className="w-full border-b dark:border-b-[hsl(var(--border))] rounded flex-1" />
           <div className="w-auto text-center flex-grow-1 flex-2 text-3xl font-logo">

@@ -8,13 +8,48 @@ export type SearchResult = {
   route: string;
   label: string;
   labelKey: string;
-  fullPath: string; // e.g., "Setup > Install CH343 Driver"
-  level: number; // 0 for section, 1 for subsection, etc.
+  fullPath: string;
+  level: number;
 };
 
 /**
+ * Recursively extracts all string values from a dictionary object
+ */
+function extractAllStrings(obj: any, results: Set<string> = new Set()): Set<string> {
+  if (obj === null || obj === undefined) return results;
+  
+  if (typeof obj === "string" && obj.length > 2) {
+    results.add(obj.toLowerCase());
+    return results;
+  }
+  
+  if (Array.isArray(obj)) {
+    obj.forEach((item) => {
+      if (typeof item === "string" && item.length > 2) {
+        results.add(item.toLowerCase());
+      } else if (typeof item === "object") {
+        extractAllStrings(item, results);
+      }
+    });
+    return results;
+  }
+  
+  if (typeof obj === "object") {
+    Object.keys(obj).forEach((key) => {
+      const value = obj[key];
+      if (typeof value === "string" && value.length > 2) {
+        results.add(value.toLowerCase());
+      } else if (typeof value === "object") {
+        extractAllStrings(value, results);
+      }
+    });
+  }
+  
+  return results;
+}
+
+/**
  * Builds a searchable index from the centralized sections config.
- * Includes page titles, section labels, and dictionary translations.
  */
 export function buildSearchIndex(dict: Dictionary, lang: Locale): SearchResult[] {
   const results: SearchResult[] = [];
@@ -87,7 +122,7 @@ export function buildSearchIndex(dict: Dictionary, lang: Locale): SearchResult[]
 
 /**
  * Search the index for matching results.
- * Searches in labels and full paths.
+ * Searches in labels, full paths, and all dictionary content.
  */
 export function searchIndex(
   query: string,
@@ -99,15 +134,27 @@ export function searchIndex(
 
   const index = buildSearchIndex(dict, lang);
   const lowerQuery = query.toLowerCase().trim();
+  
+  // Extract all searchable strings from dictionary
+  const allDictStrings = extractAllStrings(dict);
 
   const matches = index.filter((item) => {
     const labelMatch = item.label.toLowerCase().includes(lowerQuery);
     const pathMatch = item.fullPath.toLowerCase().includes(lowerQuery);
     const keyMatch = item.labelKey.toLowerCase().includes(lowerQuery);
-    return labelMatch || pathMatch || keyMatch;
+    
+    // Check if query matches any dictionary content related to this section
+    const sectionDict = getSectionDict(dict, item.labelKey);
+    const sectionStrings = extractAllStrings(sectionDict);
+    const contentMatch = Array.from(sectionStrings).some(str => str.includes(lowerQuery));
+    
+    // Also check if query appears in any dictionary string
+    const globalMatch = Array.from(allDictStrings).some(str => str.includes(lowerQuery));
+    
+    return labelMatch || pathMatch || keyMatch || contentMatch || (globalMatch && item.level === 0);
   });
 
-  // Sort by relevance: exact matches first, then by position in path
+  // Sort by relevance
   matches.sort((a, b) => {
     const aExact = a.label.toLowerCase() === lowerQuery;
     const bExact = b.label.toLowerCase() === lowerQuery;
@@ -119,9 +166,18 @@ export function searchIndex(
     if (aStarts && !bStarts) return -1;
     if (!aStarts && bStarts) return 1;
 
-    return a.level - b.level; // Prefer top-level sections
+    return a.level - b.level;
   });
 
   return matches.slice(0, maxResults);
 }
 
+function getSectionDict(dict: Dictionary, labelKey: string): any {
+  const keys = labelKey.split(".");
+  let value: any = dict;
+  for (const key of keys) {
+    value = value?.[key];
+    if (value === undefined) return {};
+  }
+  return value || {};
+}

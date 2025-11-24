@@ -18,29 +18,25 @@ export const DiscordCard = () => {
         <div className="w-full border-b dark:border-b-[hsl(var(--border))] rounded flex-1" />
       </span>
 
-      <div className="flex flex-wrap gap-3 justify-between overflow-hidden relative text-sm">
-        <a href={discordStore?.data?.instant_invite} target="_blank">
-          <Card className="text-white py-3 relative flex gap-3 items-center  bg-[#5865f2] justify-center  uppercase max-w-40 min-w-40 overflow-hidden">
-            <BotMessageSquare />
-            <span className="text-center ">Join Us</span>
-          </Card>
-        </a>
+      <div className="grid grid-cols-9 gap-3 text-sm">
         {discordStore?.data?.members &&
-          discordStore?.data.members.map((i, k) => {
+          Array.from({ length: 45 }, (_, index) => {
+            const member = discordStore.data.members[index % discordStore.data.members.length];
+            if (!member) return null;
             return (
               <Card
-                className="relative bg-transparent backdrop-blur-sm flex gap-3 items-center justify-between uppercase  max-w-40 min-w-40 overflow-hidden"
-                key={k}
+                className="relative bg-transparent backdrop-blur-sm flex gap-3 items-center justify-between uppercase max-w-40 min-w-40 overflow-hidden"
+                key={index}
               >
                 <span className="overflow-hidden pl-3 whitespace-nowrap text-ellipsis">
-                  {i.username}
+                  {member.username}
                 </span>
                 <Avatar className="rounded-none w-12 h-12">
-                  <AvatarImage src={i.avatar_url} className=" rounded-none" />
+                  <AvatarImage src={member.avatar_url} className="rounded-none" />
                 </Avatar>
               </Card>
             );
-          })}
+          }).filter(Boolean)}
       </div>
     </div>
   );
