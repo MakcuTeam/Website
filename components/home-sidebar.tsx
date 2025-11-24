@@ -3,7 +3,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
 import type { Locale } from "@/lib/locale";
-import { getAllSections } from "@/lib/sections-config";
+import { getAllSections, type SectionItem } from "@/lib/sections-config";
 import { Dictionary } from "@/lib/dictionaries";
 import { NavMenu } from "./navbar";
 
@@ -43,7 +43,7 @@ export default function HomeSidebar({ lang, dict }: HomeSidebarProps) {
     return pageTitles[page] || page;
   };
 
-  const renderSection = (section: any, pageRoute: string, level: number = 0) => {
+  const renderSection = (section: SectionItem, pageRoute: string, level: number = 0) => {
     const label = getLabel(section.labelKey);
     const href = `/${lang}${pageRoute}#${section.id}`;
 
@@ -65,7 +65,7 @@ export default function HomeSidebar({ lang, dict }: HomeSidebarProps) {
               level === 0 ? "mt-2" : "mt-1"
             }`}
           >
-            {section.children.map((child: any) => (
+            {section.children.map((child) => (
               <li key={child.id}>
                 <Link
                   href={`/${lang}${pageRoute}#${child.id}`}

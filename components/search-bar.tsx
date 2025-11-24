@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import { useRouter, usePathname } from "next/navigation";
+import { useState, useEffect, useRef, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { useDictionary } from "@/components/contexts/dictionary-provider";
 import useLocale from "@/components/hooks/useLocale";
@@ -18,9 +18,15 @@ export default function SearchBar() {
   const dict = useDictionary();
   const lang = useLocale();
   const router = useRouter();
-  const pathname = usePathname();
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const handleSelectResult = useCallback((result: SearchResult) => {
+    const href = `/${lang}${result.route}#${result.id}`;
+    setIsOpen(false);
+    setQuery("");
+    router.push(href);
+  }, [lang, router]);
 
   useEffect(() => {
     if (query.trim()) {
@@ -75,14 +81,7 @@ export default function SearchBar() {
       document.addEventListener("keydown", handleKeyDown);
       return () => document.removeEventListener("keydown", handleKeyDown);
     }
-  }, [isOpen, results, selectedIndex]);
-
-  const handleSelectResult = (result: SearchResult) => {
-    const href = `/${lang}${result.route}#${result.id}`;
-    setIsOpen(false);
-    setQuery("");
-    router.push(href);
-  };
+  }, [isOpen, results, selectedIndex, handleSelectResult]);
 
   const handleClear = () => {
     setQuery("");

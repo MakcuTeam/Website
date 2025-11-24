@@ -2,9 +2,9 @@ export const locales = ["en", "cn"] as const;
 
 export type Locale = typeof locales[number];
 
-export function getLocale(pathname: string) {
+export function getLocale(pathname: string): Locale {
     const [locale] = pathname.split("/").filter(Boolean);
-    return locales.includes(locale as Locale) ? locale : locales[0];
+    return locales.includes(locale as Locale) ? (locale as Locale) : locales[0];
 }
 
 export function pathnameHasLocale(pathname: string) {
