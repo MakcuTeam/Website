@@ -19,7 +19,112 @@ export type PageSections = {
  * Main page will show ALL sections from ALL pages.
  * Individual pages will show only their own sections.
  */
-export const SECTIONS_CONFIG: PageSections[] = [
+// Helper function to sort pages alphabetically
+const sortPagesAlphabetically = (pages: PageSections[]): PageSections[] => {
+  const pageOrder: Record<string, number> = {
+    api: 0,
+    firmware: 1,
+    setup: 2,
+    settings: 3,
+    troubleshooting: 4,
+    xim: 5,
+  };
+  return pages.sort((a, b) => {
+    const aOrder = pageOrder[a.page] ?? 999;
+    const bOrder = pageOrder[b.page] ?? 999;
+    return aOrder - bOrder;
+  });
+};
+
+export const SECTIONS_CONFIG: PageSections[] = sortPagesAlphabetically([
+  {
+    page: "api",
+    route: "/api",
+    sections: [
+      {
+        id: "transport",
+        labelKey: "api.sections.transport.title",
+      },
+      {
+        id: "mouse-buttons",
+        labelKey: "api.sections.mouse_buttons.title",
+        children: [
+          { id: "buttons-individual", labelKey: "api.sections.mouse_buttons.buttons_individual" },
+          { id: "buttons-all", labelKey: "api.sections.mouse_buttons.buttons_all" },
+          { id: "buttons-release", labelKey: "api.sections.mouse_buttons.buttons_release" },
+        ],
+      },
+      {
+        id: "mouse-movement",
+        labelKey: "api.sections.mouse_movement.title",
+        children: [
+          { id: "movement-relative", labelKey: "api.sections.mouse_movement.movement_relative" },
+          { id: "movement-absolute", labelKey: "api.sections.mouse_movement.movement_absolute" },
+        ],
+      },
+      {
+        id: "keyboard",
+        labelKey: "api.sections.keyboard.title",
+        children: [
+          { id: "keyboard-press", labelKey: "api.sections.keyboard.keyboard_press" },
+          { id: "keyboard-release", labelKey: "api.sections.keyboard.keyboard_release" },
+          { id: "keyboard-release-all", labelKey: "api.sections.keyboard.keyboard_release_all" },
+        ],
+      },
+      {
+        id: "device-info",
+        labelKey: "api.sections.device_info.title",
+        children: [
+          { id: "version", labelKey: "api.sections.device_info.version" },
+          { id: "device", labelKey: "api.sections.device_info.device" },
+          { id: "fault", labelKey: "api.sections.device_info.fault" },
+          { id: "reboot", labelKey: "api.sections.device_info.reboot" },
+          { id: "serial", labelKey: "api.sections.device_info.serial" },
+        ],
+      },
+      {
+        id: "config",
+        labelKey: "api.sections.config.title",
+        children: [
+          { id: "log", labelKey: "api.sections.config.log" },
+          { id: "echo", labelKey: "api.sections.config.echo" },
+          { id: "baud", labelKey: "api.sections.config.baud" },
+          { id: "hs", labelKey: "api.sections.config.hs" },
+          { id: "release", labelKey: "api.sections.config.release" },
+        ],
+      },
+      {
+        id: "baud-binary",
+        labelKey: "api.sections.baud_binary",
+      },
+      {
+        id: "no-usb",
+        labelKey: "api.sections.no_usb",
+      },
+      {
+        id: "limits",
+        labelKey: "api.sections.limits",
+      },
+    ],
+  },
+  {
+    page: "firmware",
+    route: "/firmware",
+    sections: [
+      {
+        id: "flashing-steps",
+        labelKey: "firmware.sections.steps.title",
+      },
+      {
+        id: "flashing-tool",
+        labelKey: "firmware.sections.flashing_tool.title",
+      },
+      {
+        id: "firmware-selection",
+        labelKey: "firmware.sections.firmware_selection.title",
+      },
+    ],
+  },
   {
     page: "setup",
     route: "/setup",
@@ -39,10 +144,6 @@ export const SECTIONS_CONFIG: PageSections[] = [
           {
             id: "flashing-process",
             labelKey: "setup.sections.flash_makcu.flashing_process.title",
-          },
-          {
-            id: "power-requirements",
-            labelKey: "setup.sections.flash_makcu.power_requirements.title",
           },
         ],
       },
@@ -148,114 +249,6 @@ export const SECTIONS_CONFIG: PageSections[] = [
     ],
   },
   {
-    page: "api",
-    route: "/api",
-    sections: [
-      {
-        id: "transport",
-        labelKey: "api.sections.transport",
-      },
-      {
-        id: "mouse-buttons",
-        labelKey: "api.sections.mouse_buttons.title",
-        children: [
-          { id: "buttons-individual", labelKey: "api.sections.mouse_buttons.buttons_individual" },
-          { id: "click", labelKey: "api.sections.mouse_buttons.click" },
-          { id: "turbo", labelKey: "api.sections.mouse_buttons.turbo" },
-        ],
-      },
-      {
-        id: "mouse-movement",
-        labelKey: "api.sections.mouse_movement.title",
-        children: [
-          { id: "move", labelKey: "api.sections.mouse_movement.move" },
-          { id: "moveto", labelKey: "api.sections.mouse_movement.moveto" },
-          { id: "wheel", labelKey: "api.sections.mouse_movement.wheel" },
-          { id: "pan", labelKey: "api.sections.mouse_movement.pan" },
-          { id: "tilt", labelKey: "api.sections.mouse_movement.tilt" },
-          { id: "getpos", labelKey: "api.sections.mouse_movement.getpos" },
-          { id: "silent", labelKey: "api.sections.mouse_movement.silent" },
-        ],
-      },
-      {
-        id: "mouse-advanced",
-        labelKey: "api.sections.mouse_advanced.title",
-        children: [
-          { id: "mo", labelKey: "api.sections.mouse_advanced.mo" },
-          { id: "lock", labelKey: "api.sections.mouse_advanced.lock" },
-          { id: "catch", labelKey: "api.sections.mouse_advanced.catch" },
-        ],
-      },
-      {
-        id: "keyboard",
-        labelKey: "api.sections.keyboard.title",
-        children: [
-          { id: "down", labelKey: "api.sections.keyboard.down" },
-          { id: "up", labelKey: "api.sections.keyboard.up" },
-          { id: "press", labelKey: "api.sections.keyboard.press" },
-          { id: "string", labelKey: "api.sections.keyboard.string" },
-          { id: "init", labelKey: "api.sections.keyboard.init" },
-          { id: "isdown", labelKey: "api.sections.keyboard.isdown" },
-          { id: "mask", labelKey: "api.sections.keyboard.mask" },
-          { id: "remap", labelKey: "api.sections.keyboard.remap" },
-        ],
-      },
-      {
-        id: "streaming",
-        labelKey: "api.sections.streaming.title",
-        children: [
-          { id: "keys-stream", labelKey: "api.sections.streaming.keys" },
-          { id: "buttons-stream", labelKey: "api.sections.streaming.buttons" },
-          { id: "axis-stream", labelKey: "api.sections.streaming.axis" },
-          { id: "mouse-stream", labelKey: "api.sections.streaming.mouse" },
-        ],
-      },
-      {
-        id: "screen",
-        labelKey: "api.sections.screen.title",
-        children: [
-          { id: "screen-cmd", labelKey: "api.sections.screen.screen_cmd" },
-        ],
-      },
-      {
-        id: "system",
-        labelKey: "api.sections.system.title",
-        children: [
-          { id: "help", labelKey: "api.sections.system.help" },
-          { id: "info", labelKey: "api.sections.system.info" },
-          { id: "version", labelKey: "api.sections.system.version" },
-          { id: "device", labelKey: "api.sections.system.device" },
-          { id: "fault", labelKey: "api.sections.system.fault" },
-          { id: "reboot", labelKey: "api.sections.system.reboot" },
-          { id: "serial", labelKey: "api.sections.system.serial" },
-        ],
-      },
-      {
-        id: "config",
-        labelKey: "api.sections.config.title",
-        children: [
-          { id: "log", labelKey: "api.sections.config.log" },
-          { id: "echo", labelKey: "api.sections.config.echo" },
-          { id: "baud", labelKey: "api.sections.config.baud" },
-          { id: "hs", labelKey: "api.sections.config.hs" },
-          { id: "release", labelKey: "api.sections.config.release" },
-        ],
-      },
-      {
-        id: "baud-binary",
-        labelKey: "api.sections.baud_binary",
-      },
-      {
-        id: "no-usb",
-        labelKey: "api.sections.no_usb",
-      },
-      {
-        id: "limits",
-        labelKey: "api.sections.limits",
-      },
-    ],
-  },
-  {
     page: "settings",
     route: "/settings",
     sections: [
@@ -270,24 +263,6 @@ export const SECTIONS_CONFIG: PageSections[] = [
       {
         id: "baud-rate",
         labelKey: "settings.baud_rate.title",
-      },
-    ],
-  },
-  {
-    page: "firmware",
-    route: "/firmware",
-    sections: [
-      {
-        id: "steps",
-        labelKey: "tools.sections.steps.title",
-      },
-      {
-        id: "flashing-tool",
-        labelKey: "tools.sections.flashing_tool.title",
-      },
-      {
-        id: "firmware-selection",
-        labelKey: "tools.sections.firmware_selection.title",
       },
     ],
   },

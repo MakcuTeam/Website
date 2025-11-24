@@ -79,12 +79,12 @@ export function NavMenu({
       href: "/setup",
     },
     {
-      title: "xim",
-      href: "/xim",
-    },
-    {
       title: "settings",
       href: "/settings",
+    },
+    {
+      title: "xim",
+      href: "/xim",
     },
     {
       title: "troubleshooting",

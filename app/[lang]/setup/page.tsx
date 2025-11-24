@@ -94,6 +94,23 @@ export default async function SetupPage({ params }: LangProps) {
                   <li>
                     <div className="space-y-2">
                       <h4 className="font-semibold text-foreground">
+                        {t("Baud Rate", "波特率")}
+                      </h4>
+                      <p className="text-sm leading-relaxed text-muted-foreground">
+                        {t("Baud rate is matched to the cheat you will use, please see the", "波特率与您将使用的作弊软件匹配，请查看")}{" "}
+                        <Link
+                          href={`/${lang}/setup#baud-rate`}
+                          className="text-blue-600 dark:text-blue-400 hover:underline"
+                        >
+                          {t("baud rate section below", "下面的波特率部分")}
+                        </Link>
+                        .
+                      </p>
+                    </div>
+                  </li>
+                  <li>
+                    <div className="space-y-2">
+                      <h4 className="font-semibold text-foreground">
                         {dict.setup.sections.requirements.both_sides}
                       </h4>
                       <p className="text-sm leading-relaxed text-muted-foreground">
@@ -185,32 +202,6 @@ export default async function SetupPage({ params }: LangProps) {
                     <h4 className="font-semibold mb-2">{t("Completing", "完成")}</h4>
                     <p className="text-sm leading-relaxed text-muted-foreground">
                       {dict.setup.sections.flash_makcu.flashing_process.completing}
-                    </p>
-                  </div>
-                </div>
-              </SubSection>
-
-              <SubSection
-                id="power-requirements"
-                title={dict.setup.sections.flash_makcu.power_requirements.title}
-                description={dict.setup.sections.flash_makcu.power_requirements.description}
-              >
-                <div className="space-y-4">
-                  <div>
-                    <h4 className="font-semibold mb-2">{t("Normal Mode", "正常模式")}</h4>
-                    <p className="text-sm leading-relaxed text-muted-foreground">
-                      {dict.setup.sections.flash_makcu.power_requirements.normal_mode}
-                    </p>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold mb-2">{t("Flash Mode", "刷写模式")}</h4>
-                    <p className="text-sm leading-relaxed text-muted-foreground">
-                      {dict.setup.sections.flash_makcu.power_requirements.flash_mode}
-                    </p>
-                  </div>
-                  <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/20">
-                    <p className="text-sm text-red-600 dark:text-red-400">
-                      <strong>{t("Warning", "警告")}:</strong> {dict.setup.sections.flash_makcu.power_requirements.warning}
                     </p>
                   </div>
                 </div>

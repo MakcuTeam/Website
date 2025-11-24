@@ -89,7 +89,13 @@ export function AudioPlayer() {
   }, [hasInteracted, audioRef, setHasInteracted, setIsMuted]);
 
   return (
-    <audio ref={audioRef} loop preload="auto" style={{ display: "none" }}>
+    <audio 
+      ref={audioRef} 
+      loop 
+      preload="auto" 
+      style={{ display: "none" }}
+      autoPlay
+    >
       <source src="/audio.mp3" type="audio/mpeg" />
       Your browser does not support the audio element.
     </audio>
