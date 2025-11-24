@@ -59,7 +59,9 @@ export default async function RootLayout({
         className={`${sansFont.variable} ${notoSerif.variable} ${monoFont.variable} ${roadRage.variable} font-basic antialiased tracking-wide`}
         suppressHydrationWarning
       >
-        <RootLayoutProvider dict={dict}>{children}</RootLayoutProvider>
+        <div style={{ transform: 'scale(0.9)', transformOrigin: 'top left', width: '111.11%' }}>
+          <RootLayoutProvider dict={dict}>{children}</RootLayoutProvider>
+        </div>
       </body>
     </html>
   );
