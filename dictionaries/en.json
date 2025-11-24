@@ -428,6 +428,9 @@
       "website_requirement": "The MAKCU website expects to use 115200 baud rate. Ensure if you are trying to use normal mode with the MAKCU website, you set the baud rate to 115200.",
       "setting_methods": "The baud rate can be set by the user (using the button method), or by the developer in code.",
       "power_requirement": "USB 1 + USB 2 must be connected for MAKCU to take power to change the baud rate. USB 2 does not provide power to MAKCU - this is done to ensure there is no back feeding to the main PC and the 2nd PC from both USB ports."
+    },
+    "sections": {
+      "status": "Status"
     }
   },
   "setup": {
@@ -536,6 +539,8 @@
     }
   },
   "settings": {
+    "title": "MAKCU Settings",
+    "description": "Configure and interact with your MAKCU device via WebSerial connection.",
     "sections": {
       "status": "Status"
     }

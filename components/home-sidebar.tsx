@@ -6,8 +6,8 @@ import Link from "next/link";
 import type { Locale } from "@/lib/locale";
 import { getAllSections, type SectionItem } from "@/lib/sections-config";
 import { Dictionary } from "@/lib/dictionaries";
-import { NavMenu } from "./navbar";
 import { ChevronRight } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 type HomeSidebarProps = {
   lang: Locale;
@@ -17,19 +17,20 @@ type HomeSidebarProps = {
 /**
  * Main page sidebar component.
  * Shows ALL sections from ALL pages (master index).
- * Includes top navigation links at the top.
+ * Initially shows only page titles, expands sections on hover.
  */
 export default function HomeSidebar({ lang, dict }: HomeSidebarProps) {
   const allPages = getAllSections();
   const isCn = lang === "cn";
+  const [hoveredPage, setHoveredPage] = useState<string | null>(null);
+  const [hoveredSections, setHoveredSections] = useState<Set<string>>(new Set());
 
   const getLabel = (labelKey: string): string => {
-    // Navigate through the dictionary using the key path
     const keys = labelKey.split(".");
     let value: any = dict;
     for (const key of keys) {
       value = value?.[key];
-      if (value === undefined) return labelKey; // Fallback to key if not found
+      if (value === undefined) return labelKey;
     }
     return typeof value === "string" ? value : labelKey;
   };
@@ -45,9 +46,12 @@ export default function HomeSidebar({ lang, dict }: HomeSidebarProps) {
     return pageTitles[page] || page;
   };
 
-  const [hoveredSections, setHoveredSections] = useState<Set<string>>(new Set());
-
-  const renderSection = (section: SectionItem, pageRoute: string, level: number = 0) => {
+  const renderSection = (
+    section: SectionItem,
+    pageRoute: string,
+    level: number = 0,
+    parentKey: string = ""
+  ) => {
     const label = getLabel(section.labelKey);
     const href = `/${lang}${pageRoute}#${section.id}`;
     const hasChildren = section.children && section.children.length > 0;
@@ -57,27 +61,37 @@ export default function HomeSidebar({ lang, dict }: HomeSidebarProps) {
     return (
       <div
         key={section.id}
-        className={level > 0 ? "mt-2" : ""}
-        onMouseEnter={() => hasChildren && setHoveredSections((prev) => new Set(prev).add(sectionKey))}
-        onMouseLeave={() => setHoveredSections((prev) => {
-          const next = new Set(prev);
-          next.delete(sectionKey);
-          return next;
-        })}
+        className={cn("relative", level > 0 ? "mt-2" : "")}
+        onMouseEnter={() => {
+          if (hasChildren) {
+            setHoveredSections((prev) => new Set(prev).add(sectionKey));
+          }
+        }}
+        onMouseLeave={() => {
+          if (hasChildren) {
+            setHoveredSections((prev) => {
+              const next = new Set(prev);
+              next.delete(sectionKey);
+              return next;
+            });
+          }
+        }}
       >
         <Link
           href={href}
-          className={`flex items-center gap-1.5 transition hover:text-foreground ${
+          className={cn(
+            "flex items-center gap-1.5 transition hover:text-foreground py-1",
             level === 0
               ? "font-medium text-foreground/80 text-sm"
               : "text-xs text-muted-foreground"
-          }`}
+          )}
         >
           {hasChildren && (
             <ChevronRight
-              className={`h-3 w-3 transition-transform ${
+              className={cn(
+                "h-3 w-3 transition-transform",
                 isHovered ? "rotate-90" : ""
-              }`}
+              )}
             />
           )}
           <span>{label}</span>
@@ -86,12 +100,7 @@ export default function HomeSidebar({ lang, dict }: HomeSidebarProps) {
           <ul className="space-y-1.5 border-l border-border/60 pl-4 mt-2 ml-1.5">
             {section.children.map((child) => (
               <li key={child.id}>
-                <Link
-                  href={`/${lang}${pageRoute}#${child.id}`}
-                  className="block text-xs text-muted-foreground transition hover:text-foreground py-1"
-                >
-                  {getLabel(child.labelKey)}
-                </Link>
+                {renderSection(child, pageRoute, level + 1, sectionKey)}
               </li>
             ))}
           </ul>
@@ -104,23 +113,43 @@ export default function HomeSidebar({ lang, dict }: HomeSidebarProps) {
     <aside>
       <Card className="border-border/60 bg-card/90 shadow-lg">
         <CardContent className="p-5">
-          {/* All Sections from All Pages */}
           <div className="text-xs font-semibold uppercase tracking-[0.3em] text-muted-foreground mb-4">
             {isCn ? "所有章节" : "All Sections"}
           </div>
-          <nav className="space-y-6 text-sm">
-            {allPages.map((pageConfig) => (
-              <div key={pageConfig.page} className="space-y-3">
-                <div className="font-semibold text-foreground/90 text-base">
-                  {getPageTitle(pageConfig.page)}
-                </div>
-                <div className="space-y-2 pl-2">
-                  {pageConfig.sections.map((section) =>
-                    renderSection(section, pageConfig.route)
+          <nav className="space-y-4 text-sm">
+            {allPages.map((pageConfig) => {
+              const pageKey = pageConfig.page;
+              const isPageHovered = hoveredPage === pageKey;
+
+              return (
+                <div
+                  key={pageKey}
+                  className="relative"
+                  onMouseEnter={() => setHoveredPage(pageKey)}
+                  onMouseLeave={() => setHoveredPage(null)}
+                >
+                  <Link
+                    href={`/${lang}${pageConfig.route}`}
+                    className="flex items-center gap-1.5 font-semibold text-foreground/90 text-base transition hover:text-foreground py-1"
+                  >
+                    <ChevronRight
+                      className={cn(
+                        "h-3.5 w-3.5 transition-transform",
+                        isPageHovered ? "rotate-90" : ""
+                      )}
+                    />
+                    <span>{getPageTitle(pageKey)}</span>
+                  </Link>
+                  {isPageHovered && (
+                    <div className="space-y-2 pl-4 mt-2 border-l border-border/60">
+                      {pageConfig.sections.map((section) =>
+                        renderSection(section, pageConfig.route, 0)
+                      )}
+                    </div>
                   )}
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </nav>
         </CardContent>
       </Card>

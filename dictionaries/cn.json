@@ -419,6 +419,9 @@
       "website_requirement": "MAKCU 网站期望使用 115200 波特率。如果您尝试在正常模式下使用 MAKCU 网站，请确保将波特率设置为 115200。",
       "setting_methods": "波特率可以由用户（使用按钮方法）设置，也可以由开发人员在代码中设置。",
       "power_requirement": "必须连接 USB 1 + USB 2 才能为 MAKCU 供电以更改波特率。USB 2 不为 MAKCU 提供电源 - 这是为了确保不会从两个 USB 端口向主 PC 和第二台 PC 反向供电。"
+    },
+    "sections": {
+      "status": "状态"
     }
   },
   "setup": {
@@ -527,6 +530,8 @@
     }
   },
   "settings": {
+    "title": "MAKCU 设置",
+    "description": "通过 WebSerial 连接配置和交互您的 MAKCU 设备。",
     "sections": {
       "status": "状态"
     }
