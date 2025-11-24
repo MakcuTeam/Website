@@ -458,6 +458,17 @@
           "flash_mode": "刷写模式一次使用 1 根线缆。只连接 USB 1 或 USB 3，不要同时连接两者。",
           "warning": "不遵循这些电源要求将导致使用不正确，MAKCU 显示无法正常工作的迹象，并且无法刷写。这些故障症状是由于不了解电源要求造成的。"
         }
+      },
+      "requirements": {
+        "title": "要求",
+        "ch343_driver": "已安装 CH343 驱动程序",
+        "ch343_desc": "MAKCU 需要在您的计算机上加载 CH343 USB 转串口驱动程序。请查看刷写页面获取下载链接和安装说明。",
+        "com_port": "正确的 COM 端口",
+        "com_port_desc": "USB 2 的 COM 端口应低于 10。如果您的 COM 端口号是 10 或更高，可能会遇到连接问题。",
+        "both_sides": "两侧均已刷写",
+        "both_sides_desc": "确保您已正确设置并在左侧（设备）和右侧（主机）上刷写了 MAKCU。",
+        "supported_device": "支持的设备",
+        "supported_device_desc": "确保您已连接支持的鼠标或键盘。MAKCU 支持键盘和鼠标设备。"
       }
     }
   }

@@ -467,6 +467,17 @@
           "flash_mode": "Flash mode uses 1 cable at a time. Only connect USB 1 OR USB 3, not both simultaneously.",
           "warning": "Failing to follow these power requirements will lead to incorrect usage, MAKCU showing signs of not being functional, and being unable to flash. These broken symptoms are due to not understanding the power requirements."
         }
+      },
+      "requirements": {
+        "title": "Requirements",
+        "ch343_driver": "CH343 Driver Installed",
+        "ch343_desc": "MAKCU requires the CH343 USB-to-serial driver to be loaded on your computer. Please see the flash page for the download link and installation instructions.",
+        "com_port": "Correct COM Port",
+        "com_port_desc": "The COM port for USB 2 should be below 10. If your COM port number is 10 or higher, you may experience connection issues.",
+        "both_sides": "Both Sides Flashed",
+        "both_sides_desc": "Make sure you have correctly set up and flashed MAKCU on both the left side (device) and right side (host).",
+        "supported_device": "Supported Device",
+        "supported_device_desc": "Ensure you have a supported mouse or keyboard connected. MAKCU supports both keyboard and mouse devices."
       }
     }
   }

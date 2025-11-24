@@ -81,7 +81,7 @@ export const SECTIONS_CONFIG: PageSections[] = [
       },
       {
         id: "prerequisites",
-        labelKey: "troubleshooting.prerequisites.title",
+        labelKey: "setup.requirements.title",
       },
     ],
   },

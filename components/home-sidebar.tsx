@@ -1,11 +1,13 @@
 "use client";
 
+import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
 import type { Locale } from "@/lib/locale";
 import { getAllSections, type SectionItem } from "@/lib/sections-config";
 import { Dictionary } from "@/lib/dictionaries";
 import { NavMenu } from "./navbar";
+import { ChevronRight } from "lucide-react";
 
 type HomeSidebarProps = {
   lang: Locale;
@@ -43,33 +45,50 @@ export default function HomeSidebar({ lang, dict }: HomeSidebarProps) {
     return pageTitles[page] || page;
   };
 
+  const [hoveredSections, setHoveredSections] = useState<Set<string>>(new Set());
+
   const renderSection = (section: SectionItem, pageRoute: string, level: number = 0) => {
     const label = getLabel(section.labelKey);
     const href = `/${lang}${pageRoute}#${section.id}`;
+    const hasChildren = section.children && section.children.length > 0;
+    const sectionKey = `${pageRoute}-${section.id}`;
+    const isHovered = hoveredSections.has(sectionKey);
 
     return (
-      <div key={section.id} className={level > 0 ? "mt-2" : ""}>
+      <div
+        key={section.id}
+        className={level > 0 ? "mt-2" : ""}
+        onMouseEnter={() => hasChildren && setHoveredSections((prev) => new Set(prev).add(sectionKey))}
+        onMouseLeave={() => setHoveredSections((prev) => {
+          const next = new Set(prev);
+          next.delete(sectionKey);
+          return next;
+        })}
+      >
         <Link
           href={href}
-          className={`block transition hover:text-foreground ${
+          className={`flex items-center gap-1.5 transition hover:text-foreground ${
             level === 0
-              ? "font-medium text-foreground/80"
+              ? "font-medium text-foreground/80 text-sm"
               : "text-xs text-muted-foreground"
           }`}
         >
-          {label}
+          {hasChildren && (
+            <ChevronRight
+              className={`h-3 w-3 transition-transform ${
+                isHovered ? "rotate-90" : ""
+              }`}
+            />
+          )}
+          <span>{label}</span>
         </Link>
-        {section.children && section.children.length > 0 && (
-          <ul
-            className={`space-y-1 border-l border-border/60 pl-3 ${
-              level === 0 ? "mt-2" : "mt-1"
-            }`}
-          >
+        {hasChildren && isHovered && (
+          <ul className="space-y-1.5 border-l border-border/60 pl-4 mt-2 ml-1.5">
             {section.children.map((child) => (
               <li key={child.id}>
                 <Link
                   href={`/${lang}${pageRoute}#${child.id}`}
-                  className="block text-xs text-muted-foreground transition hover:text-foreground"
+                  className="block text-xs text-muted-foreground transition hover:text-foreground py-1"
                 >
                   {getLabel(child.labelKey)}
                 </Link>

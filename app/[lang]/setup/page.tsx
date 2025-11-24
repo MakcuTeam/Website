@@ -532,11 +532,11 @@ export default async function SetupPage({ params }: LangProps) {
             </SubSection>
           </Section>
 
-          {/* Prerequisites */}
+          {/* Requirements */}
           <Section
             id="prerequisites"
             badge={t("Setup", "设置")}
-            title={dict.troubleshooting.prerequisites.title}
+            title={dict.setup.sections.requirements.title}
           >
             <Card className="border-border/60 bg-card/90 shadow-lg">
               <CardContent className="p-6">
@@ -544,40 +544,40 @@ export default async function SetupPage({ params }: LangProps) {
                   <li>
                     <div className="space-y-2">
                       <h4 className="font-semibold text-foreground">
-                        {dict.troubleshooting.prerequisites.ch343_driver}
+                        {dict.setup.sections.requirements.ch343_driver}
                       </h4>
                       <p className="text-sm leading-relaxed text-muted-foreground">
-                        {dict.troubleshooting.prerequisites.ch343_desc}
+                        {dict.setup.sections.requirements.ch343_desc}
                       </p>
                     </div>
                   </li>
                   <li>
                     <div className="space-y-2">
                       <h4 className="font-semibold text-foreground">
-                        {dict.troubleshooting.prerequisites.com_port}
+                        {dict.setup.sections.requirements.com_port}
                       </h4>
                       <p className="text-sm leading-relaxed text-muted-foreground">
-                        {dict.troubleshooting.prerequisites.com_port_desc}
+                        {dict.setup.sections.requirements.com_port_desc}
                       </p>
                     </div>
                   </li>
                   <li>
                     <div className="space-y-2">
                       <h4 className="font-semibold text-foreground">
-                        {dict.troubleshooting.prerequisites.both_sides}
+                        {dict.setup.sections.requirements.both_sides}
                       </h4>
                       <p className="text-sm leading-relaxed text-muted-foreground">
-                        {dict.troubleshooting.prerequisites.both_sides_desc}
+                        {dict.setup.sections.requirements.both_sides_desc}
                       </p>
                     </div>
                   </li>
                   <li>
                     <div className="space-y-2">
                       <h4 className="font-semibold text-foreground">
-                        {dict.troubleshooting.prerequisites.supported_device}
+                        {dict.setup.sections.requirements.supported_device}
                       </h4>
                       <p className="text-sm leading-relaxed text-muted-foreground">
-                        {dict.troubleshooting.prerequisites.supported_device_desc}
+                        {dict.setup.sections.requirements.supported_device_desc}
                       </p>
                     </div>
                   </li>
