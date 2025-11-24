@@ -165,7 +165,7 @@
         },
         "normal_mode": {
           "label": "正常模式",
-          "description": "MAKCU 已连接并在正常模式下运行。您可以使用设置页面配置和测试 MAKCU。USB 1 连接到游戏 PC，USB 2 是 COM 端口，USB 3 连接到您的鼠标。",
+          "description": "MAKCU 已连接并在正常模式下运行。您可以使用设置页面配置和测试 MAKCU。USB 1 连接到游戏 PC，USB 2 是 COM 端口，USB 3 应连接到您的鼠标或键盘。**3.9 固件仅支持键盘。",
           "color": "绿色（翠绿色）"
         },
         "flash_mode": {
@@ -175,7 +175,7 @@
         },
         "fault": {
           "label": "故障",
-          "description": "连接失败或设备无响应。检查您的 USB 连接并重试。",
+          "description": "连接失败或设备无响应。检查您的 USB 连接并重试。交换 USB 端口和刷新页面可能会有所帮助。",
           "color": "红色"
         }
       },
@@ -338,7 +338,7 @@
       "reflash_desc": "尝试使用最新固件重新刷写两侧",
       "hardware_check": "硬件检查",
       "hardware_check_desc": "如果 LED 完全没有响应，可能存在硬件问题",
-      "remember": "记住：MAKCU 支持键盘和鼠标设备。如果一种类型工作但另一种不工作，请检查设备兼容性。"
+      "remember": "记住：MAKCU 支持键盘和鼠标设备。但是，并非所有鼠标和键盘都与 MAKCU 兼容。如果您的鼠标无法正常工作，请尝试另一只鼠标。"
     },
     "flash_vs_normal_mode": {
       "title": "刷写模式与正常模式",
@@ -465,7 +465,7 @@
       "requirements": {
         "title": "要求",
         "ch343_driver": "已安装 CH343 驱动程序",
-        "ch343_desc": "MAKCU 需要在您的计算机上加载 CH343 USB 转串口驱动程序。请查看刷写页面获取下载链接和安装说明。",
+        "ch343_desc": "MAKCU 需要在您的作弊计算机（用于刷写的计算机）上加载 CH343 USB 转串口驱动程序。驱动程序下载链接在下面的部分中提供。",
         "com_port": "正确的 COM 端口",
         "com_port_desc": "USB 2 的 COM 端口应低于 10。如果您的 COM 端口号是 10 或更高，可能会遇到连接问题。",
         "both_sides": "两侧均已刷写",

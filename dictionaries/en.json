@@ -172,7 +172,7 @@
         },
         "normal_mode": {
           "label": "Normal mode",
-          "description": "MAKCU is connected and running in normal mode. You can use the settings page to configure and test MAKCU. USB 1 is connected to gaming PC, USB 2 is the COM port, and USB 3 is connected to your mouse.",
+          "description": "MAKCU is connected and running in normal mode. You can use the settings page to configure and test MAKCU. USB 1 is connected to gaming PC, USB 2 is the COM port, USB 3 should be connected to either your mouse or keyboard. **3.9 fw only supports keyboard.",
           "color": "Green (emerald)"
         },
         "flash_mode": {
@@ -182,7 +182,7 @@
         },
         "fault": {
           "label": "Fault",
-          "description": "Connection failed or device is not responding. Check your USB connections and try again.",
+          "description": "Connection failed or device is not responding. Check your USB connections and try again. Swapping USB ports and refreshing the page may help.",
           "color": "Red"
         }
       },
@@ -345,7 +345,7 @@
       "reflash_desc": "Try reflashing both sides with the latest firmware",
       "hardware_check": "Hardware Check",
       "hardware_check_desc": "If LEDs don't respond at all, there may be a hardware issue",
-      "remember": "Remember: MAKCU supports both keyboard and mouse devices. If one type works but the other doesn't, check device compatibility."
+      "remember": "Remember: MAKCU supports both keyboard and mouse devices. However, not all mice and keyboards are compatible with MAKCU. If your mouse is not functional, please try another mouse."
     },
     "flash_vs_normal_mode": {
       "title": "Flash Mode vs Normal Mode",
@@ -474,7 +474,7 @@
       "requirements": {
         "title": "Requirements",
         "ch343_driver": "CH343 Driver Installed",
-        "ch343_desc": "MAKCU requires the CH343 USB-to-serial driver to be loaded on your computer. Please see the flash page for the download link and installation instructions.",
+        "ch343_desc": "MAKCU requires the CH343 USB-to-serial driver to be loaded on your cheat computer (the computer you will use for flashing). The driver download link is provided in the section below.",
         "com_port": "Correct COM Port",
         "com_port_desc": "The COM port for USB 2 should be below 10. If your COM port number is 10 or higher, you may experience connection issues.",
         "both_sides": "Both Sides Flashed",
