@@ -6,6 +6,7 @@ import { BotMessageSquare } from "lucide-react";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { useState, useEffect, useLayoutEffect } from "react";
+import type { Member } from "@/store/discordSlice";
 
 // Fisher-Yates shuffle algorithm for proper randomization
 function shuffleArray<T>(array: T[]): T[] {
@@ -19,7 +20,7 @@ function shuffleArray<T>(array: T[]): T[] {
 
 export const DiscordCard = () => {
   const discordStore = useSelector((state: RootState) => state.discord);
-  const [randomizedMembers, setRandomizedMembers] = useState<typeof discordStore.data.members>([]);
+  const [randomizedMembers, setRandomizedMembers] = useState<Member[]>([]);
 
   // Function to randomize members
   const randomizeMembers = () => {
