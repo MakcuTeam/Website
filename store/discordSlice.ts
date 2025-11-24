@@ -43,8 +43,7 @@ export const fetchDiscordData = createAsyncThunk(
         throw new Error("Failed to fetch data");
       }
       const data = await response.json();
-      // 随机
-      data.members = data.members.sort(() => Math.random() - 0.5).slice(0, 20);
+      // Keep all members - randomization will happen in the component
 
       const inviteCode = data.instant_invite?.split("/").pop();
       if (inviteCode) {
