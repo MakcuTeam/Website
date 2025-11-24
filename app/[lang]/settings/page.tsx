@@ -5,26 +5,14 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getDictionary } from "@/lib/dictionaries";
 import { MakcuSettings } from "@/components/makcu-settings";
+import { Section, SubSection } from "@/components/section";
+import PageSidebar from "@/components/page-sidebar";
+import { getSectionsForPage } from "@/lib/sections-config";
 
 type TocItem = {
   id: string;
   label: string;
   children?: TocItem[];
-};
-
-type SectionProps = {
-  id: string;
-  badge?: string;
-  title: string;
-  lead?: React.ReactNode;
-  children: React.ReactNode;
-};
-
-type SubSectionProps = {
-  id: string;
-  title: string;
-  description?: string;
-  children: React.ReactNode;
 };
 
 const tocByLang: Record<Locale, TocItem[]> = {
@@ -51,36 +39,6 @@ const metadataCopy: Record<Locale, { title: string; description: string }> = {
   },
 };
 
-function Section({ id, badge, title, lead, children }: SectionProps) {
-  return (
-    <section id={id} className="scroll-mt-28">
-      <div className="sticky top-24 z-10 mb-4">
-        {badge ? (
-          <div className="inline-flex items-center gap-2 rounded-full border bg-background/80 px-4 py-1 text-[11px] uppercase tracking-[0.3em] text-muted-foreground backdrop-blur">
-            {badge}
-          </div>
-        ) : null}
-      </div>
-      <div className="space-y-4">
-        <h2 className="text-3xl font-semibold tracking-tight lg:text-4xl">{title}</h2>
-        {lead ? <div className="text-base leading-relaxed text-muted-foreground">{lead}</div> : null}
-        <div className="space-y-8">{children}</div>
-      </div>
-    </section>
-  );
-}
-
-function SubSection({ id, title, description, children }: SubSectionProps) {
-  return (
-    <section id={id} className="scroll-mt-28 space-y-4">
-      <h3 className="text-xl font-semibold tracking-tight lg:text-2xl">{title}</h3>
-      {description ? (
-        <p className="text-sm leading-relaxed text-muted-foreground">{description}</p>
-      ) : null}
-      {children}
-    </section>
-  );
-}
 
 export async function generateMetadata({ params }: LangProps): Promise<Metadata> {
   const { lang } = await params;
@@ -120,41 +78,12 @@ export default async function SettingsPage({ params }: LangProps) {
       </header>
 
       <div className="mt-10 grid gap-8 lg:grid-cols-[280px_minmax(0,1fr)] xl:grid-cols-[300px_minmax(0,1fr)]">
-        <aside>
-          <Card className="border-border/60 bg-card/90 shadow-lg">
-            <CardContent className="p-5">
-              <div className="text-xs font-semibold uppercase tracking-[0.3em] text-muted-foreground">
-                {isCn ? "目录" : "Contents"}
-              </div>
-              <nav className="mt-4 space-y-3 text-sm">
-                {toc.map((item) => (
-                  <div key={item.id} className="space-y-2">
-                    <Link
-                      href={`/${lang}/settings#${item.id}`}
-                      className="font-medium text-foreground/80 transition hover:text-foreground"
-                    >
-                      {item.label}
-                    </Link>
-                    {item.children?.length ? (
-                      <ul className="space-y-1 border-l border-border/60 pl-3 text-xs text-muted-foreground">
-                        {item.children.map((child) => (
-                          <li key={child.id}>
-                            <Link
-                              href={`/${lang}/settings#${child.id}`}
-                              className="transition hover:text-foreground"
-                            >
-                              {child.label}
-                            </Link>
-                          </li>
-                        ))}
-                      </ul>
-                    ) : null}
-                  </div>
-                ))}
-              </nav>
-            </CardContent>
-          </Card>
-        </aside>
+        <PageSidebar
+          sections={getSectionsForPage("settings")}
+          currentPage="/settings"
+          lang={lang}
+          dict={dict}
+        />
 
         <div className="space-y-20">
           {/* Status Section */}

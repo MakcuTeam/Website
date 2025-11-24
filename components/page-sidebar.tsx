@@ -96,7 +96,30 @@ export default function PageSidebar({
             {isCn ? "目录" : "Contents"}
           </div>
           <nav className="mt-4 space-y-3 text-sm">
-            {sections.map((section) => renderSection(section))}
+            {sections.map((section) => (
+              <div key={section.id} className="space-y-2">
+                <Link
+                  href={`/${lang}${currentPage}#${section.id}`}
+                  className="font-medium text-foreground/80 transition hover:text-foreground"
+                >
+                  {getLabel(section.labelKey)}
+                </Link>
+                {section.children && section.children.length > 0 && (
+                  <ul className="space-y-1 border-l border-border/60 pl-3 text-xs text-muted-foreground">
+                    {section.children.map((child) => (
+                      <li key={child.id}>
+                        <Link
+                          href={`/${lang}${currentPage}#${child.id}`}
+                          className="transition hover:text-foreground"
+                        >
+                          {getLabel(child.labelKey)}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            ))}
           </nav>
         </CardContent>
       </Card>

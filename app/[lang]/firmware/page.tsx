@@ -5,19 +5,14 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getDictionary } from "@/lib/dictionaries";
 import { DeviceTool } from "@/components/deviceTool";
+import { Section } from "@/components/section";
+import PageSidebar from "@/components/page-sidebar";
+import { getSectionsForPage } from "@/lib/sections-config";
 
 type TocItem = {
   id: string;
   label: string;
   children?: TocItem[];
-};
-
-type SectionProps = {
-  id: string;
-  badge?: string;
-  title: string;
-  lead?: React.ReactNode;
-  children: React.ReactNode;
 };
 
 const tocByLang: Record<Locale, TocItem[]> = {
@@ -44,24 +39,6 @@ const metadataCopy: Record<Locale, { title: string; description: string }> = {
   },
 };
 
-function Section({ id, badge, title, lead, children }: SectionProps) {
-  return (
-    <section id={id} className="scroll-mt-28">
-      <div className="sticky top-24 z-10 mb-4">
-        {badge ? (
-          <div className="inline-flex items-center gap-2 rounded-full border bg-background/80 px-4 py-1 text-[11px] uppercase tracking-[0.3em] text-muted-foreground backdrop-blur">
-            {badge}
-          </div>
-        ) : null}
-      </div>
-      <div className="space-y-4">
-        <h2 className="text-3xl font-semibold tracking-tight lg:text-4xl">{title}</h2>
-        {lead ? <div className="text-base leading-relaxed text-muted-foreground">{lead}</div> : null}
-        <div className="space-y-8">{children}</div>
-      </div>
-    </section>
-  );
-}
 
 export async function generateMetadata({ params }: LangProps): Promise<Metadata> {
   const { lang } = await params;

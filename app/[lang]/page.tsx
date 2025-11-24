@@ -30,22 +30,22 @@ export default function Home() {
   return (
     <div className="mt-10 grid gap-8 lg:grid-cols-[280px_minmax(0,1fr)] xl:grid-cols-[300px_minmax(0,1fr)]">
       <HomeSidebar lang={lang} dict={dict} />
-      <div className="flex flex-col px-2 sm:py-8 py-12 gap-12">
-      <div className="flex flex-col gap-6">
-        <div className="flex justify-center">
+      <div className="relative flex flex-col px-2 sm:py-8 py-12 gap-12">
+        {/* Background Image */}
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none -z-10 opacity-20">
           <div className="relative scale-[2]">
-          <Image
-            src={ProductImage}
+            <Image
+              src={ProductImage}
               className="grayscale contrast-[100%] invert dark:invert-0 brightness-[.9]"
-            alt="product_image"
-            loading="eager"
-            priority
-          />
+              alt="product_image"
+              loading="eager"
+              priority
+            />
           </div>
         </div>
-      </div>
 
-      <div className="flex gap-3 flex-col ">
+        {/* Content */}
+        <div className="relative z-10 flex gap-3 flex-col">
         <span className="flex gap-3 items-center mb-12 ">
           <div className="w-full border-b dark:border-b-[hsl(var(--border))] rounded flex-1" />
           <div className="w-auto text-center flex-grow-1 flex-2 text-3xl font-logo">

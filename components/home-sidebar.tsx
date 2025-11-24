@@ -23,7 +23,6 @@ export default function HomeSidebar({ lang, dict }: HomeSidebarProps) {
   const allPages = getAllSections();
   const isCn = lang === "cn";
   const [hoveredPage, setHoveredPage] = useState<string | null>(null);
-  const [hoveredSections, setHoveredSections] = useState<Set<string>>(new Set());
 
   const getLabel = (labelKey: string): string => {
     const keys = labelKey.split(".");
@@ -46,68 +45,6 @@ export default function HomeSidebar({ lang, dict }: HomeSidebarProps) {
     return pageTitles[page] || page;
   };
 
-  const renderSection = (
-    section: SectionItem,
-    pageRoute: string,
-    level: number = 0,
-    parentKey: string = ""
-  ) => {
-    const label = getLabel(section.labelKey);
-    const href = `/${lang}${pageRoute}#${section.id}`;
-    const hasChildren = section.children && section.children.length > 0;
-    const sectionKey = `${pageRoute}-${section.id}`;
-    const isHovered = hoveredSections.has(sectionKey);
-
-    return (
-      <div
-        key={section.id}
-        className={cn("relative", level > 0 ? "mt-2" : "")}
-        onMouseEnter={() => {
-          if (hasChildren) {
-            setHoveredSections((prev) => new Set(prev).add(sectionKey));
-          }
-        }}
-        onMouseLeave={() => {
-          if (hasChildren) {
-            setHoveredSections((prev) => {
-              const next = new Set(prev);
-              next.delete(sectionKey);
-              return next;
-            });
-          }
-        }}
-      >
-        <Link
-          href={href}
-          className={cn(
-            "flex items-center gap-1.5 transition hover:text-foreground py-1",
-            level === 0
-              ? "font-medium text-foreground/80 text-sm"
-              : "text-xs text-muted-foreground"
-          )}
-        >
-          {hasChildren && (
-            <ChevronRight
-              className={cn(
-                "h-3 w-3 transition-transform",
-                isHovered ? "rotate-90" : ""
-              )}
-            />
-          )}
-          <span>{label}</span>
-        </Link>
-        {hasChildren && isHovered && section.children && (
-          <ul className="space-y-1.5 border-l border-border/60 pl-4 mt-2 ml-1.5">
-            {section.children.map((child) => (
-              <li key={child.id}>
-                {renderSection(child, pageRoute, level + 1, sectionKey)}
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-    );
-  };
 
   return (
     <aside>
@@ -130,11 +67,11 @@ export default function HomeSidebar({ lang, dict }: HomeSidebarProps) {
                 >
                   <Link
                     href={`/${lang}${pageConfig.route}`}
-                    className="flex items-center gap-1.5 font-semibold text-foreground/90 text-base transition hover:text-foreground py-1"
+                    className="flex items-center gap-1.5 font-medium text-foreground/80 transition hover:text-foreground"
                   >
                     <ChevronRight
                       className={cn(
-                        "h-3.5 w-3.5 transition-transform",
+                        "h-3 w-3 transition-transform",
                         isPageHovered ? "rotate-90" : ""
                       )}
                     />
@@ -142,9 +79,30 @@ export default function HomeSidebar({ lang, dict }: HomeSidebarProps) {
                   </Link>
                   {isPageHovered && (
                     <div className="space-y-2 pl-4 mt-2 border-l border-border/60">
-                      {pageConfig.sections.map((section) =>
-                        renderSection(section, pageConfig.route, 0)
-                      )}
+                      {pageConfig.sections.map((section) => (
+                        <div key={section.id} className="space-y-2">
+                          <Link
+                            href={`/${lang}${pageConfig.route}#${section.id}`}
+                            className="font-medium text-foreground/80 transition hover:text-foreground"
+                          >
+                            {getLabel(section.labelKey)}
+                          </Link>
+                          {section.children && section.children.length > 0 && (
+                            <ul className="space-y-1 border-l border-border/60 pl-3 text-xs text-muted-foreground">
+                              {section.children.map((child) => (
+                                <li key={child.id}>
+                                  <Link
+                                    href={`/${lang}${pageConfig.route}#${child.id}`}
+                                    className="transition hover:text-foreground"
+                                  >
+                                    {getLabel(child.labelKey)}
+                                  </Link>
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                        </div>
+                      ))}
                     </div>
                   )}
                 </div>
