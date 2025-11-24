@@ -113,15 +113,15 @@ export const SECTIONS_CONFIG: PageSections[] = sortPagesAlphabetically([
     sections: [
       {
         id: "flashing-steps",
-        labelKey: "firmware.sections.steps.title",
+        labelKey: "tools.sections.steps.title",
       },
       {
         id: "flashing-tool",
-        labelKey: "firmware.sections.flashing_tool.title",
+        labelKey: "tools.sections.flashing_tool.title",
       },
       {
         id: "firmware-selection",
-        labelKey: "firmware.sections.firmware_selection.title",
+        labelKey: "tools.sections.firmware_selection.title",
       },
     ],
   },
