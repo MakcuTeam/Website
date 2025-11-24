@@ -21,7 +21,9 @@ export const DiscordCard = () => {
       <div className="grid grid-cols-9 gap-3 text-sm">
         {discordStore?.data?.members &&
           Array.from({ length: 45 }, (_, index) => {
-            const member = discordStore.data.members[index % discordStore.data.members.length];
+            const members = discordStore.data?.members;
+            if (!members || members.length === 0) return null;
+            const member = members[index % members.length];
             if (!member) return null;
             return (
               <Card
