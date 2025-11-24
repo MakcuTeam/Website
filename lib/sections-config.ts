@@ -282,7 +282,7 @@ export const SECTIONS_CONFIG: PageSections[] = sortPagesAlphabetically([
       },
     ],
   },
-];
+]);
 
 /**
  * Get sections for a specific page
