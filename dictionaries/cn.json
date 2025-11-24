@@ -44,7 +44,8 @@
       "troubleshooting": "故障排除",
       "settings": "设置",
       "home": "首页",
-      "setup": "设置"
+      "setup": "设置",
+      "xim": "XIM"
     },
     "search": {
       "search_guide": "搜索指南...",
@@ -543,6 +544,46 @@
       "baud_binary": "波特率（二进制）",
       "no_usb": "无需 USB 设备的函数",
       "limits": "限制与解析"
+    }
+  },
+  "xim": {
+    "title": "XIM 设置指南",
+    "description": "了解如何为控制器支持设置 XIM 与 MAKCU。",
+    "sections": {
+      "setup": {
+        "title": "如何为控制器设置 XIM 与 MAKCU",
+        "prerequisites": {
+          "title": "前提条件",
+          "mouse_requirement": "需要工作正常的鼠标",
+          "mouse_requirement_desc": "XIM 设置必须使用工作正常的鼠标。鼠标将连接到 USB 3，一旦设置完成，将不再作为普通鼠标工作。",
+          "makcu_functional": "MAKCU 必须完全正常工作",
+          "makcu_functional_desc": "在尝试 XIM 设置之前，MAKCU 应该完全正常工作并在正常鼠标模式下工作。确保 MAKCU 在鼠标连接到 USB 3 时正常工作。",
+          "baud_rate_warning": "波特率警告",
+          "baud_rate_warning_desc": "MAKCU 的波特率必须与您的作弊软件预期速度匹配。在继续之前，确保波特率配置正确。",
+          "xim_guide_note": "XIM 设置指南",
+          "xim_guide_note_desc": "在将 MAKCU 连接到 XIM 之前，确保您已查看 XIM 设置指南，了解如何使用鼠标和控制器配置 XIM。请参考官方 XIM 文档了解按钮和摇杆映射。"
+        },
+        "xim_configuration": {
+          "title": "XIM 配置",
+          "important_note": "重要：本指南仅适用于将控制器与 MAKCU 一起使用。",
+          "xim_must_work": "XIM 必须首先完全正常工作",
+          "xim_must_work_desc": "在将 MAKCU 连接到 XIM 之前，XIM 应该与您选择的游戏完全正常工作。请参考 XIM 设置指南，了解如何使用鼠标和控制器配置 XIM，确保在尝试连接 MAKCU 之前，按钮和摇杆已映射到鼠标。",
+          "xim_testing": "测试 XIM 设置",
+          "xim_testing_desc": "应该测试 XIM，确保鼠标能够在游戏中移动右摇杆，并且鼠标按钮能够作为控制器按钮工作，以确保 XIM 已完全设置。"
+        },
+        "makcu_setup": {
+          "title": "MAKCU 设置要求",
+          "mouse_connection": "鼠标连接要求",
+          "mouse_connection_desc": "在使用 XIM + 控制器时，MAKCU 期望鼠标始终连接到 USB 3。",
+          "mouse_conversion_warning": "重要：鼠标功能",
+          "mouse_conversion_warning_desc": "一旦 XIM + MAKCU + 控制器 + 鼠标设置完成，由于鼠标转换为控制器输入，鼠标将不再正常工作。"
+        },
+        "connection": {
+          "title": "连接 XIM 和 MAKCU",
+          "final_steps": "最终连接步骤",
+          "final_steps_desc": "一旦 XIM 已完全设置且 MAKCU 已完全设置，请按照下面的视频所示继续连接两者。"
+        }
+      }
     }
   }
 }

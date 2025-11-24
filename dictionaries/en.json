@@ -52,7 +52,8 @@
       "troubleshooting": "Troubleshooting",
       "settings": "Settings",
       "home": "Home",
-      "setup": "Setup"
+      "setup": "Setup",
+      "xim": "XIM"
     },
     "search": {
       "search_guide": "Search Guide...",
@@ -552,6 +553,46 @@
       "baud_binary": "Baud Rate (Binary)",
       "no_usb": "Functions Without USB Device",
       "limits": "Limits & Parsing"
+    }
+  },
+  "xim": {
+    "title": "XIM Setup Guide",
+    "description": "Learn how to set up XIM with MAKCU for controller support.",
+    "sections": {
+      "setup": {
+        "title": "How to Setup XIM with MAKCU for Controller",
+        "prerequisites": {
+          "title": "Prerequisites",
+          "mouse_requirement": "Working Mouse Required",
+          "mouse_requirement_desc": "A working mouse must be used for XIM setup. The mouse will be connected to USB 3 and will no longer function as a normal mouse once the setup is complete.",
+          "makcu_functional": "MAKCU Must Be Fully Functional",
+          "makcu_functional_desc": "MAKCU should be fully functional and working in normal mouse mode before attempting XIM setup. Ensure MAKCU works correctly with a mouse connected to USB 3.",
+          "baud_rate_warning": "Baud Rate Warning",
+          "baud_rate_warning_desc": "MAKCU's baud rate must match your cheat's expected speed. Ensure the baud rate is correctly configured before proceeding.",
+          "xim_guide_note": "XIM Setup Guides",
+          "xim_guide_note_desc": "Before connecting MAKCU to XIM, ensure you have reviewed XIM setup guides for configuring XIM with a mouse and controller. Refer to official XIM documentation for button and stick mapping."
+        },
+        "xim_configuration": {
+          "title": "XIM Configuration",
+          "important_note": "Important: This guide is only for using controller with MAKCU.",
+          "xim_must_work": "XIM Must Be Fully Functional First",
+          "xim_must_work_desc": "Before MAKCU is connected to XIM, the XIM should be fully functional with the game of your choice. Please refer to the XIM setup guides in relation to how to configure the XIM with a mouse and controller, ensuring buttons and sticks are mapped to the mouse before even attempting to connect MAKCU.",
+          "xim_testing": "Testing XIM Setup",
+          "xim_testing_desc": "The XIM should be tested with the mouse able to move the right thumb stick in your game and the mouse buttons should function as controller buttons to ensure XIM has been fully setup."
+        },
+        "makcu_setup": {
+          "title": "MAKCU Setup Requirements",
+          "mouse_connection": "Mouse Connection Requirement",
+          "mouse_connection_desc": "MAKCU expects a mouse to be attached to USB 3 at all times when using XIM + controller.",
+          "mouse_conversion_warning": "Important: Mouse Functionality",
+          "mouse_conversion_warning_desc": "Once the XIM + MAKCU + controller + mouse is setup, the mouse will no longer be functional, due to the conversion of the mouse into controller input."
+        },
+        "connection": {
+          "title": "Connecting XIM and MAKCU",
+          "final_steps": "Final Connection Steps",
+          "final_steps_desc": "Once the XIM has been fully setup and MAKCU has been fully setup, proceed to connecting both as shown in the video below."
+        }
+      }
     }
   }
 }

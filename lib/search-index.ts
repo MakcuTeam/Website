@@ -71,6 +71,7 @@ export function buildSearchIndex(dict: Dictionary, lang: Locale): SearchResult[]
       api: dict.navbar.links.api,
       firmware: dict.navbar.links.makcu_tools,
       settings: dict.navbar.links.settings,
+      xim: dict.navbar.links.xim,
     };
     return pageTitles[page] || page;
   };

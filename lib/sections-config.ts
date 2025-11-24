@@ -291,6 +291,22 @@ export const SECTIONS_CONFIG: PageSections[] = [
       },
     ],
   },
+  {
+    page: "xim",
+    route: "/xim",
+    sections: [
+      {
+        id: "xim-setup",
+        labelKey: "xim.sections.setup.title",
+        children: [
+          { id: "prerequisites", labelKey: "xim.sections.setup.prerequisites.title" },
+          { id: "xim-configuration", labelKey: "xim.sections.setup.xim_configuration.title" },
+          { id: "makcu-setup", labelKey: "xim.sections.setup.makcu_setup.title" },
+          { id: "connection", labelKey: "xim.sections.setup.connection.title" },
+        ],
+      },
+    ],
+  },
 ];
 
 /**
