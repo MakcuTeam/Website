@@ -157,7 +157,7 @@ export const SECTIONS_CONFIG: PageSections[] = [
       },
       {
         id: "mouse-buttons",
-        labelKey: "api.sections.mouse_buttons",
+        labelKey: "api.sections.mouse_buttons.title",
         children: [
           { id: "buttons-individual", labelKey: "api.sections.mouse_buttons.buttons_individual" },
           { id: "click", labelKey: "api.sections.mouse_buttons.click" },
@@ -166,7 +166,7 @@ export const SECTIONS_CONFIG: PageSections[] = [
       },
       {
         id: "mouse-movement",
-        labelKey: "api.sections.mouse_movement",
+        labelKey: "api.sections.mouse_movement.title",
         children: [
           { id: "move", labelKey: "api.sections.mouse_movement.move" },
           { id: "moveto", labelKey: "api.sections.mouse_movement.moveto" },
@@ -179,7 +179,7 @@ export const SECTIONS_CONFIG: PageSections[] = [
       },
       {
         id: "mouse-advanced",
-        labelKey: "api.sections.mouse_advanced",
+        labelKey: "api.sections.mouse_advanced.title",
         children: [
           { id: "mo", labelKey: "api.sections.mouse_advanced.mo" },
           { id: "lock", labelKey: "api.sections.mouse_advanced.lock" },
@@ -188,7 +188,7 @@ export const SECTIONS_CONFIG: PageSections[] = [
       },
       {
         id: "keyboard",
-        labelKey: "api.sections.keyboard",
+        labelKey: "api.sections.keyboard.title",
         children: [
           { id: "down", labelKey: "api.sections.keyboard.down" },
           { id: "up", labelKey: "api.sections.keyboard.up" },
@@ -202,7 +202,7 @@ export const SECTIONS_CONFIG: PageSections[] = [
       },
       {
         id: "streaming",
-        labelKey: "api.sections.streaming",
+        labelKey: "api.sections.streaming.title",
         children: [
           { id: "keys-stream", labelKey: "api.sections.streaming.keys" },
           { id: "buttons-stream", labelKey: "api.sections.streaming.buttons" },
@@ -212,14 +212,14 @@ export const SECTIONS_CONFIG: PageSections[] = [
       },
       {
         id: "screen",
-        labelKey: "api.sections.screen",
+        labelKey: "api.sections.screen.title",
         children: [
           { id: "screen-cmd", labelKey: "api.sections.screen.screen_cmd" },
         ],
       },
       {
         id: "system",
-        labelKey: "api.sections.system",
+        labelKey: "api.sections.system.title",
         children: [
           { id: "help", labelKey: "api.sections.system.help" },
           { id: "info", labelKey: "api.sections.system.info" },
@@ -232,7 +232,7 @@ export const SECTIONS_CONFIG: PageSections[] = [
       },
       {
         id: "config",
-        labelKey: "api.sections.config",
+        labelKey: "api.sections.config.title",
         children: [
           { id: "log", labelKey: "api.sections.config.log" },
           { id: "echo", labelKey: "api.sections.config.echo" },
