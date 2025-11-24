@@ -25,6 +25,10 @@ export const SECTIONS_CONFIG: PageSections[] = [
     route: "/setup",
     sections: [
       {
+        id: "requirements",
+        labelKey: "setup.sections.requirements.title",
+      },
+      {
         id: "install-driver",
         labelKey: "setup.sections.install_driver.title",
       },
@@ -78,10 +82,6 @@ export const SECTIONS_CONFIG: PageSections[] = [
             labelKey: "troubleshooting.connection_status.overview",
           },
         ],
-      },
-      {
-        id: "prerequisites",
-        labelKey: "setup.requirements.title",
       },
     ],
   },

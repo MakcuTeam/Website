@@ -62,6 +62,60 @@ export default async function SetupPage({ params }: LangProps) {
         />
 
         <div className="space-y-20">
+          {/* Requirements Section */}
+          <Section
+            id="requirements"
+            badge={t("Setup", "设置")}
+            title={dict.setup.sections.requirements.title}
+          >
+            <Card className="border-border/60 bg-card/90 shadow-lg">
+              <CardContent className="p-6">
+                <ul className="space-y-6">
+                  <li>
+                    <div className="space-y-2">
+                      <h4 className="font-semibold text-foreground">
+                        {dict.setup.sections.requirements.ch343_driver}
+                      </h4>
+                      <p className="text-sm leading-relaxed text-muted-foreground">
+                        {dict.setup.sections.requirements.ch343_desc}
+                      </p>
+                    </div>
+                  </li>
+                  <li>
+                    <div className="space-y-2">
+                      <h4 className="font-semibold text-foreground">
+                        {dict.setup.sections.requirements.com_port}
+                      </h4>
+                      <p className="text-sm leading-relaxed text-muted-foreground">
+                        {dict.setup.sections.requirements.com_port_desc}
+                      </p>
+                    </div>
+                  </li>
+                  <li>
+                    <div className="space-y-2">
+                      <h4 className="font-semibold text-foreground">
+                        {dict.setup.sections.requirements.both_sides}
+                      </h4>
+                      <p className="text-sm leading-relaxed text-muted-foreground">
+                        {dict.setup.sections.requirements.both_sides_desc}
+                      </p>
+                    </div>
+                  </li>
+                  <li>
+                    <div className="space-y-2">
+                      <h4 className="font-semibold text-foreground">
+                        {dict.setup.sections.requirements.supported_device}
+                      </h4>
+                      <p className="text-sm leading-relaxed text-muted-foreground">
+                        {dict.setup.sections.requirements.supported_device_desc}
+                      </p>
+                    </div>
+                  </li>
+                </ul>
+              </CardContent>
+            </Card>
+          </Section>
+
           {/* Install Driver Section */}
           <Section
             id="install-driver"
@@ -490,59 +544,6 @@ export default async function SetupPage({ params }: LangProps) {
             </Card>
           </Section>
 
-          {/* Requirements */}
-          <Section
-            id="prerequisites"
-            badge={t("Setup", "设置")}
-            title={dict.setup.sections.requirements.title}
-          >
-            <Card className="border-border/60 bg-card/90 shadow-lg">
-              <CardContent className="p-6">
-                <ul className="space-y-6">
-                  <li>
-                    <div className="space-y-2">
-                      <h4 className="font-semibold text-foreground">
-                        {dict.setup.sections.requirements.ch343_driver}
-                      </h4>
-                      <p className="text-sm leading-relaxed text-muted-foreground">
-                        {dict.setup.sections.requirements.ch343_desc}
-                      </p>
-                    </div>
-                  </li>
-                  <li>
-                    <div className="space-y-2">
-                      <h4 className="font-semibold text-foreground">
-                        {dict.setup.sections.requirements.com_port}
-                      </h4>
-                      <p className="text-sm leading-relaxed text-muted-foreground">
-                        {dict.setup.sections.requirements.com_port_desc}
-                      </p>
-                    </div>
-                  </li>
-                  <li>
-                    <div className="space-y-2">
-                      <h4 className="font-semibold text-foreground">
-                        {dict.setup.sections.requirements.both_sides}
-                      </h4>
-                      <p className="text-sm leading-relaxed text-muted-foreground">
-                        {dict.setup.sections.requirements.both_sides_desc}
-                      </p>
-                    </div>
-                  </li>
-                  <li>
-                    <div className="space-y-2">
-                      <h4 className="font-semibold text-foreground">
-                        {dict.setup.sections.requirements.supported_device}
-                      </h4>
-                      <p className="text-sm leading-relaxed text-muted-foreground">
-                        {dict.setup.sections.requirements.supported_device_desc}
-                      </p>
-                    </div>
-                  </li>
-                </ul>
-              </CardContent>
-            </Card>
-          </Section>
         </div>
       </div>
     </div>
