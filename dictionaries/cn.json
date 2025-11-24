@@ -528,12 +528,5 @@
       "no_usb": "无需 USB 设备的函数",
       "limits": "限制与解析"
     }
-  },
-  "settings": {
-    "title": "MAKCU 设置",
-    "description": "通过 WebSerial 连接配置和交互您的 MAKCU 设备。",
-    "sections": {
-      "status": "状态"
-    }
   }
 }

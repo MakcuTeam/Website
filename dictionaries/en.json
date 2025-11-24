@@ -537,12 +537,5 @@
       "no_usb": "Functions Without USB Device",
       "limits": "Limits & Parsing"
     }
-  },
-  "settings": {
-    "title": "MAKCU Settings",
-    "description": "Configure and interact with your MAKCU device via WebSerial connection.",
-    "sections": {
-      "status": "Status"
-    }
   }
 }
