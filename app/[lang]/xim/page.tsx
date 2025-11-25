@@ -127,6 +127,30 @@ export default async function XimPage({ params }: LangProps) {
                         </p>
                       </div>
                     </li>
+                    <li>
+                      <div className="space-y-2">
+                        <h4 className="font-semibold text-foreground">
+                          {dict.xim.sections.setup.prerequisites.mouse_conversion_important}
+                        </h4>
+                        <div className="p-4 rounded-lg bg-blue-500/10 border border-blue-500/20">
+                          <p className="text-sm text-blue-600 dark:text-blue-400">
+                            {dict.xim.sections.setup.prerequisites.mouse_conversion_important_desc}
+                          </p>
+                        </div>
+                      </div>
+                    </li>
+                    <li>
+                      <div className="space-y-2">
+                        <h4 className="font-semibold text-foreground">
+                          {dict.xim.sections.setup.prerequisites.mouse_removal_warning}
+                        </h4>
+                        <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/20">
+                          <p className="text-sm text-red-600 dark:text-red-400">
+                            {dict.xim.sections.setup.prerequisites.mouse_removal_warning_desc}
+                          </p>
+                        </div>
+                      </div>
+                    </li>
                   </ul>
                 </CardContent>
               </Card>
