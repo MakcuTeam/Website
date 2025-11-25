@@ -313,9 +313,9 @@ export const SECTIONS_CONFIG: PageSections[] = sortPagesAlphabetically([
         labelKey: "xim.sections.setup.title",
         children: [
           { id: "prerequisites", labelKey: "xim.sections.setup.prerequisites.title" },
-          { id: "xim-configuration", labelKey: "xim.sections.setup.xim_configuration.title" },
-          { id: "makcu-setup", labelKey: "xim.sections.setup.makcu_setup.title" },
-          { id: "connection", labelKey: "xim.sections.setup.connection.title" },
+          { id: "step1-prepare-xim", labelKey: "xim.sections.setup.step1_prepare_xim.title" },
+          { id: "step2-prepare-makcu", labelKey: "xim.sections.setup.step2_prepare_makcu.title" },
+          { id: "step3-connect", labelKey: "xim.sections.setup.step3_connect.title" },
         ],
       },
     ],

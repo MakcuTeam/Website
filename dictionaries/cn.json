@@ -554,38 +554,35 @@
         "title": "如何为控制器设置 XIM 与 MAKCU",
         "prerequisites": {
           "title": "前提条件",
-          "mouse_requirement": "需要工作正常的鼠标",
-          "mouse_requirement_desc": "XIM 设置必须使用工作正常的鼠标。鼠标必须始终保持连接到 USB 3，以便 MAKCU 与自瞄功能正常工作。移除鼠标将导致作弊功能停止工作。",
-          "makcu_functional": "MAKCU 必须完全正常工作",
-          "makcu_functional_desc": "在尝试 XIM 设置之前，MAKCU 应该完全正常工作并在正常鼠标模式下工作。确保 MAKCU 在鼠标连接到 USB 3 时正常工作。",
-          "baud_rate_warning": "波特率警告",
-          "baud_rate_warning_desc": "MAKCU 的波特率必须与您的作弊软件预期速度匹配。在继续之前，确保波特率配置正确。",
-          "xim_guide_note": "XIM 设置指南",
-          "xim_guide_note_desc": "在将 MAKCU 连接到 XIM 之前，确保您已查看 XIM 设置指南，了解如何使用鼠标和控制器配置 XIM。请参考官方 XIM 文档了解按钮和摇杆映射。",
-          "mouse_conversion_important": "重要",
-          "mouse_conversion_important_desc": "如果您使用 XIM 与控制器，由于 XIM 将 MAKCU 的鼠标输入转换为控制器输入，连接到 USB 的鼠标将不再作为鼠标工作。如果您仍需要鼠标输入，应将另一个鼠标连接到您的 PC（而不是 MAKCU）。",
-          "mouse_removal_warning": "警告",
-          "mouse_removal_warning_desc": "如果您从 USB 3 移除鼠标，MAKCU 将关闭，作弊功能将停止！"
-        },
-        "xim_configuration": {
-          "title": "XIM 配置",
           "important_note": "重要：本指南仅适用于将控制器与 MAKCU 一起使用。",
-          "xim_must_work": "XIM 必须首先完全正常工作",
-          "xim_must_work_desc": "在将 MAKCU 连接到 XIM 之前，XIM 应该与您选择的游戏完全正常工作。请参考 XIM 设置指南，了解如何使用鼠标和控制器配置 XIM，确保在尝试连接 MAKCU 之前，按钮和摇杆已映射到鼠标。",
+          "baud_rate_warning": "波特率配置",
+          "baud_rate_warning_desc": "MAKCU 的波特率必须与您的作弊软件预期速度匹配。在继续之前，确保波特率配置正确。",
+          "mouse_conversion_important": "鼠标功能",
+          "mouse_conversion_important_desc": "如果您使用 XIM 与控制器，由于 XIM 将 MAKCU 的鼠标输入转换为控制器输入，连接到 USB 3 的鼠标将不再作为鼠标工作。如果您仍需要鼠标输入，应将另一个鼠标连接到您的 PC（而不是 MAKCU）。",
+          "mouse_removal_warning": "严重警告",
+          "mouse_removal_warning_desc": "鼠标必须始终保持连接到 USB 3。如果您从 USB 3 移除鼠标，MAKCU 将关闭，作弊功能将停止！"
+        },
+        "step1_prepare_xim": {
+          "title": "步骤 1：准备 XIM",
+          "description": "在连接 MAKCU 之前，您的 XIM 必须与您的游戏完全正常工作。",
+          "xim_must_work": "XIM 必须首先正常工作",
+          "xim_must_work_desc": "XIM 应该与您选择的游戏完全正常工作。请参考 XIM 设置指南，了解如何使用鼠标和控制器配置 XIM，确保按钮和摇杆已映射到鼠标。",
           "xim_testing": "测试 XIM 设置",
-          "xim_testing_desc": "应该测试 XIM，确保鼠标能够在游戏中移动右摇杆，并且鼠标按钮能够作为控制器按钮工作，以确保 XIM 已完全设置。"
+          "xim_testing_desc": "测试鼠标是否能够在游戏中移动右摇杆，以及鼠标按钮是否能够作为控制器按钮工作。只有在 XIM 正常工作后才能继续。"
         },
-        "makcu_setup": {
-          "title": "MAKCU 设置要求",
-          "mouse_connection": "鼠标连接要求",
-          "mouse_connection_desc": "在使用 XIM + 控制器时，MAKCU 期望鼠标始终连接到 USB 3。鼠标必须始终保持连接，以便 MAKCU 与自瞄功能正常工作。移除鼠标将导致作弊功能停止工作。",
-          "mouse_conversion_warning": "重要：鼠标功能",
-          "mouse_conversion_warning_desc": "一旦 XIM + MAKCU + 控制器 + 鼠标设置完成，由于鼠标转换为控制器输入，鼠标将不再正常工作。"
+        "step2_prepare_makcu": {
+          "title": "步骤 2：准备 MAKCU",
+          "description": "在连接到 XIM 之前，确保 MAKCU 完全正常工作。",
+          "makcu_functional": "MAKCU 必须完全正常工作",
+          "makcu_functional_desc": "MAKCU 应该完全正常工作并在正常鼠标模式下工作。确保 MAKCU 在鼠标连接到 USB 3 时正常工作。",
+          "mouse_requirement": "需要工作正常的鼠标",
+          "mouse_requirement_desc": "必须将工作正常的鼠标连接到 USB 3。此鼠标必须始终保持连接，以便 MAKCU 与自瞄功能正常工作。"
         },
-        "connection": {
-          "title": "连接 XIM 和 MAKCU",
-          "final_steps": "最终连接步骤",
-          "final_steps_desc": "一旦 XIM 已完全设置且 MAKCU 已完全设置，请按照下面的视频所示继续连接两者。"
+        "step3_connect": {
+          "title": "步骤 3：连接 XIM 和 MAKCU",
+          "description": "一旦 XIM 和 MAKCU 都完全准备好，将它们连接在一起。",
+          "final_steps": "连接步骤",
+          "final_steps_desc": "按照下面的视频所示连接 XIM 和 MAKCU。在连接之前，确保两个设备都完全正常工作。"
         }
       }
     }

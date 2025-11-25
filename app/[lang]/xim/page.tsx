@@ -72,7 +72,7 @@ export default async function XimPage({ params }: LangProps) {
             lead={
               <div className="space-y-2">
                 <p className="text-base leading-relaxed text-muted-foreground">
-                  {dict.xim.sections.setup.xim_configuration.important_note}
+                  {dict.xim.sections.setup.prerequisites.important_note}
                 </p>
               </div>
             }
@@ -84,100 +84,67 @@ export default async function XimPage({ params }: LangProps) {
             >
               <Card className="border-border/60 bg-card/90 shadow-lg">
                 <CardContent className="p-6">
-                  <ul className="space-y-6">
-                    <li>
-                      <div className="space-y-2">
-                        <h4 className="font-semibold text-foreground">
-                          {dict.xim.sections.setup.prerequisites.mouse_requirement}
-                        </h4>
-                        <p className="text-sm leading-relaxed text-muted-foreground">
-                          {dict.xim.sections.setup.prerequisites.mouse_requirement_desc}
+                  <div className="space-y-6">
+                    <div>
+                      <h4 className="font-semibold text-foreground mb-2">
+                        {dict.xim.sections.setup.prerequisites.baud_rate_warning}
+                      </h4>
+                      <div className="p-4 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
+                        <p className="text-sm text-yellow-600 dark:text-yellow-400">
+                          {dict.xim.sections.setup.prerequisites.baud_rate_warning_desc}
                         </p>
                       </div>
-                    </li>
-                    <li>
-                      <div className="space-y-2">
-                        <h4 className="font-semibold text-foreground">
-                          {dict.xim.sections.setup.prerequisites.makcu_functional}
-                        </h4>
-                        <p className="text-sm leading-relaxed text-muted-foreground">
-                          {dict.xim.sections.setup.prerequisites.makcu_functional_desc}
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-foreground mb-2">
+                        {dict.xim.sections.setup.prerequisites.mouse_conversion_important}
+                      </h4>
+                      <div className="p-4 rounded-lg bg-blue-500/10 border border-blue-500/20">
+                        <p className="text-sm text-blue-600 dark:text-blue-400">
+                          {dict.xim.sections.setup.prerequisites.mouse_conversion_important_desc}
                         </p>
                       </div>
-                    </li>
-                    <li>
-                      <div className="space-y-2">
-                        <h4 className="font-semibold text-foreground">
-                          {dict.xim.sections.setup.prerequisites.baud_rate_warning}
-                        </h4>
-                        <div className="p-4 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
-                          <p className="text-sm text-yellow-600 dark:text-yellow-400">
-                            {dict.xim.sections.setup.prerequisites.baud_rate_warning_desc}
-                          </p>
-                        </div>
-                      </div>
-                    </li>
-                    <li>
-                      <div className="space-y-2">
-                        <h4 className="font-semibold text-foreground">
-                          {dict.xim.sections.setup.prerequisites.xim_guide_note}
-                        </h4>
-                        <p className="text-sm leading-relaxed text-muted-foreground">
-                          {dict.xim.sections.setup.prerequisites.xim_guide_note_desc}
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-foreground mb-2">
+                        {dict.xim.sections.setup.prerequisites.mouse_removal_warning}
+                      </h4>
+                      <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/20">
+                        <p className="text-sm text-red-600 dark:text-red-400">
+                          {dict.xim.sections.setup.prerequisites.mouse_removal_warning_desc}
                         </p>
                       </div>
-                    </li>
-                    <li>
-                      <div className="space-y-2">
-                        <h4 className="font-semibold text-foreground">
-                          {dict.xim.sections.setup.prerequisites.mouse_conversion_important}
-                        </h4>
-                        <div className="p-4 rounded-lg bg-blue-500/10 border border-blue-500/20">
-                          <p className="text-sm text-blue-600 dark:text-blue-400">
-                            {dict.xim.sections.setup.prerequisites.mouse_conversion_important_desc}
-                          </p>
-                        </div>
-                      </div>
-                    </li>
-                    <li>
-                      <div className="space-y-2">
-                        <h4 className="font-semibold text-foreground">
-                          {dict.xim.sections.setup.prerequisites.mouse_removal_warning}
-                        </h4>
-                        <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/20">
-                          <p className="text-sm text-red-600 dark:text-red-400">
-                            {dict.xim.sections.setup.prerequisites.mouse_removal_warning_desc}
-                          </p>
-                        </div>
-                      </div>
-                    </li>
-                  </ul>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
             </SubSection>
 
-            {/* XIM Configuration SubSection */}
+            {/* Step 1: Prepare XIM */}
             <SubSection
-              id="xim-configuration"
-              title={dict.xim.sections.setup.xim_configuration.title}
+              id="step1-prepare-xim"
+              title={dict.xim.sections.setup.step1_prepare_xim.title}
             >
               <Card className="border-border/60 bg-card/90 shadow-lg">
                 <CardContent className="p-6">
                   <div className="space-y-6">
+                    <p className="text-sm leading-relaxed text-muted-foreground">
+                      {dict.xim.sections.setup.step1_prepare_xim.description}
+                    </p>
                     <div>
                       <h4 className="font-semibold text-foreground mb-2">
-                        {dict.xim.sections.setup.xim_configuration.xim_must_work}
+                        {dict.xim.sections.setup.step1_prepare_xim.xim_must_work}
                       </h4>
                       <p className="text-sm leading-relaxed text-muted-foreground">
-                        {dict.xim.sections.setup.xim_configuration.xim_must_work_desc}
+                        {dict.xim.sections.setup.step1_prepare_xim.xim_must_work_desc}
                       </p>
                     </div>
                     <div>
                       <h4 className="font-semibold text-foreground mb-2">
-                        {dict.xim.sections.setup.xim_configuration.xim_testing}
+                        {dict.xim.sections.setup.step1_prepare_xim.xim_testing}
                       </h4>
                       <p className="text-sm leading-relaxed text-muted-foreground">
-                        {dict.xim.sections.setup.xim_configuration.xim_testing_desc}
+                        {dict.xim.sections.setup.step1_prepare_xim.xim_testing_desc}
                       </p>
                     </div>
                   </div>
@@ -185,28 +152,31 @@ export default async function XimPage({ params }: LangProps) {
               </Card>
             </SubSection>
 
-            {/* MAKCU Setup SubSection */}
+            {/* Step 2: Prepare MAKCU */}
             <SubSection
-              id="makcu-setup"
-              title={dict.xim.sections.setup.makcu_setup.title}
+              id="step2-prepare-makcu"
+              title={dict.xim.sections.setup.step2_prepare_makcu.title}
             >
               <Card className="border-border/60 bg-card/90 shadow-lg">
                 <CardContent className="p-6">
                   <div className="space-y-6">
+                    <p className="text-sm leading-relaxed text-muted-foreground">
+                      {dict.xim.sections.setup.step2_prepare_makcu.description}
+                    </p>
                     <div>
                       <h4 className="font-semibold text-foreground mb-2">
-                        {dict.xim.sections.setup.makcu_setup.mouse_connection}
+                        {dict.xim.sections.setup.step2_prepare_makcu.makcu_functional}
                       </h4>
                       <p className="text-sm leading-relaxed text-muted-foreground">
-                        {dict.xim.sections.setup.makcu_setup.mouse_connection_desc}
+                        {dict.xim.sections.setup.step2_prepare_makcu.makcu_functional_desc}
                       </p>
                     </div>
-                    <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/20">
-                      <h4 className="font-semibold text-red-600 dark:text-red-400 mb-2">
-                        {dict.xim.sections.setup.makcu_setup.mouse_conversion_warning}
+                    <div>
+                      <h4 className="font-semibold text-foreground mb-2">
+                        {dict.xim.sections.setup.step2_prepare_makcu.mouse_requirement}
                       </h4>
-                      <p className="text-sm text-red-600 dark:text-red-400">
-                        {dict.xim.sections.setup.makcu_setup.mouse_conversion_warning_desc}
+                      <p className="text-sm leading-relaxed text-muted-foreground">
+                        {dict.xim.sections.setup.step2_prepare_makcu.mouse_requirement_desc}
                       </p>
                     </div>
                   </div>
@@ -214,20 +184,23 @@ export default async function XimPage({ params }: LangProps) {
               </Card>
             </SubSection>
 
-            {/* Connection SubSection with Video */}
+            {/* Step 3: Connect */}
             <SubSection
-              id="connection"
-              title={dict.xim.sections.setup.connection.title}
+              id="step3-connect"
+              title={dict.xim.sections.setup.step3_connect.title}
             >
               <Card className="border-border/60 bg-card/90 shadow-lg">
                 <CardContent className="p-6">
                   <div className="space-y-6">
+                    <p className="text-sm leading-relaxed text-muted-foreground">
+                      {dict.xim.sections.setup.step3_connect.description}
+                    </p>
                     <div>
                       <h4 className="font-semibold text-foreground mb-2">
-                        {dict.xim.sections.setup.connection.final_steps}
+                        {dict.xim.sections.setup.step3_connect.final_steps}
                       </h4>
                       <p className="text-sm leading-relaxed text-muted-foreground">
-                        {dict.xim.sections.setup.connection.final_steps_desc}
+                        {dict.xim.sections.setup.step3_connect.final_steps_desc}
                       </p>
                     </div>
                     
