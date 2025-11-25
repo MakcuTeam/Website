@@ -63,7 +63,7 @@ export const DiscordCard = () => {
             className="relative bg-transparent backdrop-blur-sm flex gap-3 items-center justify-between uppercase max-w-40 min-w-40 overflow-hidden"
             key={`${member.id}-${index}`}
           >
-            <span className="overflow-hidden pl-3 whitespace-nowrap text-ellipsis">
+            <span className="overflow-hidden pl-3 whitespace-nowrap">
               {member.username}
             </span>
             <Avatar className="rounded-none w-12 h-12">
