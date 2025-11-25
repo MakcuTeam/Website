@@ -30,10 +30,10 @@ export const DiscordCard = () => {
       return;
     }
     
-    // Always shuffle and take up to 45 unique members
+    // Always shuffle and take up to 72 unique members (8 rows x 9 columns)
     // This ensures no duplicates and random order
     const shuffled = shuffleArray(members);
-    setRandomizedMembers(shuffled.slice(0, 45));
+    setRandomizedMembers(shuffled.slice(0, 72));
   };
 
   // Randomize on every mount (page load/navigation)

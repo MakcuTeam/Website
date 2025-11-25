@@ -43,8 +43,8 @@ export const fetchDiscordData = createAsyncThunk(
         throw new Error("Failed to fetch data");
       }
       const data = await response.json();
-      // Limit members to 200 to save bandwidth (we only need 45 for display)
-      // This ensures we have enough for randomization while keeping data transfer minimal
+      // Limit members to 200 to save bandwidth (we need 72 for display: 8 rows x 9 columns)
+      // This ensures we have enough unique members for randomization while keeping data transfer minimal
       if (data.members && Array.isArray(data.members)) {
         data.members = data.members.slice(0, 200);
       }
