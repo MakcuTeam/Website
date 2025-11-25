@@ -564,7 +564,7 @@
         "prerequisites": {
           "title": "Prerequisites",
           "mouse_requirement": "Working Mouse Required",
-          "mouse_requirement_desc": "A working mouse must be used for XIM setup. The mouse will be connected to USB 3 and will no longer function as a normal mouse once the setup is complete.",
+          "mouse_requirement_desc": "A working mouse must be used for XIM setup. The mouse must remain connected to USB 3 at all times for MAKCU to function with the aimbot. Removal of the mouse will stop the cheat from working.",
           "makcu_functional": "MAKCU Must Be Fully Functional",
           "makcu_functional_desc": "MAKCU should be fully functional and working in normal mouse mode before attempting XIM setup. Ensure MAKCU works correctly with a mouse connected to USB 3.",
           "baud_rate_warning": "Baud Rate Warning",
@@ -583,7 +583,7 @@
         "makcu_setup": {
           "title": "MAKCU Setup Requirements",
           "mouse_connection": "Mouse Connection Requirement",
-          "mouse_connection_desc": "MAKCU expects a mouse to be attached to USB 3 at all times when using XIM + controller.",
+          "mouse_connection_desc": "MAKCU expects a mouse to be attached to USB 3 at all times when using XIM + controller. The mouse must remain connected at all times for MAKCU to function with the aimbot. Removing the mouse will stop the cheat from working.",
           "mouse_conversion_warning": "Important: Mouse Functionality",
           "mouse_conversion_warning_desc": "Once the XIM + MAKCU + controller + mouse is setup, the mouse will no longer be functional, due to the conversion of the mouse into controller input."
         },

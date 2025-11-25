@@ -555,7 +555,7 @@
         "prerequisites": {
           "title": "前提条件",
           "mouse_requirement": "需要工作正常的鼠标",
-          "mouse_requirement_desc": "XIM 设置必须使用工作正常的鼠标。鼠标将连接到 USB 3，一旦设置完成，将不再作为普通鼠标工作。",
+          "mouse_requirement_desc": "XIM 设置必须使用工作正常的鼠标。鼠标必须始终保持连接到 USB 3，以便 MAKCU 与自瞄功能正常工作。移除鼠标将导致作弊功能停止工作。",
           "makcu_functional": "MAKCU 必须完全正常工作",
           "makcu_functional_desc": "在尝试 XIM 设置之前，MAKCU 应该完全正常工作并在正常鼠标模式下工作。确保 MAKCU 在鼠标连接到 USB 3 时正常工作。",
           "baud_rate_warning": "波特率警告",
@@ -574,7 +574,7 @@
         "makcu_setup": {
           "title": "MAKCU 设置要求",
           "mouse_connection": "鼠标连接要求",
-          "mouse_connection_desc": "在使用 XIM + 控制器时，MAKCU 期望鼠标始终连接到 USB 3。",
+          "mouse_connection_desc": "在使用 XIM + 控制器时，MAKCU 期望鼠标始终连接到 USB 3。鼠标必须始终保持连接，以便 MAKCU 与自瞄功能正常工作。移除鼠标将导致作弊功能停止工作。",
           "mouse_conversion_warning": "重要：鼠标功能",
           "mouse_conversion_warning_desc": "一旦 XIM + MAKCU + 控制器 + 鼠标设置完成，由于鼠标转换为控制器输入，鼠标将不再正常工作。"
         },
