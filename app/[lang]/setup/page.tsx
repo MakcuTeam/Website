@@ -426,6 +426,11 @@ export default async function SetupPage({ params }: LangProps) {
                       <p className="text-sm leading-relaxed text-muted-foreground pl-5">
                         {dict.troubleshooting.connection_status.statuses.normal_mode.description}
                       </p>
+                      <div className="ml-5 mt-2 p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
+                        <p className="text-sm text-yellow-600 dark:text-yellow-400">
+                          {dict.troubleshooting.connection_status.statuses.normal_mode.com_port_warning}
+                        </p>
+                      </div>
                     </div>
 
                     {/* Flash Mode */}

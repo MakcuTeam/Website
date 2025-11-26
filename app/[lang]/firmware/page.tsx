@@ -143,6 +143,17 @@ export default async function FirmwarePage({ params }: LangProps) {
             title={dict.tools.sections.flashing_tool.title}
             lead={<p className="text-base leading-relaxed text-muted-foreground">{dict.tools.sections.flashing_tool.description}</p>}
           >
+            {/* COM Port Warning */}
+            <Card className="border-yellow-500/40 bg-yellow-500/10 shadow-lg mb-6">
+              <CardContent className="p-6">
+                <h4 className="font-semibold text-yellow-600 dark:text-yellow-400 mb-2">
+                  {dict.tools.sections.flashing_tool.com_port_warning_title}
+                </h4>
+                <p className="text-sm text-yellow-600 dark:text-yellow-400">
+                  {dict.tools.sections.flashing_tool.com_port_warning_desc}
+                </p>
+              </CardContent>
+            </Card>
             <DeviceTool lang={lang} dict={dict} />
           </Section>
 

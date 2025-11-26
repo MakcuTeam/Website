@@ -107,7 +107,9 @@
       },
       "flashing_tool": {
         "title": "刷写工具",
-        "description": "使用下面的工具将固件刷写到您的 MAKCU 设备。"
+        "description": "使用下面的工具将固件刷写到您的 MAKCU 设备。",
+        "com_port_warning_title": "重要：COM 端口限制",
+        "com_port_warning_desc": "此工具仅用于刷写和测试 MAKCU。MAKCU 仅允许一个设备同时连接到 USB 2（COM 端口）。请确保在使用 MAKCU 与您的作弊软件之前关闭此 AIO 工具，否则您的作弊软件将无法连接。"
       },
       "firmware_selection": {
         "title": "固件选择",
@@ -167,7 +169,8 @@
         "normal_mode": {
           "label": "正常模式",
           "description": "MAKCU 已连接并在正常模式下运行。您可以使用设置页面配置和测试 MAKCU。USB 1 连接到游戏 PC，USB 2 是 COM 端口，USB 3 应连接到您的鼠标或键盘。**3.9 固件仅支持键盘。",
-          "color": "绿色（翠绿色）"
+          "color": "绿色（翠绿色）",
+          "com_port_warning": "重要：MAKCU 仅允许一个设备同时连接到 USB 2（COM 端口）。在使用 MAKCU 与您的作弊软件之前，请关闭此工具。"
         },
         "flash_mode": {
           "label": "刷写模式",

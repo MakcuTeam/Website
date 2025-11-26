@@ -115,7 +115,9 @@
       },
       "flashing_tool": {
         "title": "Flashing Tool",
-        "description": "Use the tool below to flash firmware to your MAKCU device."
+        "description": "Use the tool below to flash firmware to your MAKCU device.",
+        "com_port_warning_title": "Important: COM Port Limitation",
+        "com_port_warning_desc": "This tool is only for flashing and testing MAKCU. MAKCU only allows one device to be connected to USB 2 (COM port) at a time. Please ensure this AIO tool is closed before using MAKCU with your cheat software, otherwise your cheat will not be able to connect."
       },
       "firmware_selection": {
         "title": "Firmware Selection",
@@ -174,7 +176,8 @@
         "normal_mode": {
           "label": "Normal mode",
           "description": "MAKCU is connected and running in normal mode. You can use the settings page to configure and test MAKCU. USB 1 is connected to gaming PC, USB 2 is the COM port, USB 3 should be connected to either your mouse or keyboard. **3.9 fw only supports keyboard.",
-          "color": "Green (emerald)"
+          "color": "Green (emerald)",
+          "com_port_warning": "Important: MAKCU only allows one device connected to USB 2 (COM port) at a time. Close this tool before using MAKCU with your cheat software."
         },
         "flash_mode": {
           "label": "Flash mode",
