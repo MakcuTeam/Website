@@ -570,7 +570,7 @@
           "baud_rate_warning": "Baud Rate Configuration",
           "baud_rate_warning_desc": "MAKCU's baud rate must match your cheat's expected speed. Ensure the baud rate is correctly configured before proceeding.",
           "mouse_conversion_important": "Mouse Functionality",
-          "mouse_conversion_important_desc": "If you are using XIM with controller, the mouse attached to USB 3 will no longer function as a mouse due to the XIM converting MAKCU's mouse inputs to controller. If you still need mouse inputs, you should connect another mouse to your PC (not MAKCU).",
+          "mouse_conversion_important_desc": "When using XIM with controller, the mouse attached to USB 3 will no longer function as a mouse due to XIM converting MAKCU's mouse inputs to controller inputs. If you need a mouse to navigate your gaming PC while XIM + MAKCU is connected, connect another mouse directly to your PC (this means you need 2 mice: one for MAKCU, one for your PC).",
           "mouse_removal_warning": "Critical Warning",
           "mouse_removal_warning_desc": "The mouse must remain connected to USB 3 at all times. If you remove the mouse from USB 3, MAKCU will shut down and the cheat will stop!"
         },

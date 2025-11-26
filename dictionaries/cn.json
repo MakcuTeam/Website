@@ -561,7 +561,7 @@
           "baud_rate_warning": "波特率配置",
           "baud_rate_warning_desc": "MAKCU 的波特率必须与您的作弊软件预期速度匹配。在继续之前，确保波特率配置正确。",
           "mouse_conversion_important": "鼠标功能",
-          "mouse_conversion_important_desc": "如果您使用 XIM 与控制器，由于 XIM 将 MAKCU 的鼠标输入转换为控制器输入，连接到 USB 3 的鼠标将不再作为鼠标工作。如果您仍需要鼠标输入，应将另一个鼠标连接到您的 PC（而不是 MAKCU）。",
+          "mouse_conversion_important_desc": "当使用 XIM 与控制器时，连接到 USB 3 的鼠标将不再作为鼠标工作，因为 XIM 将 MAKCU 的鼠标输入转换为控制器输入。如果您在 XIM + MAKCU 连接时需要鼠标来操作您的游戏 PC，请将另一个鼠标直接连接到您的 PC（这意味着您需要 2 个鼠标：一个用于 MAKCU，一个用于您的 PC）。",
           "mouse_removal_warning": "严重警告",
           "mouse_removal_warning_desc": "鼠标必须始终保持连接到 USB 3。如果您从 USB 3 移除鼠标，MAKCU 将关闭，作弊功能将停止！"
         },
