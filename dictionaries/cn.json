@@ -109,7 +109,7 @@
         "title": "刷写工具",
         "description": "使用下面的工具将固件刷写到您的 MAKCU 设备。",
         "com_port_warning_title": "重要：COM 端口限制",
-        "com_port_warning_desc": "此工具仅用于刷写和测试 MAKCU。MAKCU 仅允许一个设备同时连接到 USB 2（COM 端口）。请确保在使用 MAKCU 与您的作弊软件之前关闭此 AIO 工具，否则您的作弊软件将无法连接。"
+        "com_port_warning_desc": "此工具仅用于刷写和测试 MAKCU。MAKCU 仅允许一个设备同时连接到 USB 2（COM 端口）。请确保在使用 MAKCU 与您的软件之前关闭此 AIO 工具，否则您的软件将无法连接。"
       },
       "firmware_selection": {
         "title": "固件选择",
@@ -170,7 +170,7 @@
           "label": "正常模式",
           "description": "MAKCU 已连接并在正常模式下运行。您可以使用设置页面配置和测试 MAKCU。USB 1 连接到游戏 PC，USB 2 是 COM 端口，USB 3 应连接到您的鼠标或键盘。**3.9 固件仅支持键盘。",
           "color": "绿色（翠绿色）",
-          "com_port_warning": "重要：MAKCU 仅允许一个设备同时连接到 USB 2（COM 端口）。在使用 MAKCU 与您的作弊软件之前，请关闭此工具。"
+          "com_port_warning": "重要：MAKCU 仅允许一个设备同时连接到 USB 2（COM 端口）。在使用 MAKCU 与您的软件之前，请关闭此工具。"
         },
         "flash_mode": {
           "label": "刷写模式",
@@ -292,21 +292,21 @@
         "steps": "检查设备管理器中的任何错误图标，尝试不同的 USB 端口，验证 CH343 驱动程序是否正确安装，检查 COM 端口号是否低于 10，或尝试不同的鼠标或键盘进行测试"
       },
       "baud_rate_mismatch": {
-        "title": "波特率不匹配 / 作弊软件无法连接",
-        "problem": "MAKCU 未更改波特率或作弊软件无法连接到 MAKCU。",
+        "title": "波特率不匹配 / 软件无法连接",
+        "problem": "MAKCU 未更改波特率或软件无法连接到 MAKCU。",
         "symptoms": [
-          "作弊软件无法与 MAKCU 通信",
+          "软件无法与 MAKCU 通信",
           "MAKCU 不响应命令",
           "连接超时",
           "设备显示已连接但无数据交换"
         ],
-        "solution": "打开设备管理器并将 COM 端口更改为 10 以下的任何数字（如果所有端口都在使用中，您可以强制指定 COM 端口号）。确保波特率与作弊软件的期望匹配。MAKCU.com 网站和 AIO 工具期望 MAKCU 以 115200（1 次闪烁模式）运行。用户必须确保启用 115200 波特率才能与网站和工具通信。",
+        "solution": "打开设备管理器并将 COM 端口更改为 10 以下的任何数字（如果所有端口都在使用中，您可以强制指定 COM 端口号）。确保波特率与软件的期望匹配。MAKCU.com 网站和 AIO 工具期望 MAKCU 以 115200（1 次闪烁模式）运行。用户必须确保启用 115200 波特率才能与网站和工具通信。",
         "steps": [
           "检查 MAKCU 启动时的波特率指示器 LED（左侧）- 对于 115200，它应该闪烁 1 次",
           "如果波特率不正确，快速按下左侧按钮 4 次以更改它",
           "确保连接 USB 1 + USB 2 以便 MAKCU 有电源来更改波特率",
-          "在您的作弊软件设置中更改 COM 端口以匹配 MAKCU 的",
-          "验证 MAKCU 和您的作弊软件之间的波特率是否匹配",
+          "在您的软件设置中更改 COM 端口以匹配 MAKCU 的",
+          "验证 MAKCU 和您的软件之间的波特率是否匹配",
           "如果使用 MAKCU 网站或 AIO 工具，请确保波特率设置为 115200"
         ],
         "important": "必须连接 USB 1 + USB 2 才能为 MAKCU 供电。USB 2 不为 MAKCU 提供电源 - 这可以防止从两个 USB 端口向主 PC 和第二台 PC 反向供电。"
@@ -416,7 +416,7 @@
     "baud_rate": {
       "title": "波特率",
       "description": "确保 makcu 配置为 115200 波特率以使用设置，否则 makcu 将无法正常工作",
-      "warning": "波特率更改是永久性的，只有在您的作弊软件告诉您使用不同波特率时才应设置。不匹配的波特率将阻止您的作弊软件与 MAKCU 通信。",
+      "warning": "波特率更改是永久性的，只有在您的软件告诉您使用不同波特率时才应设置。不匹配的波特率将阻止您的软件与 MAKCU 通信。",
       "how_to_change": "快速按下 MAKCU 上的左侧按钮 4 次，将波特率从 115200 更改为 4mbps。LED 将闪烁 1 次或 4 次，波特率将被保存。",
       "led_indicator": "当 MAKCU 启动时，波特率指示器 LED（左侧）将显示 MAKCU 运行的速度。",
       "startup_indicator": "当 MAKCU 启动时，波特率指示器 LED（左侧）将闪烁以指示当前波特率：1 次闪烁 = 115200，4 次闪烁 = 4mbps。",
@@ -434,10 +434,10 @@
     "sections": {
       "install_driver": {
         "title": "1. 安装 CH343 驱动程序",
-        "description": "在您的作弊 PC（用于刷写的计算机）上安装 CH343 驱动程序。",
+        "description": "在您的 PC（用于刷写的计算机）上安装 CH343 驱动程序。",
         "steps": [
           "从下面的链接下载 CH343 驱动程序",
-          "在您的作弊 PC 上运行安装程序",
+          "在您的 PC 上运行安装程序",
           "按照安装向导完成设置"
         ],
         "driver_link": "下载 CH343 驱动程序"
@@ -469,7 +469,7 @@
       "requirements": {
         "title": "要求",
         "ch343_driver": "已安装 CH343 驱动程序",
-        "ch343_desc": "MAKCU 需要在您的作弊计算机（用于刷写的计算机）上加载 CH343 USB 转串口驱动程序。驱动程序下载链接在下面的部分中提供。",
+        "ch343_desc": "MAKCU 需要在您的计算机（用于刷写的计算机）上加载 CH343 USB 转串口驱动程序。驱动程序下载链接在下面的部分中提供。",
         "com_port": "正确的 COM 端口",
         "com_port_desc": "USB 2 的 COM 端口应低于 10。如果您的 COM 端口号是 10 或更高，可能会遇到连接问题。",
         "both_sides": "两侧均已刷写",
@@ -559,11 +559,11 @@
           "title": "前提条件",
           "important_note": "重要：本指南仅适用于将控制器与 MAKCU 一起使用。",
           "baud_rate_warning": "波特率配置",
-          "baud_rate_warning_desc": "MAKCU 的波特率必须与您的作弊软件预期速度匹配。在继续之前，确保波特率配置正确。",
+          "baud_rate_warning_desc": "MAKCU 的波特率必须与您的软件预期速度匹配。在继续之前，确保波特率配置正确。",
           "mouse_conversion_important": "鼠标功能",
           "mouse_conversion_important_desc": "当使用 XIM 与控制器时，连接到 USB 3 的鼠标将不再作为鼠标工作，因为 XIM 将 MAKCU 的鼠标输入转换为控制器输入。如果您在 XIM + MAKCU 连接时需要鼠标来操作您的游戏 PC，请将另一个鼠标直接连接到您的 PC（这意味着您需要 2 个鼠标：一个用于 MAKCU，一个用于您的 PC）。",
           "mouse_removal_warning": "严重警告",
-          "mouse_removal_warning_desc": "鼠标必须始终保持连接到 USB 3。如果您从 USB 3 移除鼠标，MAKCU 将关闭，作弊功能将停止！"
+          "mouse_removal_warning_desc": "鼠标必须始终保持连接到 USB 3。如果您从 USB 3 移除鼠标，MAKCU 将关闭，软件将停止！"
         },
         "step1_prepare_xim": {
           "title": "步骤 1：准备 XIM",

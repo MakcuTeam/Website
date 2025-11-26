@@ -97,7 +97,7 @@ export default async function SetupPage({ params }: LangProps) {
                         {t("Baud Rate", "波特率")}
                       </h4>
                       <p className="text-sm leading-relaxed text-muted-foreground">
-                        {t("Baud rate is matched to the cheat you will use, please see the", "波特率与您将使用的作弊软件匹配，请查看")}{" "}
+                        {t("Baud rate is matched to the software you will use, please see the", "波特率与您将使用的软件匹配，请查看")}{" "}
                         <Link
                           href={`/${lang}/setup#baud-rate`}
                           className="text-blue-600 dark:text-blue-400 hover:underline"

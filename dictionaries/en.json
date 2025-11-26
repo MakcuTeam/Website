@@ -117,7 +117,7 @@
         "title": "Flashing Tool",
         "description": "Use the tool below to flash firmware to your MAKCU device.",
         "com_port_warning_title": "Important: COM Port Limitation",
-        "com_port_warning_desc": "This tool is only for flashing and testing MAKCU. MAKCU only allows one device to be connected to USB 2 (COM port) at a time. Please ensure this AIO tool is closed before using MAKCU with your cheat software, otherwise your cheat will not be able to connect."
+        "com_port_warning_desc": "This tool is only for flashing and testing MAKCU. MAKCU only allows one device to be connected to USB 2 (COM port) at a time. Please ensure this AIO tool is closed before using MAKCU with your software, otherwise your software will not be able to connect."
       },
       "firmware_selection": {
         "title": "Firmware Selection",
@@ -177,7 +177,7 @@
           "label": "Normal mode",
           "description": "MAKCU is connected and running in normal mode. You can use the settings page to configure and test MAKCU. USB 1 is connected to gaming PC, USB 2 is the COM port, USB 3 should be connected to either your mouse or keyboard. **3.9 fw only supports keyboard.",
           "color": "Green (emerald)",
-          "com_port_warning": "Important: MAKCU only allows one device connected to USB 2 (COM port) at a time. Close this tool before using MAKCU with your cheat software."
+          "com_port_warning": "Important: MAKCU only allows one device connected to USB 2 (COM port) at a time. Close this tool before using MAKCU with your software."
         },
         "flash_mode": {
           "label": "Flash mode",
@@ -299,21 +299,21 @@
         "steps": "Check device manager for any error icons, try a different USB port, verify CH343 driver is installed correctly, check if COM port number is below 10, or try a different mouse or keyboard to test"
       },
       "baud_rate_mismatch": {
-        "title": "Baud Rate Mismatch / Cheat Not Connecting",
-        "problem": "MAKCU is not changing baud rate or cheat is not connecting to MAKCU.",
+        "title": "Baud Rate Mismatch / Software Not Connecting",
+        "problem": "MAKCU is not changing baud rate or software is not connecting to MAKCU.",
         "symptoms": [
-          "Cheat software cannot communicate with MAKCU",
+          "Software cannot communicate with MAKCU",
           "MAKCU not responding to commands",
           "Connection timeouts",
           "Device appears connected but no data exchange"
         ],
-        "solution": "Open device manager and change the com port to be any number below 10 (you may force a com port number if all are in use). Ensure baud rate is matched to the cheat's expectations. The MAKCU.com website and the AIO tool expect MAKCU to be running at 115200 (1 flash mode). Users must ensure that baud rate 115200 is enabled to communicate with the website and tools.",
+        "solution": "Open device manager and change the com port to be any number below 10 (you may force a com port number if all are in use). Ensure baud rate is matched to the software's expectations. The MAKCU.com website and the AIO tool expect MAKCU to be running at 115200 (1 flash mode). Users must ensure that baud rate 115200 is enabled to communicate with the website and tools.",
         "steps": [
           "Check the baud rate indicator LED (left) when MAKCU starts - it should flash 1 time for 115200",
           "If baud rate is incorrect, press the left button 4 times fast to change it",
           "Ensure USB 1 + USB 2 are connected for MAKCU to have power to change baud rate",
-          "Change COM port in your cheat software settings to match MAKCU's",
-          "Verify baud rate matches between MAKCU and your cheat software",
+          "Change COM port in your software settings to match MAKCU's",
+          "Verify baud rate matches between MAKCU and your software",
           "If using MAKCU website or AIO tool, ensure baud rate is set to 115200"
         ],
         "important": "USB 1 + USB 2 must be connected for MAKCU to take power. USB 2 does not provide power to MAKCU - this prevents back feeding to the main PC and 2nd PC from both USB ports."
@@ -425,7 +425,7 @@
     "baud_rate": {
       "title": "Baud Rate",
       "description": "Ensure makcu is configured with 115200 baud rate to use the settings, otherwise makcu will fail to function",
-      "warning": "Baud rate change is PERMANENT and should only be set if your cheat has told you to use a different baud rate. A mismatched baud rate will stop your cheat from communicating with MAKCU.",
+      "warning": "Baud rate change is PERMANENT and should only be set if your software has told you to use a different baud rate. A mismatched baud rate will stop your software from communicating with MAKCU.",
       "how_to_change": "Press the left button on MAKCU 4 times fast to change the baud rate from 115200 to 4mbps. The LED will flash 1 or 4 times and the baud rate will be saved.",
       "led_indicator": "When MAKCU starts, the baud rate indicator LED (left) will show what speed MAKCU is running at.",
       "startup_indicator": "When MAKCU starts, the baud rate indicator LED (left) will flash to indicate the current baud rate: 1 flash = 115200, 4 flashes = 4mbps.",
@@ -443,10 +443,10 @@
     "sections": {
       "install_driver": {
         "title": "1. Install CH343 Driver",
-        "description": "Install the CH343 driver on your cheat PC (the computer you will use for flashing).",
+        "description": "Install the CH343 driver on your PC (the computer you will use for flashing).",
         "steps": [
           "Download the CH343 driver from the link below",
-          "Run the installer on your cheat PC",
+          "Run the installer on your PC",
           "Follow the installation wizard to complete the setup"
         ],
         "driver_link": "Download CH343 Driver"
@@ -478,7 +478,7 @@
       "requirements": {
         "title": "Requirements",
         "ch343_driver": "CH343 Driver Installed",
-        "ch343_desc": "MAKCU requires the CH343 USB-to-serial driver to be loaded on your cheat computer (the computer you will use for flashing). The driver download link is provided in the section below.",
+        "ch343_desc": "MAKCU requires the CH343 USB-to-serial driver to be loaded on your computer (the computer you will use for flashing). The driver download link is provided in the section below.",
         "com_port": "Correct COM Port",
         "com_port_desc": "The COM port for USB 2 should be below 10. If your COM port number is 10 or higher, you may experience connection issues.",
         "both_sides": "Both Sides Flashed",
@@ -568,11 +568,11 @@
           "title": "Prerequisites",
           "important_note": "Important: This guide is only for using controller with MAKCU.",
           "baud_rate_warning": "Baud Rate Configuration",
-          "baud_rate_warning_desc": "MAKCU's baud rate must match your cheat's expected speed. Ensure the baud rate is correctly configured before proceeding.",
+          "baud_rate_warning_desc": "MAKCU's baud rate must match your software's expected speed. Ensure the baud rate is correctly configured before proceeding.",
           "mouse_conversion_important": "Mouse Functionality",
           "mouse_conversion_important_desc": "When using XIM with controller, the mouse attached to USB 3 will no longer function as a mouse due to XIM converting MAKCU's mouse inputs to controller inputs. If you need a mouse to navigate your gaming PC while XIM + MAKCU is connected, connect another mouse directly to your PC (this means you need 2 mice: one for MAKCU, one for your PC).",
           "mouse_removal_warning": "Critical Warning",
-          "mouse_removal_warning_desc": "The mouse must remain connected to USB 3 at all times. If you remove the mouse from USB 3, MAKCU will shut down and the cheat will stop!"
+          "mouse_removal_warning_desc": "The mouse must remain connected to USB 3 at all times. If you remove the mouse from USB 3, MAKCU will shut down and the software will stop!"
         },
         "step1_prepare_xim": {
           "title": "Step 1: Prepare XIM",
