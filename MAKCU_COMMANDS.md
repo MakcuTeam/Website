@@ -47,6 +47,8 @@ Welcome to the Makcu help. All commands shown are listed below. For more info, s
 | `km.catch_ml(help)` / `km.catch_mm(help)` / etc. | Catch locked button state | `(mode)` - 0=auto 1=manual; requires corresponding button lock; `()` to query state; targets: ml/mm/mr/ms1/ms2 (buttons only, not axes) |
 | `km.click(help)` | Schedule mouse clicks | `(button,count,delay_ms)` - count/delay optional; delay random 35-75ms if omitted (internal timing) |
 | `km.getpos(help)` | Report current pointer position | `()` |
+| `km.invert_x(help)` | Invert X axis (physical only) | `()` show, `(0)` disable, `(1)` enable |
+| `km.invert_y(help)` | Invert Y axis (physical only) | `()` show, `(0)` disable, `(1)` enable |
 | `km.left(help)` | Set left button / query lock state | `(state)` - 0=release 1=down 2=silent_release; () returns 0=none 1=raw 2=injected 3=both |
 | `km.lock_mx(help)` / `km.lock_my(help)` / `km.lock_mw(help)` / etc. | Lock button or axis | `(state)` - state: 1=lock, 0=unlock; `()` returns 1=locked, 0=unlocked; targets: mx/my/mw (axes), mx+/mx-/my+/my-/mw+/mw- (directional axes), ml/mm/mr/ms1/ms2 (buttons) |
 | `km.middle(help)` | Set middle button / query lock state | `(state)` - 0=release 1=down 2=silent_release; () returns 0=none 1=raw 2=injected 3=both |
@@ -55,10 +57,13 @@ Welcome to the Makcu help. All commands shown are listed below. For more info, s
 | `km.move(help)` | Queue relative move | `(dx,dy,segments,cx1,cy1,cx2,cy2)` - segments/control points optional |
 | `km.moveto(help)` | Move pointer absolute | `(x,y,segments,cx1,cy1,cx2,cy2)` - internally calculates needed x,y movement to reach requested screen position; parameters align with km.move |
 | `km.pan(help)` | Horizontal scroll/pan | `(steps)` - () to query pending |
+| `km.remap_axis(help)` | Remap mouse axes (physical only) | `()` show, `(0)` reset, `(inv_x,inv_y,swap)` set flags 0/1 |
+| `km.remap_button(help)` | Remap mouse buttons (physical only) | `()` show mappings, `(0)` reset, `(src,dst)` map 1-5, `(src,0)` clear |
 | `km.right(help)` | Set right button / query lock state | `(state)` - 0=release 1=down 2=silent_release; () returns 0=none 1=raw 2=injected 3=both |
 | `km.side1(help)` | Set side1 button / query lock state | `(state)` - 0=release 1=down 2=silent_release; () returns 0=none 1=raw 2=injected 3=both |
 | `km.side2(help)` | Set side2 button / query lock state | `(state)` - 0=release 1=down 2=silent_release; () returns 0=none 1=raw 2=injected 3=both |
 | `km.silent(help)` | Move then silent left click | `(x,y)` |
+| `km.swap_xy(help)` | Swap X and Y axes (physical only) | `()` show, `(0)` disable, `(1)` enable |
 | `km.tilt(help)` | Tilt/z-axis scroll | `(steps)` - () to query pending |
 | `km.turbo(help)` | Rapid-fire mode for mouse buttons | `(button,delay_ms)` - button: 1-5 (mouse buttons) or 0 to disable all - delay_ms: 1-5000ms (0=disable) - () returns only active settings as (m1=200, m2=400) - (button) uses random 35-75ms - (0) disables all turbo - **multiple buttons can be enabled simultaneously** - when enabled, holding button triggers rapid press/release cycle |
 | `km.wheel(help)` | Scroll wheel | `(delta)` - scroll step (Windows limits to ±1 step, so delta is clamped to -1 or +1) |
@@ -213,6 +218,22 @@ km.keys(0)             # Disable keyboard key streaming
     - `km.catch_ml(0)` - Enable auto catch for left mouse button (reports on changes)
     - `km.catch_ml()` - Query catch state for left mouse button (returns 1=down, 0=up or not enabled)
 
+#### Mouse Remap Commands (Physical Only)
+- **km.remap_button(src,dst)** - Remap mouse buttons. Injection is NOT affected.
+  - `()` - Show only active mappings, e.g., `(left:right,right:left)`
+  - `(0)` - Reset all button remaps
+  - `(src,dst)` - Map button src→dst (1=left, 2=right, 3=middle, 4=side1, 5=side2)
+  - `(src,0)` - Clear remap for button src
+  - Auto-clears conflicting mappings; both directions can be mapped (swap)
+- **km.remap_axis(inv_x,inv_y,swap)** - Remap mouse axes. Injection is NOT affected.
+  - `()` - Show current settings, e.g., `(invert_x=0,invert_y=1,swap_xy=0)`
+  - `(0)` - Reset all axis remaps
+  - `(inv_x,inv_y,swap)` - Set all three flags (0 or 1)
+- **km.invert_x(state)** / **km.invert_y(state)** / **km.swap_xy(state)** - Individual axis controls.
+  - `()` - Query current state
+  - `(0)` - Disable
+  - `(1)` - Enable
+
 #### Mouse Streaming Commands
 - **km.buttons(mode,period_ms)** - Stream button states. Mode 1=raw, 2=constructed frame; period clamped 1-1000 ms. Use `(0)` or `(0,0)` to reset.
 - **km.axis(mode,period_ms)** - Stream axis deltas (X, Y, Wheel). Mode 1=raw, 2=constructed frame; period clamped 1-1000 ms. Use `(0)` or `(0,0)` to reset. Output format: `raw(x,y,w)` or `mut(x,y,w)` where w is the wheel delta.
@@ -234,4 +255,4 @@ km.keys(0)             # Disable keyboard key streaming
 
 All commands are implemented in: `main/components/Commands/commands.c`
 
-Total commands: 40
+Total commands: 45

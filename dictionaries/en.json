@@ -513,6 +513,14 @@
         "lock": "lock_<target>() (GET/SET)",
         "catch": "catch_<target>() (GET/SET)"
       },
+      "mouse_remap": {
+        "title": "Mouse Remap (Physical)",
+        "remap_button": "remap_button() (GET/SET)",
+        "remap_axis": "remap_axis() (GET/SET)",
+        "invert_x": "invert_x() (GET/SET)",
+        "invert_y": "invert_y() (GET/SET)",
+        "swap_xy": "swap_xy() (GET/SET)"
+      },
       "keyboard": {
         "title": "Keyboard",
         "down": "down() (SET)",

@@ -53,6 +53,17 @@ const tocByLang: Record<Locale, TocItem[]> = {
       ],
     },
     {
+      id: "mouse-remap",
+      label: "Mouse Remap (Physical)",
+      children: [
+        { id: "remap-button", label: "remap_button() (GET/SET)" },
+        { id: "remap-axis", label: "remap_axis() (GET/SET)" },
+        { id: "invert-x", label: "invert_x() (GET/SET)" },
+        { id: "invert-y", label: "invert_y() (GET/SET)" },
+        { id: "swap-xy", label: "swap_xy() (GET/SET)" },
+      ],
+    },
+    {
       id: "keyboard",
       label: "Keyboard",
       children: [
@@ -140,6 +151,17 @@ const tocByLang: Record<Locale, TocItem[]> = {
         { id: "mo", label: "mo() - 原始鼠标帧 (SET)" },
         { id: "lock", label: "lock_<target>() (GET/SET)" },
         { id: "catch", label: "catch_<target>() (GET/SET)" },
+      ],
+    },
+    {
+      id: "mouse-remap",
+      label: "鼠标重映射（物理）",
+      children: [
+        { id: "remap-button", label: "remap_button() (GET/SET)" },
+        { id: "remap-axis", label: "remap_axis() (GET/SET)" },
+        { id: "invert-x", label: "invert_x() (GET/SET)" },
+        { id: "invert-y", label: "invert_y() (GET/SET)" },
+        { id: "swap-xy", label: "swap_xy() (GET/SET)" },
       ],
     },
     {
@@ -1086,6 +1108,211 @@ export default async function ApiPage({ params }: LangProps) {
                         </p>
                       </div>
                     ),
+                  },
+                ]}
+              />
+            </SubSection>
+          </Section>
+
+          {/* Mouse Remap (Physical Only) */}
+          <Section id="mouse-remap" badge={t("Remap", "重映射")} title={t("Mouse Remap (Physical Only)", "鼠标重映射（仅物理）")}>
+            <Tip>
+              {isCn ? (
+                <span>
+                  以下命令仅影响物理输入，<strong>注入不受影响</strong>。这意味着您可以重映射物理鼠标按键和轴，而通过 API 注入的输入将保持不变。
+                </span>
+              ) : (
+                <span>
+                  The following commands only affect physical input, <strong>injection is NOT affected</strong>. This means you can remap physical mouse buttons and axes, while injected inputs via API will remain unchanged.
+                </span>
+              )}
+            </Tip>
+
+            <SubSection id="remap-button" title="remap_button([src,dst]) — GET/SET">
+              <SpecCard
+                entries={[
+                  {
+                    label: t("Command", "命令"),
+                    content: <span className="font-mono">remap_button([src,dst])</span>,
+                  },
+                  {
+                    label: t("Description", "描述"),
+                    content: isCn ? (
+                      <p>
+                        重映射鼠标按键（仅物理）。自动清除冲突的映射；可以映射两个方向（交换）。
+                      </p>
+                    ) : (
+                      <p>
+                        Remap mouse buttons (physical only). Auto-clears conflicting mappings; both directions can be mapped (swap).
+                      </p>
+                    ),
+                  },
+                  {
+                    label: t("Params", "参数"),
+                    content: isCn ? (
+                      <ul className="list-disc space-y-1 pl-5">
+                        <li><span className="font-mono">()</span> - 仅显示活动的映射，如 <span className="font-mono">(left:right,right:left)</span></li>
+                        <li><span className="font-mono">(0)</span> - 重置所有按键映射</li>
+                        <li><span className="font-mono">(src,dst)</span> - 映射按键 src→dst（1=左键，2=右键，3=中键，4=侧键1，5=侧键2）</li>
+                        <li><span className="font-mono">(src,0)</span> - 清除 src 按键的映射</li>
+                      </ul>
+                    ) : (
+                      <ul className="list-disc space-y-1 pl-5">
+                        <li><span className="font-mono">()</span> - Show only active mappings, e.g., <span className="font-mono">(left:right,right:left)</span></li>
+                        <li><span className="font-mono">(0)</span> - Reset all button remaps</li>
+                        <li><span className="font-mono">(src,dst)</span> - Map button src→dst (1=left, 2=right, 3=middle, 4=side1, 5=side2)</li>
+                        <li><span className="font-mono">(src,0)</span> - Clear remap for button src</li>
+                      </ul>
+                    ),
+                  },
+                  {
+                    label: t("Examples", "示例"),
+                    content: (
+                      <div className="space-y-2">
+                        <CodeBlock code={`km.remap_button()\r\n>>> `} />
+                        <CodeBlock code={`km.remap_button(1,2)\r\n>>> `} />
+                        <CodeBlock code={`km.remap_button(0)\r\n>>> `} />
+                      </div>
+                    ),
+                  },
+                ]}
+              />
+            </SubSection>
+
+            <SubSection id="remap-axis" title="remap_axis([inv_x,inv_y,swap]) — GET/SET">
+              <SpecCard
+                entries={[
+                  {
+                    label: t("Command", "命令"),
+                    content: <span className="font-mono">remap_axis([inv_x,inv_y,swap])</span>,
+                  },
+                  {
+                    label: t("Description", "描述"),
+                    content: isCn ? (
+                      <p>
+                        重映射鼠标轴（仅物理）。一次设置所有三个标志。
+                      </p>
+                    ) : (
+                      <p>
+                        Remap mouse axes (physical only). Set all three flags at once.
+                      </p>
+                    ),
+                  },
+                  {
+                    label: t("Params", "参数"),
+                    content: isCn ? (
+                      <ul className="list-disc space-y-1 pl-5">
+                        <li><span className="font-mono">()</span> - 显示当前设置，如 <span className="font-mono">(invert_x=0,invert_y=1,swap_xy=0)</span></li>
+                        <li><span className="font-mono">(0)</span> - 重置所有轴映射</li>
+                        <li><span className="font-mono">(inv_x,inv_y,swap)</span> - 设置所有三个标志（0 或 1）</li>
+                      </ul>
+                    ) : (
+                      <ul className="list-disc space-y-1 pl-5">
+                        <li><span className="font-mono">()</span> - Show current settings, e.g., <span className="font-mono">(invert_x=0,invert_y=1,swap_xy=0)</span></li>
+                        <li><span className="font-mono">(0)</span> - Reset all axis remaps</li>
+                        <li><span className="font-mono">(inv_x,inv_y,swap)</span> - Set all three flags (0 or 1)</li>
+                      </ul>
+                    ),
+                  },
+                  {
+                    label: t("Examples", "示例"),
+                    content: (
+                      <div className="space-y-2">
+                        <CodeBlock code={`km.remap_axis()\r\n>>> `} />
+                        <CodeBlock code={`km.remap_axis(0,1,0)\r\n>>> `} />
+                        <CodeBlock code={`km.remap_axis(0)\r\n>>> `} />
+                      </div>
+                    ),
+                  },
+                ]}
+              />
+            </SubSection>
+
+            <SubSection id="invert-x" title="invert_x([state]) — GET/SET">
+              <SpecCard
+                entries={[
+                  {
+                    label: t("Command", "命令"),
+                    content: <span className="font-mono">invert_x([state])</span>,
+                  },
+                  {
+                    label: t("Description", "描述"),
+                    content: t(
+                      "Invert X axis (physical only)",
+                      "反转 X 轴（仅物理）",
+                    ),
+                  },
+                  {
+                    label: t("Params", "参数"),
+                    content: isCn ? (
+                      <span>() 查询; (0) 禁用; (1) 启用</span>
+                    ) : (
+                      <span>() show; (0) disable; (1) enable</span>
+                    ),
+                  },
+                  {
+                    label: t("Response", "响应"),
+                    content: <CodeBlock code={`km.invert_x(1)\r\n>>> `} />,
+                  },
+                ]}
+              />
+            </SubSection>
+
+            <SubSection id="invert-y" title="invert_y([state]) — GET/SET">
+              <SpecCard
+                entries={[
+                  {
+                    label: t("Command", "命令"),
+                    content: <span className="font-mono">invert_y([state])</span>,
+                  },
+                  {
+                    label: t("Description", "描述"),
+                    content: t(
+                      "Invert Y axis (physical only)",
+                      "反转 Y 轴（仅物理）",
+                    ),
+                  },
+                  {
+                    label: t("Params", "参数"),
+                    content: isCn ? (
+                      <span>() 查询; (0) 禁用; (1) 启用</span>
+                    ) : (
+                      <span>() show; (0) disable; (1) enable</span>
+                    ),
+                  },
+                  {
+                    label: t("Response", "响应"),
+                    content: <CodeBlock code={`km.invert_y(1)\r\n>>> `} />,
+                  },
+                ]}
+              />
+            </SubSection>
+
+            <SubSection id="swap-xy" title="swap_xy([state]) — GET/SET">
+              <SpecCard
+                entries={[
+                  {
+                    label: t("Command", "命令"),
+                    content: <span className="font-mono">swap_xy([state])</span>,
+                  },
+                  {
+                    label: t("Description", "描述"),
+                    content: t(
+                      "Swap X and Y axes (physical only)",
+                      "交换 X 和 Y 轴（仅物理）",
+                    ),
+                  },
+                  {
+                    label: t("Params", "参数"),
+                    content: isCn ? (
+                      <span>() 查询; (0) 禁用; (1) 启用</span>
+                    ) : (
+                      <span>() show; (0) disable; (1) enable</span>
+                    ),
+                  },
+                  {
+                    label: t("Response", "响应"),
+                    content: <CodeBlock code={`km.swap_xy(1)\r\n>>> `} />,
                   },
                 ]}
               />

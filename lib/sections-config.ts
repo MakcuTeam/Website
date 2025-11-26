@@ -77,6 +77,17 @@ export const SECTIONS_CONFIG: PageSections[] = sortPagesAlphabetically([
         ],
       },
       {
+        id: "mouse-remap",
+        labelKey: "api.sections.mouse_remap.title",
+        children: [
+          { id: "remap-button", labelKey: "api.sections.mouse_remap.remap_button" },
+          { id: "remap-axis", labelKey: "api.sections.mouse_remap.remap_axis" },
+          { id: "invert-x", labelKey: "api.sections.mouse_remap.invert_x" },
+          { id: "invert-y", labelKey: "api.sections.mouse_remap.invert_y" },
+          { id: "swap-xy", labelKey: "api.sections.mouse_remap.swap_xy" },
+        ],
+      },
+      {
         id: "keyboard",
         labelKey: "api.sections.keyboard.title",
         children: [

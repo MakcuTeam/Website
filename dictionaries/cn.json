@@ -504,6 +504,14 @@
         "lock": "lock_<target>() (GET/SET)",
         "catch": "catch_<target>() (GET/SET)"
       },
+      "mouse_remap": {
+        "title": "鼠标重映射（物理）",
+        "remap_button": "remap_button() (GET/SET)",
+        "remap_axis": "remap_axis() (GET/SET)",
+        "invert_x": "invert_x() (GET/SET)",
+        "invert_y": "invert_y() (GET/SET)",
+        "swap_xy": "swap_xy() (GET/SET)"
+      },
       "keyboard": {
         "title": "键盘",
         "down": "down() (SET)",
