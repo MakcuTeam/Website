@@ -594,6 +594,80 @@ export default async function TroubleshootingPage({ params }: LangProps) {
                 </CardContent>
               </Card>
             </SubSection>
+
+            {/* Cannot Flash from Website */}
+            <SubSection
+              id="cannot-flash-website"
+              title={dict.troubleshooting.troubleshooting_steps.cannot_flash_website.title}
+            >
+              <Card className="border-border/60 bg-card/90 shadow-lg">
+                <CardContent className="p-6">
+                  <div className="space-y-4">
+                    <div>
+                      <h4 className="font-semibold text-foreground mb-2">
+                        {t("Problem", "问题")}:
+                      </h4>
+                      <p className="text-sm leading-relaxed text-muted-foreground">
+                        {dict.troubleshooting.troubleshooting_steps.cannot_flash_website.problem}
+                      </p>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-foreground mb-2">
+                        {t("Possible Causes", "可能原因")}:
+                      </h4>
+                      <p className="text-sm leading-relaxed text-muted-foreground">
+                        {dict.troubleshooting.troubleshooting_steps.cannot_flash_website.causes}
+                      </p>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-foreground mb-2">
+                        {t("What to Do", "解决方法")}:
+                      </h4>
+                      <p className="text-sm leading-relaxed text-muted-foreground">
+                        {dict.troubleshooting.troubleshooting_steps.cannot_flash_website.steps}
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </SubSection>
+
+            {/* Button Held But Still Looping */}
+            <SubSection
+              id="button-held-still-looping"
+              title={dict.troubleshooting.troubleshooting_steps.button_held_still_looping.title}
+            >
+              <Card className="border-border/60 bg-card/90 shadow-lg">
+                <CardContent className="p-6">
+                  <div className="space-y-4">
+                    <div>
+                      <h4 className="font-semibold text-foreground mb-2">
+                        {t("Problem", "问题")}:
+                      </h4>
+                      <p className="text-sm leading-relaxed text-muted-foreground">
+                        {dict.troubleshooting.troubleshooting_steps.button_held_still_looping.problem}
+                      </p>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-foreground mb-2">
+                        {t("Possible Causes", "可能原因")}:
+                      </h4>
+                      <p className="text-sm leading-relaxed text-muted-foreground">
+                        {dict.troubleshooting.troubleshooting_steps.button_held_still_looping.causes}
+                      </p>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-foreground mb-2">
+                        {t("What to Do", "解决方法")}:
+                      </h4>
+                      <p className="text-sm leading-relaxed text-muted-foreground">
+                        {dict.troubleshooting.troubleshooting_steps.button_held_still_looping.steps}
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </SubSection>
           </Section>
 
           {/* Quick Reference */}

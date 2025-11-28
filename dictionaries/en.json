@@ -117,7 +117,9 @@
         "title": "Flashing Tool",
         "description": "Use the tool below to flash firmware to your MAKCU device.",
         "com_port_warning_title": "Important: COM Port Limitation",
-        "com_port_warning_desc": "This tool is only for flashing and testing MAKCU. MAKCU only allows one device to be connected to USB 2 (COM port) at a time. Please ensure this AIO tool is closed before using MAKCU with your software, otherwise your software will not be able to connect."
+        "com_port_warning_desc": "This tool is only for flashing and testing MAKCU. MAKCU only allows one device to be connected to USB 2 (COM port) at a time. Please ensure this AIO tool is closed before using MAKCU with your software, otherwise your software will not be able to connect.",
+        "unflashed_warning_title": "First Time Flashing",
+        "unflashed_warning_desc": "If your MAKCU comes without firmware or has not been tested, it is normal to be connected to USB 1 or 3 without holding buttons down and the USB sound to loop endlessly. This is the ESP32-S3 chip's default state from the factory. Upon the first flash, this state will go away and never return."
       },
       "firmware_selection": {
         "title": "Firmware Selection",
@@ -317,6 +319,18 @@
           "If using MAKCU website or AIO tool, ensure baud rate is set to 115200"
         ],
         "important": "USB 1 + USB 2 must be connected for MAKCU to take power. USB 2 does not provide power to MAKCU - this prevents back feeding to the main PC and 2nd PC from both USB ports."
+      },
+      "cannot_flash_website": {
+        "title": "Cannot Flash from Website - USB Disconnecting",
+        "problem": "Cannot flash MAKCU from the website. Device Manager shows USB 1 or 3 disconnecting constantly.",
+        "causes": "MAKCU is not flashed - this is the default factory state of the ESP32-S3 chip.",
+        "steps": "This is normal for unflashed devices. Hold the button down correctly and insert the USB cable. The Device Manager will stop looping and you are ready to flash. After the first flash, this will not happen again."
+      },
+      "button_held_still_looping": {
+        "title": "Button Held Correctly But Still Boot Looping",
+        "problem": "Holding the button down correctly and connecting the USB cable, but Device Manager is still boot looping.",
+        "causes": "MAKCU may be faulty, USB cables may be faulty, or your USB port may have issues supporting MAKCU.",
+        "steps": "Try another USB port, try another PC, try the other cable, replace the cable, or seek a replacement from your reseller."
       }
     },
     "quick_reference": {

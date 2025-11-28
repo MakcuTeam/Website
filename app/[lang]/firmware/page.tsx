@@ -154,6 +154,17 @@ export default async function FirmwarePage({ params }: LangProps) {
                 </p>
               </CardContent>
             </Card>
+            {/* Unflashed Device Warning */}
+            <Card className="border-red-500/40 bg-red-500/10 shadow-lg mb-6">
+              <CardContent className="p-6">
+                <h4 className="font-semibold text-red-600 dark:text-red-400 mb-2">
+                  {dict.tools.sections.flashing_tool.unflashed_warning_title}
+                </h4>
+                <p className="text-sm text-red-600 dark:text-red-400">
+                  {dict.tools.sections.flashing_tool.unflashed_warning_desc}
+                </p>
+              </CardContent>
+            </Card>
             <DeviceTool lang={lang} dict={dict} />
           </Section>
 

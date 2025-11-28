@@ -285,6 +285,14 @@ export const SECTIONS_CONFIG: PageSections[] = sortPagesAlphabetically([
             id: "baud-rate-mismatch",
             labelKey: "troubleshooting.troubleshooting_steps.baud_rate_mismatch.title",
           },
+          {
+            id: "cannot-flash-website",
+            labelKey: "troubleshooting.troubleshooting_steps.cannot_flash_website.title",
+          },
+          {
+            id: "button-held-still-looping",
+            labelKey: "troubleshooting.troubleshooting_steps.button_held_still_looping.title",
+          },
         ],
       },
       {

@@ -109,7 +109,9 @@
         "title": "刷写工具",
         "description": "使用下面的工具将固件刷写到您的 MAKCU 设备。",
         "com_port_warning_title": "重要：COM 端口限制",
-        "com_port_warning_desc": "此工具仅用于刷写和测试 MAKCU。MAKCU 仅允许一个设备同时连接到 USB 2（COM 端口）。请确保在使用 MAKCU 与您的软件之前关闭此 AIO 工具，否则您的软件将无法连接。"
+        "com_port_warning_desc": "此工具仅用于刷写和测试 MAKCU。MAKCU 仅允许一个设备同时连接到 USB 2（COM 端口）。请确保在使用 MAKCU 与您的软件之前关闭此 AIO 工具，否则您的软件将无法连接。",
+        "unflashed_warning_title": "首次刷写",
+        "unflashed_warning_desc": "如果您的 MAKCU 没有固件或未经测试，在不按住按钮的情况下连接到 USB 1 或 3 时，USB 声音会无限循环是正常的。这是 ESP32-S3 芯片出厂时的默认状态。首次刷写后，此状态将消失且不会再出现。"
       },
       "firmware_selection": {
         "title": "固件选择",
@@ -310,6 +312,18 @@
           "如果使用 MAKCU 网站或 AIO 工具，请确保波特率设置为 115200"
         ],
         "important": "必须连接 USB 1 + USB 2 才能为 MAKCU 供电。USB 2 不为 MAKCU 提供电源 - 这可以防止从两个 USB 端口向主 PC 和第二台 PC 反向供电。"
+      },
+      "cannot_flash_website": {
+        "title": "无法从网站刷写 - USB 不断断开",
+        "problem": "无法从网站刷写 MAKCU。设备管理器显示 USB 1 或 3 不断断开连接。",
+        "causes": "MAKCU 未刷写 - 这是 ESP32-S3 芯片的默认出厂状态。",
+        "steps": "这对于未刷写的设备是正常的。正确按住按钮并插入 USB 线。设备管理器将停止循环，您就可以开始刷写了。首次刷写后，这种情况不会再发生。"
+      },
+      "button_held_still_looping": {
+        "title": "正确按住按钮但仍循环启动",
+        "problem": "正确按住按钮并连接 USB 线，但设备管理器仍在循环启动。",
+        "causes": "MAKCU 可能有故障，USB 线可能有故障，或者您的 USB 端口可能无法支持 MAKCU。",
+        "steps": "尝试另一个 USB 端口，尝试另一台 PC，尝试另一根线缆，更换线缆，或向您的经销商寻求更换。"
       }
     },
     "quick_reference": {
