@@ -41,6 +41,7 @@
       "api": "API 文档",
       "makcu_tools": "固件刷写",
       "discord": "Discord",
+      "information": "信息",
       "troubleshooting": "故障排除",
       "settings": "设置",
       "home": "首页",
@@ -577,6 +578,171 @@
           "final_steps": "连接步骤",
           "final_steps_desc": "按照下面的视频所示连接 XIM 和 MAKCU。在连接之前，确保两个设备都完全正常工作。"
         }
+      }
+    }
+  },
+  "information": {
+    "title": "MAKCU 信息",
+    "description": "了解 MAKCU 是什么、它的功能以及工作原理。",
+    "what_is_makcu": {
+      "title": "什么是 MAKCU？",
+      "description": "MAKCU 是一个 USB 直通设备，充当游戏 PC 与鼠标或键盘之间的桥梁。它由两个 ESP32-S3 微控制器协同工作，创建透明连接，允许软件实时拦截和修改输入信号。",
+      "key_points": [
+        "双芯片架构，每侧独立处理",
+        "完整的鼠标和键盘 USB 直通功能",
+        "实时输入拦截和修改",
+        "基于 Web 的配置和固件更新",
+        "需要通过 USB 2（COM 端口）从第二台 PC 进行软件控制",
+        "无法在独立模式下运行 - 需要活动软件连接",
+        "必须在 USB 3 上连接鼠标或键盘才能工作"
+      ],
+      "important_notes": {
+        "title": "重要要求",
+        "standalone": "MAKCU 无法在独立模式下运行。它需要第二台 PC（通过 USB 2 连接）上运行的软件来控制和操作设备。",
+        "attached_device": "MAKCU 无法在没有连接的鼠标或键盘设备的情况下运行。必须在 USB 3 上连接鼠标或键盘，MAKCU 才能运行。",
+        "software_control": "MAKCU 需要通过 COM 端口（USB 2）从第二台 PC 的软件来控制。没有此软件连接，MAKCU 将不会处理或修改输入。"
+      }
+    },
+    "what_is_it_used_for": {
+      "title": "MAKCU 用于什么？",
+      "description": "MAKCU 专为需要精确控制输入设备的高级用户设计，用于游戏、自动化或辅助功能。",
+      "use_cases": [
+        "游戏：通过自定义脚本和自动化增强鼠标和键盘控制",
+        "辅助功能：自定义输入重映射和辅助功能",
+        "自动化：用于测试或自动化的输入设备程序化控制",
+        "自定义：精细调整鼠标灵敏度、按键重映射和输入行为",
+        "设备控制：使您的计算机能够直接与鼠标或键盘通信，允许您通过鼠标/键盘制造商的软件更改 LED、DPI 设置和其他设备特定功能"
+      ],
+      "device_communication": {
+        "title": "直接设备通信",
+        "description": "MAKCU 使您的计算机能够通过 USB 1 直接与鼠标或键盘通信。这允许您使用制造商软件（如 Logitech G HUB、Razer Synapse 等）来控制设备特定功能。",
+        "features": [
+          "更改 RGB LED 颜色和效果",
+          "调整 DPI 设置和配置文件",
+          "配置鼠标按钮分配",
+          "更新设备固件",
+          "访问所有制造商软件功能"
+        ]
+      }
+    },
+    "capabilities": {
+      "title": "MAKCU 能做什么和不能做什么",
+      "can_do": {
+        "title": "MAKCU 能做什么",
+        "items": [
+          "以完全兼容性直通鼠标和键盘输入",
+          "实时拦截和修改鼠标移动、点击和键盘按键",
+          "重映射按键和鼠标按钮",
+          "调整鼠标灵敏度和加速度",
+          "执行自定义脚本和自动化",
+          "支持有线和无线设备（通过 USB 适配器连接时）",
+          "与大多数标准 USB HID 鼠标和键盘配合使用",
+          "在 PC 和鼠标/键盘之间实现直接通信，用于 LED 控制、DPI 更改和其他设备功能",
+          "如果游戏支持鼠标和键盘输入，则直接支持游戏机游戏"
+        ]
+      },
+      "cannot_do": {
+        "title": "MAKCU 不能做什么",
+        "items": [
+          "无法直接与蓝牙设备配合使用（需要 USB 适配器）",
+          "无法修改加密或专有协议",
+          "无法在没有正确固件安装的情况下运行",
+          "无法与非 USB 输入设备配合使用",
+          "与某些具有专有驱动程序的专用游戏外设的兼容性有限",
+          "无法在独立模式下运行 - 需要软件控制",
+          "无法在没有连接的鼠标或键盘设备的情况下运行",
+          "无法提供 ESP（透视）、自瞄或自瞄机器人功能",
+          "无法加载或执行游戏脚本 - 它只处理输入/输出信号",
+          "无法与不原生支持鼠标和键盘的游戏机配合使用（需要 XIM 适配器）"
+        ]
+      },
+      "important_reminders": {
+        "title": "重要提醒",
+        "no_cheats": "MAKCU 无法提供 ESP（透视）、自瞄或自瞄机器人功能。它是一个硬件直通设备，只处理输入和输出信号。它无法加载脚本、修改游戏内存或提供视觉叠加。",
+        "input_only": "MAKCU 仅在输入级别工作。它可以修改您发送到计算机的内容，但无法读取游戏数据、提供视觉信息或直接与游戏软件交互。"
+      },
+      "console_support": {
+        "title": "游戏机支持",
+        "description": "MAKCU 可以支持游戏机游戏，但要求取决于游戏机和游戏。",
+        "direct_support": {
+          "title": "直接游戏机支持",
+          "description": "如果您的游戏机游戏原生支持鼠标和键盘输入，MAKCU 可以直接工作。只需通过 USB 1 将 MAKCU 连接到游戏机，并将鼠标/键盘连接到 USB 3。",
+          "examples": [
+            "具有原生鼠标/键盘支持的 PlayStation 5 游戏",
+            "具有原生鼠标/键盘支持的 Xbox Series X/S 游戏",
+            "任何正式支持鼠标和键盘输入的游戏机游戏"
+          ]
+        },
+        "xim_required": {
+          "title": "需要 XIM 适配器",
+          "description": "如果您的游戏机或游戏不原生支持鼠标和键盘，您将需要 XIM 适配器将 MAKCU 的鼠标输入转换为控制器输入。",
+          "note": "请参阅 XIM 设置页面，了解如何配置 MAKCU 与 XIM 的详细说明。",
+          "link_text": "查看 XIM 设置指南"
+        }
+      }
+    },
+    "preflashed_vs_unflashed": {
+      "title": "预刷写与未刷写",
+      "description": "MAKCU 设备可能有两种状态，具体取决于您的经销商是否在发货前准备了设备。",
+      "preflashed": {
+        "title": "预刷写 MAKCU",
+        "description": "预刷写的 MAKCU 已由您的经销商在发货前设置。固件已加载，设备已测试以确保正常工作。",
+        "benefits": [
+          "连接后立即可用",
+          "由经销商测试和验证",
+          "无需初始刷写",
+          "两侧（左侧和右侧）已配置"
+        ],
+        "indicator": "如果您的 MAKCU 是预刷写的，插入时会正常连接，您可以立即开始使用。"
+      },
+      "unflashed": {
+        "title": "未刷写 MAKCU",
+        "description": "未刷写的 MAKCU 直接从工厂发货，未安装固件。这是制造商 ESP32-S3 芯片的默认状态。",
+        "characteristics": [
+          "首次使用前需要刷写固件",
+          "在刷写之前会在设备管理器中显示 USB 断开循环",
+          "在不按住按钮的情况下连接时，USB 连接声音会无限循环",
+          "这是正常行为，不是缺陷"
+        ],
+        "what_to_do": "如果您的 MAKCU 未刷写，您需要使用固件刷写页面刷写固件。首次成功刷写后，此行为将停止且不会再出现。"
+      }
+    },
+    "usb_ports": {
+      "title": "了解 USB 端口",
+      "description": "MAKCU 有三个 USB 端口，每个都有特定用途。了解它们的工作原理对于正确设置至关重要。",
+      "usb1": {
+        "title": "USB 1 - 左侧（设备端口）",
+        "description": "USB 1 连接到左侧 ESP32-S3 芯片，用作与游戏 PC 或游戏机的设备连接。",
+        "purpose": "这是 MAKCU 作为 USB 设备出现在您的计算机或游戏机上的位置。您的游戏 PC 或游戏机连接在这里。",
+        "usage": "将 USB 1 连接到您的游戏 PC 或游戏机。这是允许您的计算机/游戏机将 MAKCU 识别为鼠标或键盘设备的主要连接。",
+        "power": "USB 1 为 MAKCU 的左侧供电。",
+        "device_communication": "此端口还使您的 PC 与连接的鼠标/键盘之间能够直接通信，允许您使用制造商软件来控制设备功能。"
+      },
+      "usb2": {
+        "title": "USB 2 - COM 端口（通信）",
+        "description": "USB 2 是用于发送命令和配置 MAKCU 的通信端口。这对 MAKCU 的功能至关重要。",
+        "purpose": "此端口创建串行 COM 端口连接，允许软件和 MAKCU 网站与设备通信。MAKCU 需要通过此端口进行活动软件控制才能运行。",
+        "usage": "将 USB 2 连接到您用于配置 MAKCU 的同一台计算机（通常是您的游戏 PC 或单独的配置 PC）。这用于设置、固件更新、设备控制，并且是 MAKCU 处理输入所必需的。",
+        "power": "USB 2 不为 MAKCU 供电。这可以防止主 PC 和第二台 PC 之间的反向供电。",
+        "important": "在正常模式下，必须同时连接 USB 1 和 USB 2 才能为 MAKCU 供电。USB 2 仅用于通信，不供电。没有通过 USB 2 连接的软件，MAKCU 无法运行。",
+        "software_requirement": "MAKCU 需要连接到 USB 2 的 PC 上运行的软件来控制和操作设备。没有此软件连接，MAKCU 将不会处理或修改输入。"
+      },
+      "usb3": {
+        "title": "USB 3 - 右侧（主机端口）",
+        "description": "USB 3 连接到右侧 ESP32-S3 芯片，用作鼠标或键盘的主机端口。",
+        "purpose": "这是您连接实际鼠标或键盘的位置。MAKCU 充当 USB 主机并从您的设备接收输入。",
+        "usage": "将鼠标或键盘连接到 USB 3。这是 MAKCU 将通过 USB 1 直通到游戏 PC 的输入设备。必须在此处连接设备，MAKCU 才能工作。",
+        "power": "USB 3 为 MAKCU 的右侧供电，也为连接的鼠标/键盘供电。",
+        "required": "必须在 USB 3 上连接鼠标或键盘，MAKCU 才能运行。MAKCU 无法在没有连接设备的情况下运行。"
+      },
+      "summary": {
+        "title": "快速摘要",
+        "connections": {
+          "normal_mode": "正常模式：USB 1 → 游戏 PC/游戏机，USB 2 → 配置 PC（COM 端口 - 运行所必需），USB 3 → 鼠标/键盘（必需）",
+          "flash_mode": "刷写模式：仅连接 USB 1 或 USB 3（一次一个，不能同时连接）"
+        },
+        "power_requirement": "电源要求：在正常模式下，必须同时连接 USB 1 和 USB 2 才能为 MAKCU 供电。USB 2 不供电 - 仅用于通信。",
+        "operation_requirement": "运行要求：MAKCU 需要 USB 2（用于软件控制）和 USB 3（连接设备）才能运行。它无法在独立模式下运行。"
       }
     }
   }

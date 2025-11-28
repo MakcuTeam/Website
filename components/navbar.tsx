@@ -75,6 +75,10 @@ export function NavMenu({
       href: "/firmware",
     },
     {
+      title: "information",
+      href: "/information",
+    },
+    {
       title: "setup",
       href: "/setup",
     },

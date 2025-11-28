@@ -24,10 +24,11 @@ const sortPagesAlphabetically = (pages: PageSections[]): PageSections[] => {
   const pageOrder: Record<string, number> = {
     api: 0,
     firmware: 1,
-    setup: 2,
-    settings: 3,
-    troubleshooting: 4,
-    xim: 5,
+    information: 2,
+    setup: 3,
+    settings: 4,
+    troubleshooting: 5,
+    xim: 6,
   };
   return pages.sort((a, b) => {
     const aOrder = pageOrder[a.page] ?? 999;
@@ -171,6 +172,90 @@ export const SECTIONS_CONFIG: PageSections[] = sortPagesAlphabetically([
       {
         id: "firmware-selection",
         labelKey: "tools.sections.firmware_selection.title",
+      },
+    ],
+  },
+  {
+    page: "information",
+    route: "/information",
+    sections: [
+      {
+        id: "what-is-makcu",
+        labelKey: "information.what_is_makcu.title",
+        children: [
+          {
+            id: "important-requirements",
+            labelKey: "information.what_is_makcu.important_notes.title",
+          },
+        ],
+      },
+      {
+        id: "what-is-it-used-for",
+        labelKey: "information.what_is_it_used_for.title",
+        children: [
+          {
+            id: "device-communication",
+            labelKey: "information.what_is_it_used_for.device_communication.title",
+          },
+        ],
+      },
+      {
+        id: "capabilities",
+        labelKey: "information.capabilities.title",
+        children: [
+          {
+            id: "can-do",
+            labelKey: "information.capabilities.can_do.title",
+          },
+          {
+            id: "cannot-do",
+            labelKey: "information.capabilities.cannot_do.title",
+          },
+          {
+            id: "important-reminders",
+            labelKey: "information.capabilities.important_reminders.title",
+          },
+          {
+            id: "console-support",
+            labelKey: "information.capabilities.console_support.title",
+          },
+        ],
+      },
+      {
+        id: "preflashed-vs-unflashed",
+        labelKey: "information.preflashed_vs_unflashed.title",
+        children: [
+          {
+            id: "preflashed",
+            labelKey: "information.preflashed_vs_unflashed.preflashed.title",
+          },
+          {
+            id: "unflashed",
+            labelKey: "information.preflashed_vs_unflashed.unflashed.title",
+          },
+        ],
+      },
+      {
+        id: "usb-ports",
+        labelKey: "information.usb_ports.title",
+        children: [
+          {
+            id: "usb1",
+            labelKey: "information.usb_ports.usb1.title",
+          },
+          {
+            id: "usb2",
+            labelKey: "information.usb_ports.usb2.title",
+          },
+          {
+            id: "usb3",
+            labelKey: "information.usb_ports.usb3.title",
+          },
+          {
+            id: "usb-summary",
+            labelKey: "information.usb_ports.summary.title",
+          },
+        ],
       },
     ],
   },

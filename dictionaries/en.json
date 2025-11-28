@@ -49,6 +49,7 @@
       "makcu_tools": "Firmware Flashing",
       "guides": "Guides",
       "discord": "Discord",
+      "information": "Information",
       "troubleshooting": "Troubleshooting",
       "settings": "Settings",
       "home": "Home",
@@ -586,6 +587,171 @@
           "final_steps": "Connection Steps",
           "final_steps_desc": "Connect XIM and MAKCU as shown in the video below. Ensure both devices are fully functional before connecting."
         }
+      }
+    }
+  },
+  "information": {
+    "title": "MAKCU Information",
+    "description": "Learn about what MAKCU is, what it does, and how it works.",
+    "what_is_makcu": {
+      "title": "What is MAKCU?",
+      "description": "MAKCU is a USB passthrough device that acts as a bridge between your gaming PC and your mouse or keyboard. It consists of two ESP32-S3 microcontrollers working together to create a transparent connection that allows software to intercept and modify input signals in real-time.",
+      "key_points": [
+        "Dual-chip architecture with independent processing on each side",
+        "Full USB passthrough capability for mice and keyboards",
+        "Real-time input interception and modification",
+        "Web-based configuration and firmware updates",
+        "Requires software control via USB 2 (COM port) from a second PC",
+        "Cannot function in standalone mode - requires active software connection",
+        "Must have a mouse or keyboard attached to USB 3 to function"
+      ],
+      "important_notes": {
+        "title": "Important Requirements",
+        "standalone": "MAKCU cannot function in standalone mode. It requires software running on a second PC (connected via USB 2) to control and operate the device.",
+        "attached_device": "MAKCU cannot function without an attached mouse or keyboard device. A mouse or keyboard must be connected to USB 3 for MAKCU to operate.",
+        "software_control": "MAKCU requires software to control it via the COM port (USB 2) from a second PC. Without this software connection, MAKCU will not process or modify inputs."
+      }
+    },
+    "what_is_it_used_for": {
+      "title": "What is MAKCU Used For?",
+      "description": "MAKCU is designed for advanced users who need precise control over their input devices for gaming, automation, or accessibility purposes.",
+      "use_cases": [
+        "Gaming: Enhanced mouse and keyboard control with custom scripts and automation",
+        "Accessibility: Custom input remapping and assistive features",
+        "Automation: Programmatic control of input devices for testing or automation",
+        "Customization: Fine-tuned control over mouse sensitivity, key remapping, and input behavior",
+        "Device Control: Enables your computer to communicate directly with your mouse or keyboard, allowing you to change LEDs, DPI settings, and other device-specific features through the mouse/keyboard manufacturer's software"
+      ],
+      "device_communication": {
+        "title": "Direct Device Communication",
+        "description": "MAKCU enables your computer to talk directly to your mouse or keyboard through USB 1. This allows you to use the manufacturer's software (such as Logitech G HUB, Razer Synapse, etc.) to control device-specific features.",
+        "features": [
+          "Change RGB LED colors and effects",
+          "Adjust DPI settings and profiles",
+          "Configure mouse button assignments",
+          "Update device firmware",
+          "Access all manufacturer software features"
+        ]
+      }
+    },
+    "capabilities": {
+      "title": "What MAKCU Can and Cannot Do",
+      "can_do": {
+        "title": "What MAKCU Can Do",
+        "items": [
+          "Pass through mouse and keyboard input with full compatibility",
+          "Intercept and modify mouse movements, clicks, and keyboard presses in real-time",
+          "Remap keys and mouse buttons",
+          "Adjust mouse sensitivity and acceleration",
+          "Execute custom scripts and automation",
+          "Support both wired and wireless devices (when connected via USB adapter)",
+          "Work with most standard USB HID mice and keyboards",
+          "Enable direct communication between your PC and mouse/keyboard for LED control, DPI changes, and other device features",
+          "Support console gaming directly if the game supports mouse and keyboard input"
+        ]
+      },
+      "cannot_do": {
+        "title": "What MAKCU Cannot Do",
+        "items": [
+          "Cannot work with Bluetooth devices directly (requires USB adapter)",
+          "Cannot modify encrypted or proprietary protocols",
+          "Cannot function without proper firmware installation",
+          "Cannot work with non-USB input devices",
+          "Limited compatibility with some specialized gaming peripherals with proprietary drivers",
+          "Cannot function in standalone mode - requires software control",
+          "Cannot function without an attached mouse or keyboard device",
+          "Cannot provide ESP (wallhacks), self-aiming, or aimbot capabilities",
+          "Cannot load or execute game scripts - it only processes input/output signals",
+          "Cannot work with consoles that don't support mouse and keyboard natively (requires XIM adapter)"
+        ]
+      },
+      "important_reminders": {
+        "title": "Important Reminders",
+        "no_cheats": "MAKCU cannot provide ESP (wallhacks), self-aiming, or aimbot capabilities. It is a hardware passthrough device that only processes input and output signals. It cannot load scripts, modify game memory, or provide visual overlays.",
+        "input_only": "MAKCU works at the input level only. It can modify what you send to your computer, but it cannot read game data, provide visual information, or interact with game software directly."
+      },
+      "console_support": {
+        "title": "Console Support",
+        "description": "MAKCU can support console gaming, but the requirements depend on the console and game.",
+        "direct_support": {
+          "title": "Direct Console Support",
+          "description": "If your console's game natively supports mouse and keyboard input, MAKCU can work directly. Simply connect MAKCU to your console via USB 1, and connect your mouse/keyboard to USB 3.",
+          "examples": [
+            "PlayStation 5 games with native mouse/keyboard support",
+            "Xbox Series X/S games with native mouse/keyboard support",
+            "Any console game that officially supports mouse and keyboard input"
+          ]
+        },
+        "xim_required": {
+          "title": "XIM Adapter Required",
+          "description": "If your console or game does not support mouse and keyboard natively, you will need a XIM adapter to convert MAKCU's mouse input into controller input.",
+          "note": "Please see the XIM setup page for detailed instructions on how to configure MAKCU with XIM.",
+          "link_text": "See XIM Setup Guide"
+        }
+      }
+    },
+    "preflashed_vs_unflashed": {
+      "title": "Pre-flashed vs Unflashed",
+      "description": "MAKCU devices can come in two states depending on whether your reseller has prepared the device before shipping.",
+      "preflashed": {
+        "title": "Pre-flashed MAKCU",
+        "description": "A pre-flashed MAKCU has been set up by your reseller before shipping. The firmware has been loaded and the device has been tested to ensure it works correctly.",
+        "benefits": [
+          "Ready to use immediately after connecting",
+          "Tested and verified by the reseller",
+          "No initial flashing required",
+          "Both sides (left and right) are already configured"
+        ],
+        "indicator": "If your MAKCU is pre-flashed, it will connect normally when you plug it in, and you can start using it right away."
+      },
+      "unflashed": {
+        "title": "Unflashed MAKCU",
+        "description": "An unflashed MAKCU comes directly from the factory without firmware installed. This is the default state of ESP32-S3 chips from the manufacturer.",
+        "characteristics": [
+          "Requires firmware flashing before first use",
+          "Will show USB disconnection loops in Device Manager until flashed",
+          "USB connection sound will loop endlessly when connected without holding buttons",
+          "This is normal behavior and not a defect"
+        ],
+        "what_to_do": "If your MAKCU is unflashed, you'll need to flash the firmware using the firmware flashing page. After the first successful flash, this behavior will stop and never return."
+      }
+    },
+    "usb_ports": {
+      "title": "Understanding USB Ports",
+      "description": "MAKCU has three USB ports, each serving a specific purpose. Understanding how they work is essential for proper setup.",
+      "usb1": {
+        "title": "USB 1 - Left Side (Device Port)",
+        "description": "USB 1 is connected to the left-side ESP32-S3 chip and serves as the device connection to your gaming PC or console.",
+        "purpose": "This is where MAKCU appears as a USB device to your computer or console. Your gaming PC or console connects here.",
+        "usage": "Connect USB 1 to your gaming PC or console. This is the primary connection that allows your computer/console to recognize MAKCU as a mouse or keyboard device.",
+        "power": "USB 1 provides power to the left side of MAKCU.",
+        "device_communication": "This port also enables direct communication between your PC and the connected mouse/keyboard, allowing you to use manufacturer software to control device features."
+      },
+      "usb2": {
+        "title": "USB 2 - COM Port (Communication)",
+        "description": "USB 2 is the communication port used for sending commands and configuring MAKCU. This is essential for MAKCU to function.",
+        "purpose": "This port creates a serial COM port connection that allows software and the MAKCU website to communicate with the device. MAKCU requires active software control via this port to operate.",
+        "usage": "Connect USB 2 to the same computer you're using to configure MAKCU (typically your gaming PC or a separate configuration PC). This is used for settings, firmware updates, device control, and is required for MAKCU to process inputs.",
+        "power": "USB 2 does NOT provide power to MAKCU. This prevents back-feeding power between your main PC and a second PC.",
+        "important": "In normal mode, both USB 1 and USB 2 must be connected for MAKCU to receive power. USB 2 is only for communication, not power. Without software connected via USB 2, MAKCU cannot function.",
+        "software_requirement": "MAKCU requires software running on the PC connected to USB 2 to control and operate the device. Without this software connection, MAKCU will not process or modify inputs."
+      },
+      "usb3": {
+        "title": "USB 3 - Right Side (Host Port)",
+        "description": "USB 3 is connected to the right-side ESP32-S3 chip and serves as the host port for your mouse or keyboard.",
+        "purpose": "This is where you connect your actual mouse or keyboard. MAKCU acts as a USB host and receives input from your device.",
+        "usage": "Connect your mouse or keyboard to USB 3. This is the input device that MAKCU will pass through to your gaming PC via USB 1. A device must be connected here for MAKCU to function.",
+        "power": "USB 3 provides power to the right side of MAKCU and also powers the connected mouse/keyboard.",
+        "required": "A mouse or keyboard must be connected to USB 3 for MAKCU to operate. MAKCU cannot function without an attached device."
+      },
+      "summary": {
+        "title": "Quick Summary",
+        "connections": {
+          "normal_mode": "Normal Mode: USB 1 → Gaming PC/Console, USB 2 → Configuration PC (COM port - REQUIRED for operation), USB 3 → Mouse/Keyboard (REQUIRED)",
+          "flash_mode": "Flash Mode: Only USB 1 OR USB 3 connected (one at a time, not both)"
+        },
+        "power_requirement": "Power Requirement: USB 1 + USB 2 must both be connected in normal mode for MAKCU to receive power. USB 2 does not provide power - it's communication only.",
+        "operation_requirement": "Operation Requirement: MAKCU requires both USB 2 (for software control) and USB 3 (with attached device) to function. It cannot operate in standalone mode."
       }
     }
   }
