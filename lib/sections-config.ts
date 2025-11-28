@@ -242,11 +242,25 @@ export const SECTIONS_CONFIG: PageSections[] = sortPagesAlphabetically([
       {
         id: "led-guide",
         labelKey: "troubleshooting.led_guide.title",
+        children: [
+          {
+            id: "left-side",
+            labelKey: "troubleshooting.led_guide.left_side.title",
+          },
+          {
+            id: "right-side",
+            labelKey: "troubleshooting.led_guide.right_side.title",
+          },
+        ],
       },
       {
         id: "troubleshooting-steps",
         labelKey: "troubleshooting.troubleshooting_steps.title",
         children: [
+          {
+            id: "slow-persists",
+            labelKey: "troubleshooting.troubleshooting_steps.slow_persists.title",
+          },
           {
             id: "led-not-responding",
             labelKey: "troubleshooting.troubleshooting_steps.led_not_responding.title",
@@ -268,6 +282,10 @@ export const SECTIONS_CONFIG: PageSections[] = sortPagesAlphabetically([
             labelKey: "troubleshooting.troubleshooting_steps.button_held_still_looping.title",
           },
         ],
+      },
+      {
+        id: "quick-reference",
+        labelKey: "troubleshooting.quick_reference.title",
       },
       {
         id: "still-issues",

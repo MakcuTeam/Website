@@ -201,10 +201,56 @@
     },
     "led_guide": {
       "title": "LED 状态指南",
-      "description": "MAKCU 在两侧使用 LED 来指示系统状态。左侧显示 USB 设备连接状态，右侧显示 USB 主机连接状态。"
+      "description": "MAKCU 在两侧使用 LED 来指示系统状态并帮助您排除故障。LED 可以是常亮（开或关）或闪烁。",
+      "left_side": {
+        "title": "左侧（设备侧）",
+        "description": "左侧 LED 显示 USB 设备与计算机连接的状态。",
+        "solid_on": {
+          "title": "常亮（绿色）",
+          "meaning": "USB 设备已连接并正常工作",
+          "action": "无需操作 - 一切正常"
+        },
+        "solid_off": {
+          "title": "常灭",
+          "meaning": "未连接 USB 设备",
+          "action": "检查 USB 线连接并确保设备已通电"
+        },
+        "slow_blink": {
+          "title": "慢闪（500ms 亮，500ms 灭）",
+          "meaning": "警告 - 系统正在调整设置",
+          "when": "正在更改波特率或系统正在重新配置",
+          "action": "等待几秒钟 - 这应该会自动解决。如果持续存在，请尝试重启 MAKCU。"
+        }
+      },
+      "right_side": {
+        "title": "右侧（主机侧）",
+        "description": "右侧 LED 显示 USB 主机与鼠标/键盘连接的状态。",
+        "solid_on": {
+          "title": "常亮（绿色）",
+          "meaning": "USB 主机已连接并正常工作",
+          "action": "无需操作 - 一切正常"
+        },
+        "solid_off": {
+          "title": "常灭",
+          "meaning": "未连接 USB 设备到主机",
+          "action": "将支持的鼠标或键盘连接到右侧 USB 端口"
+        },
+        "slow_blink": {
+          "title": "慢闪（500ms 亮，500ms 灭）",
+          "meaning": "警告 - 检测到临时问题",
+          "when": "USB 请求繁忙（操作期间正常）或系统正在处理临时状况",
+          "action": "通常会自动解决。如果持续存在，请检查设备连接。"
+        }
+      }
     },
     "troubleshooting_steps": {
       "title": "故障排除步骤",
+      "slow_persists": {
+        "title": "慢闪持续",
+        "problem": "LED 持续慢闪且无法解决",
+        "causes": "系统卡在配置状态，波特率更改未完成，或警告条件未清除",
+        "steps": "等待 10 秒 - 某些操作需要时间，循环重启受影响的一侧，检查设备管理器中的任何错误消息，或如果问题继续，请重新刷写"
+      },
       "led_not_responding": {
         "title": "LED 无响应",
         "problem": "LED 根本不亮或不改变状态",
@@ -251,24 +297,17 @@
       }
     },
     "quick_reference": {
-      "title": "LED 快速参考",
-      "description": "MAKCU 两侧 LED 状态的快速参考指南。",
+      "title": "快速参考",
       "led_state": "LED 状态",
       "left_meaning": "左侧含义",
       "right_meaning": "右侧含义",
       "action": "操作",
-      "solid_on": "常亮（绿色）",
+      "solid_on": "常亮",
       "solid_off": "常灭",
-      "flash": "闪烁",
-      "on_meaning_left": "设备已连接并正常工作",
-      "on_meaning_right": "主机已连接并正常工作",
-      "off_meaning_left": "未连接设备",
-      "off_meaning_right": "未连接设备",
-      "flash_meaning_left": "波特率指示器或系统调整中",
-      "flash_meaning_right": "系统调整中或临时状态",
+      "slow_blink": "慢闪",
       "working": "正常工作 - 无需操作",
       "connect_device": "连接设备",
-      "check_connections": "检查连接，重启或重新刷写"
+      "wait_resolves": "等待，通常会自动解决"
     },
     "still_issues": {
       "title": "仍有问题？",

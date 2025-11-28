@@ -208,10 +208,56 @@
     },
     "led_guide": {
       "title": "LED Status Guide",
-      "description": "MAKCU uses LEDs on both sides to indicate system status. The left side shows USB device connection status, and the right side shows USB host connection status."
+      "description": "MAKCU uses LEDs on both sides to indicate system status and help you troubleshoot issues. The LEDs can be solid (on or off) or blinking.",
+      "left_side": {
+        "title": "Left Side (Device Side)",
+        "description": "The left side LED shows the status of the USB device connection to your computer.",
+        "solid_on": {
+          "title": "Solid ON (Green)",
+          "meaning": "USB device is connected and working correctly",
+          "action": "No action needed - everything is working"
+        },
+        "solid_off": {
+          "title": "Solid OFF",
+          "meaning": "No USB device connected",
+          "action": "Check USB cable connection and ensure device is powered on"
+        },
+        "slow_blink": {
+          "title": "Slow Blink (500ms on, 500ms off)",
+          "meaning": "Warning - system is adjusting settings",
+          "when": "Baud rate is being changed or system is reconfiguring",
+          "action": "Wait a few seconds - this should resolve automatically. If it persists, try restarting MAKCU."
+        }
+      },
+      "right_side": {
+        "title": "Right Side (Host Side)",
+        "description": "The right side LED shows the status of the USB host connection to your mouse/keyboard.",
+        "solid_on": {
+          "title": "Solid ON (Green)",
+          "meaning": "USB host is connected and working correctly",
+          "action": "No action needed - everything is working"
+        },
+        "solid_off": {
+          "title": "Solid OFF",
+          "meaning": "No USB device connected to host",
+          "action": "Connect a supported mouse or keyboard to the right side USB port"
+        },
+        "slow_blink": {
+          "title": "Slow Blink (500ms on, 500ms off)",
+          "meaning": "Warning - temporary issue detected",
+          "when": "USB request is busy (normal during operation) or system is handling a temporary condition",
+          "action": "Usually resolves automatically. If it persists, check device connection."
+        }
+      }
     },
     "troubleshooting_steps": {
       "title": "Troubleshooting Steps",
+      "slow_persists": {
+        "title": "Slow Blink Persists",
+        "problem": "LED keeps blinking slowly and doesn't resolve",
+        "causes": "System stuck in configuration state, baud rate change didn't complete, or warning condition not clearing",
+        "steps": "Wait 10 seconds - some operations take time, power cycle the affected side, check for any error messages in device manager, or reflash if problem continues"
+      },
       "led_not_responding": {
         "title": "LED Not Responding",
         "problem": "LED doesn't turn on or change state at all",
@@ -258,24 +304,17 @@
       }
     },
     "quick_reference": {
-      "title": "LED Quick Reference",
-      "description": "Quick reference guide for LED states on both sides of MAKCU.",
+      "title": "Quick Reference",
       "led_state": "LED State",
       "left_meaning": "Left Side Meaning",
       "right_meaning": "Right Side Meaning",
       "action": "Action",
-      "solid_on": "ON (Green)",
-      "solid_off": "OFF",
-      "flash": "Flash",
-      "on_meaning_left": "Device connected and working",
-      "on_meaning_right": "Host connected and working",
-      "off_meaning_left": "No device connected",
-      "off_meaning_right": "No device connected",
-      "flash_meaning_left": "Baud rate indicator or system adjusting",
-      "flash_meaning_right": "System adjusting or temporary state",
+      "solid_on": "Solid ON",
+      "solid_off": "Solid OFF",
+      "slow_blink": "Slow Blink",
       "working": "Working - no action needed",
       "connect_device": "Connect device",
-      "check_connections": "Check connections, restart, or reflash"
+      "wait_resolves": "Wait, usually resolves"
     },
     "still_issues": {
       "title": "Still Having Issues?",
