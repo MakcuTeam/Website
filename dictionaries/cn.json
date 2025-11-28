@@ -201,86 +201,10 @@
     },
     "led_guide": {
       "title": "LED 状态指南",
-      "description": "MAKCU 在两侧使用 LED 来指示系统状态并帮助您排除故障。LED 可以是常亮（开或关）或以不同速度闪烁。",
-      "left_side": {
-        "title": "左侧（设备侧）",
-        "description": "左侧 LED 显示 USB 设备与计算机连接的状态。",
-        "solid_on": {
-          "title": "常亮（绿色）",
-          "meaning": "USB 设备已连接并正常工作",
-          "action": "无需操作 - 一切正常"
-        },
-        "solid_off": {
-          "title": "常灭",
-          "meaning": "未连接 USB 设备",
-          "action": "检查 USB 线连接并确保设备已通电"
-        },
-        "slow_blink": {
-          "title": "慢闪（500ms 亮，500ms 灭）",
-          "meaning": "警告 - 系统正在调整设置",
-          "when": "正在更改波特率或系统正在重新配置",
-          "action": "等待几秒钟 - 这应该会自动解决。如果持续存在，请尝试重启 MAKCU。"
-        },
-        "fast_blink": {
-          "title": "快闪（100ms 亮，100ms 灭）",
-          "meaning": "错误 - 检测到连接问题",
-          "when": "USB 主机（右侧）已停止响应，左右两侧之间的桥接连接断开，或检测到主机崩溃/超时",
-          "action": "检查左右两侧之间的连接，检查右侧 LED 状态，尝试拔下并重新连接两个 USB 线，或如果问题持续存在，请重新刷写两侧"
-        }
-      },
-      "right_side": {
-        "title": "右侧（主机侧）",
-        "description": "右侧 LED 显示 USB 主机与鼠标/键盘连接的状态。",
-        "solid_on": {
-          "title": "常亮（绿色）",
-          "meaning": "USB 主机已连接并正常工作",
-          "action": "无需操作 - 一切正常"
-        },
-        "solid_off": {
-          "title": "常灭",
-          "meaning": "未连接 USB 设备到主机",
-          "action": "将支持的鼠标或键盘连接到右侧 USB 端口"
-        },
-        "slow_blink": {
-          "title": "慢闪（500ms 亮，500ms 灭）",
-          "meaning": "警告 - 检测到临时问题",
-          "when": "USB 请求繁忙（操作期间正常）或系统正在处理临时状况",
-          "action": "通常会自动解决。如果持续存在，请检查设备连接。"
-        },
-        "fast_blink": {
-          "title": "快闪（100ms 亮，100ms 灭）",
-          "meaning": "错误 - 检测到严重问题",
-          "when": "USB 设备（左侧）已停止响应，左右两侧之间的桥接连接断开，定时器或 USB 请求失败，或检测到设备崩溃/超时",
-          "action": "检查左右两侧之间的连接，检查左侧 LED 状态，尝试拔下并重新连接两个 USB 线，或如果问题持续存在，请重新刷写两侧"
-        }
-      }
+      "description": "MAKCU 在两侧使用 LED 来指示系统状态。左侧显示 USB 设备连接状态，右侧显示 USB 主机连接状态。"
     },
     "troubleshooting_steps": {
       "title": "故障排除步骤",
-      "both_fast": {
-        "title": "两侧 LED 快闪",
-        "problem": "左右两侧均显示快闪（错误状态）",
-        "causes": "两侧之间的桥接连接断开，UART 通信失败，或一侧已崩溃或重置",
-        "steps": "循环重启两侧（拔下并重新插入 USB 线），检查左右两侧之间的物理连接，验证两侧都已正确通电，或如果问题持续存在，请重新刷写两侧"
-      },
-      "left_fast": {
-        "title": "左侧快闪，右侧正常",
-        "problem": "左侧显示错误，右侧正常工作",
-        "causes": "右侧（主机）已崩溃或停止响应，或左侧桥接心跳超时",
-        "steps": "检查右侧 LED - 如果它也显示错误，请参阅「两侧 LED 快闪」，尝试重启右侧，或如果需要，请重新刷写右侧"
-      },
-      "right_fast": {
-        "title": "右侧快闪，左侧正常",
-        "problem": "右侧显示错误，左侧正常工作",
-        "causes": "左侧（设备）已崩溃或停止响应，或右侧桥接心跳超时",
-        "steps": "检查左侧 LED - 如果它也显示错误，请参阅「两侧 LED 快闪」，尝试重启左侧，或如果需要，请重新刷写左侧"
-      },
-      "slow_persists": {
-        "title": "慢闪持续",
-        "problem": "LED 持续慢闪且无法解决",
-        "causes": "系统卡在配置状态，波特率更改未完成，或警告条件未清除",
-        "steps": "等待 10 秒 - 某些操作需要时间，循环重启受影响的一侧，检查设备管理器中的任何错误消息，或如果问题继续，请重新刷写"
-      },
       "led_not_responding": {
         "title": "LED 无响应",
         "problem": "LED 根本不亮或不改变状态",
@@ -327,19 +251,24 @@
       }
     },
     "quick_reference": {
-      "title": "快速参考",
+      "title": "LED 快速参考",
+      "description": "MAKCU 两侧 LED 状态的快速参考指南。",
       "led_state": "LED 状态",
       "left_meaning": "左侧含义",
       "right_meaning": "右侧含义",
       "action": "操作",
-      "solid_on": "常亮",
+      "solid_on": "常亮（绿色）",
       "solid_off": "常灭",
-      "slow_blink": "慢闪",
-      "fast_blink": "快闪",
+      "flash": "闪烁",
+      "on_meaning_left": "设备已连接并正常工作",
+      "on_meaning_right": "主机已连接并正常工作",
+      "off_meaning_left": "未连接设备",
+      "off_meaning_right": "未连接设备",
+      "flash_meaning_left": "波特率指示器或系统调整中",
+      "flash_meaning_right": "系统调整中或临时状态",
       "working": "正常工作 - 无需操作",
       "connect_device": "连接设备",
-      "wait_resolves": "等待，通常会自动解决",
-      "check_connections": "检查连接，重启，重新刷写"
+      "check_connections": "检查连接，重启或重新刷写"
     },
     "still_issues": {
       "title": "仍有问题？",

@@ -84,247 +84,56 @@ export default async function TroubleshootingPage({ params }: LangProps) {
               </p>
             }
           >
-            {/* Left Side */}
-            <SubSection
-              id="left-side"
-              title={dict.troubleshooting.led_guide.left_side.title}
-              description={dict.troubleshooting.led_guide.left_side.description}
-            >
-              <div className="space-y-6">
-                {/* Solid ON */}
-                <Card className="border-border/60 bg-card/90 shadow-lg">
-                  <CardContent className="p-6">
-                    <div className="space-y-4">
-                      <h4 className="text-lg font-semibold text-foreground">
-                        {dict.troubleshooting.led_guide.left_side.solid_on.title}
-                      </h4>
-                      <div className="space-y-2 text-sm leading-relaxed text-muted-foreground">
-                        <p>
-                          <strong className="text-foreground">
-                            {t("Meaning", "含义")}:{" "}
-                          </strong>
-                          {dict.troubleshooting.led_guide.left_side.solid_on.meaning}
-                        </p>
-                        <p>
-                          <strong className="text-foreground">
-                            {t("Action", "操作")}:{" "}
-                          </strong>
-                          {dict.troubleshooting.led_guide.left_side.solid_on.action}
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Solid OFF */}
-                <Card className="border-border/60 bg-card/90 shadow-lg">
-                  <CardContent className="p-6">
-                    <div className="space-y-4">
-                      <h4 className="text-lg font-semibold text-foreground">
-                        {dict.troubleshooting.led_guide.left_side.solid_off.title}
-                      </h4>
-                      <div className="space-y-2 text-sm leading-relaxed text-muted-foreground">
-                        <p>
-                          <strong className="text-foreground">
-                            {t("Meaning", "含义")}:{" "}
-                          </strong>
-                          {dict.troubleshooting.led_guide.left_side.solid_off.meaning}
-                        </p>
-                        <p>
-                          <strong className="text-foreground">
-                            {t("Action", "操作")}:{" "}
-                          </strong>
-                          {dict.troubleshooting.led_guide.left_side.solid_off.action}
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Slow Blink */}
-                <Card className="border-border/60 bg-card/90 shadow-lg">
-                  <CardContent className="p-6">
-                    <div className="space-y-4">
-                      <h4 className="text-lg font-semibold text-foreground">
-                        {dict.troubleshooting.led_guide.left_side.slow_blink.title}
-                      </h4>
-                      <div className="space-y-2 text-sm leading-relaxed text-muted-foreground">
-                        <p>
-                          <strong className="text-foreground">
-                            {t("Meaning", "含义")}:{" "}
-                          </strong>
-                          {dict.troubleshooting.led_guide.left_side.slow_blink.meaning}
-                        </p>
-                        <p>
-                          <strong className="text-foreground">
-                            {t("When it occurs", "发生时间")}:{" "}
-                          </strong>
-                          {dict.troubleshooting.led_guide.left_side.slow_blink.when}
-                        </p>
-                        <p>
-                          <strong className="text-foreground">
-                            {t("Action", "操作")}:{" "}
-                          </strong>
-                          {dict.troubleshooting.led_guide.left_side.slow_blink.action}
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Fast Blink */}
-                <Card className="border-border/60 bg-card/90 shadow-lg">
-                  <CardContent className="p-6">
-                    <div className="space-y-4">
-                      <h4 className="text-lg font-semibold text-foreground">
-                        {dict.troubleshooting.led_guide.left_side.fast_blink.title}
-                      </h4>
-                      <div className="space-y-2 text-sm leading-relaxed text-muted-foreground">
-                        <p>
-                          <strong className="text-foreground">
-                            {t("Meaning", "含义")}:{" "}
-                          </strong>
-                          {dict.troubleshooting.led_guide.left_side.fast_blink.meaning}
-                        </p>
-                        <p>
-                          <strong className="text-foreground">
-                            {t("When it occurs", "发生时间")}:{" "}
-                          </strong>
-                          {dict.troubleshooting.led_guide.left_side.fast_blink.when}
-                        </p>
-                        <p>
-                          <strong className="text-foreground">
-                            {t("Action", "操作")}:{" "}
-                          </strong>
-                          {dict.troubleshooting.led_guide.left_side.fast_blink.action}
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </SubSection>
-
-            {/* Right Side */}
-            <SubSection
-              id="right-side"
-              title={dict.troubleshooting.led_guide.right_side.title}
-              description={dict.troubleshooting.led_guide.right_side.description}
-            >
-              <div className="space-y-6">
-                {/* Solid ON */}
-                <Card className="border-border/60 bg-card/90 shadow-lg">
-                  <CardContent className="p-6">
-                    <div className="space-y-4">
-                      <h4 className="text-lg font-semibold text-foreground">
-                        {dict.troubleshooting.led_guide.right_side.solid_on.title}
-                      </h4>
-                      <div className="space-y-2 text-sm leading-relaxed text-muted-foreground">
-                        <p>
-                          <strong className="text-foreground">
-                            {t("Meaning", "含义")}:{" "}
-                          </strong>
-                          {dict.troubleshooting.led_guide.right_side.solid_on.meaning}
-                        </p>
-                        <p>
-                          <strong className="text-foreground">
-                            {t("Action", "操作")}:{" "}
-                          </strong>
-                          {dict.troubleshooting.led_guide.right_side.solid_on.action}
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Solid OFF */}
-                <Card className="border-border/60 bg-card/90 shadow-lg">
-                  <CardContent className="p-6">
-                    <div className="space-y-4">
-                      <h4 className="text-lg font-semibold text-foreground">
-                        {dict.troubleshooting.led_guide.right_side.solid_off.title}
-                      </h4>
-                      <div className="space-y-2 text-sm leading-relaxed text-muted-foreground">
-                        <p>
-                          <strong className="text-foreground">
-                            {t("Meaning", "含义")}:{" "}
-                          </strong>
-                          {dict.troubleshooting.led_guide.right_side.solid_off.meaning}
-                        </p>
-                        <p>
-                          <strong className="text-foreground">
-                            {t("Action", "操作")}:{" "}
-                          </strong>
-                          {dict.troubleshooting.led_guide.right_side.solid_off.action}
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Slow Blink */}
-                <Card className="border-border/60 bg-card/90 shadow-lg">
-                  <CardContent className="p-6">
-                    <div className="space-y-4">
-                      <h4 className="text-lg font-semibold text-foreground">
-                        {dict.troubleshooting.led_guide.right_side.slow_blink.title}
-                      </h4>
-                      <div className="space-y-2 text-sm leading-relaxed text-muted-foreground">
-                        <p>
-                          <strong className="text-foreground">
-                            {t("Meaning", "含义")}:{" "}
-                          </strong>
-                          {dict.troubleshooting.led_guide.right_side.slow_blink.meaning}
-                        </p>
-                        <p>
-                          <strong className="text-foreground">
-                            {t("When it occurs", "发生时间")}:{" "}
-                          </strong>
-                          {dict.troubleshooting.led_guide.right_side.slow_blink.when}
-                        </p>
-                        <p>
-                          <strong className="text-foreground">
-                            {t("Action", "操作")}:{" "}
-                          </strong>
-                          {dict.troubleshooting.led_guide.right_side.slow_blink.action}
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Fast Blink */}
-                <Card className="border-border/60 bg-card/90 shadow-lg">
-                  <CardContent className="p-6">
-                    <div className="space-y-4">
-                      <h4 className="text-lg font-semibold text-foreground">
-                        {dict.troubleshooting.led_guide.right_side.fast_blink.title}
-                      </h4>
-                      <div className="space-y-2 text-sm leading-relaxed text-muted-foreground">
-                        <p>
-                          <strong className="text-foreground">
-                            {t("Meaning", "含义")}:{" "}
-                          </strong>
-                          {dict.troubleshooting.led_guide.right_side.fast_blink.meaning}
-                        </p>
-                        <p>
-                          <strong className="text-foreground">
-                            {t("When it occurs", "发生时间")}:{" "}
-                          </strong>
-                          {dict.troubleshooting.led_guide.right_side.fast_blink.when}
-                        </p>
-                        <p>
-                          <strong className="text-foreground">
-                            {t("Action", "操作")}:{" "}
-                          </strong>
-                          {dict.troubleshooting.led_guide.right_side.fast_blink.action}
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </SubSection>
+            <Card className="border-border/60 bg-card/90 shadow-lg">
+              <CardContent className="p-6">
+                <div className="overflow-x-auto">
+                  <table className="w-full border-collapse">
+                    <thead>
+                      <tr className="border-b border-border/60">
+                        <th className="text-left py-3 px-4 text-xs font-semibold uppercase tracking-[0.25em] text-emerald-500">
+                          {dict.troubleshooting.quick_reference.led_state}
+                        </th>
+                        <th className="text-left py-3 px-4 text-xs font-semibold uppercase tracking-[0.25em] text-emerald-500">
+                          {dict.troubleshooting.quick_reference.left_meaning}
+                        </th>
+                        <th className="text-left py-3 px-4 text-xs font-semibold uppercase tracking-[0.25em] text-emerald-500">
+                          {dict.troubleshooting.quick_reference.right_meaning}
+                        </th>
+                        <th className="text-left py-3 px-4 text-xs font-semibold uppercase tracking-[0.25em] text-emerald-500">
+                          {dict.troubleshooting.quick_reference.action}
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="text-sm text-muted-foreground">
+                      <tr className="border-b border-border/60">
+                        <td className="py-3 px-4 font-medium text-foreground">
+                          {dict.troubleshooting.quick_reference.solid_on}
+                        </td>
+                        <td className="py-3 px-4">{dict.troubleshooting.quick_reference.on_meaning_left}</td>
+                        <td className="py-3 px-4">{dict.troubleshooting.quick_reference.on_meaning_right}</td>
+                        <td className="py-3 px-4">{dict.troubleshooting.quick_reference.working}</td>
+                      </tr>
+                      <tr className="border-b border-border/60">
+                        <td className="py-3 px-4 font-medium text-foreground">
+                          {dict.troubleshooting.quick_reference.solid_off}
+                        </td>
+                        <td className="py-3 px-4">{dict.troubleshooting.quick_reference.off_meaning_left}</td>
+                        <td className="py-3 px-4">{dict.troubleshooting.quick_reference.off_meaning_right}</td>
+                        <td className="py-3 px-4">{dict.troubleshooting.quick_reference.connect_device}</td>
+                      </tr>
+                      <tr>
+                        <td className="py-3 px-4 font-medium text-foreground">
+                          {dict.troubleshooting.quick_reference.flash}
+                        </td>
+                        <td className="py-3 px-4">{dict.troubleshooting.quick_reference.flash_meaning_left}</td>
+                        <td className="py-3 px-4">{dict.troubleshooting.quick_reference.flash_meaning_right}</td>
+                        <td className="py-3 px-4">{dict.troubleshooting.quick_reference.check_connections}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </CardContent>
+            </Card>
           </Section>
 
           {/* Troubleshooting Steps */}
@@ -333,144 +142,6 @@ export default async function TroubleshootingPage({ params }: LangProps) {
             badge={t("Steps", "步骤")}
             title={dict.troubleshooting.troubleshooting_steps.title}
           >
-            {/* Both Fast */}
-            <SubSection id="both-fast" title={dict.troubleshooting.troubleshooting_steps.both_fast.title}>
-              <Card className="border-border/60 bg-card/90 shadow-lg">
-                <CardContent className="p-6">
-                  <div className="space-y-4">
-                    <div>
-                      <h4 className="font-semibold text-foreground mb-2">
-                        {t("Problem", "问题")}:
-                      </h4>
-                      <p className="text-sm leading-relaxed text-muted-foreground">
-                        {dict.troubleshooting.troubleshooting_steps.both_fast.problem}
-                      </p>
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-foreground mb-2">
-                        {t("Possible Causes", "可能原因")}:
-                      </h4>
-                      <p className="text-sm leading-relaxed text-muted-foreground">
-                        {dict.troubleshooting.troubleshooting_steps.both_fast.causes}
-                      </p>
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-foreground mb-2">
-                        {t("What to Do", "解决方法")}:
-                      </h4>
-                      <p className="text-sm leading-relaxed text-muted-foreground">
-                        {dict.troubleshooting.troubleshooting_steps.both_fast.steps}
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </SubSection>
-
-            {/* Left Fast */}
-            <SubSection id="left-fast" title={dict.troubleshooting.troubleshooting_steps.left_fast.title}>
-              <Card className="border-border/60 bg-card/90 shadow-lg">
-                <CardContent className="p-6">
-                  <div className="space-y-4">
-                    <div>
-                      <h4 className="font-semibold text-foreground mb-2">
-                        {t("Problem", "问题")}:
-                      </h4>
-                      <p className="text-sm leading-relaxed text-muted-foreground">
-                        {dict.troubleshooting.troubleshooting_steps.left_fast.problem}
-                      </p>
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-foreground mb-2">
-                        {t("Possible Causes", "可能原因")}:
-                      </h4>
-                      <p className="text-sm leading-relaxed text-muted-foreground">
-                        {dict.troubleshooting.troubleshooting_steps.left_fast.causes}
-                      </p>
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-foreground mb-2">
-                        {t("What to Do", "解决方法")}:
-                      </h4>
-                      <p className="text-sm leading-relaxed text-muted-foreground">
-                        {dict.troubleshooting.troubleshooting_steps.left_fast.steps}
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </SubSection>
-
-            {/* Right Fast */}
-            <SubSection id="right-fast" title={dict.troubleshooting.troubleshooting_steps.right_fast.title}>
-              <Card className="border-border/60 bg-card/90 shadow-lg">
-                <CardContent className="p-6">
-                  <div className="space-y-4">
-                    <div>
-                      <h4 className="font-semibold text-foreground mb-2">
-                        {t("Problem", "问题")}:
-                      </h4>
-                      <p className="text-sm leading-relaxed text-muted-foreground">
-                        {dict.troubleshooting.troubleshooting_steps.right_fast.problem}
-                      </p>
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-foreground mb-2">
-                        {t("Possible Causes", "可能原因")}:
-                      </h4>
-                      <p className="text-sm leading-relaxed text-muted-foreground">
-                        {dict.troubleshooting.troubleshooting_steps.right_fast.causes}
-                      </p>
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-foreground mb-2">
-                        {t("What to Do", "解决方法")}:
-                      </h4>
-                      <p className="text-sm leading-relaxed text-muted-foreground">
-                        {dict.troubleshooting.troubleshooting_steps.right_fast.steps}
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </SubSection>
-
-            {/* Slow Persists */}
-            <SubSection
-              id="slow-persists"
-              title={dict.troubleshooting.troubleshooting_steps.slow_persists.title}
-            >
-              <Card className="border-border/60 bg-card/90 shadow-lg">
-                <CardContent className="p-6">
-                  <div className="space-y-4">
-                    <div>
-                      <h4 className="font-semibold text-foreground mb-2">
-                        {t("Problem", "问题")}:
-                      </h4>
-                      <p className="text-sm leading-relaxed text-muted-foreground">
-                        {dict.troubleshooting.troubleshooting_steps.slow_persists.problem}
-                      </p>
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-foreground mb-2">
-                        {t("Possible Causes", "可能原因")}:
-                      </h4>
-                      <p className="text-sm leading-relaxed text-muted-foreground">
-                        {dict.troubleshooting.troubleshooting_steps.slow_persists.causes}
-                      </p>
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-foreground mb-2">
-                        {t("What to Do", "解决方法")}:
-                      </h4>
-                      <p className="text-sm leading-relaxed text-muted-foreground">
-                        {dict.troubleshooting.troubleshooting_steps.slow_persists.steps}
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </SubSection>
 
             {/* LED Not Responding */}
             <SubSection
@@ -670,67 +341,6 @@ export default async function TroubleshootingPage({ params }: LangProps) {
             </SubSection>
           </Section>
 
-          {/* Quick Reference */}
-          <Section id="quick-reference" badge={t("Reference", "参考")} title={dict.troubleshooting.quick_reference.title}>
-            <Card className="border-border/60 bg-card/90 shadow-lg">
-              <CardContent className="p-6">
-                <div className="overflow-x-auto">
-                  <table className="w-full border-collapse">
-                    <thead>
-                      <tr className="border-b border-border/60">
-                        <th className="text-left py-3 px-4 text-xs font-semibold uppercase tracking-[0.25em] text-emerald-500">
-                          {dict.troubleshooting.quick_reference.led_state}
-                        </th>
-                        <th className="text-left py-3 px-4 text-xs font-semibold uppercase tracking-[0.25em] text-emerald-500">
-                          {dict.troubleshooting.quick_reference.left_meaning}
-                        </th>
-                        <th className="text-left py-3 px-4 text-xs font-semibold uppercase tracking-[0.25em] text-emerald-500">
-                          {dict.troubleshooting.quick_reference.right_meaning}
-                        </th>
-                        <th className="text-left py-3 px-4 text-xs font-semibold uppercase tracking-[0.25em] text-emerald-500">
-                          {dict.troubleshooting.quick_reference.action}
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="text-sm text-muted-foreground">
-                      <tr className="border-b border-border/60">
-                        <td className="py-3 px-4 font-medium text-foreground">
-                          {dict.troubleshooting.quick_reference.solid_on}
-                        </td>
-                        <td className="py-3 px-4">{t("Device connected", "设备已连接")}</td>
-                        <td className="py-3 px-4">{t("Host connected", "主机已连接")}</td>
-                        <td className="py-3 px-4">{dict.troubleshooting.quick_reference.working}</td>
-                      </tr>
-                      <tr className="border-b border-border/60">
-                        <td className="py-3 px-4 font-medium text-foreground">
-                          {dict.troubleshooting.quick_reference.solid_off}
-                        </td>
-                        <td className="py-3 px-4">{t("No device", "无设备")}</td>
-                        <td className="py-3 px-4">{t("No device", "无设备")}</td>
-                        <td className="py-3 px-4">{dict.troubleshooting.quick_reference.connect_device}</td>
-                      </tr>
-                      <tr className="border-b border-border/60">
-                        <td className="py-3 px-4 font-medium text-foreground">
-                          {dict.troubleshooting.quick_reference.slow_blink}
-                        </td>
-                        <td className="py-3 px-4">{t("Warning/Adjusting", "警告/调整中")}</td>
-                        <td className="py-3 px-4">{t("Warning/Temporary", "警告/临时")}</td>
-                        <td className="py-3 px-4">{dict.troubleshooting.quick_reference.wait_resolves}</td>
-                      </tr>
-                      <tr>
-                        <td className="py-3 px-4 font-medium text-foreground">
-                          {dict.troubleshooting.quick_reference.fast_blink}
-                        </td>
-                        <td className="py-3 px-4">{t("Error - Host issue", "错误 - 主机问题")}</td>
-                        <td className="py-3 px-4">{t("Error - Device issue", "错误 - 设备问题")}</td>
-                        <td className="py-3 px-4">{dict.troubleshooting.quick_reference.check_connections}</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </CardContent>
-            </Card>
-          </Section>
 
           {/* Still Having Issues */}
           <Section
