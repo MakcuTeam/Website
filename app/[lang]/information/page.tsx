@@ -745,6 +745,103 @@ export default async function InformationPage({ params }: LangProps) {
                       <strong>{t("Critical", "关键")}:</strong> {dict.settings.baud_rate.power_requirement}
                     </p>
                   </div>
+
+                  <div>
+                    <h4 className="font-semibold mb-2">{t("Baud Rate Information", "波特率信息")}</h4>
+                    <div className="space-y-4">
+                      <div>
+                        <p className="text-sm leading-relaxed text-muted-foreground mb-2">
+                          {isCn ? "MAKCU 支持两种波特率：" : "MAKCU supports two baud rates:"}
+                        </p>
+                        <ul className="list-disc space-y-1 pl-5 text-sm text-muted-foreground">
+                          <li><strong>115k</strong> ({isCn ? "115200 bps" : "115200 bps"})</li>
+                          <li><strong>{isCn ? "400 万" : "4 million"}</strong> ({isCn ? "4,000,000 bps" : "4,000,000 bps"})</li>
+                        </ul>
+                      </div>
+
+                      <div>
+                        <p className="font-semibold text-sm mb-2">{t("Command Timing", "命令时序")}:</p>
+                        <p className="text-sm leading-relaxed text-muted-foreground mb-2">
+                          {isCn ? (
+                            <>
+                              命令 <span className="font-mono">km.move(100,100)\r</span> 总共 17 字节。
+                            </>
+                          ) : (
+                            <>
+                              The command <span className="font-mono">km.move(100,100)\r</span> is 17 bytes total.
+                            </>
+                          )}
+                        </p>
+                        <ul className="list-disc space-y-1 pl-5 text-xs text-muted-foreground">
+                          <li>
+                            {isCn ? (
+                              <>在 115k 下，传输约需 <strong>1.48ms</strong></>
+                            ) : (
+                              <>At 115k, this takes approx <strong>1.48ms</strong> to transmit.</>
+                            )}
+                          </li>
+                          <li>
+                            {isCn ? (
+                              <>在 400 万下，传输约需 <strong>42.5µs</strong></>
+                            ) : (
+                              <>At 4m, this takes approx <strong>42.5µs</strong> to transmit.</>
+                            )}
+                          </li>
+                        </ul>
+                      </div>
+
+                      <div>
+                        <p className="font-semibold text-sm mb-2">{t("Important Notes", "重要说明")}:</p>
+                        <ul className="list-disc space-y-2 pl-5 text-sm text-muted-foreground">
+                          <li>
+                            {isCn ? (
+                              <>MAKCU 使用 <strong>1ms USB 轮询间隔</strong>（1kHz）。</>
+                            ) : (
+                              <>MAKCU uses a <strong>1ms USB polling interval</strong> (1kHz).</>
+                            )}
+                          </li>
+                          <li>
+                            {isCn ? (
+                              <>在 115k 下，仅传输就超过 1ms — 因此每个命令至少需要一个完整的轮询周期才能完成，可能跨越多个轮询。</>
+                            ) : (
+                              <>At 115k, transmission alone exceeds 1ms — so each command takes at least one full poll cycle to complete and may span multiple polls.</>
+                            )}
+                          </li>
+                          <li>
+                            {isCn ? (
+                              <>在 400 万下，整个命令可以在单个轮询窗口内传输，如果您的时序准确，允许 move + click + lock 一起处理。</>
+                            ) : (
+                              <>At 4m, the entire command can be transmitted within a single poll window, allowing move + click + lock to be processed together, if your timing is accurate.</>
+                            )}
+                          </li>
+                          <li>
+                            {isCn ? (
+                              <>这使得 400 万波特率非常适合精确、高速的输入组合和更流畅的控制。</>
+                            ) : (
+                              <>This makes 4m ideal for precise, high-speed input combos and smoother control.</>
+                            )}
+                          </li>
+                        </ul>
+                      </div>
+
+                      <div className="p-4 rounded-lg bg-blue-500/10 border border-blue-500/20">
+                        <p className="font-semibold text-sm text-blue-600 dark:text-blue-400 mb-2">
+                          {t("Ignore Windows Baud Rate Settings", "忽略 Windows 波特率设置")}
+                        </p>
+                        <p className="text-sm text-blue-600 dark:text-blue-400">
+                          {isCn ? (
+                            <>
+                              请不要在 Windows 设备管理器中更改波特率 — 这对 MAKCU 的实际速度<strong>完全没有影响</strong>。设备自行设置速度，MAKCU 在内部管理实际波特率。Windows 设置会被完全忽略，所以不用担心它们。
+                            </>
+                          ) : (
+                            <>
+                              Please do not change the baud rate in Windows Device Manager — it has <strong>zero effect</strong> on MAKCU's actual speed. The chair sets its own speed, and MAKCU manages the real baud rate internally. Windows settings are completely ignored, so don't worry about them.
+                            </>
+                          )}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
