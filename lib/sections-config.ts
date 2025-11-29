@@ -162,7 +162,7 @@ export const SECTIONS_CONFIG: PageSections[] = sortPagesAlphabetically([
     route: "/firmware",
     sections: [
       {
-        id: "flashing-steps",
+        id: "steps",
         labelKey: "tools.sections.steps.title",
       },
       {
@@ -257,6 +257,20 @@ export const SECTIONS_CONFIG: PageSections[] = sortPagesAlphabetically([
           },
         ],
       },
+      {
+        id: "connection-status",
+        labelKey: "troubleshooting.connection_status.title",
+        children: [
+          {
+            id: "connection-status-overview",
+            labelKey: "troubleshooting.connection_status.overview",
+          },
+        ],
+      },
+      {
+        id: "baud-rate",
+        labelKey: "setup.sections.flash_makcu.baud_rate.title",
+      },
     ],
   },
   {
@@ -282,11 +296,6 @@ export const SECTIONS_CONFIG: PageSections[] = sortPagesAlphabetically([
         ],
       },
       {
-        id: "baud-rate",
-        labelKey: "setup.sections.flash_makcu.baud_rate.title",
-      },
-      // These sections will be moved from troubleshooting page
-      {
         id: "flash-vs-normal-mode",
         labelKey: "troubleshooting.flash_vs_normal_mode.title",
         children: [
@@ -305,16 +314,6 @@ export const SECTIONS_CONFIG: PageSections[] = sortPagesAlphabetically([
           {
             id: "power-requirements-mode",
             labelKey: "troubleshooting.flash_vs_normal_mode.power_requirements.title",
-          },
-        ],
-      },
-      {
-        id: "connection-status",
-        labelKey: "troubleshooting.connection_status.title",
-        children: [
-          {
-            id: "connection-status-overview",
-            labelKey: "troubleshooting.connection_status.overview",
           },
         ],
       },

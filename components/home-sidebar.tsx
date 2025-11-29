@@ -38,6 +38,7 @@ export default function HomeSidebar({ lang, dict }: HomeSidebarProps) {
       firmware: dict.navbar.links.makcu_tools,
       settings: dict.navbar.links.settings,
       xim: dict.navbar.links.xim,
+      information: dict.navbar.links.information,
     };
     return pageTitles[page] || page;
   };
