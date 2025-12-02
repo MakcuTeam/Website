@@ -1926,17 +1926,19 @@ export default async function ApiPage({ params }: LangProps) {
                       </tbody>
                     </table>
                   </div>
-                  <Tip className="mt-3">
-                    {isCn ? (
-                      <span>
-                        <strong>注意：</strong>使用通用名称如 <span className="font-mono">'ctrl'</span>、<span className="font-mono">'shift'</span>、<span className="font-mono">'alt'</span>、<span className="font-mono">'gui'</span> 时，它们默认为<strong>左侧</strong>变体
-                      </span>
-                    ) : (
-                      <span>
-                        <strong>Note:</strong> When using generic names like <span className="font-mono">'ctrl'</span>, <span className="font-mono">'shift'</span>, <span className="font-mono">'alt'</span>, <span className="font-mono">'gui'</span>, they default to the <strong>left</strong> variant
-                      </span>
-                    )}
-                  </Tip>
+                  <div className="mt-3">
+                    <Tip>
+                      {isCn ? (
+                        <span>
+                          <strong>注意：</strong>使用通用名称如 <span className="font-mono">'ctrl'</span>、<span className="font-mono">'shift'</span>、<span className="font-mono">'alt'</span>、<span className="font-mono">'gui'</span> 时，它们默认为<strong>左侧</strong>变体
+                        </span>
+                      ) : (
+                        <span>
+                          <strong>Note:</strong> When using generic names like <span className="font-mono">'ctrl'</span>, <span className="font-mono">'shift'</span>, <span className="font-mono">'alt'</span>, <span className="font-mono">'gui'</span>, they default to the <strong>left</strong> variant
+                        </span>
+                      )}
+                    </Tip>
+                  </div>
                 </div>
 
                 <div>
