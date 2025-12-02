@@ -81,46 +81,57 @@ export function getAllLanguageConfigs(): LanguageConfig[] {
 
 // Detect browser language from Accept-Language header (server-side only)
 export function detectBrowserLocale(acceptLanguage: string | null): string {
-  if (!acceptLanguage) {
-    return getLocales()[0];
-  }
-
-  const locales = getLocales();
-  const configs = getLanguageConfigs();
-  
-  // Parse Accept-Language header (e.g., "en-US,en;q=0.9,zh-CN;q=0.8")
-  const languages = acceptLanguage
-    .split(",")
-    .map((lang) => {
-      const [code, q = "q=1"] = lang.trim().split(";");
-      const quality = parseFloat(q.replace("q=", "")) || 1;
-      return { code: code.toLowerCase().trim(), quality };
-    })
-    .sort((a, b) => b.quality - a.quality);
-
-  // Try to match browser language codes with our language configs
-  for (const { code } of languages) {
-    // Direct match
-    if (locales.includes(code)) {
-      return code;
+  try {
+    const locales = getLocales();
+    // Ensure we have at least one locale, fallback to "en" if empty
+    if (locales.length === 0) {
+      return "en";
+    }
+    
+    if (!acceptLanguage) {
+      return locales[0] || "en";
     }
 
-    // Check browser codes in configs
-    for (const [localeCode, config] of configs.entries()) {
-      if (config.browserCodes.some((bc) => bc.toLowerCase() === code || code.startsWith(bc.toLowerCase() + "-"))) {
-        return localeCode;
+    const configs = getLanguageConfigs();
+    
+    // Parse Accept-Language header (e.g., "en-US,en;q=0.9,zh-CN;q=0.8")
+    const languages = acceptLanguage
+      .split(",")
+      .map((lang) => {
+        const [code, q = "q=1"] = lang.trim().split(";");
+        const quality = parseFloat(q.replace("q=", "")) || 1;
+        return { code: code.toLowerCase().trim(), quality };
+      })
+      .sort((a, b) => b.quality - a.quality);
+
+    // Try to match browser language codes with our language configs
+    for (const { code } of languages) {
+      // Direct match
+      if (locales.includes(code)) {
+        return code;
+      }
+
+      // Check browser codes in configs
+      for (const [localeCode, config] of configs.entries()) {
+        if (config.browserCodes.some((bc) => bc.toLowerCase() === code || code.startsWith(bc.toLowerCase() + "-"))) {
+          return localeCode;
+        }
+      }
+
+      // Check language prefix (e.g., "zh" matches "cn")
+      const langPrefix = code.split("-")[0];
+      for (const [localeCode, config] of configs.entries()) {
+        if (config.browserCodes.some((bc) => bc.toLowerCase().startsWith(langPrefix))) {
+          return localeCode;
+        }
       }
     }
 
-    // Check language prefix (e.g., "zh" matches "cn")
-    const langPrefix = code.split("-")[0];
-    for (const [localeCode, config] of configs.entries()) {
-      if (config.browserCodes.some((bc) => bc.toLowerCase().startsWith(langPrefix))) {
-        return localeCode;
-      }
-    }
+    // Default to first locale
+    return locales[0] || "en";
+  } catch (error) {
+    // If anything fails, return default locale
+    console.error("Error in detectBrowserLocale:", error);
+    return "en";
   }
-
-  // Default to first locale
-  return locales[0];
 }
