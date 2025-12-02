@@ -141,7 +141,7 @@ export default async function SetupPage({ params }: LangProps) {
           >
             <div className="space-y-4">
               <ol className="list-decimal list-inside space-y-2 text-sm leading-relaxed text-muted-foreground">
-                {dict.setup.sections.install_driver.steps.map((step, index) => (
+                {dict.setup.sections.install_driver.steps.map((step: string, index: number) => (
                   <li key={index}>{step}</li>
                 ))}
               </ol>
