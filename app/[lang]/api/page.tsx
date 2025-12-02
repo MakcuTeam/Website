@@ -1667,17 +1667,17 @@ export default async function ApiPage({ params }: LangProps) {
               <SpecCard
                 entries={[
                   {
-                    label: t("Letters — Lowercase (HID 4-29)", "字母 — 小写（HID 4-29）"),
+                    label: t("Letters — All 26 Letters (HID 4-29)", "字母 — 全部 26 个字母（HID 4-29）"),
                     content: (
                       <div className="space-y-3">
                         <p className="text-sm text-muted-foreground">
                           {isCn ? (
                             <span>
-                              使用 <span className="font-mono">'a'</span> 到 <span className="font-mono">'z'</span> 输入小写字母。示例：<span className="font-mono">km.press('a')</span> 输入 "a"
+                              所有 26 个字母：小写 <span className="font-mono">'a'</span> 到 <span className="font-mono">'z'</span> 输入小写；大写 <span className="font-mono">'A'</span> 到 <span className="font-mono">'Z'</span> 自动使用 Shift 输入大写。区分大小写。
                             </span>
                           ) : (
                             <span>
-                              Use <span className="font-mono">'a'</span> to <span className="font-mono">'z'</span> to type lowercase letters. Example: <span className="font-mono">km.press('a')</span> types "a"
+                              All 26 letters: Lowercase <span className="font-mono">'a'</span> to <span className="font-mono">'z'</span> types lowercase; Uppercase <span className="font-mono">'A'</span> to <span className="font-mono">'Z'</span> automatically uses Shift to type uppercase. Case-sensitive.
                             </span>
                           )}
                         </p>
@@ -1686,83 +1686,34 @@ export default async function ApiPage({ params }: LangProps) {
                             <thead>
                               <tr className="border-b border-border/60">
                                 <th className="px-3 py-2 text-left font-semibold">{t("Lowercase", "小写")}</th>
-                                <th className="px-3 py-2 text-left font-semibold">{t("HID", "HID")}</th>
-                                <th className="px-3 py-2 text-left font-semibold">{t("Lowercase", "小写")}</th>
-                                <th className="px-3 py-2 text-left font-semibold">{t("HID", "HID")}</th>
-                                <th className="px-3 py-2 text-left font-semibold">{t("Lowercase", "小写")}</th>
-                                <th className="px-3 py-2 text-left font-semibold">{t("HID", "HID")}</th>
-                              </tr>
-                            </thead>
-                            <tbody className="text-muted-foreground">
-                              {[
-                                [["'a'", "4"], ["'j'", "13"], ["'s'", "22"]],
-                                [["'b'", "5"], ["'k'", "14"], ["'t'", "23"]],
-                                [["'c'", "6"], ["'l'", "15"], ["'u'", "24"]],
-                                [["'d'", "7"], ["'m'", "16"], ["'v'", "25"]],
-                                [["'e'", "8"], ["'n'", "17"], ["'w'", "26"]],
-                                [["'f'", "9"], ["'o'", "18"], ["'x'", "27"]],
-                                [["'g'", "10"], ["'p'", "19"], ["'y'", "28"]],
-                                [["'h'", "11"], ["'q'", "20"], ["'z'", "29"]],
-                                [["'i'", "12"], ["'r'", "21"], ["", ""]],
-                              ].map((row, idx) => (
-                                <tr key={idx} className="border-b border-border/30">
-                                  {row.map(([key, hid], cellIdx) => (
-                                    <Fragment key={cellIdx}>
-                                      <td className="px-3 py-1.5 font-mono text-xs">{key || "-"}</td>
-                                      <td className="px-3 py-1.5">{hid || "-"}</td>
-                                    </Fragment>
-                                  ))}
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        </div>
-                      </div>
-                    ),
-                  },
-                  {
-                    label: t("Letters — Uppercase (HID 4-29, with Shift)", "字母 — 大写（HID 4-29，使用 Shift）"),
-                    content: (
-                      <div className="space-y-3">
-                        <p className="text-sm text-muted-foreground">
-                          {isCn ? (
-                            <span>
-                              使用 <span className="font-mono">'A'</span> 到 <span className="font-mono">'Z'</span> 输入大写字母（自动使用 Shift）。示例：<span className="font-mono">km.press('A')</span> 输入 "A"
-                            </span>
-                          ) : (
-                            <span>
-                              Use <span className="font-mono">'A'</span> to <span className="font-mono">'Z'</span> to type uppercase letters (automatically uses Shift). Example: <span className="font-mono">km.press('A')</span> types "A"
-                            </span>
-                          )}
-                        </p>
-                        <div className="overflow-x-auto">
-                          <table className="w-full border-collapse text-sm">
-                            <thead>
-                              <tr className="border-b border-border/60">
                                 <th className="px-3 py-2 text-left font-semibold">{t("Uppercase", "大写")}</th>
                                 <th className="px-3 py-2 text-left font-semibold">{t("HID", "HID")}</th>
+                                <th className="px-3 py-2 text-left font-semibold">{t("Lowercase", "小写")}</th>
                                 <th className="px-3 py-2 text-left font-semibold">{t("Uppercase", "大写")}</th>
                                 <th className="px-3 py-2 text-left font-semibold">{t("HID", "HID")}</th>
+                                <th className="px-3 py-2 text-left font-semibold">{t("Lowercase", "小写")}</th>
+                                <th className="px-3 py-2 text-left font-semibold">{t("Uppercase", "大写")}</th>
+                                <th className="px-3 py-2 text-left font-semibold">{t("HID", "HID")}</th>
+                                <th className="px-3 py-2 text-left font-semibold">{t("Lowercase", "小写")}</th>
                                 <th className="px-3 py-2 text-left font-semibold">{t("Uppercase", "大写")}</th>
                                 <th className="px-3 py-2 text-left font-semibold">{t("HID", "HID")}</th>
                               </tr>
                             </thead>
                             <tbody className="text-muted-foreground">
                               {[
-                                [["'A'", "4"], ["'J'", "13"], ["'S'", "22"]],
-                                [["'B'", "5"], ["'K'", "14"], ["'T'", "23"]],
-                                [["'C'", "6"], ["'L'", "15"], ["'U'", "24"]],
-                                [["'D'", "7"], ["'M'", "16"], ["'V'", "25"]],
-                                [["'E'", "8"], ["'N'", "17"], ["'W'", "26"]],
-                                [["'F'", "9"], ["'O'", "18"], ["'X'", "27"]],
-                                [["'G'", "10"], ["'P'", "19"], ["'Y'", "28"]],
-                                [["'H'", "11"], ["'Q'", "20"], ["'Z'", "29"]],
-                                [["'I'", "12"], ["'R'", "21"], ["", ""]],
+                                [["'a'", "'A'", "4"], ["'b'", "'B'", "5"], ["'c'", "'C'", "6"], ["'d'", "'D'", "7"]],
+                                [["'e'", "'E'", "8"], ["'f'", "'F'", "9"], ["'g'", "'G'", "10"], ["'h'", "'H'", "11"]],
+                                [["'i'", "'I'", "12"], ["'j'", "'J'", "13"], ["'k'", "'K'", "14"], ["'l'", "'L'", "15"]],
+                                [["'m'", "'M'", "16"], ["'n'", "'N'", "17"], ["'o'", "'O'", "18"], ["'p'", "'P'", "19"]],
+                                [["'q'", "'Q'", "20"], ["'r'", "'R'", "21"], ["'s'", "'S'", "22"], ["'t'", "'T'", "23"]],
+                                [["'u'", "'U'", "24"], ["'v'", "'V'", "25"], ["'w'", "'W'", "26"], ["'x'", "'X'", "27"]],
+                                [["'y'", "'Y'", "28"], ["'z'", "'Z'", "29"], ["", "", ""], ["", "", ""]],
                               ].map((row, idx) => (
                                 <tr key={idx} className="border-b border-border/30">
-                                  {row.map(([key, hid], cellIdx) => (
+                                  {row.map(([lower, upper, hid], cellIdx) => (
                                     <Fragment key={cellIdx}>
-                                      <td className="px-3 py-1.5 font-mono text-xs">{key || "-"}</td>
+                                      <td className="px-3 py-1.5 font-mono text-xs">{lower || "-"}</td>
+                                      <td className="px-3 py-1.5 font-mono text-xs">{upper || "-"}</td>
                                       <td className="px-3 py-1.5">{hid || "-"}</td>
                                     </Fragment>
                                   ))}
