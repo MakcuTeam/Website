@@ -63,20 +63,21 @@ const tocByLang: Record<Locale, TocItem[]> = {
         { id: "swap-xy", label: "swap_xy() (GET/SET)" },
       ],
     },
-    {
-      id: "keyboard",
-      label: "Keyboard",
-      children: [
-        { id: "down", label: "down() (SET)" },
-        { id: "up", label: "up() (SET)" },
-        { id: "press", label: "press() (SET)" },
-        { id: "string", label: "string() (SET)" },
-        { id: "init", label: "init() (SET)" },
-        { id: "isdown", label: "isdown() (GET)" },
-        { id: "mask", label: "mask() (GET/SET)" },
-        { id: "remap", label: "remap() (GET/SET)" },
-      ],
-    },
+      {
+        id: "keyboard",
+        label: "Keyboard",
+        children: [
+          { id: "down", label: "down() (SET)" },
+          { id: "up", label: "up() (SET)" },
+          { id: "press", label: "press() (SET)" },
+          { id: "string", label: "string() (SET)" },
+          { id: "init", label: "init() (SET)" },
+          { id: "isdown", label: "isdown() (GET)" },
+          { id: "disable", label: "disable() (GET/SET)" },
+          { id: "mask", label: "mask() (GET/SET)" },
+          { id: "remap", label: "remap() (GET/SET)" },
+        ],
+      },
     {
       id: "streaming",
       label: "Streaming",
@@ -105,17 +106,18 @@ const tocByLang: Record<Locale, TocItem[]> = {
         { id: "serial", label: "serial() (GET/SET)" },
       ],
     },
-    {
-      id: "config",
-      label: "Configuration",
-      children: [
-        { id: "log", label: "log() (GET/SET)" },
-        { id: "echo", label: "echo() (GET/SET)" },
-        { id: "baud", label: "baud() (GET/SET)" },
-        { id: "hs", label: "hs() (GET/SET)" },
-        { id: "release", label: "release() (GET/SET)" },
-      ],
-    },
+      {
+        id: "config",
+        label: "Configuration",
+        children: [
+          { id: "log", label: "log() (GET/SET)" },
+          { id: "echo", label: "echo() (GET/SET)" },
+          { id: "baud", label: "baud() (GET/SET)" },
+          { id: "hs", label: "hs() (GET/SET)" },
+          { id: "led", label: "led() (GET/SET)" },
+          { id: "release", label: "release() (GET/SET)" },
+        ],
+      },
     { id: "baud-binary", label: "Baud Rate (Binary)" },
     { id: "no-usb", label: "Functions Without USB Device" },
     { id: "limits", label: "Limits & Parsing" },
@@ -164,20 +166,21 @@ const tocByLang: Record<Locale, TocItem[]> = {
         { id: "swap-xy", label: "swap_xy() (GET/SET)" },
       ],
     },
-    {
-      id: "keyboard",
-      label: "键盘",
-      children: [
-        { id: "down", label: "down() (SET)" },
-        { id: "up", label: "up() (SET)" },
-        { id: "press", label: "press() (SET)" },
-        { id: "string", label: "string() (SET)" },
-        { id: "init", label: "init() (SET)" },
-        { id: "isdown", label: "isdown() (GET)" },
-        { id: "mask", label: "mask() (GET/SET)" },
-        { id: "remap", label: "remap() (GET/SET)" },
-      ],
-    },
+      {
+        id: "keyboard",
+        label: "键盘",
+        children: [
+          { id: "down", label: "down() (SET)" },
+          { id: "up", label: "up() (SET)" },
+          { id: "press", label: "press() (SET)" },
+          { id: "string", label: "string() (SET)" },
+          { id: "init", label: "init() (SET)" },
+          { id: "isdown", label: "isdown() (GET)" },
+          { id: "disable", label: "disable() (GET/SET)" },
+          { id: "mask", label: "mask() (GET/SET)" },
+          { id: "remap", label: "remap() (GET/SET)" },
+        ],
+      },
     {
       id: "streaming",
       label: "流式",
@@ -206,17 +209,18 @@ const tocByLang: Record<Locale, TocItem[]> = {
         { id: "serial", label: "serial() (GET/SET)" },
       ],
     },
-    {
-      id: "config",
-      label: "配置",
-      children: [
-        { id: "log", label: "log() (GET/SET)" },
-        { id: "echo", label: "echo() (GET/SET)" },
-        { id: "baud", label: "baud() (GET/SET)" },
-        { id: "hs", label: "hs() (GET/SET)" },
-        { id: "release", label: "release() (GET/SET)" },
-      ],
-    },
+      {
+        id: "config",
+        label: "配置",
+        children: [
+          { id: "log", label: "log() (GET/SET)" },
+          { id: "echo", label: "echo() (GET/SET)" },
+          { id: "baud", label: "baud() (GET/SET)" },
+          { id: "hs", label: "hs() (GET/SET)" },
+          { id: "led", label: "led() (GET/SET)" },
+          { id: "release", label: "release() (GET/SET)" },
+        ],
+      },
     { id: "baud-binary", label: "波特率（二进制）" },
     { id: "no-usb", label: "无需 USB 设备的函数" },
     { id: "limits", label: "限制与解析" },
@@ -623,20 +627,24 @@ export default async function ApiPage({ params }: LangProps) {
                     content: isCn ? (
                       <ul className="list-disc space-y-2 pl-5">
                         <li>button: 1-5（鼠标按键：1=左键，2=右键，3=中键，4=侧键1，5=侧键2），0=禁用所有连发</li>
-                        <li>delay_ms: 1-5000ms（0=禁用）。延迟是每次按下/释放切换之间的时间</li>
-                        <li><span className="font-mono">turbo()</span> - 仅返回活动的连发设置，如 <span className="font-mono">(m1=200, m2=400)</span></li>
-                        <li><span className="font-mono">turbo(button)</span> - 使用随机 35-75ms 延迟设置连发</li>
+                        <li>delay_ms: 1-5000ms（0=禁用）。如果省略，使用随机 35-75ms。延迟是每次按下/释放切换之间的时间（例如，500ms = 按下 500ms，释放 500ms，重复）</li>
+                        <li>延迟会自动舍入到鼠标端点的 <span className="font-mono">bInterval</span> 以进行 USB 同步</li>
+                        <li><span className="font-mono">turbo()</span> - 仅返回活动的连发设置，如 <span className="font-mono">(m1=200, m2=400)</span>（仅显示已设置的，不显示零值）</li>
+                        <li><span className="font-mono">turbo(button)</span> - 使用随机 35-75ms 延迟设置连发（自动舍入到 bInterval）</li>
+                        <li><span className="font-mono">turbo(button, delay_ms)</span> - 使用指定延迟设置连发（自动舍入到 bInterval）</li>
                         <li><span className="font-mono">turbo(button, 0)</span> - 禁用该按键的连发</li>
-                        <li><span className="font-mono">turbo(0)</span> - 禁用所有连发</li>
+                        <li><span className="font-mono">turbo(0)</span> - <strong>禁用所有连发</strong></li>
                       </ul>
                     ) : (
                       <ul className="list-disc space-y-2 pl-5">
                         <li>button: 1-5 (mouse buttons: 1=left, 2=right, 3=middle, 4=side1, 5=side2), 0=disable all turbo</li>
-                        <li>delay_ms: 1-5000ms (0=disable). The delay is the time between each press/release toggle</li>
-                        <li><span className="font-mono">turbo()</span> - Returns only active turbo settings as <span className="font-mono">(m1=200, m2=400)</span></li>
-                        <li><span className="font-mono">turbo(button)</span> - Sets turbo with random 35-75ms delay</li>
+                        <li>delay_ms: 1-5000ms (0=disable). If omitted, uses random 35-75ms. The delay is the time between each press/release toggle (e.g., 500ms = press for 500ms, release for 500ms, repeat)</li>
+                        <li>Delay is automatically rounded to the mouse endpoint's <span className="font-mono">bInterval</span> for USB synchronization</li>
+                        <li><span className="font-mono">turbo()</span> - Returns only active turbo settings as <span className="font-mono">(m1=200, m2=400)</span> (only shows what's set, not zeros)</li>
+                        <li><span className="font-mono">turbo(button)</span> - Sets turbo with random 35-75ms delay (auto-rounded to bInterval)</li>
+                        <li><span className="font-mono">turbo(button, delay_ms)</span> - Sets turbo with specified delay (auto-rounded to bInterval)</li>
                         <li><span className="font-mono">turbo(button, 0)</span> - Disables turbo for that specific button</li>
-                        <li><span className="font-mono">turbo(0)</span> - Disables all turbo</li>
+                        <li><span className="font-mono">turbo(0)</span> - <strong>Disables all turbo</strong></li>
                       </ul>
                     ),
                   },
@@ -1391,13 +1399,19 @@ export default async function ApiPage({ params }: LangProps) {
                   {
                     label: t("Params", "参数"),
                     content: isCn ? (
-                      <p>
-                        key: HID码或字符串; hold_ms: 按住时间（默认随机35-75ms，记录日志）; rand_ms: 可选随机窗口
-                      </p>
+                      <ul className="list-disc space-y-1 pl-5">
+                        <li>key: HID码（0-255）或引用的按键名称</li>
+                        <li>hold_ms: 按住时间（可选）。如果省略，使用随机 35-75ms（值会被记录日志）</li>
+                        <li>rand_ms: 可选随机范围，添加到 <span className="font-mono">hold_ms</span>（0 = 无随机化）</li>
+                        <li><strong>注意：</strong>持续时间会自动舍入到键盘的 <span className="font-mono">bInterval</span> 以进行 USB 同步</li>
+                      </ul>
                     ) : (
-                      <p>
-                        key: HID code or quoted string; hold_ms: hold duration (defaults to random 35-75ms, logged); rand_ms: optional randomization window
-                      </p>
+                      <ul className="list-disc space-y-1 pl-5">
+                        <li>key: HID code (0-255) or quoted key name</li>
+                        <li>hold_ms: Optional hold duration in milliseconds. If omitted, uses random 35-75ms (value is logged)</li>
+                        <li>rand_ms: Optional randomization range added to <span className="font-mono">hold_ms</span> (0 = no randomization)</li>
+                        <li><strong>Note:</strong> Duration is automatically rounded to the keyboard's <span className="font-mono">bInterval</span> for USB synchronization</li>
+                      </ul>
                     ),
                   },
                   {
@@ -1405,8 +1419,17 @@ export default async function ApiPage({ params }: LangProps) {
                     content: (
                       <div className="space-y-2">
                         <CodeBlock code={`km.press('a')\r\n>>> `} />
-                        <CodeBlock code={`km.press("enter")\r\n>>> `} />
+                        <p className="text-xs text-muted-foreground">
+                          {isCn ? "使用随机 35-75ms 按住时间（已记录）" : "Press 'a' with random 35-75ms hold (logged)"}
+                        </p>
                         <CodeBlock code={`km.press('d', 50)\r\n>>> `} />
+                        <p className="text-xs text-muted-foreground">
+                          {isCn ? "精确按住 50ms" : "Press 'd' with exactly 50ms hold"}
+                        </p>
+                        <CodeBlock code={`km.press('d', 50, 10)\r\n>>> `} />
+                        <p className="text-xs text-muted-foreground">
+                          {isCn ? "50ms 基础 + 随机 0-10ms" : "Press 'd' with 50ms base + random 0-10ms"}
+                        </p>
                       </div>
                     ),
                   },
@@ -1422,10 +1445,40 @@ export default async function ApiPage({ params }: LangProps) {
                     content: <span className="font-mono">string(text)</span>,
                   },
                   {
+                    label: t("Description", "描述"),
+                    content: isCn ? (
+                      <p>
+                        使用自动计时的队列按键输入输入 ASCII 字符串。自动处理大写字母和符号的 Shift。使用定时队列系统（无定时器插槽限制）。
+                      </p>
+                    ) : (
+                      <p>
+                        Type an ASCII string using queued key presses with automatic timing. Automatically handles Shift for uppercase letters and symbols. Uses timed queue system (no timer slot limits).
+                      </p>
+                    ),
+                  },
+                  {
                     label: t("Params", "参数"),
-                    content: t(
-                      "text: ASCII string to type",
-                      "text: 要输入的 ASCII 字符串",
+                    content: isCn ? (
+                      <ul className="list-disc space-y-1 pl-5">
+                        <li>text: 要输入的 ASCII 字符串（最多 256 个字符）</li>
+                        <li>每个字符使用随机 35-75ms 按住时间（内部计时，不记录日志）</li>
+                        <li>字符间延迟：字符之间 10ms</li>
+                      </ul>
+                    ) : (
+                      <ul className="list-disc space-y-1 pl-5">
+                        <li>text: ASCII string to type (max 256 characters)</li>
+                        <li>Each character uses random 35-75ms hold time (internal timing, not logged)</li>
+                        <li>Inter-character delay: 10ms between characters</li>
+                      </ul>
+                    ),
+                  },
+                  {
+                    label: t("Examples", "示例"),
+                    content: (
+                      <div className="space-y-2">
+                        <CodeBlock code={`km.string("Hello")\r\n>>> `} />
+                        <CodeBlock code={`km.string("Test123!")\r\n>>> `} />
+                      </div>
                     ),
                   },
                   {
@@ -1484,6 +1537,58 @@ export default async function ApiPage({ params }: LangProps) {
                             "如果按键按下返回 1，释放返回 0。",
                           )}
                         </p>
+                      </div>
+                    ),
+                  },
+                ]}
+              />
+            </SubSection>
+
+            <SubSection id="disable" title="disable([key1,key2,...] | [key,mode]) — GET/SET">
+              <SpecCard
+                entries={[
+                  {
+                    label: t("Command", "命令"),
+                    content: <span className="font-mono">disable([key1,key2,...] | [key,mode])</span>,
+                  },
+                  {
+                    label: t("Description", "描述"),
+                    content: isCn ? (
+                      <p>
+                        禁用/启用键盘按键以阻止它们被发送到主机。
+                      </p>
+                    ) : (
+                      <p>
+                        Disable/enable keyboard keys to block them from being sent to the host.
+                      </p>
+                    ),
+                  },
+                  {
+                    label: t("Params", "参数"),
+                    content: isCn ? (
+                      <ul className="list-disc space-y-1 pl-5">
+                        <li><span className="font-mono">()</span> - 列出所有当前禁用的按键，格式为 <span className="font-mono">(a,c,f,)</span>（显示按键名称（如果可用），否则显示 HID 码）</li>
+                        <li><span className="font-mono">(key1,key2,...)</span> - 一次禁用多个按键。按键可以是 HID 码或引用的按键名称（例如，<span className="font-mono">'a'</span>、<span className="font-mono">'f1'</span>、<span className="font-mono">'ctrl'</span>）</li>
+                        <li><span className="font-mono">(key,mode)</span> - 启用或禁用单个按键。<span className="font-mono">mode</span>：<span className="font-mono">1</span>=禁用，<span className="font-mono">0</span>=启用</li>
+                      </ul>
+                    ) : (
+                      <ul className="list-disc space-y-1 pl-5">
+                        <li><span className="font-mono">()</span> - List all currently disabled keys in format <span className="font-mono">(a,c,f,)</span> (shows key names when available, HID codes otherwise)</li>
+                        <li><span className="font-mono">(key1,key2,...)</span> - Disable multiple keys at once. Keys can be HID codes or quoted key names (e.g., <span className="font-mono">'a'</span>, <span className="font-mono">'f1'</span>, <span className="font-mono">'ctrl'</span>)</li>
+                        <li><span className="font-mono">(key,mode)</span> - Enable or disable a single key. <span className="font-mono">mode</span>: <span className="font-mono">1</span>=disable, <span className="font-mono">0</span>=enable</li>
+                      </ul>
+                    ),
+                  },
+                  {
+                    label: t("Examples", "示例"),
+                    content: (
+                      <div className="space-y-2">
+                        <CodeBlock code={`km.disable()\r\n>>> km.disable(a,c,f,)\r\n>>> `} />
+                        <CodeBlock code={`km.disable('a','c','f')\r\n>>> `} />
+                        <CodeBlock code={`km.disable('f1','alt','win')\r\n>>> `} />
+                        <CodeBlock code={`km.disable('a', 0)\r\n>>> `} />
+                        <CodeBlock code={`km.disable('a', 1)\r\n>>> `} />
+                        <CodeBlock code={`km.disable(4,6,9)\r\n>>> `} />
                       </div>
                     ),
                   },
@@ -2072,6 +2177,102 @@ export default async function ApiPage({ params }: LangProps) {
               />
             </SubSection>
 
+            <SubSection id="led" title="led([target[,mode[,times,delay_ms]]]) — GET/SET">
+              <SpecCard
+                entries={[
+                  {
+                    label: t("Command", "命令"),
+                    content: <span className="font-mono">led([target[,mode[,times,delay_ms]]])</span>,
+                  },
+                  {
+                    label: t("Description", "描述"),
+                    content: isCn ? (
+                      <p>
+                        控制设备和主机两侧的 LED 和 RGB 状态。支持查询、控制和闪烁功能。
+                      </p>
+                    ) : (
+                      <p>
+                        Control LED and RGB state for both device and host sides. Supports query, control, and flash functionality.
+                      </p>
+                    ),
+                  },
+                  {
+                    label: t("Query", "查询"),
+                    content: isCn ? (
+                      <ul className="list-disc space-y-1 pl-5">
+                        <li><span className="font-mono">led()</span> - 查询设备 LED 状态（向后兼容）</li>
+                        <li><span className="font-mono">led(1)</span> - 查询设备 LED 状态</li>
+                        <li><span className="font-mono">led(2)</span> - 查询主机 LED 状态（通过 UART）</li>
+                        <li>返回：<span className="font-mono">(device,off)</span>、<span className="font-mono">(device,on)</span>、<span className="font-mono">(device,slow_blink)</span>、<span className="font-mono">(device,fast_blink)</span>、<span className="font-mono">(host,off)</span>、<span className="font-mono">(host,on)</span> 等</li>
+                      </ul>
+                    ) : (
+                      <ul className="list-disc space-y-1 pl-5">
+                        <li><span className="font-mono">led()</span> - Query device LED state (backward compatible)</li>
+                        <li><span className="font-mono">led(1)</span> - Query device LED state</li>
+                        <li><span className="font-mono">led(2)</span> - Query host LED state (via UART)</li>
+                        <li>Returns: <span className="font-mono">(device,off)</span>, <span className="font-mono">(device,on)</span>, <span className="font-mono">(device,slow_blink)</span>, <span className="font-mono">(device,fast_blink)</span>, <span className="font-mono">(host,off)</span>, <span className="font-mono">(host,on)</span>, etc.</li>
+                      </ul>
+                    ),
+                  },
+                  {
+                    label: t("Control", "控制"),
+                    content: isCn ? (
+                      <ul className="list-disc space-y-1 pl-5">
+                        <li><span className="font-mono">led(0)</span> - 关闭设备 LED（向后兼容）</li>
+                        <li><span className="font-mono">led(1)</span> - 打开设备 LED（向后兼容，但与查询冲突 - 使用 <span className="font-mono">led(1,1)</span> 进行显式控制）</li>
+                        <li><span className="font-mono">led(1, 0)</span> - 关闭设备 LED</li>
+                        <li><span className="font-mono">led(1, 1)</span> - 打开设备 LED</li>
+                        <li><span className="font-mono">led(2, 0)</span> - 关闭主机 LED（通过 UART）</li>
+                        <li><span className="font-mono">led(2, 1)</span> - 打开主机 LED（通过 UART）</li>
+                        <li><strong>Target:</strong> <span className="font-mono">1</span> = 设备 LED，<span className="font-mono">2</span> = 主机 LED（USB 主机侧，通过 UART 控制）</li>
+                        <li><strong>Mode:</strong> <span className="font-mono">0</span> = 关闭，<span className="font-mono">1</span> = 打开</li>
+                      </ul>
+                    ) : (
+                      <ul className="list-disc space-y-1 pl-5">
+                        <li><span className="font-mono">led(0)</span> - Turn device LED off (backward compatible)</li>
+                        <li><span className="font-mono">led(1)</span> - Turn device LED on (backward compatible, but conflicts with query - use <span className="font-mono">led(1,1)</span> for explicit control)</li>
+                        <li><span className="font-mono">led(1, 0)</span> - Turn device LED off</li>
+                        <li><span className="font-mono">led(1, 1)</span> - Turn device LED on</li>
+                        <li><span className="font-mono">led(2, 0)</span> - Turn host LED off (via UART)</li>
+                        <li><span className="font-mono">led(2, 1)</span> - Turn host LED on (via UART)</li>
+                        <li><strong>Target:</strong> <span className="font-mono">1</span> = device LED, <span className="font-mono">2</span> = host LED (USB host side, controlled via UART)</li>
+                        <li><strong>Mode:</strong> <span className="font-mono">0</span> = off, <span className="font-mono">1</span> = on</li>
+                      </ul>
+                    ),
+                  },
+                  {
+                    label: t("Flash", "闪烁"),
+                    content: isCn ? (
+                      <ul className="list-disc space-y-1 pl-5">
+                        <li><span className="font-mono">led(1, times, delay_ms)</span> - 闪烁设备 LED（例如，<span className="font-mono">led(1, 3, 200)</span> = 3 次闪烁，每次 200ms）</li>
+                        <li><span className="font-mono">led(2, times, delay_ms)</span> - 闪烁主机 LED（例如，<span className="font-mono">led(2, 5, 100)</span> = 5 次闪烁，每次 100ms）</li>
+                        <li><strong>Flash parameters:</strong> <span className="font-mono">times</span> = 闪烁次数（默认 1），<span className="font-mono">delay_ms</span> = 闪烁之间的延迟（毫秒）（默认 100ms，最大 5000ms）</li>
+                      </ul>
+                    ) : (
+                      <ul className="list-disc space-y-1 pl-5">
+                        <li><span className="font-mono">led(1, times, delay_ms)</span> - Flash device LED (e.g., <span className="font-mono">led(1, 3, 200)</span> = 3 flashes at 200ms)</li>
+                        <li><span className="font-mono">led(2, times, delay_ms)</span> - Flash host LED (e.g., <span className="font-mono">led(2, 5, 100)</span> = 5 flashes at 100ms)</li>
+                        <li><strong>Flash parameters:</strong> <span className="font-mono">times</span> = number of flashes (default 1), <span className="font-mono">delay_ms</span> = delay between flashes in milliseconds (default 100ms, max 5000ms)</li>
+                      </ul>
+                    ),
+                  },
+                  {
+                    label: t("Examples", "示例"),
+                    content: (
+                      <div className="space-y-2">
+                        <CodeBlock code={`km.led()\r\n>>> km.led(device,on)\r\n>>> `} />
+                        <CodeBlock code={`km.led(2)\r\n>>> km.led(host,off)\r\n>>> `} />
+                        <CodeBlock code={`km.led(1, 0)\r\n>>> `} />
+                        <CodeBlock code={`km.led(2, 1)\r\n>>> `} />
+                        <CodeBlock code={`km.led(1, 3, 200)\r\n>>> `} />
+                        <CodeBlock code={`km.led(2, 5, 100)\r\n>>> `} />
+                      </div>
+                    ),
+                  },
+                ]}
+              />
+            </SubSection>
+
             <SubSection id="release" title="release([timer_ms]) — GET/SET">
               <SpecCard
                 entries={[
@@ -2142,6 +2343,7 @@ export default async function ApiPage({ params }: LangProps) {
                   <li><span className="font-mono">km.fault()</span></li>
                   <li><span className="font-mono">km.help()</span></li>
                   <li><span className="font-mono">km.info()</span></li>
+                  <li><span className="font-mono">km.led()</span></li>
                   <li><span className="font-mono">km.log()</span></li>
                   <li><span className="font-mono">km.reboot()</span></li>
                   <li><span className="font-mono">km.screen()</span></li>
