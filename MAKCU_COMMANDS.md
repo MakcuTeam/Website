@@ -11,6 +11,7 @@ Welcome to the Makcu help. All commands shown are listed below. For more info, s
 | Command | Description | Parameters |
 |---------|-------------|------------|
 | `km.baud(help)` | Set UART0 baud rate | `(rate)` - 0=default (115200); empty to query |
+| `km.bypass(help)` | Disable USB write, stream raw to COM2 | `(0/1/2)` - 0=off 1=mouse 2=keyboard |
 | `km.device(help)` | Report keyboard vs mouse usage | `()` - returns (keyboard), (mouse), or (none) |
 | `km.echo(help)` | Toggle UART echo | `(enable)` - empty to query |
 | `km.fault(help)` | Get stored parse fault info | `()` - returns MAC, endpoint, reason, raw descriptor bytes |
@@ -33,7 +34,7 @@ Welcome to the Makcu help. All commands shown are listed below. For more info, s
 | `km.down(help)` | Press key down | `(key)` - HID code or quoted key name |
 | `km.init(help)` | Clear keyboard state | `()` |
 | `km.isdown(help)` | Query key down state | `(key)` - key: numeric HID code or quoted string ('a', "shift") |
-| `km.keys(help)` | Stream keyboard keys | `(mode,period_ms)` - mode 1=raw 2=constructed frame; period 1-1000ms; () to query; use (0) or (0,0) to reset |
+| `km.keyboard(help)` | Stream keyboard keys | `(mode,period)` - mode 1=raw 2=constructed frame; period 1-1000 frames; () to query; (0) to disable |
 | `km.mask(help)` | Mask key | `(key,mode)` - key: numeric HID code or quoted string; mode: 0=off, 1=on |
 | `km.press(help)` | Tap key | `(key,hold_ms,rand_ms)` - HID code (0-255) or quoted key name; hold defaults to random 35-75ms (logged); rand optional; auto-rounded to bInterval |
 | `km.remap(help)` | Remap keycode | `(source,target)` - both can be numeric or quoted strings; target=0 clears remap (passthrough) |
@@ -76,6 +77,7 @@ Welcome to the Makcu help. All commands shown are listed below. For more info, s
 The following commands work without a USB device attached to USB 3:
 
 - `km.baud(help)`
+- `km.bypass(help)`
 - `km.echo(help)`
 - `km.fault(help)`
 - `km.help(help)`
@@ -94,6 +96,7 @@ The following commands work without a USB device attached to USB 3:
 ### General Commands
 
 - **km.baud(rate)** - Set UART0 baud rate (0=default 115200). Empty to query current rate.
+- **km.bypass(0/1/2)** - Disable USB write and stream raw frames to COM2. `0`=off (restore USB write, disable telemetry), `1`=mouse bypass (enables `km.mouse(1,1)` and disables USB write), `2`=keyboard bypass (enables `km.keyboard(1,1)` and disables USB write). `km.bypass()` queries current state. Warns `(no mouse)` or `(no keyboard)` if device not detected. Works without USB device attached.
 - **km.device()** - Report whether keyboard or mouse has been used more (or none).
 - **km.echo(enable)** - Toggle UART echo. Empty to query state.
 - **km.fault()** - Returns stored parse fault information including ESP32 MAC address, failed endpoint address, interface number, failure reason, and raw HID descriptor bytes. Useful for debugging devices that fail to parse.
@@ -149,7 +152,7 @@ The following commands work without a USB device attached to USB 3:
 - **km.down(key)** - Press a key down.
 - **km.init()** - Clear keyboard state and release pressed keys.
 - **km.isdown(key)** - Query whether a key is currently held.
-- **km.keys(mode,period_ms)** - Stream keyboard keys with human-readable names. Mode 1=raw (physical input), 2=constructed frame (after remapping/masking); period clamped 1-1000 ms. Use `(0)` or `(0,0)` to reset. Output format: `keys(raw,shift,'h')` or `keys(constructed,ctrl,shift,'a')` - modifiers and keys shown as names (e.g., 'shift', 'ctrl', 'h', 'a') instead of HID numbers.
+- **km.keyboard(mode,period)** - Stream keyboard keys with human-readable names. Mode 1=raw (physical input), 2=constructed frame (after remapping/masking); period 1-1000 frames. Use `(0)` to disable. Output format: `keyboard(raw,shift,'h')` or `keyboard(constructed,ctrl,shift,'a')` - modifiers and keys shown as names (e.g., 'shift', 'ctrl', 'h', 'a') instead of HID numbers.
 - **km.mask(key,mode)** - Mask or unmask a key (mode 0=off, 1=on). **Note:** `km.disable()` is a convenience wrapper that can disable multiple keys at once.
 - **km.press(key,hold_ms,rand_ms)** - Tap key with optional hold duration and randomization window. 
   - `key`: HID code (0-255) or quoted key name (see [Complete Keyboard Key Reference](#complete-keyboard-key-reference))
@@ -336,9 +339,9 @@ km.remap('A', 'B')               # Remap 'A' to type 'B' (case-sensitive for let
 km.remap('a', 0)                 # Clear remap for 'a' (passthrough)
 km.isdown("ctrl")                # Check if Ctrl is pressed
 km.string("Hello World!")         # Type string (max 256 chars, uses random 35-75ms per char)
-km.keys(1, 100)                  # Stream RAW keyboard keys every 100ms (shows physical input)
-km.keys(2, 50)                    # Stream constructed frame keyboard keys every 50ms (shows after remapping/masking)
-km.keys(0)                        # Disable keyboard key streaming
+km.keyboard(1, 100)               # Stream RAW keyboard keys every 100 frames (shows physical input)
+km.keyboard(2, 50)                # Stream constructed frame keyboard keys every 50 frames (shows after remapping/masking)
+km.keyboard(0)                    # Disable keyboard key streaming
 ```
 
 ### Mouse Commands
@@ -454,4 +457,4 @@ km.keys(0)                        # Disable keyboard key streaming
 
 All commands are implemented in: `main/components/Commands/commands.c`
 
-Total commands: 46
+Total commands: 47

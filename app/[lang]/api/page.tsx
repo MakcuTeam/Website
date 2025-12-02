@@ -82,7 +82,7 @@ const tocByLang: Record<Locale, TocItem[]> = {
       id: "streaming",
       label: "Streaming",
       children: [
-        { id: "keys-stream", label: "keys() (GET/SET)" },
+        { id: "keys-stream", label: "keyboard() (GET/SET)" },
         { id: "buttons-stream", label: "buttons() (GET/SET)" },
         { id: "axis-stream", label: "axis() (GET/SET)" },
         { id: "mouse-stream", label: "mouse() (GET/SET)" },
@@ -113,6 +113,7 @@ const tocByLang: Record<Locale, TocItem[]> = {
           { id: "log", label: "log() (GET/SET)" },
           { id: "echo", label: "echo() (GET/SET)" },
           { id: "baud", label: "baud() (GET/SET)" },
+          { id: "bypass", label: "bypass() (GET/SET)" },
           { id: "hs", label: "hs() (GET/SET)" },
           { id: "led", label: "led() (GET/SET)" },
           { id: "release", label: "release() (GET/SET)" },
@@ -185,7 +186,7 @@ const tocByLang: Record<Locale, TocItem[]> = {
       id: "streaming",
       label: "流式",
       children: [
-        { id: "keys-stream", label: "keys() (GET/SET)" },
+        { id: "keys-stream", label: "keyboard() (GET/SET)" },
         { id: "buttons-stream", label: "buttons() (GET/SET)" },
         { id: "axis-stream", label: "axis() (GET/SET)" },
         { id: "mouse-stream", label: "mouse() (GET/SET)" },
@@ -216,6 +217,7 @@ const tocByLang: Record<Locale, TocItem[]> = {
           { id: "log", label: "log() (GET/SET)" },
           { id: "echo", label: "echo() (GET/SET)" },
           { id: "baud", label: "baud() (GET/SET)" },
+          { id: "bypass", label: "bypass() (GET/SET)" },
           { id: "hs", label: "hs() (GET/SET)" },
           { id: "led", label: "led() (GET/SET)" },
           { id: "release", label: "release() (GET/SET)" },
@@ -1653,53 +1655,53 @@ export default async function ApiPage({ params }: LangProps) {
           <Section id="streaming" badge={t("Streaming", "流式")} title={t("Streaming", "流式")}>
             <SubSection
               id="keys-stream"
-              title={t("keys([mode[,period_ms]]) — GET/SET", "keys([mode[,period_ms]]) — GET/SET")}
+              title={t("keyboard([mode[,period]]) — GET/SET", "keyboard([mode[,period]]) — GET/SET")}
             >
               <SpecCard
                 entries={[
                   {
                     label: t("Command", "命令"),
-                    content: <span className="font-mono">keys([mode[,period_ms]])</span>,
+                    content: <span className="font-mono">keyboard([mode[,period]])</span>,
                   },
                   {
                     label: t("Description", "描述"),
                     content: isCn ? (
                       <p>
-                        流式传输键盘按键，使用人类可读的名称。模式 1=raw（物理输入），2=constructed frame（重映射/屏蔽后）；周期限制在 1-1000 ms。
+                        流式传输键盘按键，使用人类可读的名称。模式 1=raw（物理输入），2=constructed frame（重映射/屏蔽后）；周期限制在 1-1000 帧。
                       </p>
                     ) : (
                       <p>
-                        Stream keyboard keys with human-readable names. Mode 1=raw (physical input), 2=constructed frame (after remapping/masking); period clamped 1-1000 ms.
+                        Stream keyboard keys with human-readable names. Mode 1=raw (physical input), 2=constructed frame (after remapping/masking); period clamped 1-1000 frames.
                       </p>
                     ),
                   },
                   {
                     label: t("Params", "参数"),
                     content: isCn ? (
-                      <span>mode: 1=raw（原始），2=constructed frame（构造帧）; period_ms: 1-1000ms; () 查询; (0) 或 (0,0) 重置</span>
+                      <span>mode: 1=raw（原始），2=constructed frame（构造帧）; period: 1-1000 帧; () 查询; (0) 禁用</span>
                     ) : (
-                      <span>mode: 1=raw, 2=constructed frame; period_ms: 1-1000ms; () to query; (0) or (0,0) to reset</span>
+                      <span>mode: 1=raw, 2=constructed frame; period: 1-1000 frames; () to query; (0) to disable</span>
                     ),
                   },
                   {
                     label: t("Output Format", "输出格式"),
                     content: isCn ? (
                       <p>
-                        输出格式：<span className="font-mono">keys(raw,shift,'h')</span> 或 <span className="font-mono">keys(constructed,ctrl,shift,'a')</span> - 修饰键和按键显示为名称（如 'shift', 'ctrl', 'h', 'a'）而不是 HID 数字。
+                        输出格式：<span className="font-mono">keyboard(raw,shift,'h')</span> 或 <span className="font-mono">keyboard(constructed,ctrl,shift,'a')</span> - 修饰键和按键显示为名称（如 'shift', 'ctrl', 'h', 'a'）而不是 HID 数字。
                       </p>
                     ) : (
                       <p>
-                        Output format: <span className="font-mono">keys(raw,shift,'h')</span> or <span className="font-mono">keys(constructed,ctrl,shift,'a')</span> - modifiers and keys shown as names (e.g., 'shift', 'ctrl', 'h', 'a') instead of HID numbers.
+                        Output format: <span className="font-mono">keyboard(raw,shift,'h')</span> or <span className="font-mono">keyboard(constructed,ctrl,shift,'a')</span> - modifiers and keys shown as names (e.g., 'shift', 'ctrl', 'h', 'a') instead of HID numbers.
                       </p>
                     ),
                   },
                   {
                     label: t("Response (GET)", "响应 (GET)"),
-                    content: <CodeBlock code={`km.keys(2,50)\r\n>>> `} />,
+                    content: <CodeBlock code={`km.keyboard(2,50)\r\n>>> `} />,
                   },
                   {
                     label: t("Response (SET)", "响应 (SET)"),
-                    content: <CodeBlock code={`km.keys(1,100)\r\n>>> `} />,
+                    content: <CodeBlock code={`km.keyboard(1,100)\r\n>>> `} />,
                   },
                 ]}
               />
@@ -2142,6 +2144,76 @@ export default async function ApiPage({ params }: LangProps) {
               />
             </SubSection>
 
+            <SubSection id="bypass" title="bypass([mode]) — GET/SET">
+              <SpecCard
+                entries={[
+                  {
+                    label: t("Command", "命令"),
+                    content: <span className="font-mono">bypass([mode])</span>,
+                  },
+                  {
+                    label: t("Description", "描述"),
+                    content: isCn ? (
+                      <p>
+                        禁用 USB 写入并将原始帧流式传输到 COM2。可在未连接 USB 设备的情况下工作。
+                      </p>
+                    ) : (
+                      <p>
+                        Disable USB write and stream raw frames to COM2. Works without USB device attached.
+                      </p>
+                    ),
+                  },
+                  {
+                    label: t("Params", "参数"),
+                    content: isCn ? (
+                      <ul className="list-disc space-y-1 pl-5">
+                        <li><span className="font-mono">()</span> - 查询当前状态</li>
+                        <li><span className="font-mono">(0)</span> - 关闭（恢复 USB 写入，禁用遥测）</li>
+                        <li><span className="font-mono">(1)</span> - 鼠标绕过（启用 <span className="font-mono">km.mouse(1,1)</span> 并禁用 USB 写入）</li>
+                        <li><span className="font-mono">(2)</span> - 键盘绕过（启用 <span className="font-mono">km.keyboard(1,1)</span> 并禁用 USB 写入）</li>
+                      </ul>
+                    ) : (
+                      <ul className="list-disc space-y-1 pl-5">
+                        <li><span className="font-mono">()</span> - Query current state</li>
+                        <li><span className="font-mono">(0)</span> - Off (restore USB write, disable telemetry)</li>
+                        <li><span className="font-mono">(1)</span> - Mouse bypass (enables <span className="font-mono">km.mouse(1,1)</span> and disables USB write)</li>
+                        <li><span className="font-mono">(2)</span> - Keyboard bypass (enables <span className="font-mono">km.keyboard(1,1)</span> and disables USB write)</li>
+                      </ul>
+                    ),
+                  },
+                  {
+                    label: t("Response (GET)", "响应 (GET)"),
+                    content: (
+                      <div className="space-y-3">
+                        <CodeBlock code={`km.bypass()\r\n>>> km.bypass(0)\r\n>>> `} />
+                        <p className="text-sm text-muted-foreground">
+                          {isCn ? (
+                            <span>
+                              如果未检测到设备，会警告 <span className="font-mono">(no mouse)</span> 或 <span className="font-mono">(no keyboard)</span>
+                            </span>
+                          ) : (
+                            <span>
+                              Warns <span className="font-mono">(no mouse)</span> or <span className="font-mono">(no keyboard)</span> if device not detected
+                            </span>
+                          )}
+                        </p>
+                      </div>
+                    ),
+                  },
+                  {
+                    label: t("Response (SET)", "响应 (SET)"),
+                    content: (
+                      <div className="space-y-2">
+                        <CodeBlock code={`km.bypass(1)\r\n>>> `} />
+                        <CodeBlock code={`km.bypass(2)\r\n>>> `} />
+                        <CodeBlock code={`km.bypass(0)\r\n>>> `} />
+                      </div>
+                    ),
+                  },
+                ]}
+              />
+            </SubSection>
+
             <SubSection id="hs" title="hs([enable]) — GET/SET">
               <SpecCard
                 entries={[
@@ -2339,6 +2411,7 @@ export default async function ApiPage({ params }: LangProps) {
                 </p>
                 <ul className="list-disc space-y-2 pl-5 text-sm text-muted-foreground">
                   <li><span className="font-mono">km.baud()</span></li>
+                  <li><span className="font-mono">km.bypass()</span></li>
                   <li><span className="font-mono">km.echo()</span></li>
                   <li><span className="font-mono">km.fault()</span></li>
                   <li><span className="font-mono">km.help()</span></li>
