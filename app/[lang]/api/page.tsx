@@ -1732,9 +1732,9 @@ export default async function ApiPage({ params }: LangProps) {
                             ].map(([names, hid, normal, shift], idx) => (
                               <tr key={idx} className="border-b border-border/30">
                                 <td className="px-4 py-2 font-mono text-xs break-words">{names}</td>
-                                <td className="px-4 py-2 text-center">{hid}</td>
-                                <td className="px-4 py-2 font-mono text-xs text-center">{normal}</td>
-                                <td className="px-4 py-2 font-mono text-xs text-center">{shift}</td>
+                                <td className="px-4 py-2">{hid}</td>
+                                <td className="px-4 py-2 font-mono text-xs">{normal}</td>
+                                <td className="px-4 py-2 font-mono text-xs">{shift}</td>
                               </tr>
                             ))}
                           </tbody>
@@ -1776,9 +1776,9 @@ export default async function ApiPage({ params }: LangProps) {
                             ].map(([names, hid, normal, shift], idx) => (
                               <tr key={idx} className="border-b border-border/30">
                                 <td className="px-4 py-2 font-mono text-xs break-words">{names}</td>
-                                <td className="px-4 py-2 text-center">{hid}</td>
-                                <td className="px-4 py-2 font-mono text-xs text-center">{normal}</td>
-                                <td className="px-4 py-2 font-mono text-xs text-center">{shift}</td>
+                                <td className="px-4 py-2">{hid}</td>
+                                <td className="px-4 py-2 font-mono text-xs">{normal}</td>
+                                <td className="px-4 py-2 font-mono text-xs">{shift}</td>
                               </tr>
                             ))}
                           </tbody>
@@ -1815,9 +1815,9 @@ export default async function ApiPage({ params }: LangProps) {
                             ].map(([names, hid, normal, shift], idx) => (
                               <tr key={idx} className="border-b border-border/30">
                                 <td className="px-4 py-2 font-mono text-xs break-words">{names}</td>
-                                <td className="px-4 py-2 text-center">{hid}</td>
+                                <td className="px-4 py-2">{hid}</td>
                                 <td className="px-4 py-2 font-mono text-xs whitespace-normal break-words">{normal}</td>
-                                <td className="px-4 py-2 font-mono text-xs text-center">{shift}</td>
+                                <td className="px-4 py-2 font-mono text-xs">{shift}</td>
                               </tr>
                             ))}
                           </tbody>
@@ -1862,9 +1862,9 @@ export default async function ApiPage({ params }: LangProps) {
                             ].map(([names, hid, normal, shift], idx) => (
                               <tr key={idx} className="border-b border-border/30">
                                 <td className="px-4 py-2 font-mono text-xs break-words">{names}</td>
-                                <td className="px-4 py-2 text-center">{hid}</td>
+                                <td className="px-4 py-2">{hid}</td>
                                 <td className="px-4 py-2 font-mono text-xs whitespace-normal break-words">{normal}</td>
-                                <td className="px-4 py-2 font-mono text-xs text-center">{shift}</td>
+                                <td className="px-4 py-2 font-mono text-xs">{shift}</td>
                               </tr>
                             ))}
                           </tbody>
@@ -1908,9 +1908,9 @@ export default async function ApiPage({ params }: LangProps) {
                             ].map(([names, hid, normal, shift], idx) => (
                               <tr key={idx} className="border-b border-border/30">
                                 <td className="px-4 py-2 font-mono text-xs break-words">{names}</td>
-                                <td className="px-4 py-2 text-center">{hid}</td>
-                                <td className="px-4 py-2 font-mono text-xs text-center">{normal}</td>
-                                <td className="px-4 py-2 font-mono text-xs text-center">{shift}</td>
+                                <td className="px-4 py-2">{hid}</td>
+                                <td className="px-4 py-2 font-mono text-xs">{normal}</td>
+                                <td className="px-4 py-2 font-mono text-xs">{shift}</td>
                               </tr>
                             ))}
                           </tbody>
@@ -1956,9 +1956,9 @@ export default async function ApiPage({ params }: LangProps) {
                             ].map(([names, hid, normal, shift], idx) => (
                               <tr key={idx} className="border-b border-border/30">
                                 <td className="px-4 py-2 font-mono text-xs break-words">{names}</td>
-                                <td className="px-4 py-2 text-center">{hid}</td>
+                                <td className="px-4 py-2">{hid}</td>
                                 <td className="px-4 py-2 font-mono text-xs whitespace-normal break-words">{normal}</td>
-                                <td className="px-4 py-2 font-mono text-xs text-center">{shift}</td>
+                                <td className="px-4 py-2 font-mono text-xs">{shift}</td>
                               </tr>
                             ))}
                           </tbody>
@@ -2006,9 +2006,9 @@ export default async function ApiPage({ params }: LangProps) {
                             ].map(([names, hid, normal, shift], idx) => (
                               <tr key={idx} className="border-b border-border/30">
                                 <td className="px-4 py-2 font-mono text-xs break-words">{names}</td>
-                                <td className="px-4 py-2 text-center">{hid}</td>
+                                <td className="px-4 py-2">{hid}</td>
                                 <td className="px-4 py-2 font-mono text-xs whitespace-normal break-words">{normal}</td>
-                                <td className="px-4 py-2 font-mono text-xs text-center">{shift}</td>
+                                <td className="px-4 py-2 font-mono text-xs">{shift}</td>
                               </tr>
                             ))}
                           </tbody>
@@ -2049,9 +2049,9 @@ export default async function ApiPage({ params }: LangProps) {
                               ].map(([names, hid, normal, shift], idx) => (
                                 <tr key={idx} className="border-b border-border/30">
                                   <td className="px-4 py-2 font-mono text-xs break-words">{names}</td>
-                                  <td className="px-4 py-2 text-center">{hid}</td>
+                                  <td className="px-4 py-2">{hid}</td>
                                   <td className="px-4 py-2 font-mono text-xs whitespace-normal break-words">{normal}</td>
-                                  <td className="px-4 py-2 font-mono text-xs text-center">{shift}</td>
+                                  <td className="px-4 py-2 font-mono text-xs">{shift}</td>
                                 </tr>
                               ))}
                             </tbody>
