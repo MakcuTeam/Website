@@ -55,7 +55,7 @@ export default function Home() {
         </span>
 
         <div className="gap-3 grid-cols-1 grid md:grid-cols-3 sm:grid-cols-1">
-          {dict.info.list.map((item, index) => {
+          {dict.info.list.map((item: { icon: string; title: string; number: string; description: string | string[] }, index: number) => {
             const IconComponent = iconMap[item.icon as keyof typeof iconMap];
             const number =
               item.icon === "users_round"
