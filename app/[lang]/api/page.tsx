@@ -1667,7 +1667,7 @@ export default async function ApiPage({ params }: LangProps) {
               <SpecCard
                 entries={[
                   {
-                    label: t("Letters — All 26 Letters (HID 4-29)", "字母 — 全部 26 个字母（HID 4-29）"),
+                    label: t("Letters (HID 4-29)", "字母（HID 4-29）"),
                     content: (
                       <div className="space-y-3">
                         <p className="text-sm text-muted-foreground">
@@ -1685,38 +1685,42 @@ export default async function ApiPage({ params }: LangProps) {
                           <table className="w-full border-collapse text-sm">
                             <thead>
                               <tr className="border-b border-border/60">
-                                <th className="px-3 py-2 text-left font-semibold">{t("Lowercase", "小写")}</th>
-                                <th className="px-3 py-2 text-left font-semibold">{t("Uppercase", "大写")}</th>
-                                <th className="px-3 py-2 text-left font-semibold">{t("HID", "HID")}</th>
-                                <th className="px-3 py-2 text-left font-semibold">{t("Lowercase", "小写")}</th>
-                                <th className="px-3 py-2 text-left font-semibold">{t("Uppercase", "大写")}</th>
-                                <th className="px-3 py-2 text-left font-semibold">{t("HID", "HID")}</th>
-                                <th className="px-3 py-2 text-left font-semibold">{t("Lowercase", "小写")}</th>
-                                <th className="px-3 py-2 text-left font-semibold">{t("Uppercase", "大写")}</th>
-                                <th className="px-3 py-2 text-left font-semibold">{t("HID", "HID")}</th>
-                                <th className="px-3 py-2 text-left font-semibold">{t("Lowercase", "小写")}</th>
-                                <th className="px-3 py-2 text-left font-semibold">{t("Uppercase", "大写")}</th>
-                                <th className="px-3 py-2 text-left font-semibold">{t("HID", "HID")}</th>
+                                <th className="px-4 py-2.5 text-left font-semibold">{t("Key Names", "按键名称")}</th>
+                                <th className="px-4 py-2.5 text-left font-semibold">{t("HID", "HID")}</th>
                               </tr>
                             </thead>
                             <tbody className="text-muted-foreground">
                               {[
-                                [["'a'", "'A'", "4"], ["'b'", "'B'", "5"], ["'c'", "'C'", "6"], ["'d'", "'D'", "7"]],
-                                [["'e'", "'E'", "8"], ["'f'", "'F'", "9"], ["'g'", "'G'", "10"], ["'h'", "'H'", "11"]],
-                                [["'i'", "'I'", "12"], ["'j'", "'J'", "13"], ["'k'", "'K'", "14"], ["'l'", "'L'", "15"]],
-                                [["'m'", "'M'", "16"], ["'n'", "'N'", "17"], ["'o'", "'O'", "18"], ["'p'", "'P'", "19"]],
-                                [["'q'", "'Q'", "20"], ["'r'", "'R'", "21"], ["'s'", "'S'", "22"], ["'t'", "'T'", "23"]],
-                                [["'u'", "'U'", "24"], ["'v'", "'V'", "25"], ["'w'", "'W'", "26"], ["'x'", "'X'", "27"]],
-                                [["'y'", "'Y'", "28"], ["'z'", "'Z'", "29"], ["", "", ""], ["", "", ""]],
-                              ].map((row, idx) => (
+                                ["'a' / 'A'", "4"],
+                                ["'b' / 'B'", "5"],
+                                ["'c' / 'C'", "6"],
+                                ["'d' / 'D'", "7"],
+                                ["'e' / 'E'", "8"],
+                                ["'f' / 'F'", "9"],
+                                ["'g' / 'G'", "10"],
+                                ["'h' / 'H'", "11"],
+                                ["'i' / 'I'", "12"],
+                                ["'j' / 'J'", "13"],
+                                ["'k' / 'K'", "14"],
+                                ["'l' / 'L'", "15"],
+                                ["'m' / 'M'", "16"],
+                                ["'n' / 'N'", "17"],
+                                ["'o' / 'O'", "18"],
+                                ["'p' / 'P'", "19"],
+                                ["'q' / 'Q'", "20"],
+                                ["'r' / 'R'", "21"],
+                                ["'s' / 'S'", "22"],
+                                ["'t' / 'T'", "23"],
+                                ["'u' / 'U'", "24"],
+                                ["'v' / 'V'", "25"],
+                                ["'w' / 'W'", "26"],
+                                ["'x' / 'X'", "27"],
+                                ["'y' / 'Y'", "28"],
+                                ["'z' / 'Z'", "29"],
+                              ].map(([names, hid], idx) => (
                                 <tr key={idx} className="border-b border-border/30">
-                                  {row.map(([lower, upper, hid], cellIdx) => (
-                                    <Fragment key={cellIdx}>
-                                      <td className="px-3 py-1.5 font-mono text-xs">{lower || "-"}</td>
-                                      <td className="px-3 py-1.5 font-mono text-xs">{upper || "-"}</td>
-                                      <td className="px-3 py-1.5">{hid || "-"}</td>
-                                    </Fragment>
-                                  ))}
+                                  <td className="px-4 py-2 font-mono text-xs">{names}</td>
+                                  <td className="px-4 py-2">{hid}</td>
                                 </tr>
                               ))}
                             </tbody>
@@ -1744,30 +1748,30 @@ export default async function ApiPage({ params }: LangProps) {
                           <table className="w-full border-collapse text-sm">
                             <thead>
                               <tr className="border-b border-border/60">
-                                <th className="px-3 py-2 text-left font-semibold">{t("Number", "数字")}</th>
-                                <th className="px-3 py-2 text-left font-semibold">{t("HID", "HID")}</th>
-                                <th className="px-3 py-2 text-left font-semibold">{t("With Shift", "Shift 变体")}</th>
-                                <th className="px-3 py-2 text-left font-semibold">{t("Number", "数字")}</th>
-                                <th className="px-3 py-2 text-left font-semibold">{t("HID", "HID")}</th>
-                                <th className="px-3 py-2 text-left font-semibold">{t("With Shift", "Shift 变体")}</th>
+                                <th className="px-4 py-2.5 text-left font-semibold">{t("Key Names", "按键名称")}</th>
+                                <th className="px-4 py-2.5 text-left font-semibold">{t("HID", "HID")}</th>
+                                <th className="px-4 py-2.5 text-left font-semibold">{t("Normal Output", "正常输出")}</th>
+                                <th className="px-4 py-2.5 text-left font-semibold">{t("Shift Output", "Shift 输出")}</th>
                               </tr>
                             </thead>
                             <tbody className="text-muted-foreground">
                               {[
-                                [["'1'", "30", "'!'"], ["'6'", "35", "'^'"]],
-                                [["'2'", "31", "'@'"], ["'7'", "36", "'&'"]],
-                                [["'3'", "32", "'#'"], ["'8'", "37", "'*'"]],
-                                [["'4'", "33", "'$'"], ["'9'", "38", "'('"]],
-                                [["'5'", "34", "'%'"], ["'0'", "39", "')'"]],
-                              ].map((row, idx) => (
+                                ["'1'", "30", "1", "!"],
+                                ["'2'", "31", "2", "@"],
+                                ["'3'", "32", "3", "#"],
+                                ["'4'", "33", "4", "$"],
+                                ["'5'", "34", "5", "%"],
+                                ["'6'", "35", "6", "^"],
+                                ["'7'", "36", "7", "&"],
+                                ["'8'", "37", "8", "*"],
+                                ["'9'", "38", "9", "("],
+                                ["'0'", "39", "0", ")"],
+                              ].map(([names, hid, normal, shift], idx) => (
                                 <tr key={idx} className="border-b border-border/30">
-                                  {row.map(([num, hid, shift], cellIdx) => (
-                                    <Fragment key={cellIdx}>
-                                      <td className="px-3 py-1.5 font-mono text-xs">{num}</td>
-                                      <td className="px-3 py-1.5">{hid}</td>
-                                      <td className="px-3 py-1.5 font-mono text-xs">{shift}</td>
-                                    </Fragment>
-                                  ))}
+                                  <td className="px-4 py-2 font-mono text-xs">{names}</td>
+                                  <td className="px-4 py-2">{hid}</td>
+                                  <td className="px-4 py-2 font-mono text-xs">{normal}</td>
+                                  <td className="px-4 py-2 font-mono text-xs">{shift}</td>
                                 </tr>
                               ))}
                             </tbody>
@@ -1783,8 +1787,8 @@ export default async function ApiPage({ params }: LangProps) {
                         <table className="w-full border-collapse text-sm">
                           <thead>
                             <tr className="border-b border-border/60">
-                              <th className="px-3 py-2 text-left font-semibold">{t("Key Names", "按键名称")}</th>
-                              <th className="px-3 py-2 text-left font-semibold">{t("HID", "HID")}</th>
+                              <th className="px-4 py-2.5 text-left font-semibold">{t("Key Names", "按键名称")}</th>
+                              <th className="px-4 py-2.5 text-left font-semibold">{t("HID", "HID")}</th>
                             </tr>
                           </thead>
                           <tbody className="text-muted-foreground">
@@ -1796,8 +1800,8 @@ export default async function ApiPage({ params }: LangProps) {
                               ["'space', 'spacebar'", "44"],
                             ].map(([names, hid], idx) => (
                               <tr key={idx} className="border-b border-border/30">
-                                <td className="px-3 py-1.5 font-mono text-xs">{names}</td>
-                                <td className="px-3 py-1.5">{hid}</td>
+                                <td className="px-4 py-2 font-mono text-xs">{names}</td>
+                                <td className="px-4 py-2">{hid}</td>
                               </tr>
                             ))}
                           </tbody>
@@ -1824,33 +1828,33 @@ export default async function ApiPage({ params }: LangProps) {
                           <table className="w-full border-collapse text-sm">
                             <thead>
                               <tr className="border-b border-border/60">
-                                <th className="px-3 py-2 text-left font-semibold">{t("Key Names", "按键名称")}</th>
-                                <th className="px-3 py-2 text-left font-semibold">{t("HID", "HID")}</th>
-                                <th className="px-3 py-2 text-left font-semibold">{t("Output", "输出")}</th>
-                                <th className="px-3 py-2 text-left font-semibold">{t("With Shift", "Shift 变体")}</th>
+                                <th className="px-4 py-2.5 text-left font-semibold">{t("Key Names", "按键名称")}</th>
+                                <th className="px-4 py-2.5 text-left font-semibold">{t("HID", "HID")}</th>
+                                <th className="px-4 py-2.5 text-left font-semibold">{t("Normal Output", "正常输出")}</th>
+                                <th className="px-4 py-2.5 text-left font-semibold">{t("Shift Output", "Shift 输出")}</th>
                               </tr>
                             </thead>
                             <tbody className="text-muted-foreground">
                               {[
-                                ["'minus', 'dash', 'hyphen'", "45", "-", "'_'"],
-                                ["'equals', 'equal'", "46", "=", "'+'"],
-                                ["'leftbracket', 'lbracket', 'openbracket'", "47", "[", "'{'"],
-                                ["'rightbracket', 'rbracket', 'closebracket'", "48", "]", "'}'"],
-                                ["'backslash', 'bslash'", "49", "\\", "'|'"],
+                                ["'minus', 'dash', 'hyphen'", "45", "-", "_"],
+                                ["'equals', 'equal'", "46", "=", "+"],
+                                ["'leftbracket', 'lbracket', 'openbracket'", "47", "[", "{"],
+                                ["'rightbracket', 'rbracket', 'closebracket'", "48", "]", "}"],
+                                ["'backslash', 'bslash'", "49", "\\", "|"],
                                 ["'nonus_hash'", "50", "#", "-"],
-                                ["'semicolon', 'semi'", "51", ";", "':'"],
-                                ["'quote', 'apostrophe', 'singlequote'", "52", "'", "'\"'"],
-                                ["'grave', 'backtick', 'tilde'", "53", "`", "'~'"],
-                                ["'comma'", "54", ",", "'<'"],
-                                ["'period', 'dot'", "55", ".", "'>'"],
-                                ["'slash', 'forwardslash', 'fslash'", "56", "/", "'?'"],
+                                ["'semicolon', 'semi'", "51", ";", ":"],
+                                ["'quote', 'apostrophe', 'singlequote'", "52", "'", '"'],
+                                ["'grave', 'backtick', 'tilde'", "53", "`", "~"],
+                                ["'comma'", "54", ",", "<"],
+                                ["'period', 'dot'", "55", ".", ">"],
+                                ["'slash', 'forwardslash', 'fslash'", "56", "/", "?"],
                                 ["'capslock', 'caps'", "57", "Caps Lock", "-"],
                               ].map(([names, hid, normal, shift], idx) => (
                                 <tr key={idx} className="border-b border-border/30">
-                                  <td className="px-3 py-1.5 font-mono text-xs">{names}</td>
-                                  <td className="px-3 py-1.5">{hid}</td>
-                                  <td className="px-3 py-1.5 font-mono text-xs">{normal}</td>
-                                  <td className="px-3 py-1.5 font-mono text-xs">{shift || "-"}</td>
+                                  <td className="px-4 py-2 font-mono text-xs">{names}</td>
+                                  <td className="px-4 py-2">{hid}</td>
+                                  <td className="px-4 py-2 font-mono text-xs">{normal}</td>
+                                  <td className="px-4 py-2 font-mono text-xs">{shift || "-"}</td>
                                 </tr>
                               ))}
                             </tbody>
@@ -1866,28 +1870,28 @@ export default async function ApiPage({ params }: LangProps) {
                         <table className="w-full border-collapse text-sm">
                           <thead>
                             <tr className="border-b border-border/60">
-                              <th className="px-3 py-2 text-left font-semibold">{t("Key", "按键")}</th>
-                              <th className="px-3 py-2 text-left font-semibold">{t("HID", "HID")}</th>
-                              <th className="px-3 py-2 text-left font-semibold">{t("Key", "按键")}</th>
-                              <th className="px-3 py-2 text-left font-semibold">{t("HID", "HID")}</th>
-                              <th className="px-3 py-2 text-left font-semibold">{t("Key", "按键")}</th>
-                              <th className="px-3 py-2 text-left font-semibold">{t("HID", "HID")}</th>
+                              <th className="px-4 py-2.5 text-left font-semibold">{t("Key Names", "按键名称")}</th>
+                              <th className="px-4 py-2.5 text-left font-semibold">{t("HID", "HID")}</th>
                             </tr>
                           </thead>
                           <tbody className="text-muted-foreground">
                             {[
-                              [["'f1'", "58"], ["'f5'", "62"], ["'f9'", "66"]],
-                              [["'f2'", "59"], ["'f6'", "63"], ["'f10'", "67"]],
-                              [["'f3'", "60"], ["'f7'", "64"], ["'f11'", "68"]],
-                              [["'f4'", "61"], ["'f8'", "65"], ["'f12'", "69"]],
-                            ].map((row, idx) => (
+                              ["'f1'", "58"],
+                              ["'f2'", "59"],
+                              ["'f3'", "60"],
+                              ["'f4'", "61"],
+                              ["'f5'", "62"],
+                              ["'f6'", "63"],
+                              ["'f7'", "64"],
+                              ["'f8'", "65"],
+                              ["'f9'", "66"],
+                              ["'f10'", "67"],
+                              ["'f11'", "68"],
+                              ["'f12'", "69"],
+                            ].map(([names, hid], idx) => (
                               <tr key={idx} className="border-b border-border/30">
-                                {row.map(([key, hid], cellIdx) => (
-                                  <Fragment key={cellIdx}>
-                                    <td className="px-3 py-1.5 font-mono text-xs">{key}</td>
-                                    <td className="px-3 py-1.5">{hid}</td>
-                                  </Fragment>
-                                ))}
+                                <td className="px-4 py-2 font-mono text-xs">{names}</td>
+                                <td className="px-4 py-2">{hid}</td>
                               </tr>
                             ))}
                           </tbody>
@@ -1902,8 +1906,8 @@ export default async function ApiPage({ params }: LangProps) {
                         <table className="w-full border-collapse text-sm">
                           <thead>
                             <tr className="border-b border-border/60">
-                              <th className="px-3 py-2 text-left font-semibold">{t("Key Names", "按键名称")}</th>
-                              <th className="px-3 py-2 text-left font-semibold">{t("HID", "HID")}</th>
+                              <th className="px-4 py-2.5 text-left font-semibold">{t("Key Names", "按键名称")}</th>
+                              <th className="px-4 py-2.5 text-left font-semibold">{t("HID", "HID")}</th>
                             </tr>
                           </thead>
                           <tbody className="text-muted-foreground">
@@ -1924,8 +1928,8 @@ export default async function ApiPage({ params }: LangProps) {
                               ["'numlock', 'num'", "83"],
                             ].map(([names, hid], idx) => (
                               <tr key={idx} className="border-b border-border/30">
-                                <td className="px-3 py-1.5 font-mono text-xs">{names}</td>
-                                <td className="px-3 py-1.5">{hid}</td>
+                                <td className="px-4 py-2 font-mono text-xs">{names}</td>
+                                <td className="px-4 py-2">{hid}</td>
                               </tr>
                             ))}
                           </tbody>
@@ -1940,8 +1944,8 @@ export default async function ApiPage({ params }: LangProps) {
                         <table className="w-full border-collapse text-sm">
                           <thead>
                             <tr className="border-b border-border/60">
-                              <th className="px-3 py-2 text-left font-semibold">{t("Key Names", "按键名称")}</th>
-                              <th className="px-3 py-2 text-left font-semibold">{t("HID", "HID")}</th>
+                              <th className="px-4 py-2.5 text-left font-semibold">{t("Key Names", "按键名称")}</th>
+                              <th className="px-4 py-2.5 text-left font-semibold">{t("HID", "HID")}</th>
                             </tr>
                           </thead>
                           <tbody className="text-muted-foreground">
@@ -1964,8 +1968,8 @@ export default async function ApiPage({ params }: LangProps) {
                               ["'kpperiod', 'kpdot', 'npperiod', 'npdot'", "99"],
                             ].map(([names, hid], idx) => (
                               <tr key={idx} className="border-b border-border/30">
-                                <td className="px-3 py-1.5 font-mono text-xs">{names}</td>
-                                <td className="px-3 py-1.5">{hid}</td>
+                                <td className="px-4 py-2 font-mono text-xs">{names}</td>
+                                <td className="px-4 py-2">{hid}</td>
                               </tr>
                             ))}
                           </tbody>
@@ -1981,8 +1985,8 @@ export default async function ApiPage({ params }: LangProps) {
                           <table className="w-full border-collapse text-sm">
                             <thead>
                               <tr className="border-b border-border/60">
-                                <th className="px-3 py-2 text-left font-semibold">{t("Key Names (aliases)", "按键名称（别名）")}</th>
-                                <th className="px-3 py-2 text-left font-semibold">{t("HID", "HID")}</th>
+                                <th className="px-4 py-2.5 text-left font-semibold">{t("Key Names (aliases)", "按键名称（别名）")}</th>
+                                <th className="px-4 py-2.5 text-left font-semibold">{t("HID", "HID")}</th>
                               </tr>
                             </thead>
                             <tbody className="text-muted-foreground">
@@ -1997,8 +2001,8 @@ export default async function ApiPage({ params }: LangProps) {
                                 ["'rightgui', 'rgui', 'rightwin', 'rwin', 'rightwindows'", "231"],
                               ].map(([names, hid], idx) => (
                                 <tr key={idx} className="border-b border-border/30">
-                                  <td className="px-3 py-1.5 font-mono text-xs">{names}</td>
-                                  <td className="px-3 py-1.5">{hid}</td>
+                                  <td className="px-4 py-2 font-mono text-xs">{names}</td>
+                                  <td className="px-4 py-2">{hid}</td>
                                 </tr>
                               ))}
                             </tbody>
