@@ -1667,116 +1667,110 @@ export default async function ApiPage({ params }: LangProps) {
               <SpecCard
                 entries={[
                   {
+                    label: t("Command", "命令"),
+                    content: <span className="font-mono">press(key)</span>,
+                  },
+                  {
+                    label: t("Description", "描述"),
+                    content: isCn ? (
+                      <p>
+                        键盘按键参考表。所有按键支持 HID 码或字符串名称。单字符字母区分大小写（小写输入小写，大写自动使用 Shift 输入大写）。多字符特殊键不区分大小写。
+                      </p>
+                    ) : (
+                      <p>
+                        Complete keyboard key reference table. All keys support HID codes or string names. Single character letters are case-sensitive (lowercase types lowercase, uppercase automatically uses Shift to type uppercase). Multi-character special keys are case-insensitive.
+                      </p>
+                    ),
+                  },
+                  {
                     label: t("Letters (HID 4-29)", "字母（HID 4-29）"),
                     content: (
-                      <div className="space-y-3">
-                        <p className="text-sm text-muted-foreground">
-                          {isCn ? (
-                            <span>
-                              所有 26 个字母：小写 <span className="font-mono">'a'</span> 到 <span className="font-mono">'z'</span> 输入小写；大写 <span className="font-mono">'A'</span> 到 <span className="font-mono">'Z'</span> 自动使用 Shift 输入大写。区分大小写。
-                            </span>
-                          ) : (
-                            <span>
-                              All 26 letters: Lowercase <span className="font-mono">'a'</span> to <span className="font-mono">'z'</span> types lowercase; Uppercase <span className="font-mono">'A'</span> to <span className="font-mono">'Z'</span> automatically uses Shift to type uppercase. Case-sensitive.
-                            </span>
-                          )}
-                        </p>
-                        <div className="overflow-x-auto">
-                          <table className="w-full border-collapse text-sm">
-                            <thead>
-                              <tr className="border-b border-border/60">
-                                <th className="px-4 py-2.5 text-left font-semibold">{t("Key Names", "按键名称")}</th>
-                                <th className="px-4 py-2.5 text-left font-semibold">{t("HID", "HID")}</th>
+                      <div className="overflow-x-auto">
+                        <table className="w-full border-collapse text-sm">
+                          <thead>
+                            <tr className="border-b border-border/60">
+                              <th className="px-4 py-2.5 text-left font-semibold">{t("Key Names", "按键名称")}</th>
+                              <th className="px-4 py-2.5 text-left font-semibold">{t("HID", "HID")}</th>
+                              <th className="px-4 py-2.5 text-left font-semibold">{t("Normal Output", "正常输出")}</th>
+                              <th className="px-4 py-2.5 text-left font-semibold">{t("Shift Output", "Shift 输出")}</th>
+                            </tr>
+                          </thead>
+                          <tbody className="text-muted-foreground">
+                            {[
+                              ["'a'", "4", "a", "A"],
+                              ["'b'", "5", "b", "B"],
+                              ["'c'", "6", "c", "C"],
+                              ["'d'", "7", "d", "D"],
+                              ["'e'", "8", "e", "E"],
+                              ["'f'", "9", "f", "F"],
+                              ["'g'", "10", "g", "G"],
+                              ["'h'", "11", "h", "H"],
+                              ["'i'", "12", "i", "I"],
+                              ["'j'", "13", "j", "J"],
+                              ["'k'", "14", "k", "K"],
+                              ["'l'", "15", "l", "L"],
+                              ["'m'", "16", "m", "M"],
+                              ["'n'", "17", "n", "N"],
+                              ["'o'", "18", "o", "O"],
+                              ["'p'", "19", "p", "P"],
+                              ["'q'", "20", "q", "Q"],
+                              ["'r'", "21", "r", "R"],
+                              ["'s'", "22", "s", "S"],
+                              ["'t'", "23", "t", "T"],
+                              ["'u'", "24", "u", "U"],
+                              ["'v'", "25", "v", "V"],
+                              ["'w'", "26", "w", "W"],
+                              ["'x'", "27", "x", "X"],
+                              ["'y'", "28", "y", "Y"],
+                              ["'z'", "29", "z", "Z"],
+                            ].map(([names, hid, normal, shift], idx) => (
+                              <tr key={idx} className="border-b border-border/30">
+                                <td className="px-4 py-2 font-mono text-xs">{names}</td>
+                                <td className="px-4 py-2">{hid}</td>
+                                <td className="px-4 py-2 font-mono text-xs">{normal}</td>
+                                <td className="px-4 py-2 font-mono text-xs">{shift}</td>
                               </tr>
-                            </thead>
-                            <tbody className="text-muted-foreground">
-                              {[
-                                ["'a' / 'A'", "4"],
-                                ["'b' / 'B'", "5"],
-                                ["'c' / 'C'", "6"],
-                                ["'d' / 'D'", "7"],
-                                ["'e' / 'E'", "8"],
-                                ["'f' / 'F'", "9"],
-                                ["'g' / 'G'", "10"],
-                                ["'h' / 'H'", "11"],
-                                ["'i' / 'I'", "12"],
-                                ["'j' / 'J'", "13"],
-                                ["'k' / 'K'", "14"],
-                                ["'l' / 'L'", "15"],
-                                ["'m' / 'M'", "16"],
-                                ["'n' / 'N'", "17"],
-                                ["'o' / 'O'", "18"],
-                                ["'p' / 'P'", "19"],
-                                ["'q' / 'Q'", "20"],
-                                ["'r' / 'R'", "21"],
-                                ["'s' / 'S'", "22"],
-                                ["'t' / 'T'", "23"],
-                                ["'u' / 'U'", "24"],
-                                ["'v' / 'V'", "25"],
-                                ["'w' / 'W'", "26"],
-                                ["'x' / 'X'", "27"],
-                                ["'y' / 'Y'", "28"],
-                                ["'z' / 'Z'", "29"],
-                              ].map(([names, hid], idx) => (
-                                <tr key={idx} className="border-b border-border/30">
-                                  <td className="px-4 py-2 font-mono text-xs">{names}</td>
-                                  <td className="px-4 py-2">{hid}</td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        </div>
+                            ))}
+                          </tbody>
+                        </table>
                       </div>
                     ),
                   },
                   {
                     label: t("Numbers & Shift Variants (HID 30-39)", "数字和 Shift 变体（HID 30-39）"),
                     content: (
-                      <div className="space-y-3">
-                        <p className="text-sm text-muted-foreground">
-                          {isCn ? (
-                            <span>
-                              数字键的 Shift 变体：按住 Shift 键时，数字键会输入符号。示例：<span className="font-mono">km.press('1')</span> 输入 "1"，<span className="font-mono">km.press('!')</span> 输入 "!"（需要先按住 Shift）
-                            </span>
-                          ) : (
-                            <span>
-                              Number keys with Shift variants: When holding Shift, number keys type symbols. Example: <span className="font-mono">km.press('1')</span> types "1", <span className="font-mono">km.press('!')</span> types "!" (requires Shift held)
-                            </span>
-                          )}
-                        </p>
-                        <div className="overflow-x-auto">
-                          <table className="w-full border-collapse text-sm">
-                            <thead>
-                              <tr className="border-b border-border/60">
-                                <th className="px-4 py-2.5 text-left font-semibold">{t("Key Names", "按键名称")}</th>
-                                <th className="px-4 py-2.5 text-left font-semibold">{t("HID", "HID")}</th>
-                                <th className="px-4 py-2.5 text-left font-semibold">{t("Normal Output", "正常输出")}</th>
-                                <th className="px-4 py-2.5 text-left font-semibold">{t("Shift Output", "Shift 输出")}</th>
+                      <div className="overflow-x-auto">
+                        <table className="w-full border-collapse text-sm">
+                          <thead>
+                            <tr className="border-b border-border/60">
+                              <th className="px-4 py-2.5 text-left font-semibold">{t("Key Names", "按键名称")}</th>
+                              <th className="px-4 py-2.5 text-left font-semibold">{t("HID", "HID")}</th>
+                              <th className="px-4 py-2.5 text-left font-semibold">{t("Normal Output", "正常输出")}</th>
+                              <th className="px-4 py-2.5 text-left font-semibold">{t("Shift Output", "Shift 输出")}</th>
+                            </tr>
+                          </thead>
+                          <tbody className="text-muted-foreground">
+                            {[
+                              ["'1'", "30", "1", "!"],
+                              ["'2'", "31", "2", "@"],
+                              ["'3'", "32", "3", "#"],
+                              ["'4'", "33", "4", "$"],
+                              ["'5'", "34", "5", "%"],
+                              ["'6'", "35", "6", "^"],
+                              ["'7'", "36", "7", "&"],
+                              ["'8'", "37", "8", "*"],
+                              ["'9'", "38", "9", "("],
+                              ["'0'", "39", "0", ")"],
+                            ].map(([names, hid, normal, shift], idx) => (
+                              <tr key={idx} className="border-b border-border/30">
+                                <td className="px-4 py-2 font-mono text-xs">{names}</td>
+                                <td className="px-4 py-2">{hid}</td>
+                                <td className="px-4 py-2 font-mono text-xs">{normal}</td>
+                                <td className="px-4 py-2 font-mono text-xs">{shift}</td>
                               </tr>
-                            </thead>
-                            <tbody className="text-muted-foreground">
-                              {[
-                                ["'1'", "30", "1", "!"],
-                                ["'2'", "31", "2", "@"],
-                                ["'3'", "32", "3", "#"],
-                                ["'4'", "33", "4", "$"],
-                                ["'5'", "34", "5", "%"],
-                                ["'6'", "35", "6", "^"],
-                                ["'7'", "36", "7", "&"],
-                                ["'8'", "37", "8", "*"],
-                                ["'9'", "38", "9", "("],
-                                ["'0'", "39", "0", ")"],
-                              ].map(([names, hid, normal, shift], idx) => (
-                                <tr key={idx} className="border-b border-border/30">
-                                  <td className="px-4 py-2 font-mono text-xs">{names}</td>
-                                  <td className="px-4 py-2">{hid}</td>
-                                  <td className="px-4 py-2 font-mono text-xs">{normal}</td>
-                                  <td className="px-4 py-2 font-mono text-xs">{shift}</td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        </div>
+                            ))}
+                          </tbody>
+                        </table>
                       </div>
                     ),
                   },
@@ -1789,19 +1783,23 @@ export default async function ApiPage({ params }: LangProps) {
                             <tr className="border-b border-border/60">
                               <th className="px-4 py-2.5 text-left font-semibold">{t("Key Names", "按键名称")}</th>
                               <th className="px-4 py-2.5 text-left font-semibold">{t("HID", "HID")}</th>
+                              <th className="px-4 py-2.5 text-left font-semibold">{t("Normal Output", "正常输出")}</th>
+                              <th className="px-4 py-2.5 text-left font-semibold">{t("Shift Output", "Shift 输出")}</th>
                             </tr>
                           </thead>
                           <tbody className="text-muted-foreground">
                             {[
-                              ["'enter', 'return'", "40"],
-                              ["'escape', 'esc'", "41"],
-                              ["'backspace', 'back'", "42"],
-                              ["'tab'", "43"],
-                              ["'space', 'spacebar'", "44"],
-                            ].map(([names, hid], idx) => (
+                              ["'enter', 'return'", "40", "Enter", "-"],
+                              ["'escape', 'esc'", "41", "Escape", "-"],
+                              ["'backspace', 'back'", "42", "Backspace", "-"],
+                              ["'tab'", "43", "Tab", "-"],
+                              ["'space', 'spacebar'", "44", " ", "-"],
+                            ].map(([names, hid, normal, shift], idx) => (
                               <tr key={idx} className="border-b border-border/30">
                                 <td className="px-4 py-2 font-mono text-xs">{names}</td>
                                 <td className="px-4 py-2">{hid}</td>
+                                <td className="px-4 py-2 font-mono text-xs">{normal}</td>
+                                <td className="px-4 py-2 font-mono text-xs">{shift}</td>
                               </tr>
                             ))}
                           </tbody>
@@ -1812,54 +1810,41 @@ export default async function ApiPage({ params }: LangProps) {
                   {
                     label: t("Symbols & Shift Variants (HID 45-57)", "符号和 Shift 变体（HID 45-57）"),
                     content: (
-                      <div className="space-y-3">
-                        <p className="text-sm text-muted-foreground">
-                          {isCn ? (
-                            <span>
-                              符号键的 Shift 变体。示例：<span className="font-mono">km.press('minus')</span> 输入 "-"，<span className="font-mono">km.press('_')</span> 输入 "_"（需要 Shift）
-                            </span>
-                          ) : (
-                            <span>
-                              Symbol keys with Shift variants. Example: <span className="font-mono">km.press('minus')</span> types "-", <span className="font-mono">km.press('_')</span> types "_" (requires Shift)
-                            </span>
-                          )}
-                        </p>
-                        <div className="overflow-x-auto">
-                          <table className="w-full border-collapse text-sm">
-                            <thead>
-                              <tr className="border-b border-border/60">
-                                <th className="px-4 py-2.5 text-left font-semibold">{t("Key Names", "按键名称")}</th>
-                                <th className="px-4 py-2.5 text-left font-semibold">{t("HID", "HID")}</th>
-                                <th className="px-4 py-2.5 text-left font-semibold">{t("Normal Output", "正常输出")}</th>
-                                <th className="px-4 py-2.5 text-left font-semibold">{t("Shift Output", "Shift 输出")}</th>
+                      <div className="overflow-x-auto">
+                        <table className="w-full border-collapse text-sm">
+                          <thead>
+                            <tr className="border-b border-border/60">
+                              <th className="px-4 py-2.5 text-left font-semibold">{t("Key Names", "按键名称")}</th>
+                              <th className="px-4 py-2.5 text-left font-semibold">{t("HID", "HID")}</th>
+                              <th className="px-4 py-2.5 text-left font-semibold">{t("Normal Output", "正常输出")}</th>
+                              <th className="px-4 py-2.5 text-left font-semibold">{t("Shift Output", "Shift 输出")}</th>
+                            </tr>
+                          </thead>
+                          <tbody className="text-muted-foreground">
+                            {[
+                              ["'minus', 'dash', 'hyphen'", "45", "-", "_"],
+                              ["'equals', 'equal'", "46", "=", "+"],
+                              ["'leftbracket', 'lbracket', 'openbracket'", "47", "[", "{"],
+                              ["'rightbracket', 'rbracket', 'closebracket'", "48", "]", "}"],
+                              ["'backslash', 'bslash'", "49", "\\", "|"],
+                              ["'nonus_hash'", "50", "#", "-"],
+                              ["'semicolon', 'semi'", "51", ";", ":"],
+                              ["'quote', 'apostrophe', 'singlequote'", "52", "'", '"'],
+                              ["'grave', 'backtick', 'tilde'", "53", "`", "~"],
+                              ["'comma'", "54", ",", "<"],
+                              ["'period', 'dot'", "55", ".", ">"],
+                              ["'slash', 'forwardslash', 'fslash'", "56", "/", "?"],
+                              ["'capslock', 'caps'", "57", "Caps Lock", "-"],
+                            ].map(([names, hid, normal, shift], idx) => (
+                              <tr key={idx} className="border-b border-border/30">
+                                <td className="px-4 py-2 font-mono text-xs">{names}</td>
+                                <td className="px-4 py-2">{hid}</td>
+                                <td className="px-4 py-2 font-mono text-xs">{normal}</td>
+                                <td className="px-4 py-2 font-mono text-xs">{shift}</td>
                               </tr>
-                            </thead>
-                            <tbody className="text-muted-foreground">
-                              {[
-                                ["'minus', 'dash', 'hyphen'", "45", "-", "_"],
-                                ["'equals', 'equal'", "46", "=", "+"],
-                                ["'leftbracket', 'lbracket', 'openbracket'", "47", "[", "{"],
-                                ["'rightbracket', 'rbracket', 'closebracket'", "48", "]", "}"],
-                                ["'backslash', 'bslash'", "49", "\\", "|"],
-                                ["'nonus_hash'", "50", "#", "-"],
-                                ["'semicolon', 'semi'", "51", ";", ":"],
-                                ["'quote', 'apostrophe', 'singlequote'", "52", "'", '"'],
-                                ["'grave', 'backtick', 'tilde'", "53", "`", "~"],
-                                ["'comma'", "54", ",", "<"],
-                                ["'period', 'dot'", "55", ".", ">"],
-                                ["'slash', 'forwardslash', 'fslash'", "56", "/", "?"],
-                                ["'capslock', 'caps'", "57", "Caps Lock", "-"],
-                              ].map(([names, hid, normal, shift], idx) => (
-                                <tr key={idx} className="border-b border-border/30">
-                                  <td className="px-4 py-2 font-mono text-xs">{names}</td>
-                                  <td className="px-4 py-2">{hid}</td>
-                                  <td className="px-4 py-2 font-mono text-xs">{normal}</td>
-                                  <td className="px-4 py-2 font-mono text-xs">{shift || "-"}</td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        </div>
+                            ))}
+                          </tbody>
+                        </table>
                       </div>
                     ),
                   },
@@ -1872,26 +1857,30 @@ export default async function ApiPage({ params }: LangProps) {
                             <tr className="border-b border-border/60">
                               <th className="px-4 py-2.5 text-left font-semibold">{t("Key Names", "按键名称")}</th>
                               <th className="px-4 py-2.5 text-left font-semibold">{t("HID", "HID")}</th>
+                              <th className="px-4 py-2.5 text-left font-semibold">{t("Normal Output", "正常输出")}</th>
+                              <th className="px-4 py-2.5 text-left font-semibold">{t("Shift Output", "Shift 输出")}</th>
                             </tr>
                           </thead>
                           <tbody className="text-muted-foreground">
                             {[
-                              ["'f1'", "58"],
-                              ["'f2'", "59"],
-                              ["'f3'", "60"],
-                              ["'f4'", "61"],
-                              ["'f5'", "62"],
-                              ["'f6'", "63"],
-                              ["'f7'", "64"],
-                              ["'f8'", "65"],
-                              ["'f9'", "66"],
-                              ["'f10'", "67"],
-                              ["'f11'", "68"],
-                              ["'f12'", "69"],
-                            ].map(([names, hid], idx) => (
+                              ["'f1'", "58", "F1", "-"],
+                              ["'f2'", "59", "F2", "-"],
+                              ["'f3'", "60", "F3", "-"],
+                              ["'f4'", "61", "F4", "-"],
+                              ["'f5'", "62", "F5", "-"],
+                              ["'f6'", "63", "F6", "-"],
+                              ["'f7'", "64", "F7", "-"],
+                              ["'f8'", "65", "F8", "-"],
+                              ["'f9'", "66", "F9", "-"],
+                              ["'f10'", "67", "F10", "-"],
+                              ["'f11'", "68", "F11", "-"],
+                              ["'f12'", "69", "F12", "-"],
+                            ].map(([names, hid, normal, shift], idx) => (
                               <tr key={idx} className="border-b border-border/30">
                                 <td className="px-4 py-2 font-mono text-xs">{names}</td>
                                 <td className="px-4 py-2">{hid}</td>
+                                <td className="px-4 py-2 font-mono text-xs">{normal}</td>
+                                <td className="px-4 py-2 font-mono text-xs">{shift}</td>
                               </tr>
                             ))}
                           </tbody>
@@ -1908,28 +1897,32 @@ export default async function ApiPage({ params }: LangProps) {
                             <tr className="border-b border-border/60">
                               <th className="px-4 py-2.5 text-left font-semibold">{t("Key Names", "按键名称")}</th>
                               <th className="px-4 py-2.5 text-left font-semibold">{t("HID", "HID")}</th>
+                              <th className="px-4 py-2.5 text-left font-semibold">{t("Normal Output", "正常输出")}</th>
+                              <th className="px-4 py-2.5 text-left font-semibold">{t("Shift Output", "Shift 输出")}</th>
                             </tr>
                           </thead>
                           <tbody className="text-muted-foreground">
                             {[
-                              ["'printscreen', 'prtsc', 'print'", "70"],
-                              ["'scrolllock', 'scroll'", "71"],
-                              ["'pause', 'break'", "72"],
-                              ["'insert', 'ins'", "73"],
-                              ["'home'", "74"],
-                              ["'pageup', 'pgup'", "75"],
-                              ["'delete', 'del'", "76"],
-                              ["'end'", "77"],
-                              ["'pagedown', 'pgdown', 'pgdn'", "78"],
-                              ["'right', 'rightarrow'", "79"],
-                              ["'left', 'leftarrow'", "80"],
-                              ["'down', 'downarrow'", "81"],
-                              ["'up', 'uparrow'", "82"],
-                              ["'numlock', 'num'", "83"],
-                            ].map(([names, hid], idx) => (
+                              ["'printscreen', 'prtsc', 'print'", "70", "Print Screen", "-"],
+                              ["'scrolllock', 'scroll'", "71", "Scroll Lock", "-"],
+                              ["'pause', 'break'", "72", "Pause/Break", "-"],
+                              ["'insert', 'ins'", "73", "Insert", "-"],
+                              ["'home'", "74", "Home", "-"],
+                              ["'pageup', 'pgup'", "75", "Page Up", "-"],
+                              ["'delete', 'del'", "76", "Delete", "-"],
+                              ["'end'", "77", "End", "-"],
+                              ["'pagedown', 'pgdown', 'pgdn'", "78", "Page Down", "-"],
+                              ["'right', 'rightarrow'", "79", "Right Arrow", "-"],
+                              ["'left', 'leftarrow'", "80", "Left Arrow", "-"],
+                              ["'down', 'downarrow'", "81", "Down Arrow", "-"],
+                              ["'up', 'uparrow'", "82", "Up Arrow", "-"],
+                              ["'numlock', 'num'", "83", "Num Lock", "-"],
+                            ].map(([names, hid, normal, shift], idx) => (
                               <tr key={idx} className="border-b border-border/30">
                                 <td className="px-4 py-2 font-mono text-xs">{names}</td>
                                 <td className="px-4 py-2">{hid}</td>
+                                <td className="px-4 py-2 font-mono text-xs">{normal}</td>
+                                <td className="px-4 py-2 font-mono text-xs">{shift}</td>
                               </tr>
                             ))}
                           </tbody>
@@ -1946,30 +1939,34 @@ export default async function ApiPage({ params }: LangProps) {
                             <tr className="border-b border-border/60">
                               <th className="px-4 py-2.5 text-left font-semibold">{t("Key Names", "按键名称")}</th>
                               <th className="px-4 py-2.5 text-left font-semibold">{t("HID", "HID")}</th>
+                              <th className="px-4 py-2.5 text-left font-semibold">{t("Normal Output", "正常输出")}</th>
+                              <th className="px-4 py-2.5 text-left font-semibold">{t("Shift Output", "Shift 输出")}</th>
                             </tr>
                           </thead>
                           <tbody className="text-muted-foreground">
                             {[
-                              ["'kpdivide', 'npdivide'", "84"],
-                              ["'kpmultiply', 'npmultiply'", "85"],
-                              ["'kpminus', 'npminus'", "86"],
-                              ["'kpplus', 'npplus'", "87"],
-                              ["'kpenter', 'npenter'", "88"],
-                              ["'kp1', 'np1'", "89"],
-                              ["'kp2', 'np2'", "90"],
-                              ["'kp3', 'np3'", "91"],
-                              ["'kp4', 'np4'", "92"],
-                              ["'kp5', 'np5'", "93"],
-                              ["'kp6', 'np6'", "94"],
-                              ["'kp7', 'np7'", "95"],
-                              ["'kp8', 'np8'", "96"],
-                              ["'kp9', 'np9'", "97"],
-                              ["'kp0', 'np0'", "98"],
-                              ["'kpperiod', 'kpdot', 'npperiod', 'npdot'", "99"],
-                            ].map(([names, hid], idx) => (
+                              ["'kpdivide', 'npdivide'", "84", "/", "-"],
+                              ["'kpmultiply', 'npmultiply'", "85", "*", "-"],
+                              ["'kpminus', 'npminus'", "86", "-", "-"],
+                              ["'kpplus', 'npplus'", "87", "+", "-"],
+                              ["'kpenter', 'npenter'", "88", "Enter", "-"],
+                              ["'kp1', 'np1'", "89", "1", "-"],
+                              ["'kp2', 'np2'", "90", "2", "-"],
+                              ["'kp3', 'np3'", "91", "3", "-"],
+                              ["'kp4', 'np4'", "92", "4", "-"],
+                              ["'kp5', 'np5'", "93", "5", "-"],
+                              ["'kp6', 'np6'", "94", "6", "-"],
+                              ["'kp7', 'np7'", "95", "7", "-"],
+                              ["'kp8', 'np8'", "96", "8", "-"],
+                              ["'kp9', 'np9'", "97", "9", "-"],
+                              ["'kp0', 'np0'", "98", "0", "-"],
+                              ["'kpperiod', 'kpdot', 'npperiod', 'npdot'", "99", ".", "-"],
+                            ].map(([names, hid, normal, shift], idx) => (
                               <tr key={idx} className="border-b border-border/30">
                                 <td className="px-4 py-2 font-mono text-xs">{names}</td>
                                 <td className="px-4 py-2">{hid}</td>
+                                <td className="px-4 py-2 font-mono text-xs">{normal}</td>
+                                <td className="px-4 py-2 font-mono text-xs">{shift}</td>
                               </tr>
                             ))}
                           </tbody>
@@ -1987,22 +1984,26 @@ export default async function ApiPage({ params }: LangProps) {
                               <tr className="border-b border-border/60">
                                 <th className="px-4 py-2.5 text-left font-semibold">{t("Key Names (aliases)", "按键名称（别名）")}</th>
                                 <th className="px-4 py-2.5 text-left font-semibold">{t("HID", "HID")}</th>
+                                <th className="px-4 py-2.5 text-left font-semibold">{t("Normal Output", "正常输出")}</th>
+                                <th className="px-4 py-2.5 text-left font-semibold">{t("Shift Output", "Shift 输出")}</th>
                               </tr>
                             </thead>
                             <tbody className="text-muted-foreground">
                               {[
-                                ["'leftctrl', 'lctrl', 'leftcontrol', 'lcontrol', 'ctrl', 'control'", "224"],
-                                ["'leftshift', 'lshift', 'shift'", "225"],
-                                ["'leftalt', 'lalt', 'alt'", "226"],
-                                ["'leftgui', 'lgui', 'leftwin', 'lwin', 'gui', 'win', 'windows', 'super', 'meta', 'cmd', 'command'", "227"],
-                                ["'rightctrl', 'rctrl', 'rightcontrol', 'rcontrol'", "228"],
-                                ["'rightshift', 'rshift'", "229"],
-                                ["'rightalt', 'ralt'", "230"],
-                                ["'rightgui', 'rgui', 'rightwin', 'rwin', 'rightwindows'", "231"],
-                              ].map(([names, hid], idx) => (
+                                ["'leftctrl', 'lctrl', 'leftcontrol', 'lcontrol', 'ctrl', 'control'", "224", "Left Ctrl", "-"],
+                                ["'leftshift', 'lshift', 'shift'", "225", "Left Shift", "-"],
+                                ["'leftalt', 'lalt', 'alt'", "226", "Left Alt", "-"],
+                                ["'leftgui', 'lgui', 'leftwin', 'lwin', 'gui', 'win', 'windows', 'super', 'meta', 'cmd', 'command'", "227", "Left GUI", "-"],
+                                ["'rightctrl', 'rctrl', 'rightcontrol', 'rcontrol'", "228", "Right Ctrl", "-"],
+                                ["'rightshift', 'rshift'", "229", "Right Shift", "-"],
+                                ["'rightalt', 'ralt'", "230", "Right Alt", "-"],
+                                ["'rightgui', 'rgui', 'rightwin', 'rwin', 'rightwindows'", "231", "Right GUI", "-"],
+                              ].map(([names, hid, normal, shift], idx) => (
                                 <tr key={idx} className="border-b border-border/30">
                                   <td className="px-4 py-2 font-mono text-xs">{names}</td>
                                   <td className="px-4 py-2">{hid}</td>
+                                  <td className="px-4 py-2 font-mono text-xs">{normal}</td>
+                                  <td className="px-4 py-2 font-mono text-xs">{shift}</td>
                                 </tr>
                               ))}
                             </tbody>
@@ -2023,7 +2024,7 @@ export default async function ApiPage({ params }: LangProps) {
                     ),
                   },
                   {
-                    label: t("Examples", "示例"),
+                    label: t("Response", "响应"),
                     content: (
                       <div className="space-y-2">
                         <CodeBlock code={`# Lowercase letters (case-sensitive)\nkm.press('a')      # types "a" (HID 4)\nkm.press('b')      # types "b" (HID 5)\nkm.press('z')      # types "z" (HID 29)\n\n# Uppercase letters (case-sensitive, auto-uses Shift)\nkm.press('A')      # types "A" (HID 4 + Shift)\nkm.press('B')      # types "B" (HID 5 + Shift)\nkm.press('Z')      # types "Z" (HID 29 + Shift)\n\n# Numbers\nkm.press('1')      # types "1" (HID 30)\nkm.press('2')      # types "2" (HID 31)\nkm.press('0')      # types "0" (HID 39)\n\n# Number shift variants (requires Shift held)\nkm.down('shift')\nkm.press('1')      # types "!" (HID 30 + Shift)\nkm.press('2')      # types "@" (HID 31 + Shift)\nkm.up('shift')\n\n# Symbols\nkm.press('minus')  # types "-" (HID 45)\nkm.press('equals') # types "=" (HID 46)\nkm.press('comma')  # types "," (HID 54)\n\n# Symbol shift variants (requires Shift held)\nkm.down('shift')\nkm.press('minus')  # types "_" (HID 45 + Shift)\nkm.press('equals') # types "+" (HID 46 + Shift)\nkm.press('comma')  # types "<" (HID 54 + Shift)\nkm.up('shift')\n\n# Special keys (case-insensitive)\nkm.press('enter')  # Enter key (HID 40)\nkm.press('ENTER')  # same as 'enter'\nkm.press('f1')     # F1 key (HID 58)\nkm.press('F1')     # same as 'f1'\nkm.press('ctrl')   # same as 'CTRL' or 'Ctrl'\n\n# Modifiers\nkm.down('ctrl')    # Left Ctrl (HID 224)\nkm.down('shift')   # Left Shift (HID 225)\nkm.down('alt')     # Left Alt (HID 226)\nkm.down('win')     # Left GUI/Windows (HID 227)\nkm.down('ralt')    # Right Alt (HID 230)\nkm.up('ctrl')\n\n# Using HID codes directly\nkm.press(4)        # 'a' (HID 4)\nkm.press(40)       # Enter (HID 40)\nkm.press(224)      # Left Ctrl (HID 224)`} />
