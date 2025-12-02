@@ -1743,6 +1743,14 @@ export default async function ApiPage({ params }: LangProps) {
                     ),
                   },
                   {
+                    label: t("Response", "响应"),
+                    content: (
+                      <div className="space-y-2">
+                        <CodeBlock code={`km.press('a')      # types "a" (HID 4)\nkm.press('A')      # types "A" (HID 4 + Shift)`} />
+                      </div>
+                    ),
+                  },
+                  {
                     label: t("Numbers & Shift Variants (HID 30-39)", "数字和 Shift 变体（HID 30-39）"),
                     content: (
                       <div className="overflow-x-auto">
@@ -1787,6 +1795,14 @@ export default async function ApiPage({ params }: LangProps) {
                     ),
                   },
                   {
+                    label: t("Response", "响应"),
+                    content: (
+                      <div className="space-y-2">
+                        <CodeBlock code={`km.press('1')      # types "1" (HID 30)\nkm.down('shift')\nkm.press('1')      # types "!" (HID 30 + Shift)\nkm.up('shift')`} />
+                      </div>
+                    ),
+                  },
+                  {
                     label: t("Control Keys (HID 40-44)", "控制键（HID 40-44）"),
                     content: (
                       <div className="overflow-x-auto">
@@ -1822,6 +1838,14 @@ export default async function ApiPage({ params }: LangProps) {
                             ))}
                           </tbody>
                         </table>
+                      </div>
+                    ),
+                  },
+                  {
+                    label: t("Response", "响应"),
+                    content: (
+                      <div className="space-y-2">
+                        <CodeBlock code={`km.press('enter')  # Enter key (HID 40)`} />
                       </div>
                     ),
                   },
@@ -1873,6 +1897,14 @@ export default async function ApiPage({ params }: LangProps) {
                     ),
                   },
                   {
+                    label: t("Response", "响应"),
+                    content: (
+                      <div className="space-y-2">
+                        <CodeBlock code={`km.press('minus')  # types "-" (HID 45)\nkm.down('shift')\nkm.press('minus')  # types "_" (HID 45 + Shift)\nkm.up('shift')`} />
+                      </div>
+                    ),
+                  },
+                  {
                     label: t("Function Keys (HID 58-69)", "功能键（HID 58-69）"),
                     content: (
                       <div className="overflow-x-auto">
@@ -1915,6 +1947,14 @@ export default async function ApiPage({ params }: LangProps) {
                             ))}
                           </tbody>
                         </table>
+                      </div>
+                    ),
+                  },
+                  {
+                    label: t("Response", "响应"),
+                    content: (
+                      <div className="space-y-2">
+                        <CodeBlock code={`km.press('f1')     # F1 key (HID 58)`} />
                       </div>
                     ),
                   },
@@ -1967,6 +2007,14 @@ export default async function ApiPage({ params }: LangProps) {
                     ),
                   },
                   {
+                    label: t("Response", "响应"),
+                    content: (
+                      <div className="space-y-2">
+                        <CodeBlock code={`km.press('home')   # Home key (HID 74)`} />
+                      </div>
+                    ),
+                  },
+                  {
                     label: t("Numpad Keys (HID 84-99)", "数字键盘（HID 84-99）"),
                     content: (
                       <div className="overflow-x-auto">
@@ -2013,6 +2061,14 @@ export default async function ApiPage({ params }: LangProps) {
                             ))}
                           </tbody>
                         </table>
+                      </div>
+                    ),
+                  },
+                  {
+                    label: t("Response", "响应"),
+                    content: (
+                      <div className="space-y-2">
+                        <CodeBlock code={`km.press('kp1')    # Numpad 1 (HID 89)`} />
                       </div>
                     ),
                   },
@@ -2075,7 +2131,7 @@ export default async function ApiPage({ params }: LangProps) {
                     label: t("Response", "响应"),
                     content: (
                       <div className="space-y-2">
-                        <CodeBlock code={`# Lowercase letters (case-sensitive)\nkm.press('a')      # types "a" (HID 4)\nkm.press('b')      # types "b" (HID 5)\nkm.press('z')      # types "z" (HID 29)\n\n# Uppercase letters (case-sensitive, auto-uses Shift)\nkm.press('A')      # types "A" (HID 4 + Shift)\nkm.press('B')      # types "B" (HID 5 + Shift)\nkm.press('Z')      # types "Z" (HID 29 + Shift)\n\n# Numbers\nkm.press('1')      # types "1" (HID 30)\nkm.press('2')      # types "2" (HID 31)\nkm.press('0')      # types "0" (HID 39)\n\n# Number shift variants (requires Shift held)\nkm.down('shift')\nkm.press('1')      # types "!" (HID 30 + Shift)\nkm.press('2')      # types "@" (HID 31 + Shift)\nkm.up('shift')\n\n# Symbols\nkm.press('minus')  # types "-" (HID 45)\nkm.press('equals') # types "=" (HID 46)\nkm.press('comma')  # types "," (HID 54)\n\n# Symbol shift variants (requires Shift held)\nkm.down('shift')\nkm.press('minus')  # types "_" (HID 45 + Shift)\nkm.press('equals') # types "+" (HID 46 + Shift)\nkm.press('comma')  # types "<" (HID 54 + Shift)\nkm.up('shift')\n\n# Special keys (case-insensitive)\nkm.press('enter')  # Enter key (HID 40)\nkm.press('ENTER')  # same as 'enter'\nkm.press('f1')     # F1 key (HID 58)\nkm.press('F1')     # same as 'f1'\nkm.press('ctrl')   # same as 'CTRL' or 'Ctrl'\n\n# Modifiers\nkm.down('ctrl')    # Left Ctrl (HID 224)\nkm.down('shift')   # Left Shift (HID 225)\nkm.down('alt')     # Left Alt (HID 226)\nkm.down('win')     # Left GUI/Windows (HID 227)\nkm.down('ralt')    # Right Alt (HID 230)\nkm.up('ctrl')\n\n# Using HID codes directly\nkm.press(4)        # 'a' (HID 4)\nkm.press(40)       # Enter (HID 40)\nkm.press(224)      # Left Ctrl (HID 224)`} />
+                        <CodeBlock code={`km.down('ctrl')    # Left Ctrl (HID 224)\nkm.up('ctrl')`} />
                       </div>
                     ),
                   },
