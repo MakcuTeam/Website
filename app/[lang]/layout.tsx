@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Space_Mono, Space_Grotesk, Noto_Serif_SC } from "next/font/google";
 import { getDictionary, LangProps } from "@/lib/dictionaries";
-import { getLocales } from "@/lib/locale";
+import { getLocales } from "@/lib/locale-server";
 import "@/styles/globals.css";
 import localFont from "next/font/local";
 
@@ -46,11 +46,9 @@ export async function generateMetadata(params: LangProps): Promise<Metadata> {
 export default async function RootLayout({
   children,
   params,
-}: Readonly<
-  {
-    children: React.ReactNode;
-  } & LangProps
->) {
+}: Readonly<{
+  children: React.ReactNode;
+} & LangProps>) {
   const { lang } = await params;
   const dict = await getDictionary(lang);
   return (

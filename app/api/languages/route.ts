@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getAllLanguageConfigs } from "@/lib/locale";
+import { getAllLanguageConfigs } from "@/lib/locale-server";
 
 export async function GET() {
   try {
@@ -13,4 +13,3 @@ export async function GET() {
     );
   }
 }
-

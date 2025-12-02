@@ -1,4 +1,5 @@
-import { Locale, getLocales } from "./locale";
+import { Locale } from "./locale";
+import { getLocales } from "./locale-server";
 import { cache } from "react";
 
 export type LangProps = { params: Promise<{ lang: Locale }> };

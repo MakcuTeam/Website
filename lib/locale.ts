@@ -1,6 +1,3 @@
-import { readdirSync, readFileSync } from "fs";
-import { join } from "path";
-
 // Language configuration type
 export interface LanguageConfig {
   code: string;
@@ -10,7 +7,7 @@ export interface LanguageConfig {
   browserCodes: string[];
 }
 
-// Default languages (used as fallback and for client-side)
+// Default languages (used for client-side and fallback)
 const DEFAULT_LANGUAGES: LanguageConfig[] = [
   {
     code: "en",
@@ -28,92 +25,59 @@ const DEFAULT_LANGUAGES: LanguageConfig[] = [
   },
 ];
 
-// Cache for language configs
-let languageConfigsCache: Map<string, LanguageConfig> | null = null;
-let localesCache: readonly string[] | null = null;
+// Client-side cache (only uses default languages)
+let clientLocalesCache: readonly string[] | null = null;
+let clientConfigsCache: Map<string, LanguageConfig> | null = null;
 
-// Check if we're in a server environment
-function isServer(): boolean {
-  return typeof window === "undefined";
-}
-
-// Get all language configurations
-function getLanguageConfigs(): Map<string, LanguageConfig> {
-  if (languageConfigsCache) {
-    return languageConfigsCache;
+// Get default language configs (client-safe)
+function getDefaultLanguageConfigs(): Map<string, LanguageConfig> {
+  if (clientConfigsCache) {
+    return clientConfigsCache;
   }
 
   const configs = new Map<string, LanguageConfig>();
-
-  // On client side, use default languages
-  if (!isServer()) {
-    for (const config of DEFAULT_LANGUAGES) {
-      configs.set(config.code, config);
-    }
-    languageConfigsCache = configs;
-    return configs;
+  for (const config of DEFAULT_LANGUAGES) {
+    configs.set(config.code, config);
   }
-
-  // On server side, load from filesystem
-  const langsDir = join(process.cwd(), "langs");
-
-  try {
-    const files = readdirSync(langsDir);
-    for (const file of files) {
-      if (file.endsWith(".json") && !file.endsWith(".dict.json")) {
-        const filePath = join(langsDir, file);
-        const content = readFileSync(filePath, "utf-8");
-        const config: LanguageConfig = JSON.parse(content);
-        configs.set(config.code, config);
-      }
-    }
-  } catch (error) {
-    console.error("Error loading language configs:", error);
-    // Fallback to default languages
-    for (const config of DEFAULT_LANGUAGES) {
-      configs.set(config.code, config);
-    }
-  }
-
-  languageConfigsCache = configs;
+  clientConfigsCache = configs;
   return configs;
 }
 
-// Get all available locale codes
+// Get all available locale codes (client-safe, uses defaults)
 export function getLocales(): readonly string[] {
-  if (localesCache) {
-    return localesCache;
+  if (clientLocalesCache) {
+    return clientLocalesCache;
   }
 
-  const configs = getLanguageConfigs();
+  const configs = getDefaultLanguageConfigs();
   const codes = Array.from(configs.keys()).sort();
-  localesCache = codes as readonly string[];
-  return localesCache;
+  clientLocalesCache = codes as readonly string[];
+  return codes;
 }
 
-// Get language configuration for a locale
+// Get language configuration for a locale (client-safe)
 export function getLanguageConfig(locale: string): LanguageConfig | undefined {
-  const configs = getLanguageConfigs();
+  const configs = getDefaultLanguageConfigs();
   return configs.get(locale);
 }
 
-// Get all language configurations
+// Get all language configurations (client-safe, uses defaults)
 export function getAllLanguageConfigs(): LanguageConfig[] {
-  const configs = getLanguageConfigs();
+  const configs = getDefaultLanguageConfigs();
   return Array.from(configs.values()).sort((a, b) => a.code.localeCompare(b.code));
 }
 
 // Type for locale
 export type Locale = typeof DEFAULT_LANGUAGES[number]["code"] | string;
 
-// Get locale from pathname
+// Get locale from pathname (client-safe)
 export function getLocale(pathname: string): Locale {
   const locales = getLocales();
   const [locale] = pathname.split("/").filter(Boolean);
   return locales.includes(locale as Locale) ? (locale as Locale) : locales[0];
 }
 
-// Check if pathname has a locale
+// Check if pathname has a locale (client-safe)
 export function pathnameHasLocale(pathname: string): boolean {
   const locales = getLocales();
   return locales.some(
@@ -122,53 +86,7 @@ export function pathnameHasLocale(pathname: string): boolean {
   );
 }
 
-// Detect browser language from Accept-Language header
-export function detectBrowserLocale(acceptLanguage: string | null): Locale {
-  if (!acceptLanguage) {
-    return getLocales()[0];
-  }
-
-  const locales = getLocales();
-  const configs = getLanguageConfigs();
-  
-  // Parse Accept-Language header (e.g., "en-US,en;q=0.9,zh-CN;q=0.8")
-  const languages = acceptLanguage
-    .split(",")
-    .map((lang) => {
-      const [code, q = "q=1"] = lang.trim().split(";");
-      const quality = parseFloat(q.replace("q=", "")) || 1;
-      return { code: code.toLowerCase().trim(), quality };
-    })
-    .sort((a, b) => b.quality - a.quality);
-
-  // Try to match browser language codes with our language configs
-  for (const { code } of languages) {
-    // Direct match
-    if (locales.includes(code as Locale)) {
-      return code as Locale;
-    }
-
-    // Check browser codes in configs
-    for (const [localeCode, config] of configs.entries()) {
-      if (config.browserCodes.some((bc) => bc.toLowerCase() === code || code.startsWith(bc.toLowerCase() + "-"))) {
-        return localeCode as Locale;
-      }
-    }
-
-    // Check language prefix (e.g., "zh" matches "cn")
-    const langPrefix = code.split("-")[0];
-    for (const [localeCode, config] of configs.entries()) {
-      if (config.browserCodes.some((bc) => bc.toLowerCase().startsWith(langPrefix))) {
-        return localeCode as Locale;
-      }
-    }
-  }
-
-  // Default to first locale
-  return locales[0];
-}
-
-// Get next locale in cycle
+// Get next locale in cycle (client-safe)
 export function getNextLocale(currentLocale: Locale): Locale {
   const locales = getLocales();
   const currentIndex = locales.indexOf(currentLocale);

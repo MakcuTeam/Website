@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getLocale, pathnameHasLocale, detectBrowserLocale } from "./lib/locale";
+import { getLocale, pathnameHasLocale } from "./lib/locale";
+import { detectBrowserLocale } from "./lib/locale-server";
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
