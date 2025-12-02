@@ -1686,7 +1686,13 @@ export default async function ApiPage({ params }: LangProps) {
                     label: t("Letters (HID 4-29)", "字母（HID 4-29）"),
                     content: (
                       <div className="overflow-x-auto">
-                        <table className="w-full border-collapse text-sm">
+                        <table className="w-full table-fixed border-collapse text-sm">
+                          <colgroup>
+                            <col className="w-[40%]" />
+                            <col className="w-[15%]" />
+                            <col className="w-[22.5%]" />
+                            <col className="w-[22.5%]" />
+                          </colgroup>
                           <thead>
                             <tr className="border-b border-border/60">
                               <th className="px-4 py-2.5 text-left font-semibold">{t("Key Names", "按键名称")}</th>
@@ -1725,10 +1731,10 @@ export default async function ApiPage({ params }: LangProps) {
                               ["'z'", "29", "z", "Z"],
                             ].map(([names, hid, normal, shift], idx) => (
                               <tr key={idx} className="border-b border-border/30">
-                                <td className="px-4 py-2 font-mono text-xs">{names}</td>
-                                <td className="px-4 py-2">{hid}</td>
-                                <td className="px-4 py-2 font-mono text-xs">{normal}</td>
-                                <td className="px-4 py-2 font-mono text-xs">{shift}</td>
+                                <td className="px-4 py-2 font-mono text-xs break-words">{names}</td>
+                                <td className="px-4 py-2 text-center">{hid}</td>
+                                <td className="px-4 py-2 font-mono text-xs text-center">{normal}</td>
+                                <td className="px-4 py-2 font-mono text-xs text-center">{shift}</td>
                               </tr>
                             ))}
                           </tbody>
@@ -1740,7 +1746,13 @@ export default async function ApiPage({ params }: LangProps) {
                     label: t("Numbers & Shift Variants (HID 30-39)", "数字和 Shift 变体（HID 30-39）"),
                     content: (
                       <div className="overflow-x-auto">
-                        <table className="w-full border-collapse text-sm">
+                        <table className="w-full table-fixed border-collapse text-sm">
+                          <colgroup>
+                            <col className="w-[40%]" />
+                            <col className="w-[15%]" />
+                            <col className="w-[22.5%]" />
+                            <col className="w-[22.5%]" />
+                          </colgroup>
                           <thead>
                             <tr className="border-b border-border/60">
                               <th className="px-4 py-2.5 text-left font-semibold">{t("Key Names", "按键名称")}</th>
@@ -1763,10 +1775,10 @@ export default async function ApiPage({ params }: LangProps) {
                               ["'0'", "39", "0", ")"],
                             ].map(([names, hid, normal, shift], idx) => (
                               <tr key={idx} className="border-b border-border/30">
-                                <td className="px-4 py-2 font-mono text-xs">{names}</td>
-                                <td className="px-4 py-2">{hid}</td>
-                                <td className="px-4 py-2 font-mono text-xs">{normal}</td>
-                                <td className="px-4 py-2 font-mono text-xs">{shift}</td>
+                                <td className="px-4 py-2 font-mono text-xs break-words">{names}</td>
+                                <td className="px-4 py-2 text-center">{hid}</td>
+                                <td className="px-4 py-2 font-mono text-xs text-center">{normal}</td>
+                                <td className="px-4 py-2 font-mono text-xs text-center">{shift}</td>
                               </tr>
                             ))}
                           </tbody>
@@ -1778,7 +1790,13 @@ export default async function ApiPage({ params }: LangProps) {
                     label: t("Control Keys (HID 40-44)", "控制键（HID 40-44）"),
                     content: (
                       <div className="overflow-x-auto">
-                        <table className="w-full border-collapse text-sm">
+                        <table className="w-full table-fixed border-collapse text-sm">
+                          <colgroup>
+                            <col className="w-[40%]" />
+                            <col className="w-[15%]" />
+                            <col className="w-[22.5%]" />
+                            <col className="w-[22.5%]" />
+                          </colgroup>
                           <thead>
                             <tr className="border-b border-border/60">
                               <th className="px-4 py-2.5 text-left font-semibold">{t("Key Names", "按键名称")}</th>
@@ -1796,10 +1814,10 @@ export default async function ApiPage({ params }: LangProps) {
                               ["'space', 'spacebar'", "44", " ", "-"],
                             ].map(([names, hid, normal, shift], idx) => (
                               <tr key={idx} className="border-b border-border/30">
-                                <td className="px-4 py-2 font-mono text-xs">{names}</td>
-                                <td className="px-4 py-2">{hid}</td>
-                                <td className="px-4 py-2 font-mono text-xs">{normal}</td>
-                                <td className="px-4 py-2 font-mono text-xs">{shift}</td>
+                                <td className="px-4 py-2 font-mono text-xs break-words">{names}</td>
+                                <td className="px-4 py-2 text-center">{hid}</td>
+                                <td className="px-4 py-2 font-mono text-xs whitespace-normal break-words">{normal}</td>
+                                <td className="px-4 py-2 font-mono text-xs text-center">{shift}</td>
                               </tr>
                             ))}
                           </tbody>
@@ -1811,7 +1829,13 @@ export default async function ApiPage({ params }: LangProps) {
                     label: t("Symbols & Shift Variants (HID 45-57)", "符号和 Shift 变体（HID 45-57）"),
                     content: (
                       <div className="overflow-x-auto">
-                        <table className="w-full border-collapse text-sm">
+                        <table className="w-full table-fixed border-collapse text-sm">
+                          <colgroup>
+                            <col className="w-[40%]" />
+                            <col className="w-[15%]" />
+                            <col className="w-[22.5%]" />
+                            <col className="w-[22.5%]" />
+                          </colgroup>
                           <thead>
                             <tr className="border-b border-border/60">
                               <th className="px-4 py-2.5 text-left font-semibold">{t("Key Names", "按键名称")}</th>
@@ -1837,10 +1861,10 @@ export default async function ApiPage({ params }: LangProps) {
                               ["'capslock', 'caps'", "57", "Caps Lock", "-"],
                             ].map(([names, hid, normal, shift], idx) => (
                               <tr key={idx} className="border-b border-border/30">
-                                <td className="px-4 py-2 font-mono text-xs">{names}</td>
-                                <td className="px-4 py-2">{hid}</td>
-                                <td className="px-4 py-2 font-mono text-xs">{normal}</td>
-                                <td className="px-4 py-2 font-mono text-xs">{shift}</td>
+                                <td className="px-4 py-2 font-mono text-xs break-words">{names}</td>
+                                <td className="px-4 py-2 text-center">{hid}</td>
+                                <td className="px-4 py-2 font-mono text-xs whitespace-normal break-words">{normal}</td>
+                                <td className="px-4 py-2 font-mono text-xs text-center">{shift}</td>
                               </tr>
                             ))}
                           </tbody>
@@ -1852,7 +1876,13 @@ export default async function ApiPage({ params }: LangProps) {
                     label: t("Function Keys (HID 58-69)", "功能键（HID 58-69）"),
                     content: (
                       <div className="overflow-x-auto">
-                        <table className="w-full border-collapse text-sm">
+                        <table className="w-full table-fixed border-collapse text-sm">
+                          <colgroup>
+                            <col className="w-[40%]" />
+                            <col className="w-[15%]" />
+                            <col className="w-[22.5%]" />
+                            <col className="w-[22.5%]" />
+                          </colgroup>
                           <thead>
                             <tr className="border-b border-border/60">
                               <th className="px-4 py-2.5 text-left font-semibold">{t("Key Names", "按键名称")}</th>
@@ -1877,10 +1907,10 @@ export default async function ApiPage({ params }: LangProps) {
                               ["'f12'", "69", "F12", "-"],
                             ].map(([names, hid, normal, shift], idx) => (
                               <tr key={idx} className="border-b border-border/30">
-                                <td className="px-4 py-2 font-mono text-xs">{names}</td>
-                                <td className="px-4 py-2">{hid}</td>
-                                <td className="px-4 py-2 font-mono text-xs">{normal}</td>
-                                <td className="px-4 py-2 font-mono text-xs">{shift}</td>
+                                <td className="px-4 py-2 font-mono text-xs break-words">{names}</td>
+                                <td className="px-4 py-2 text-center">{hid}</td>
+                                <td className="px-4 py-2 font-mono text-xs text-center">{normal}</td>
+                                <td className="px-4 py-2 font-mono text-xs text-center">{shift}</td>
                               </tr>
                             ))}
                           </tbody>
@@ -1892,7 +1922,13 @@ export default async function ApiPage({ params }: LangProps) {
                     label: t("System Keys (HID 70-83)", "系统键（HID 70-83）"),
                     content: (
                       <div className="overflow-x-auto">
-                        <table className="w-full border-collapse text-sm">
+                        <table className="w-full table-fixed border-collapse text-sm">
+                          <colgroup>
+                            <col className="w-[40%]" />
+                            <col className="w-[15%]" />
+                            <col className="w-[22.5%]" />
+                            <col className="w-[22.5%]" />
+                          </colgroup>
                           <thead>
                             <tr className="border-b border-border/60">
                               <th className="px-4 py-2.5 text-left font-semibold">{t("Key Names", "按键名称")}</th>
@@ -1919,10 +1955,10 @@ export default async function ApiPage({ params }: LangProps) {
                               ["'numlock', 'num'", "83", "Num Lock", "-"],
                             ].map(([names, hid, normal, shift], idx) => (
                               <tr key={idx} className="border-b border-border/30">
-                                <td className="px-4 py-2 font-mono text-xs">{names}</td>
-                                <td className="px-4 py-2">{hid}</td>
-                                <td className="px-4 py-2 font-mono text-xs">{normal}</td>
-                                <td className="px-4 py-2 font-mono text-xs">{shift}</td>
+                                <td className="px-4 py-2 font-mono text-xs break-words">{names}</td>
+                                <td className="px-4 py-2 text-center">{hid}</td>
+                                <td className="px-4 py-2 font-mono text-xs whitespace-normal break-words">{normal}</td>
+                                <td className="px-4 py-2 font-mono text-xs text-center">{shift}</td>
                               </tr>
                             ))}
                           </tbody>
@@ -1934,7 +1970,13 @@ export default async function ApiPage({ params }: LangProps) {
                     label: t("Numpad Keys (HID 84-99)", "数字键盘（HID 84-99）"),
                     content: (
                       <div className="overflow-x-auto">
-                        <table className="w-full border-collapse text-sm">
+                        <table className="w-full table-fixed border-collapse text-sm">
+                          <colgroup>
+                            <col className="w-[40%]" />
+                            <col className="w-[15%]" />
+                            <col className="w-[22.5%]" />
+                            <col className="w-[22.5%]" />
+                          </colgroup>
                           <thead>
                             <tr className="border-b border-border/60">
                               <th className="px-4 py-2.5 text-left font-semibold">{t("Key Names", "按键名称")}</th>
@@ -1963,10 +2005,10 @@ export default async function ApiPage({ params }: LangProps) {
                               ["'kpperiod', 'kpdot', 'npperiod', 'npdot'", "99", ".", "-"],
                             ].map(([names, hid, normal, shift], idx) => (
                               <tr key={idx} className="border-b border-border/30">
-                                <td className="px-4 py-2 font-mono text-xs">{names}</td>
-                                <td className="px-4 py-2">{hid}</td>
-                                <td className="px-4 py-2 font-mono text-xs">{normal}</td>
-                                <td className="px-4 py-2 font-mono text-xs">{shift}</td>
+                                <td className="px-4 py-2 font-mono text-xs break-words">{names}</td>
+                                <td className="px-4 py-2 text-center">{hid}</td>
+                                <td className="px-4 py-2 font-mono text-xs whitespace-normal break-words">{normal}</td>
+                                <td className="px-4 py-2 font-mono text-xs text-center">{shift}</td>
                               </tr>
                             ))}
                           </tbody>
@@ -1979,7 +2021,13 @@ export default async function ApiPage({ params }: LangProps) {
                     content: (
                       <div className="space-y-3">
                         <div className="overflow-x-auto">
-                          <table className="w-full border-collapse text-sm">
+                          <table className="w-full table-fixed border-collapse text-sm">
+                            <colgroup>
+                              <col className="w-[40%]" />
+                              <col className="w-[15%]" />
+                              <col className="w-[22.5%]" />
+                              <col className="w-[22.5%]" />
+                            </colgroup>
                             <thead>
                               <tr className="border-b border-border/60">
                                 <th className="px-4 py-2.5 text-left font-semibold">{t("Key Names (aliases)", "按键名称（别名）")}</th>
@@ -2000,10 +2048,10 @@ export default async function ApiPage({ params }: LangProps) {
                                 ["'rightgui', 'rgui', 'rightwin', 'rwin', 'rightwindows'", "231", "Right GUI", "-"],
                               ].map(([names, hid, normal, shift], idx) => (
                                 <tr key={idx} className="border-b border-border/30">
-                                  <td className="px-4 py-2 font-mono text-xs">{names}</td>
-                                  <td className="px-4 py-2">{hid}</td>
-                                  <td className="px-4 py-2 font-mono text-xs">{normal}</td>
-                                  <td className="px-4 py-2 font-mono text-xs">{shift}</td>
+                                  <td className="px-4 py-2 font-mono text-xs break-words">{names}</td>
+                                  <td className="px-4 py-2 text-center">{hid}</td>
+                                  <td className="px-4 py-2 font-mono text-xs whitespace-normal break-words">{normal}</td>
+                                  <td className="px-4 py-2 font-mono text-xs text-center">{shift}</td>
                                 </tr>
                               ))}
                             </tbody>
