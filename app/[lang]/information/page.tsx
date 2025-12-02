@@ -78,7 +78,7 @@ export default async function InformationPage({ params }: LangProps) {
             <Card className="border-border/60 bg-card/90 shadow-lg">
               <CardContent className="p-6">
                 <ul className="space-y-3 text-sm leading-relaxed text-muted-foreground">
-                  {dict.information.what_is_makcu.key_points.map((point, index) => (
+                  {dict.information.what_is_makcu.key_points.map((point: string, index: number) => (
                     <li key={index} className="flex items-start">
                       <span className="mr-2 text-emerald-500">•</span>
                       <span>{point}</span>
@@ -149,7 +149,7 @@ export default async function InformationPage({ params }: LangProps) {
             <Card className="border-border/60 bg-card/90 shadow-lg">
               <CardContent className="p-6">
                 <ul className="space-y-3 text-sm leading-relaxed text-muted-foreground">
-                  {dict.information.what_is_it_used_for.use_cases.map((useCase, index) => (
+                  {dict.information.what_is_it_used_for.use_cases.map((useCase: string, index: number) => (
                     <li key={index} className="flex items-start">
                       <span className="mr-2 text-emerald-500">•</span>
                       <span>{useCase}</span>
@@ -170,7 +170,7 @@ export default async function InformationPage({ params }: LangProps) {
                       {dict.information.what_is_it_used_for.device_communication.description}
                     </p>
                     <ul className="space-y-2 text-sm leading-relaxed text-muted-foreground">
-                      {dict.information.what_is_it_used_for.device_communication.features.map((feature, index) => (
+                      {dict.information.what_is_it_used_for.device_communication.features.map((feature: string, index: number) => (
                         <li key={index} className="flex items-start">
                           <span className="mr-2 text-emerald-500">•</span>
                           <span>{feature}</span>
@@ -196,7 +196,7 @@ export default async function InformationPage({ params }: LangProps) {
               <Card className="border-border/60 bg-card/90 shadow-lg">
                 <CardContent className="p-6">
                   <ul className="space-y-3 text-sm leading-relaxed text-muted-foreground">
-                    {dict.information.capabilities.can_do.items.map((item, index) => (
+                    {dict.information.capabilities.can_do.items.map((item: string, index: number) => (
                       <li key={index} className="flex items-start">
                         <span className="mr-2 text-emerald-500">✓</span>
                         <span>{item}</span>
@@ -214,7 +214,7 @@ export default async function InformationPage({ params }: LangProps) {
               <Card className="border-border/60 bg-card/90 shadow-lg">
                 <CardContent className="p-6">
                   <ul className="space-y-3 text-sm leading-relaxed text-muted-foreground">
-                    {dict.information.capabilities.cannot_do.items.map((item, index) => (
+                    {dict.information.capabilities.cannot_do.items.map((item: string, index: number) => (
                       <li key={index} className="flex items-start">
                         <span className="mr-2 text-red-500">✗</span>
                         <span>{item}</span>
@@ -278,7 +278,7 @@ export default async function InformationPage({ params }: LangProps) {
                           {dict.information.capabilities.console_support.direct_support.description}
                         </p>
                         <ul className="space-y-2 text-sm leading-relaxed text-muted-foreground">
-                          {dict.information.capabilities.console_support.direct_support.examples.map((example, index) => (
+                          {dict.information.capabilities.console_support.direct_support.examples.map((example: string, index: number) => (
                             <li key={index} className="flex items-start">
                               <span className="mr-2 text-emerald-500">•</span>
                               <span>{example}</span>
@@ -333,7 +333,7 @@ export default async function InformationPage({ params }: LangProps) {
                       {dict.information.preflashed_vs_unflashed.preflashed.description}
                     </p>
                     <ul className="space-y-2 text-sm leading-relaxed text-muted-foreground">
-                      {dict.information.preflashed_vs_unflashed.preflashed.benefits.map((benefit, index) => (
+                      {dict.information.preflashed_vs_unflashed.preflashed.benefits.map((benefit: string, index: number) => (
                         <li key={index} className="flex items-start">
                           <span className="mr-2 text-emerald-500">•</span>
                           <span>{benefit}</span>
@@ -361,7 +361,7 @@ export default async function InformationPage({ params }: LangProps) {
                       {dict.information.preflashed_vs_unflashed.unflashed.description}
                     </p>
                     <ul className="space-y-2 text-sm leading-relaxed text-muted-foreground">
-                      {dict.information.preflashed_vs_unflashed.unflashed.characteristics.map((characteristic, index) => (
+                      {dict.information.preflashed_vs_unflashed.unflashed.characteristics.map((characteristic: string, index: number) => (
                         <li key={index} className="flex items-start">
                           <span className="mr-2 text-yellow-500">•</span>
                           <span>{characteristic}</span>
