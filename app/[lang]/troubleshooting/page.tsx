@@ -403,7 +403,7 @@ export default async function TroubleshootingPage({ params }: LangProps) {
                         {t("Symptoms", "症状")}:
                       </h4>
                       <ul className="list-disc list-inside space-y-1 text-sm leading-relaxed text-muted-foreground">
-                        {dict.troubleshooting.troubleshooting_steps.baud_rate_mismatch.symptoms.map((symptom, index) => (
+                        {dict.troubleshooting.troubleshooting_steps.baud_rate_mismatch.symptoms.map((symptom: string, index: number) => (
                           <li key={index}>{symptom}</li>
                         ))}
                       </ul>
@@ -416,7 +416,7 @@ export default async function TroubleshootingPage({ params }: LangProps) {
                         {dict.troubleshooting.troubleshooting_steps.baud_rate_mismatch.solution}
                       </p>
                       <ol className="list-decimal list-inside space-y-2 text-sm leading-relaxed text-muted-foreground">
-                        {dict.troubleshooting.troubleshooting_steps.baud_rate_mismatch.steps.map((step, index) => (
+                        {dict.troubleshooting.troubleshooting_steps.baud_rate_mismatch.steps.map((step: string, index: number) => (
                           <li key={index}>{step}</li>
                         ))}
                       </ol>
