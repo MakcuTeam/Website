@@ -1,0 +1,749 @@
+{
+  "metadata": {
+    "title": "Makcu 官方网站",
+    "description": "Experience seamless mouse and keyboard control with MAKCU, the next generation."
+  },
+  "home": {
+    "main_header": "体验下一代的安全性和速度。",
+    "read_guide": "指南",
+    "name": "Makcu"
+  },
+  "info": {
+    "title": "Why are we better?",
+    "list": [
+      {
+        "icon": "users_round",
+        "title": "服务器成员",
+        "number": "",
+        "description": "我们拥有大量活跃用户，以及由优秀用户社区打造的强大技术团队。"
+      },
+      {
+        "icon": "mouse",
+        "title": "支持的鼠标",
+        "number": "几乎所有",
+        "description": "我们正在积极适配所有鼠标，并相信很快就会实现 100% 覆盖。"
+      },
+      {
+        "icon": "cpu",
+        "title": "完全直通",
+        "number": "100%",
+        "description": "完整的鼠标、键盘和控制器直通。"
+      }
+    ]
+  },
+  "contributions": {
+    "title": "Contribution List",
+    "more": "等待你的加入..."
+  },
+  "navbar": {
+    "links": {
+      "guide": "指南",
+      "api": "API 文档",
+      "makcu_tools": "固件刷写",
+      "discord": "Discord",
+      "information": "信息",
+      "troubleshooting": "故障排除",
+      "settings": "设置",
+      "home": "首页",
+      "setup": "设置",
+      "xim": "XIM"
+    },
+    "search": {
+      "search_guide": "搜索指南...",
+      "no_results_found": "没有找到结果",
+      "type_something": "填写关键字搜索..."
+    },
+    "theme": {
+      "light": "亮色",
+      "dark": "暗色",
+      "system": "系统默认"
+    },
+    "makcu_status": {
+      "disconnected": "未连接",
+      "connecting": "连接中...",
+      "connected_normal": "正常模式",
+      "connected_flash": "刷写模式",
+      "fault": "故障"
+    }
+  },
+  "tools": {
+    "title": "固件刷写",
+    "description": "将固件刷写到您的 MAKCU 设备。仔细按照步骤操作以确保成功刷写。",
+    "status": "状态",
+    "connectBtn": "连接设备",
+    "connected": "已连接",
+    "disconnectBtn": "断开连接",
+    "flashMode": "刷写模式",
+    "online": "在线",
+    "offline": "离线",
+    "firmware": "固件",
+    "list": "设备列表",
+    "connectToSelect": "连接设备以选择固件",
+    "onlineFlash": "在线刷写",
+    "offlineFlash": "离线刷写",
+    "clearDebugInfo": "清除调试信息",
+    "uploadFirmware": "上传固件",
+    "connectSuccess": "连接成功",
+    "flashSuccess": "固件刷写成功",
+    "usb1Left": "USB1 左侧",
+    "usb3Right": "USB3 右侧",
+    "noLeftFirmware": "未找到左侧固件",
+    "noRightFirmware": "未找到右侧固件",
+    "browserNotSupported": "您的浏览器不支持 Web Serial/WebUSB。请使用 Chrome、Edge 或其他基于 Chromium 的浏览器。",
+    "driverNotice": "如果你还没有安装CH343驱动程序，请点击",
+    "driverLink": "此链接",
+    "driverNoticeEnd": "下载",
+    "sections": {
+      "steps": {
+        "title": "刷写步骤",
+        "description": "仔细按照这些步骤刷写您的 MAKCU 设备。",
+        "step1": "按住要刷写一侧最近的按钮（左侧按钮对应 USB 1/左侧，右侧按钮对应 USB 3/右侧）",
+        "step2": "将 USB 线连接到相应的端口（左侧使用 USB 1，右侧使用 USB 3）",
+        "step3": "在 PC 上听到 USB 连接声音",
+        "step4": "听到声音后松开按钮",
+        "step5": "点击页面右上角的连接按钮",
+        "step6": "从下拉菜单中选择与您正在刷写的一侧匹配的固件（检查 MAKCU 板上的数字以匹配 USB 1/3 与左/右）",
+        "step7": "等待刷写过程完成",
+        "step8": "当提示断开连接时，移除 USB 线并重复另一侧的过程"
+      },
+      "flashing_tool": {
+        "title": "刷写工具",
+        "description": "使用下面的工具将固件刷写到您的 MAKCU 设备。",
+        "com_port_warning_title": "重要：COM 端口限制",
+        "com_port_warning_desc": "此工具仅用于刷写和测试 MAKCU。MAKCU 仅允许一个设备同时连接到 USB 2（COM 端口）。请确保在使用 MAKCU 与您的软件之前关闭此 AIO 工具，否则您的软件将无法连接。",
+        "unflashed_warning_title": "首次刷写",
+        "unflashed_warning_desc": "如果您的 MAKCU 没有固件或未经测试，在不按住按钮的情况下连接到 USB 1 或 3 时，USB 声音会无限循环是正常的。这是 ESP32-S3 芯片出厂时的默认状态。首次刷写后，此状态将消失且不会再出现。"
+      },
+      "firmware_selection": {
+        "title": "固件选择",
+        "description": "选择适合您正在刷写的一侧的固件。",
+        "left_note": "USB 1 对应左侧 - 选择名称中包含 'LEFT' 的固件",
+        "right_note": "USB 3 对应右侧 - 选择名称中包含 'RIGHT' 的固件",
+        "matching_note": "检查 MAKCU 板上打印的数字，确保将正确的 USB 端口与正确的一侧匹配"
+      }
+    }
+  },
+  "docs": {
+    "on_this_page": "On this page",
+    "next": "Next",
+    "previous": "Previous"
+  },
+  "not_found": {
+    "404": "404",
+    "page_not_found": "找不到页面",
+    "sub_text": "您请求的页面不存在。",
+    "back_to_homepage": "回到首页"
+  },
+  "leftbar": {
+    "getting_started": "快速开始",
+    "introduction": "前言",
+    "installation": "安装"
+  },
+
+  "error": {
+    "oops": "Oops!",
+    "something_went_wrong": "Something went wrong.",
+    "sub_text": "We're sorry, but an error occurred while processing your request.",
+    "reload_page": "Reload Page",
+    "back_to_homepage": "Back to homepage"
+  },
+  "troubleshooting": {
+    "title": "MAKCU 故障排除",
+    "description": "LED 状态指南和 MAKCU 设备问题的故障排除步骤。",
+    "connection_status": {
+      "title": "连接状态",
+      "description": "MAKCU 连接状态显示在导航栏右上角，音频切换旁边。状态显示您 MAKCU 设备的当前连接状态和模式。",
+      "statuses": {
+        "not_supported": {
+          "label": "不支持",
+          "description": "您的浏览器不支持 Web Serial API。请使用 Chrome/Edge 89+、Opera 76+ 或其他基于 Chromium 的浏览器。",
+          "color": "灰色（静音）"
+        },
+        "disconnected": {
+          "label": "未连接",
+          "description": "MAKCU 未连接。点击连接按钮以建立连接。",
+          "color": "灰色（静音）"
+        },
+        "connecting": {
+          "label": "连接中...",
+          "description": "系统正在尝试连接到 MAKCU 并检测其处于哪种模式（正常模式或刷写模式）。",
+          "color": "黄色"
+        },
+        "normal_mode": {
+          "label": "正常模式",
+          "description": "MAKCU 已连接并在正常模式下运行。您可以使用设置页面配置和测试 MAKCU。USB 1 连接到游戏 PC，USB 2 是 COM 端口，USB 3 应连接到您的鼠标或键盘。**3.9 固件仅支持键盘。",
+          "color": "绿色（翠绿色）",
+          "com_port_warning": "重要：MAKCU 仅允许一个设备同时连接到 USB 2（COM 端口）。在使用 MAKCU 与您的软件之前，请关闭此工具。"
+        },
+        "flash_mode": {
+          "label": "刷写模式",
+          "description": "MAKCU 在刷写模式下连接。此模式仅用于固件更新。此模式下无法使用设置。只应连接一根 USB 线（USB 1 或 USB 3）。",
+          "color": "蓝色"
+        },
+        "fault": {
+          "label": "故障",
+          "description": "连接失败或设备无响应。检查您的 USB 连接并重试。交换 USB 端口和刷新页面可能会有所帮助。",
+          "color": "红色"
+        }
+      },
+      "com_port_note": "注意：COM 端口号不显示，因为出于安全原因，Web Serial API 不提供此信息。连接状态将显示模式（正常或刷写）代替。",
+      "overview": "连接状态概述"
+    },
+    "prerequisites": {
+      "title": "前提条件",
+      "ch343_driver": "已安装 CH343 驱动程序",
+      "ch343_desc": "MAKCU 需要在您的计算机上加载 CH343 USB 转串口驱动程序。请查看刷写页面获取下载链接和安装说明。",
+      "com_port": "正确的 COM 端口",
+      "com_port_desc": "USB 2 的 COM 端口应低于 10。如果您的 COM 端口号是 10 或更高，可能会遇到连接问题。",
+      "both_sides": "两侧均已刷写",
+      "both_sides_desc": "确保您已正确设置并在左侧（设备）和右侧（主机）上刷写了 MAKCU。",
+      "supported_device": "支持的设备",
+      "supported_device_desc": "确保您已连接支持的鼠标或键盘。MAKCU 支持键盘和鼠标设备。"
+    },
+    "led_guide": {
+      "title": "LED 状态指南",
+      "description": "MAKCU 在两侧使用 LED 来指示系统状态并帮助您排除故障。LED 可以是常亮（开或关）或闪烁。",
+      "left_side": {
+        "title": "左侧（设备侧）",
+        "description": "左侧 LED 显示 USB 设备与计算机连接的状态。",
+        "solid_on": {
+          "title": "常亮（绿色）",
+          "meaning": "USB 设备已连接并正常工作",
+          "action": "无需操作 - 一切正常"
+        },
+        "solid_off": {
+          "title": "常灭",
+          "meaning": "未连接 USB 设备",
+          "action": "检查 USB 线连接并确保设备已通电"
+        },
+        "slow_blink": {
+          "title": "慢闪（500ms 亮，500ms 灭）",
+          "meaning": "警告 - 系统正在调整设置",
+          "when": "正在更改波特率或系统正在重新配置",
+          "action": "等待几秒钟 - 这应该会自动解决。如果持续存在，请尝试重启 MAKCU。"
+        }
+      },
+      "right_side": {
+        "title": "右侧（主机侧）",
+        "description": "右侧 LED 显示 USB 主机与鼠标/键盘连接的状态。",
+        "solid_on": {
+          "title": "常亮（绿色）",
+          "meaning": "USB 主机已连接并正常工作",
+          "action": "无需操作 - 一切正常"
+        },
+        "solid_off": {
+          "title": "常灭",
+          "meaning": "未连接 USB 设备到主机",
+          "action": "将支持的鼠标或键盘连接到右侧 USB 端口"
+        },
+        "slow_blink": {
+          "title": "慢闪（500ms 亮，500ms 灭）",
+          "meaning": "警告 - 检测到临时问题",
+          "when": "USB 请求繁忙（操作期间正常）或系统正在处理临时状况",
+          "action": "通常会自动解决。如果持续存在，请检查设备连接。"
+        }
+      }
+    },
+    "troubleshooting_steps": {
+      "title": "故障排除步骤",
+      "slow_persists": {
+        "title": "慢闪持续",
+        "problem": "LED 持续慢闪且无法解决",
+        "causes": "系统卡在配置状态，波特率更改未完成，或警告条件未清除",
+        "steps": "等待 10 秒 - 某些操作需要时间，循环重启受影响的一侧，检查设备管理器中的任何错误消息，或如果问题继续，请重新刷写"
+      },
+      "led_not_responding": {
+        "title": "LED 无响应",
+        "problem": "LED 根本不亮或不改变状态",
+        "causes": "LED 硬件问题，固件未运行，或电源问题",
+        "steps": "验证设备已通电（检查 USB 连接），检查设备管理器中是否识别到设备，尝试重新刷写固件，或如果仍然无法工作，可能存在硬件问题"
+      },
+      "device_not_working": {
+        "title": "尽管绿色 LED 但设备不工作",
+        "problem": "LED 显示常亮（绿色）但鼠标/键盘不工作",
+        "causes": "计算机上的设备驱动程序问题，USB 端口问题，或设备兼容性问题",
+        "steps": "检查设备管理器中的任何错误图标，尝试不同的 USB 端口，验证 CH343 驱动程序是否正确安装，检查 COM 端口号是否低于 10，或尝试不同的鼠标或键盘进行测试"
+      },
+      "baud_rate_mismatch": {
+        "title": "波特率不匹配 / 软件无法连接",
+        "problem": "MAKCU 未更改波特率或软件无法连接到 MAKCU。",
+        "symptoms": [
+          "软件无法与 MAKCU 通信",
+          "MAKCU 不响应命令",
+          "连接超时",
+          "设备显示已连接但无数据交换"
+        ],
+        "solution": "打开设备管理器并将 COM 端口更改为 10 以下的任何数字（如果所有端口都在使用中，您可以强制指定 COM 端口号）。确保波特率与软件的期望匹配。MAKCU.com 网站和 AIO 工具期望 MAKCU 以 115200（1 次闪烁模式）运行。用户必须确保启用 115200 波特率才能与网站和工具通信。",
+        "steps": [
+          "检查 MAKCU 启动时的波特率指示器 LED（左侧）- 对于 115200，它应该闪烁 1 次",
+          "如果波特率不正确，快速按下左侧按钮 4 次以更改它",
+          "确保连接 USB 1 + USB 2 以便 MAKCU 有电源来更改波特率",
+          "在您的软件设置中更改 COM 端口以匹配 MAKCU 的",
+          "验证 MAKCU 和您的软件之间的波特率是否匹配",
+          "如果使用 MAKCU 网站或 AIO 工具，请确保波特率设置为 115200"
+        ],
+        "important": "必须连接 USB 1 + USB 2 才能为 MAKCU 供电。USB 2 不为 MAKCU 提供电源 - 这可以防止从两个 USB 端口向主 PC 和第二台 PC 反向供电。"
+      },
+      "cannot_flash_website": {
+        "title": "无法从网站刷写 - USB 不断断开",
+        "problem": "无法从网站刷写 MAKCU。设备管理器显示 USB 1 或 3 不断断开连接。",
+        "causes": "MAKCU 未刷写 - 这是 ESP32-S3 芯片的默认出厂状态。",
+        "steps": "这对于未刷写的设备是正常的。正确按住按钮并插入 USB 线。设备管理器将停止循环，您就可以开始刷写了。首次刷写后，这种情况不会再发生。"
+      },
+      "button_held_still_looping": {
+        "title": "正确按住按钮但仍循环启动",
+        "problem": "正确按住按钮并连接 USB 线，但设备管理器仍在循环启动。",
+        "causes": "MAKCU 可能有故障，USB 线可能有故障，或者您的 USB 端口可能无法支持 MAKCU。",
+        "steps": "尝试另一个 USB 端口，尝试另一台 PC，尝试另一根线缆，更换线缆，或向您的经销商寻求更换。"
+      }
+    },
+    "quick_reference": {
+      "title": "快速参考",
+      "led_state": "LED 状态",
+      "left_meaning": "左侧含义",
+      "right_meaning": "右侧含义",
+      "action": "操作",
+      "solid_on": "常亮",
+      "solid_off": "常灭",
+      "slow_blink": "慢闪",
+      "working": "正常工作 - 无需操作",
+      "connect_device": "连接设备",
+      "wait_resolves": "等待，通常会自动解决"
+    },
+    "still_issues": {
+      "title": "仍有问题？",
+      "description": "如果您已尝试所有故障排除步骤但问题仍然存在：",
+      "verify_setup": "验证设置",
+      "verify_setup_desc": "确保两侧都已正确刷写和配置",
+      "check_connections": "检查连接",
+      "check_connections_desc": "验证所有 USB 线和连接是否牢固",
+      "driver_check": "驱动程序检查",
+      "driver_check_desc": "确认已安装 CH343 驱动程序且 COM 端口低于 10",
+      "supported_device": "支持的设备",
+      "supported_device_desc": "确保您使用的是支持的鼠标或键盘",
+      "reflash": "重新刷写",
+      "reflash_desc": "尝试使用最新固件重新刷写两侧",
+      "hardware_check": "硬件检查",
+      "hardware_check_desc": "如果 LED 完全没有响应，可能存在硬件问题",
+      "remember": "记住：MAKCU 支持键盘和鼠标设备。但是，并非所有鼠标和键盘都与 MAKCU 兼容。如果您的鼠标无法正常工作，请尝试另一只鼠标。"
+    },
+    "flash_vs_normal_mode": {
+      "title": "刷写模式与正常模式",
+      "description": "了解 MAKCU 如何与其 2 个芯片和 3 个 USB 端口配合工作。",
+      "makcu_structure": {
+        "title": "MAKCU 结构",
+        "content": "MAKCU 有 2 个芯片和 3 个 USB 端口。USB 端口 1 和 USB 端口 3 连接到 2 个芯片。USB 端口 2 是用于在正常使用模式下向 MAKCU 发送命令的 COM 端口。"
+      },
+      "flash_mode": {
+        "title": "刷写模式",
+        "description": "刷写模式仅在更新 MAKCU 固件时使用。",
+        "steps": {
+          "1": "按住最靠近 MAKCU 的按钮（左侧芯片 = 左侧按钮，右侧芯片 = 右侧按钮）",
+          "2": "将 USB 线连接到相应的 USB 端口（左侧芯片使用 USB 1，右侧芯片使用 USB 3）",
+          "3": "听到 PC 上的 USB 连接声音后，松开按钮",
+          "4": "设备现在将以刷写模式出现在您的 PC 上"
+        },
+        "important": "如果在连接线缆时未按住按钮，设备将不会在您的 PC 上显示。",
+        "cable_note": "在刷写模式下，您应该只使用一根线缆进行刷写。不要同时连接多根 USB 线缆。"
+      },
+      "normal_mode": {
+        "title": "正常模式",
+        "description": "这是 MAKCU 在正常操作期间的使用方式。",
+        "connections": {
+          "usb1": "USB 1 → 连接到您的游戏 PC",
+          "usb2": "USB 2 → COM 端口（用于向 MAKCU 发送命令）",
+          "usb3": "USB 3 → 连接到您的鼠标"
+        },
+        "important": "在正常模式下，可以测试和调整 MAKCU。您不需要刷写 USB 2，也不需要按住任何按钮来使用正常模式。"
+      },
+      "power_requirements": {
+        "title": "电源要求",
+        "description": "了解 MAKCU 如何接收电源对于正确操作至关重要。",
+        "normal_mode": "在正常模式下，必须连接 USB 1 + USB 2 才能为 MAKCU 供电。USB 2 不为 MAKCU 提供电源 - 这是为了确保不会从两个 USB 端口向主 PC 和第二台 PC 反向供电。",
+        "flash_mode": "刷写模式一次使用 1 根线缆。只连接 USB 1 或 USB 3，不要同时连接两者。",
+        "warning": "不遵循这些电源要求将导致使用不正确，MAKCU 显示无法正常工作的迹象，并且无法刷写。这些故障症状是由于不了解电源要求造成的。"
+      },
+      "problem": "设备处于刷写模式时无法使用设置，或设备处于正常模式时无法刷写。",
+      "solution": "要进入刷写模式：按住按钮，连接 USB 线，等待 USB 声音，然后松开按钮。要使用正常模式：将 USB 1 连接到游戏 PC，USB 2 用于 COM 端口，USB 3 连接到鼠标 - 无需按住任何按钮。"
+    }
+  },
+  "settings": {
+    "title": "MAKCU 设置",
+    "description": "通过 WebSerial 连接配置和交互您的 MAKCU 设备。",
+    "status": {
+      "disconnected": "未连接",
+      "connecting": "连接中...",
+      "connected_normal": "已连接在正常模式",
+      "connected_flash": "已连接在刷写模式（此模式下无法使用设置）",
+      "fault": "故障"
+    },
+    "connection": {
+      "connect": "连接",
+      "disconnect": "断开连接",
+      "connecting": "连接中..."
+    },
+    "prerequisites": {
+      "title": "前提条件",
+      "firmware": "MAKCU 已刷入 3.9 固件",
+      "firmware_desc": "设置页面需要固件版本 3.9 或更高版本",
+      "usb1": "USB 1 连接到您的游戏 PC",
+      "usb1_desc": "USB 1 必须连接到您的游戏 PC",
+      "usb2": "USB 2 连接到本 PC",
+      "usb2_desc": "USB 2 必须连接到同一台计算机。否则，MAKCU 无法正常工作。",
+      "note": "注意：如果遇到连接问题，请参阅故障排除页面以获取详细的设置说明。"
+    },
+    "warnings": {
+      "flash_mode_detected": "检测到刷写模式。此模式下无法使用设置。",
+      "normal_mode_detected": "检测到正常模式。刷写只能在 USB 1 或 3 上完成。请拔掉所有线缆以将 MAKCU 设置为刷写模式。"
+    },
+    "baud_rate": {
+      "title": "波特率",
+      "description": "确保 makcu 配置为 115200 波特率以使用设置，否则 makcu 将无法正常工作",
+      "warning": "波特率更改是永久性的，只有在您的软件告诉您使用不同波特率时才应设置。不匹配的波特率将阻止您的软件与 MAKCU 通信。",
+      "how_to_change": "快速按下 MAKCU 上的左侧按钮 4 次，将波特率从 115200 更改为 4mbps。LED 将闪烁 1 次或 4 次，波特率将被保存。",
+      "led_indicator": "当 MAKCU 启动时，波特率指示器 LED（左侧）将显示 MAKCU 运行的速度。",
+      "startup_indicator": "当 MAKCU 启动时，波特率指示器 LED（左侧）将闪烁以指示当前波特率：1 次闪烁 = 115200，4 次闪烁 = 4mbps。",
+      "website_requirement": "MAKCU 网站期望使用 115200 波特率。如果您尝试在正常模式下使用 MAKCU 网站，请确保将波特率设置为 115200。",
+      "setting_methods": "波特率可以由用户（使用按钮方法）设置，也可以由开发人员在代码中设置。",
+      "power_requirement": "必须连接 USB 1 + USB 2 才能为 MAKCU 供电以更改波特率。USB 2 不为 MAKCU 提供电源 - 这是为了确保不会从两个 USB 端口向主 PC 和第二台 PC 反向供电。"
+    },
+    "sections": {
+      "status": "状态"
+    }
+  },
+  "setup": {
+    "title": "设置指南",
+    "description": "按照以下步骤设置您的 MAKCU 设备。",
+    "sections": {
+      "install_driver": {
+        "title": "1. 安装 CH343 驱动程序",
+        "description": "在您的 PC（用于刷写的计算机）上安装 CH343 驱动程序。",
+        "steps": [
+          "从下面的链接下载 CH343 驱动程序",
+          "在您的 PC 上运行安装程序",
+          "按照安装向导完成设置"
+        ],
+        "driver_link": "下载 CH343 驱动程序"
+      },
+      "flash_makcu": {
+        "title": "2. 刷写 MAKCU 固件",
+        "description": "使用固件刷写页面将固件刷写到您的 MAKCU 设备。",
+        "dropdown_explanation": "刷写页面有一个下拉菜单，显示左侧和右侧固件。您应该将 USB1 匹配到 USB 端口的左侧，将 USB3 匹配到右侧。在 MAKCU 板下方，有文字说明数字。",
+        "flashing_process": {
+          "title": "刷写过程",
+          "flash_mode": "首先，您需要进入刷写模式。按住最靠近要刷写一侧的按钮（左侧按钮用于左侧/USB1，右侧按钮用于右侧/USB3），然后连接 USB 线。一旦您听到 PC 上的 USB 声音，释放按钮。",
+          "connecting": "进入刷写模式后，使用页面右上角的连接按钮连接到设备。系统将自动检测设备处于刷写模式。",
+          "selecting_firmware": "从下拉菜单中选择相应的固件。确保为 USB1 选择左侧固件，为 USB3 选择右侧固件。",
+          "flashing": "点击下拉菜单中的固件开始刷写。进度将显示在日志窗口中。",
+          "completing": "刷写完成后，拔掉 USB 线。然后对另一侧重复该过程（按住另一个按钮，连接 USB 线，等待 USB 声音，释放按钮，在右上角连接，然后刷写）。"
+        },
+        "baud_rate": {
+          "title": "波特率",
+          "description": "波特率通常为 115200。如果需要更改波特率，请参考故障排除页面。"
+        },
+        "power_requirements": {
+          "title": "电源要求",
+          "description": "了解 MAKCU 如何接收电源对于正确操作至关重要。",
+          "normal_mode": "在正常模式下，必须连接 USB 1 + USB 2 才能为 MAKCU 供电。USB 2 不为 MAKCU 提供电源 - 这是为了确保不会从两个 USB 端口向主 PC 和第二台 PC 反向供电。",
+          "flash_mode": "刷写模式一次使用 1 根线缆。只连接 USB 1 或 USB 3，不要同时连接两者。",
+          "warning": "不遵循这些电源要求将导致使用不正确，MAKCU 显示无法正常工作的迹象，并且无法刷写。这些故障症状是由于不了解电源要求造成的。"
+        }
+      },
+      "requirements": {
+        "title": "要求",
+        "ch343_driver": "已安装 CH343 驱动程序",
+        "ch343_desc": "MAKCU 需要在您的计算机（用于刷写的计算机）上加载 CH343 USB 转串口驱动程序。驱动程序下载链接在下面的部分中提供。",
+        "com_port": "正确的 COM 端口",
+        "com_port_desc": "USB 2 的 COM 端口应低于 10。如果您的 COM 端口号是 10 或更高，可能会遇到连接问题。",
+        "both_sides": "两侧均已刷写",
+        "both_sides_desc": "确保您已正确设置并在左侧（设备）和右侧（主机）上刷写了 MAKCU。",
+        "supported_device": "支持的设备",
+        "supported_device_desc": "确保您已连接支持的鼠标或键盘。MAKCU 支持键盘和鼠标设备。"
+      }
+    }
+  },
+  "api": {
+    "sections": {
+      "transport": "传输与封装",
+      "mouse_buttons": {
+        "title": "鼠标按键",
+        "buttons_individual": "单个按键 (GET/SET)",
+        "click": "点击调度 (SET)",
+        "turbo": "turbo() (GET/SET)"
+      },
+      "mouse_movement": {
+        "title": "鼠标移动",
+        "move": "move() (SET)",
+        "moveto": "moveto() (SET)",
+        "wheel": "wheel() (SET)",
+        "pan": "pan() (GET/SET)",
+        "tilt": "tilt() (GET/SET)",
+        "getpos": "getpos() (GET)",
+        "silent": "silent() (SET)"
+      },
+      "mouse_advanced": {
+        "title": "鼠标高级",
+        "mo": "mo() - 原始鼠标帧 (SET)",
+        "lock": "lock_<target>() (GET/SET)",
+        "catch": "catch_<target>() (GET/SET)"
+      },
+      "mouse_remap": {
+        "title": "鼠标重映射（物理）",
+        "remap_button": "remap_button() (GET/SET)",
+        "remap_axis": "remap_axis() (GET/SET)",
+        "invert_x": "invert_x() (GET/SET)",
+        "invert_y": "invert_y() (GET/SET)",
+        "swap_xy": "swap_xy() (GET/SET)"
+      },
+      "keyboard": {
+        "title": "键盘",
+        "down": "down() (SET)",
+        "up": "up() (SET)",
+        "press": "press() (SET)",
+        "string": "string() (SET)",
+        "init": "init() (SET)",
+        "isdown": "isdown() (GET)",
+        "mask": "mask() (GET/SET)",
+        "remap": "remap() (GET/SET)"
+      },
+      "streaming": {
+        "title": "流式",
+        "keys": "keys() (GET/SET)",
+        "buttons": "buttons() (GET/SET)",
+        "axis": "axis() (GET/SET)",
+        "mouse": "mouse() (GET/SET)"
+      },
+      "screen": {
+        "title": "位置与屏幕",
+        "screen_cmd": "screen() (GET/SET)"
+      },
+      "system": {
+        "title": "系统命令",
+        "help": "help() (GET)",
+        "info": "info() (GET)",
+        "version": "version() (GET)",
+        "device": "device() (GET)",
+        "fault": "fault() (GET)",
+        "reboot": "reboot() (SET)",
+        "serial": "serial() (GET/SET)"
+      },
+      "config": {
+        "title": "配置",
+        "log": "log() (GET/SET)",
+        "echo": "echo() (GET/SET)",
+        "baud": "baud() (GET/SET)",
+        "hs": "hs() (GET/SET)",
+        "release": "release() (GET/SET)"
+      },
+      "baud_binary": "波特率（二进制）",
+      "no_usb": "无需 USB 设备的函数",
+      "limits": "限制与解析"
+    }
+  },
+  "xim": {
+    "title": "XIM 设置指南",
+    "description": "了解如何为控制器支持设置 XIM 与 MAKCU。",
+    "sections": {
+      "setup": {
+        "title": "如何为控制器设置 XIM 与 MAKCU",
+        "prerequisites": {
+          "title": "前提条件",
+          "important_note": "重要：本指南仅适用于将控制器与 MAKCU 一起使用。",
+          "baud_rate_warning": "波特率配置",
+          "baud_rate_warning_desc": "MAKCU 的波特率必须与您的软件预期速度匹配。在继续之前，确保波特率配置正确。",
+          "mouse_conversion_important": "鼠标功能",
+          "mouse_conversion_important_desc": "当使用 XIM 与控制器时，连接到 USB 3 的鼠标将不再作为鼠标工作，因为 XIM 将 MAKCU 的鼠标输入转换为控制器输入。如果您在 XIM + MAKCU 连接时需要鼠标来操作您的游戏 PC，请将另一个鼠标直接连接到您的 PC（这意味着您需要 2 个鼠标：一个用于 MAKCU，一个用于您的 PC）。",
+          "mouse_removal_warning": "严重警告",
+          "mouse_removal_warning_desc": "鼠标必须始终保持连接到 USB 3。如果您从 USB 3 移除鼠标，MAKCU 将关闭，软件将停止！"
+        },
+        "step1_prepare_xim": {
+          "title": "步骤 1：准备 XIM",
+          "description": "在连接 MAKCU 之前，您的 XIM 必须与您的游戏完全正常工作。",
+          "xim_must_work": "XIM 必须首先正常工作",
+          "xim_must_work_desc": "XIM 应该与您选择的游戏完全正常工作。请参考 XIM 设置指南，了解如何使用鼠标和控制器配置 XIM，确保按钮和摇杆已映射到鼠标。",
+          "xim_testing": "测试 XIM 设置",
+          "xim_testing_desc": "测试鼠标是否能够在游戏中移动右摇杆，以及鼠标按钮是否能够作为控制器按钮工作。只有在 XIM 正常工作后才能继续。"
+        },
+        "step2_prepare_makcu": {
+          "title": "步骤 2：准备 MAKCU",
+          "description": "在连接到 XIM 之前，确保 MAKCU 完全正常工作。",
+          "makcu_functional": "MAKCU 必须完全正常工作",
+          "makcu_functional_desc": "MAKCU 应该完全正常工作并在正常鼠标模式下工作。确保 MAKCU 在鼠标连接到 USB 3 时正常工作。",
+          "mouse_requirement": "需要工作正常的鼠标",
+          "mouse_requirement_desc": "必须将工作正常的鼠标连接到 USB 3。此鼠标必须始终保持连接，以便 MAKCU 与自瞄功能正常工作。"
+        },
+        "step3_connect": {
+          "title": "步骤 3：连接 XIM 和 MAKCU",
+          "description": "一旦 XIM 和 MAKCU 都完全准备好，将它们连接在一起。",
+          "final_steps": "连接步骤",
+          "final_steps_desc": "按照下面的视频所示连接 XIM 和 MAKCU。在连接之前，确保两个设备都完全正常工作。"
+        }
+      }
+    }
+  },
+  "information": {
+    "title": "MAKCU 信息",
+    "description": "了解 MAKCU 是什么、它的功能以及工作原理。",
+    "what_is_makcu": {
+      "title": "什么是 MAKCU？",
+      "description": "MAKCU 是一个 USB 直通设备，充当游戏 PC 与鼠标或键盘之间的桥梁。它由两个 ESP32-S3 微控制器协同工作，创建透明连接，允许软件实时拦截和修改输入信号。",
+      "key_points": [
+        "双芯片架构，每侧独立处理",
+        "完整的鼠标和键盘 USB 直通功能",
+        "实时输入拦截和修改",
+        "基于 Web 的配置和固件更新",
+        "需要通过 USB 2（COM 端口）从第二台 PC 进行软件控制",
+        "无法在独立模式下运行 - 需要活动软件连接",
+        "必须在 USB 3 上连接鼠标或键盘才能工作"
+      ],
+      "important_notes": {
+        "title": "重要要求",
+        "standalone": "MAKCU 无法在独立模式下运行。它需要第二台 PC（通过 USB 2 连接）上运行的软件来控制和操作设备。",
+        "attached_device": "MAKCU 无法在没有连接的鼠标或键盘设备的情况下运行。必须在 USB 3 上连接鼠标或键盘，MAKCU 才能运行。",
+        "software_control": "MAKCU 需要通过 COM 端口（USB 2）从第二台 PC 的软件来控制。没有此软件连接，MAKCU 将不会处理或修改输入。"
+      }
+    },
+    "what_is_it_used_for": {
+      "title": "MAKCU 用于什么？",
+      "description": "MAKCU 专为需要精确控制输入设备的高级用户设计，用于游戏、自动化或辅助功能。",
+      "use_cases": [
+        "游戏：通过自定义脚本和自动化增强鼠标和键盘控制",
+        "辅助功能：自定义输入重映射和辅助功能",
+        "自动化：用于测试或自动化的输入设备程序化控制",
+        "自定义：精细调整鼠标灵敏度、按键重映射和输入行为",
+        "设备控制：使您的计算机能够直接与鼠标或键盘通信，允许您通过鼠标/键盘制造商的软件更改 LED、DPI 设置和其他设备特定功能"
+      ],
+      "device_communication": {
+        "title": "直接设备通信",
+        "description": "MAKCU 使您的计算机能够通过 USB 1 直接与鼠标或键盘通信。这允许您使用制造商软件（如 Logitech G HUB、Razer Synapse 等）来控制设备特定功能。",
+        "features": [
+          "更改 RGB LED 颜色和效果",
+          "调整 DPI 设置和配置文件",
+          "配置鼠标按钮分配",
+          "更新设备固件",
+          "访问所有制造商软件功能"
+        ]
+      }
+    },
+    "capabilities": {
+      "title": "MAKCU 能做什么和不能做什么",
+      "can_do": {
+        "title": "MAKCU 能做什么",
+        "items": [
+          "以完全兼容性直通鼠标和键盘输入",
+          "实时拦截和修改鼠标移动、点击和键盘按键",
+          "重映射按键和鼠标按钮",
+          "调整鼠标灵敏度和加速度",
+          "执行自定义脚本和自动化",
+          "支持有线和无线设备（通过 USB 适配器连接时）",
+          "与大多数标准 USB HID 鼠标和键盘配合使用",
+          "在 PC 和鼠标/键盘之间实现直接通信，用于 LED 控制、DPI 更改和其他设备功能",
+          "如果游戏支持鼠标和键盘输入，则直接支持游戏机游戏"
+        ]
+      },
+      "cannot_do": {
+        "title": "MAKCU 不能做什么",
+        "items": [
+          "无法直接与蓝牙设备配合使用（需要 USB 适配器）",
+          "无法修改加密或专有协议",
+          "无法在没有正确固件安装的情况下运行",
+          "无法与非 USB 输入设备配合使用",
+          "与某些具有专有驱动程序的专用游戏外设的兼容性有限",
+          "无法在独立模式下运行 - 需要软件控制",
+          "无法在没有连接的鼠标或键盘设备的情况下运行",
+          "无法提供 ESP（透视）、自瞄或自瞄机器人功能",
+          "无法加载或执行游戏脚本 - 它只处理输入/输出信号",
+          "无法与不原生支持鼠标和键盘的游戏机配合使用（需要 XIM 适配器）"
+        ]
+      },
+      "important_reminders": {
+        "title": "重要提醒",
+        "no_cheats": "MAKCU 无法提供 ESP（透视）、自瞄或自瞄机器人功能。它是一个硬件直通设备，只处理输入和输出信号。它无法加载脚本、修改游戏内存或提供视觉叠加。",
+        "input_only": "MAKCU 仅在输入级别工作。它可以修改您发送到计算机的内容，但无法读取游戏数据、提供视觉信息或直接与游戏软件交互。"
+      },
+      "console_support": {
+        "title": "游戏机支持",
+        "description": "MAKCU 可以支持游戏机游戏，但要求取决于游戏机和游戏。",
+        "direct_support": {
+          "title": "直接游戏机支持",
+          "description": "如果您的游戏机游戏原生支持鼠标和键盘输入，MAKCU 可以直接工作。只需通过 USB 1 将 MAKCU 连接到游戏机，并将鼠标/键盘连接到 USB 3。",
+          "examples": [
+            "具有原生鼠标/键盘支持的 PlayStation 5 游戏",
+            "具有原生鼠标/键盘支持的 Xbox Series X/S 游戏",
+            "任何正式支持鼠标和键盘输入的游戏机游戏"
+          ]
+        },
+        "xim_required": {
+          "title": "需要 XIM 适配器",
+          "description": "如果您的游戏机或游戏不原生支持鼠标和键盘，您将需要 XIM 适配器将 MAKCU 的鼠标输入转换为控制器输入。",
+          "note": "请参阅 XIM 设置页面，了解如何配置 MAKCU 与 XIM 的详细说明。",
+          "link_text": "查看 XIM 设置指南"
+        }
+      }
+    },
+    "preflashed_vs_unflashed": {
+      "title": "预刷写与未刷写",
+      "description": "MAKCU 设备可能有两种状态，具体取决于您的经销商是否在发货前准备了设备。",
+      "preflashed": {
+        "title": "预刷写 MAKCU",
+        "description": "预刷写的 MAKCU 已由您的经销商在发货前设置。固件已加载，设备已测试以确保正常工作。",
+        "benefits": [
+          "连接后立即可用",
+          "由经销商测试和验证",
+          "无需初始刷写",
+          "两侧（左侧和右侧）已配置"
+        ],
+        "indicator": "如果您的 MAKCU 是预刷写的，插入时会正常连接，您可以立即开始使用。"
+      },
+      "unflashed": {
+        "title": "未刷写 MAKCU",
+        "description": "未刷写的 MAKCU 直接从工厂发货，未安装固件。这是制造商 ESP32-S3 芯片的默认状态。",
+        "characteristics": [
+          "首次使用前需要刷写固件",
+          "在刷写之前会在设备管理器中显示 USB 断开循环",
+          "在不按住按钮的情况下连接时，USB 连接声音会无限循环",
+          "这是正常行为，不是缺陷"
+        ],
+        "what_to_do": "如果您的 MAKCU 未刷写，您需要使用固件刷写页面刷写固件。首次成功刷写后，此行为将停止且不会再出现。"
+      }
+    },
+    "usb_ports": {
+      "title": "了解 USB 端口",
+      "description": "MAKCU 有三个 USB 端口，每个都有特定用途。了解它们的工作原理对于正确设置至关重要。",
+      "usb1": {
+        "title": "USB 1 - 左侧（设备端口）",
+        "description": "USB 1 连接到左侧 ESP32-S3 芯片，用作与游戏 PC 或游戏机的设备连接。",
+        "purpose": "这是 MAKCU 作为 USB 设备出现在您的计算机或游戏机上的位置。您的游戏 PC 或游戏机连接在这里。",
+        "usage": "将 USB 1 连接到您的游戏 PC 或游戏机。这是允许您的计算机/游戏机将 MAKCU 识别为鼠标或键盘设备的主要连接。",
+        "power": "USB 1 为 MAKCU 的左侧供电。",
+        "device_communication": "此端口还使您的 PC 与连接的鼠标/键盘之间能够直接通信，允许您使用制造商软件来控制设备功能。"
+      },
+      "usb2": {
+        "title": "USB 2 - COM 端口（通信）",
+        "description": "USB 2 是用于发送命令和配置 MAKCU 的通信端口。这对 MAKCU 的功能至关重要。",
+        "purpose": "此端口创建串行 COM 端口连接，允许软件和 MAKCU 网站与设备通信。MAKCU 需要通过此端口进行活动软件控制才能运行。",
+        "usage": "将 USB 2 连接到您用于配置 MAKCU 的同一台计算机（通常是您的游戏 PC 或单独的配置 PC）。这用于设置、固件更新、设备控制，并且是 MAKCU 处理输入所必需的。",
+        "power": "USB 2 不为 MAKCU 供电。这可以防止主 PC 和第二台 PC 之间的反向供电。",
+        "important": "在正常模式下，必须同时连接 USB 1 和 USB 2 才能为 MAKCU 供电。USB 2 仅用于通信，不供电。没有通过 USB 2 连接的软件，MAKCU 无法运行。",
+        "software_requirement": "MAKCU 需要连接到 USB 2 的 PC 上运行的软件来控制和操作设备。没有此软件连接，MAKCU 将不会处理或修改输入。"
+      },
+      "usb3": {
+        "title": "USB 3 - 右侧（主机端口）",
+        "description": "USB 3 连接到右侧 ESP32-S3 芯片，用作鼠标或键盘的主机端口。",
+        "purpose": "这是您连接实际鼠标或键盘的位置。MAKCU 充当 USB 主机并从您的设备接收输入。",
+        "usage": "将鼠标或键盘连接到 USB 3。这是 MAKCU 将通过 USB 1 直通到游戏 PC 的输入设备。必须在此处连接设备，MAKCU 才能工作。",
+        "power": "USB 3 为 MAKCU 的右侧供电，也为连接的鼠标/键盘供电。",
+        "required": "必须在 USB 3 上连接鼠标或键盘，MAKCU 才能运行。MAKCU 无法在没有连接设备的情况下运行。"
+      },
+      "summary": {
+        "title": "快速摘要",
+        "connections": {
+          "normal_mode": "正常模式：USB 1 → 游戏 PC/游戏机，USB 2 → 配置 PC（COM 端口 - 运行所必需），USB 3 → 鼠标/键盘（必需）",
+          "flash_mode": "刷写模式：仅连接 USB 1 或 USB 3（一次一个，不能同时连接）"
+        },
+        "power_requirement": "电源要求：在正常模式下，必须同时连接 USB 1 和 USB 2 才能为 MAKCU 供电。USB 2 不供电 - 仅用于通信。",
+        "operation_requirement": "运行要求：MAKCU 需要 USB 2（用于软件控制）和 USB 3（连接设备）才能运行。它无法在独立模式下运行。"
+      }
+    }
+  }
+}

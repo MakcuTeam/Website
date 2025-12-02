@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Space_Mono, Space_Grotesk, Noto_Serif_SC } from "next/font/google";
 import { getDictionary, LangProps } from "@/lib/dictionaries";
-import { locales } from "@/lib/locale";
+import { getLocales } from "@/lib/locale";
 import "@/styles/globals.css";
 import localFont from "next/font/local";
 
@@ -68,5 +68,6 @@ export default async function RootLayout({
 }
 
 export async function generateStaticParams() {
+  const locales = getLocales();
   return locales.map((locale) => ({ lang: locale }));
 }

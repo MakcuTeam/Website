@@ -1,0 +1,758 @@
+{
+  "metadata": {
+    "title": "Makcu Official",
+    "description": "Experience seamless mouse and keyboard control with MAKCU, the next generation."
+  },
+  "home": {
+    "main_header": "Experience security and speed with the next generation.",
+
+    "read_guide": "Read Guide",
+    "name": "Makcu"
+  },
+  "info": {
+    "title": "Why are we better?",
+    "list": [
+        {
+          "icon": "users_round",
+          "title": "Server members",
+          "number": "",
+          "description": "We have a large number of active users and a strong technical team built by an excellent user community."
+        },
+      {
+        "icon": "mouse",
+        "title": "Supported Mice",
+        "number": "Almost all",
+        "description": "We are actively adapting to all mice and believe that 100% coverage will be achieved soon."
+      },
+      {
+        "icon": "cpu",
+        "title": "Full Pass-Through",
+        "number": "100%",
+        "description": [
+          "Mouse",
+          "Keyboard (soon)",
+          "Controller (xim needed)"
+        ]
+      }
+    ]
+  },
+
+  "contributions": {
+    "title": "Contribution List",
+    "more": "Wait u Join..."
+  },
+  "navbar": {
+    "links": {
+      "guide": "Guide",
+      "api": "API",
+      "blog": "Blog",
+      "makcu_tools": "Firmware Flashing",
+      "guides": "Guides",
+      "discord": "Discord",
+      "information": "Information",
+      "troubleshooting": "Troubleshooting",
+      "settings": "Settings",
+      "home": "Home",
+      "setup": "Setup",
+      "xim": "XIM"
+    },
+    "search": {
+      "search_guide": "Search Guide...",
+      "no_results_found": " No results found for",
+      "type_something": "Type something to search..."
+    },
+    "theme": {
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System"
+    },
+    "makcu_status": {
+      "disconnected": "Disconnected",
+      "connecting": "Connecting...",
+      "connected_normal": "Normal mode",
+      "connected_flash": "Flash mode",
+      "fault": "Fault"
+    }
+  },
+  "tools": {
+    "title": "Firmware Flashing",
+    "description": "Flash firmware to your MAKCU device. Follow the steps carefully to ensure successful flashing.",
+    "status": "Status",
+    "connectBtn": "Connect Device",
+    "connected": "Connected",
+    "disconnectBtn": "Disconnect Device",
+    "flashMode": "Flash Mode",
+    "online": "Online",
+    "offline": "Offline",
+    "firmware": "Firmware",
+    "list": "Select Firmware",
+    "connectToSelect": "Connect your device to enable selection",
+    "onlineFlash": "Online Flash",
+    "offlineFlash": "Offline Flash",
+    "clearDebugInfo": "Clear Debug Info",
+    "uploadFirmware": "Upload Firmware",
+    "connectSuccess": "Connect Success",
+    "flashSuccess": "Firmware Flash Success",
+    "usb1Left": "USB1 Left",
+    "usb3Right": "USB3 Right",
+    "noLeftFirmware": "No left firmware found",
+    "noRightFirmware": "No right firmware found",
+    "browserNotSupported": "Your browser does not support Web Serial/WebUSB. Please use Chrome, Edge, or another Chromium-based browser.",
+    "driverNotice": "If you have not installed the CH343 driver yet then please click ",
+    "driverLink": "this link",
+    "driverNoticeEnd": " to download",
+    "sections": {
+      "steps": {
+        "title": "Flashing Steps",
+        "description": "Follow these steps carefully to flash your MAKCU device.",
+        "step1": "Hold the button closest to the side you want to flash (left button for USB 1/left side, right button for USB 3/right side)",
+        "step2": "Connect the USB cable to the corresponding port (USB 1 for left, USB 3 for right)",
+        "step3": "Listen for the USB connection sound on your PC",
+        "step4": "Release the button after you hear the sound",
+        "step5": "Click the Connect button at the top right of the page",
+        "step6": "Select the firmware from the dropdown that matches the side you're flashing (check the numbers on the MAKCU board to match USB 1/3 with left/right)",
+        "step7": "Wait for the flashing process to complete",
+        "step8": "When told to disconnect, remove the USB cable and repeat the process for the other side"
+      },
+      "flashing_tool": {
+        "title": "Flashing Tool",
+        "description": "Use the tool below to flash firmware to your MAKCU device.",
+        "com_port_warning_title": "Important: COM Port Limitation",
+        "com_port_warning_desc": "This tool is only for flashing and testing MAKCU. MAKCU only allows one device to be connected to USB 2 (COM port) at a time. Please ensure this AIO tool is closed before using MAKCU with your software, otherwise your software will not be able to connect.",
+        "unflashed_warning_title": "First Time Flashing",
+        "unflashed_warning_desc": "If your MAKCU comes without firmware or has not been tested, it is normal to be connected to USB 1 or 3 without holding buttons down and the USB sound to loop endlessly. This is the ESP32-S3 chip's default state from the factory. Upon the first flash, this state will go away and never return."
+      },
+      "firmware_selection": {
+        "title": "Firmware Selection",
+        "description": "Select the appropriate firmware for the side you are flashing.",
+        "left_note": "USB 1 corresponds to the left side - select firmware with 'LEFT' in the name",
+        "right_note": "USB 3 corresponds to the right side - select firmware with 'RIGHT' in the name",
+        "matching_note": "Check the numbers printed on the MAKCU board to ensure you match the correct USB port to the correct side"
+      }
+    }
+  },
+  "docs": {
+    "on_this_page": "On this page",
+    "next": "Next",
+    "previous": "Previous"
+  },
+  "not_found": {
+    "404": "404",
+    "page_not_found": "Page not found",
+    "sub_text": "Oops! The page you're looking for doesn't exist.",
+    "back_to_homepage": "Back to homepage"
+  },
+  "leftbar": {
+    "getting_started": "Getting Started",
+    "introduction": "Introduction",
+    "installation": "Installation"
+  },
+  "error": {
+    "oops": "Oops!",
+    "something_went_wrong": "Something went wrong.",
+    "sub_text": "We're sorry, but an error occurred while processing your request.",
+    "reload_page": "Reload Page",
+    "back_to_homepage": "Back to homepage"
+  },
+  "troubleshooting": {
+    "title": "MAKCU Troubleshooting",
+    "description": "LED status guide and troubleshooting steps for MAKCU device issues.",
+    "connection_status": {
+      "title": "Connection Status",
+      "description": "The MAKCU connection status is displayed in the top right of the navbar, next to the audio toggle. The status shows the current connection state and mode of your MAKCU device.",
+      "statuses": {
+        "not_supported": {
+          "label": "Not Supported",
+          "description": "Your browser does not support Web Serial API. Please use Chrome/Edge 89+, Opera 76+, or another Chromium-based browser.",
+          "color": "Gray (muted)"
+        },
+        "disconnected": {
+          "label": "Disconnected",
+          "description": "MAKCU is not connected. Click the Connect button to establish a connection.",
+          "color": "Gray (muted)"
+        },
+        "connecting": {
+          "label": "Connecting...",
+          "description": "The system is attempting to connect to MAKCU and detect which mode it is in (normal or flash mode).",
+          "color": "Yellow"
+        },
+        "normal_mode": {
+          "label": "Normal mode",
+          "description": "MAKCU is connected and running in normal mode. You can use the settings page to configure and test MAKCU. USB 1 is connected to gaming PC, USB 2 is the COM port, USB 3 should be connected to either your mouse or keyboard. **3.9 fw only supports keyboard.",
+          "color": "Green (emerald)",
+          "com_port_warning": "Important: MAKCU only allows one device connected to USB 2 (COM port) at a time. Close this tool before using MAKCU with your software."
+        },
+        "flash_mode": {
+          "label": "Flash mode",
+          "description": "MAKCU is connected in flash mode. This mode is used for firmware updates only. Settings cannot be used in this mode. Only one USB cable should be connected (USB 1 or USB 3).",
+          "color": "Blue"
+        },
+        "fault": {
+          "label": "Fault",
+          "description": "Connection failed or device is not responding. Check your USB connections and try again. Swapping USB ports and refreshing the page may help.",
+          "color": "Red"
+        }
+      },
+      "com_port_note": "Note: The COM port number is not displayed as it is not available via the Web Serial API for security reasons. The connection status will show the mode (normal or flash) instead.",
+      "overview": "Connection Status Overview"
+    },
+    "prerequisites": {
+      "title": "Prerequisites",
+      "ch343_driver": "CH343 Driver Installed",
+      "ch343_desc": "MAKCU requires the CH343 USB-to-serial driver to be loaded on your computer. Please see the flash page for the download link and installation instructions.",
+      "com_port": "Correct COM Port",
+      "com_port_desc": "The COM port for USB 2 should be below 10. If your COM port number is 10 or higher, you may experience connection issues.",
+      "both_sides": "Both Sides Flashed",
+      "both_sides_desc": "Make sure you have correctly set up and flashed MAKCU on both the left side (device) and right side (host).",
+      "supported_device": "Supported Device",
+      "supported_device_desc": "Ensure you have a supported mouse or keyboard connected. MAKCU supports both keyboard and mouse devices."
+    },
+    "led_guide": {
+      "title": "LED Status Guide",
+      "description": "MAKCU uses LEDs on both sides to indicate system status and help you troubleshoot issues. The LEDs can be solid (on or off) or blinking.",
+      "left_side": {
+        "title": "Left Side (Device Side)",
+        "description": "The left side LED shows the status of the USB device connection to your computer.",
+        "solid_on": {
+          "title": "Solid ON (Green)",
+          "meaning": "USB device is connected and working correctly",
+          "action": "No action needed - everything is working"
+        },
+        "solid_off": {
+          "title": "Solid OFF",
+          "meaning": "No USB device connected",
+          "action": "Check USB cable connection and ensure device is powered on"
+        },
+        "slow_blink": {
+          "title": "Slow Blink (500ms on, 500ms off)",
+          "meaning": "Warning - system is adjusting settings",
+          "when": "Baud rate is being changed or system is reconfiguring",
+          "action": "Wait a few seconds - this should resolve automatically. If it persists, try restarting MAKCU."
+        }
+      },
+      "right_side": {
+        "title": "Right Side (Host Side)",
+        "description": "The right side LED shows the status of the USB host connection to your mouse/keyboard.",
+        "solid_on": {
+          "title": "Solid ON (Green)",
+          "meaning": "USB host is connected and working correctly",
+          "action": "No action needed - everything is working"
+        },
+        "solid_off": {
+          "title": "Solid OFF",
+          "meaning": "No USB device connected to host",
+          "action": "Connect a supported mouse or keyboard to the right side USB port"
+        },
+        "slow_blink": {
+          "title": "Slow Blink (500ms on, 500ms off)",
+          "meaning": "Warning - temporary issue detected",
+          "when": "USB request is busy (normal during operation) or system is handling a temporary condition",
+          "action": "Usually resolves automatically. If it persists, check device connection."
+        }
+      }
+    },
+    "troubleshooting_steps": {
+      "title": "Troubleshooting Steps",
+      "slow_persists": {
+        "title": "Slow Blink Persists",
+        "problem": "LED keeps blinking slowly and doesn't resolve",
+        "causes": "System stuck in configuration state, baud rate change didn't complete, or warning condition not clearing",
+        "steps": "Wait 10 seconds - some operations take time, power cycle the affected side, check for any error messages in device manager, or reflash if problem continues"
+      },
+      "led_not_responding": {
+        "title": "LED Not Responding",
+        "problem": "LED doesn't turn on or change state at all",
+        "causes": "LED hardware issue, firmware not running, or power issue",
+        "steps": "Verify device is powered (check USB connection), check if device is recognized in device manager, try reflashing the firmware, or if still not working, there may be a hardware issue"
+      },
+      "device_not_working": {
+        "title": "Device Not Working Despite Green LED",
+        "problem": "LED shows solid ON (green) but mouse/keyboard doesn't work",
+        "causes": "Device driver issue on computer, USB port problem, or device compatibility issue",
+        "steps": "Check device manager for any error icons, try a different USB port, verify CH343 driver is installed correctly, check if COM port number is below 10, or try a different mouse or keyboard to test"
+      },
+      "baud_rate_mismatch": {
+        "title": "Baud Rate Mismatch / Software Not Connecting",
+        "problem": "MAKCU is not changing baud rate or software is not connecting to MAKCU.",
+        "symptoms": [
+          "Software cannot communicate with MAKCU",
+          "MAKCU not responding to commands",
+          "Connection timeouts",
+          "Device appears connected but no data exchange"
+        ],
+        "solution": "Open device manager and change the com port to be any number below 10 (you may force a com port number if all are in use). Ensure baud rate is matched to the software's expectations. The MAKCU.com website and the AIO tool expect MAKCU to be running at 115200 (1 flash mode). Users must ensure that baud rate 115200 is enabled to communicate with the website and tools.",
+        "steps": [
+          "Check the baud rate indicator LED (left) when MAKCU starts - it should flash 1 time for 115200",
+          "If baud rate is incorrect, press the left button 4 times fast to change it",
+          "Ensure USB 1 + USB 2 are connected for MAKCU to have power to change baud rate",
+          "Change COM port in your software settings to match MAKCU's",
+          "Verify baud rate matches between MAKCU and your software",
+          "If using MAKCU website or AIO tool, ensure baud rate is set to 115200"
+        ],
+        "important": "USB 1 + USB 2 must be connected for MAKCU to take power. USB 2 does not provide power to MAKCU - this prevents back feeding to the main PC and 2nd PC from both USB ports."
+      },
+      "cannot_flash_website": {
+        "title": "Cannot Flash from Website - USB Disconnecting",
+        "problem": "Cannot flash MAKCU from the website. Device Manager shows USB 1 or 3 disconnecting constantly.",
+        "causes": "MAKCU is not flashed - this is the default factory state of the ESP32-S3 chip.",
+        "steps": "This is normal for unflashed devices. Hold the button down correctly and insert the USB cable. The Device Manager will stop looping and you are ready to flash. After the first flash, this will not happen again."
+      },
+      "button_held_still_looping": {
+        "title": "Button Held Correctly But Still Boot Looping",
+        "problem": "Holding the button down correctly and connecting the USB cable, but Device Manager is still boot looping.",
+        "causes": "MAKCU may be faulty, USB cables may be faulty, or your USB port may have issues supporting MAKCU.",
+        "steps": "Try another USB port, try another PC, try the other cable, replace the cable, or seek a replacement from your reseller."
+      }
+    },
+    "quick_reference": {
+      "title": "Quick Reference",
+      "led_state": "LED State",
+      "left_meaning": "Left Side Meaning",
+      "right_meaning": "Right Side Meaning",
+      "action": "Action",
+      "solid_on": "Solid ON",
+      "solid_off": "Solid OFF",
+      "slow_blink": "Slow Blink",
+      "working": "Working - no action needed",
+      "connect_device": "Connect device",
+      "wait_resolves": "Wait, usually resolves"
+    },
+    "still_issues": {
+      "title": "Still Having Issues?",
+      "description": "If you've tried all troubleshooting steps and the problem persists:",
+      "verify_setup": "Verify Setup",
+      "verify_setup_desc": "Ensure both sides are correctly flashed and configured",
+      "check_connections": "Check Connections",
+      "check_connections_desc": "Verify all USB cables and connections are secure",
+      "driver_check": "Driver Check",
+      "driver_check_desc": "Confirm CH343 driver is installed and COM port is below 10",
+      "supported_device": "Supported Device",
+      "supported_device_desc": "Ensure you're using a supported mouse or keyboard",
+      "reflash": "Reflash",
+      "reflash_desc": "Try reflashing both sides with the latest firmware",
+      "hardware_check": "Hardware Check",
+      "hardware_check_desc": "If LEDs don't respond at all, there may be a hardware issue",
+      "remember": "Remember: MAKCU supports both keyboard and mouse devices. However, not all mice and keyboards are compatible with MAKCU. If your mouse is not functional, please try another mouse."
+    },
+    "flash_vs_normal_mode": {
+      "title": "Flash Mode vs Normal Mode",
+      "description": "Understanding how MAKCU works with its 2 chips and 3 USB ports.",
+      "makcu_structure": {
+        "title": "MAKCU Structure",
+        "content": "MAKCU has 2 chips and 3 USB ports. USB port 1 and USB port 3 are connected to the 2 chips. USB port 2 is the COM port used to send commands to MAKCU while in normal use mode."
+      },
+      "flash_mode": {
+        "title": "Flash Mode",
+        "description": "Flash mode is used only when updating the firmware on MAKCU.",
+        "steps": {
+          "1": "Hold down the button closest to MAKCU (left chip = left button, right chip = right button)",
+          "2": "Connect the USB cable to the corresponding USB port (USB 1 for left chip, USB 3 for right chip)",
+          "3": "Once you hear the USB connection sound on your PC, release the button",
+          "4": "The device will now appear on your PC in flash mode"
+        },
+        "important": "If the button is NOT held down when the cable is connected, the device will NOT show up on your PC.",
+        "cable_note": "In flash mode, you should only use ONE cable to perform flashing. Do not connect multiple USB cables at the same time."
+      },
+      "normal_mode": {
+        "title": "Normal Mode",
+        "description": "This is how MAKCU is used during normal operation.",
+        "connections": {
+          "usb1": "USB 1 → Connected to your gaming PC",
+          "usb2": "USB 2 → COM port (used for sending commands to MAKCU)",
+          "usb3": "USB 3 → Connected to your mouse"
+        },
+        "important": "In normal mode, MAKCU can be tested and adjusted. You do NOT need to flash USB 2, and you do NOT hold any buttons down to use normal mode."
+      },
+      "power_requirements": {
+        "title": "Power Requirements",
+        "description": "Understanding how MAKCU receives power is critical for proper operation.",
+        "normal_mode": "In normal mode, USB 1 + USB 2 must be connected to power MAKCU. USB 2 does not provide power to MAKCU - this is done to ensure there is no back feeding to the main PC and the 2nd PC from both USB ports.",
+        "flash_mode": "Flash mode uses 1 cable at a time. Only connect USB 1 OR USB 3, not both simultaneously.",
+        "warning": "Failing to follow these power requirements will lead to incorrect usage, MAKCU showing signs of not being functional, and being unable to flash. These broken symptoms are due to not understanding the power requirements."
+      },
+      "problem": "Cannot use settings when device is in flash mode, or cannot flash when device is in normal mode.",
+      "solution": "To enter flash mode: Hold the button, connect USB cable, wait for USB sound, then release button. To use normal mode: Connect USB 1 to gaming PC, USB 2 for COM port, and USB 3 to mouse - no buttons need to be held."
+    }
+  },
+  "settings": {
+    "title": "MAKCU Settings",
+    "description": "Configure and interact with your MAKCU device via WebSerial connection.",
+    "status": {
+      "disconnected": "Disconnected",
+      "connecting": "Connecting...",
+      "connected_normal": "Connected in Normal mode",
+      "connected_flash": "Connected in Flash mode (settings cannot be used in this mode)",
+      "fault": "Fault"
+    },
+    "connection": {
+      "title": "Connection",
+      "connect": "Connect",
+      "disconnect": "Disconnect",
+      "connecting": "Connecting...",
+      "browser_not_supported": "Your browser does not support Web Serial API. Please use Chrome/Edge 89+, Opera 76+, or another Chromium-based browser."
+    },
+    "prerequisites": {
+      "title": "Prerequisites",
+      "firmware": "MAKCU flashed with 3.9 firmware",
+      "firmware_desc": "The settings page requires firmware version 3.9 or later",
+      "usb1": "USB 1 connected to your gaming PC",
+      "usb1_desc": "USB 1 must be connected to your gaming PC",
+      "usb2": "USB 2 connected to this PC",
+      "usb2_desc": "USB 2 must be connected to the same computer. Otherwise, MAKCU is not functional.",
+      "note": "Note: If you encounter connection issues, please see the troubleshooting page for detailed setup instructions."
+    },
+    "warnings": {
+      "flash_mode_detected": "Flash mode detected. Settings cannot be used in this mode.",
+      "normal_mode_detected": "Normal mode detected. Flashing must be completed on USB 1 or 3 only. Please remove all cables to set MAKCU into flash mode."
+    },
+    "baud_rate": {
+      "title": "Baud Rate",
+      "description": "Ensure makcu is configured with 115200 baud rate to use the settings, otherwise makcu will fail to function",
+      "warning": "Baud rate change is PERMANENT and should only be set if your software has told you to use a different baud rate. A mismatched baud rate will stop your software from communicating with MAKCU.",
+      "how_to_change": "Press the left button on MAKCU 4 times fast to change the baud rate from 115200 to 4mbps. The LED will flash 1 or 4 times and the baud rate will be saved.",
+      "led_indicator": "When MAKCU starts, the baud rate indicator LED (left) will show what speed MAKCU is running at.",
+      "startup_indicator": "When MAKCU starts, the baud rate indicator LED (left) will flash to indicate the current baud rate: 1 flash = 115200, 4 flashes = 4mbps.",
+      "website_requirement": "The MAKCU website expects to use 115200 baud rate. Ensure if you are trying to use normal mode with the MAKCU website, you set the baud rate to 115200.",
+      "setting_methods": "The baud rate can be set by the user (using the button method), or by the developer in code.",
+      "power_requirement": "USB 1 + USB 2 must be connected for MAKCU to take power to change the baud rate. USB 2 does not provide power to MAKCU - this is done to ensure there is no back feeding to the main PC and the 2nd PC from both USB ports."
+    },
+    "sections": {
+      "status": "Status"
+    }
+  },
+  "setup": {
+    "title": "Setup Guide",
+    "description": "Follow these steps to get your MAKCU device up and running.",
+    "sections": {
+      "install_driver": {
+        "title": "1. Install CH343 Driver",
+        "description": "Install the CH343 driver on your PC (the computer you will use for flashing).",
+        "steps": [
+          "Download the CH343 driver from the link below",
+          "Run the installer on your PC",
+          "Follow the installation wizard to complete the setup"
+        ],
+        "driver_link": "Download CH343 Driver"
+      },
+      "flash_makcu": {
+        "title": "2. Flash MAKCU Firmware",
+        "description": "Flash the firmware to your MAKCU device using the firmware flashing page.",
+        "dropdown_explanation": "The flash page has a dropdown menu that shows the left and right firmwares. You should match USB1 to the left side and USB3 to the right side of the USB port. Under the MAKCU board, there is text to explain the numbers.",
+        "flashing_process": {
+          "title": "How Flashing Works",
+          "flash_mode": "First, you need to enter flash mode. Hold down the button closest to the side you want to flash (left button for left side/USB1, right button for right side/USB3), then connect the USB cable. Once you hear the USB sound on your PC, release the button.",
+          "connecting": "After entering flash mode, connect to the device using the connection button at the top right of the page. The system will automatically detect that the device is in flash mode.",
+          "selecting_firmware": "Select the appropriate firmware from the dropdown menu. Make sure to select the left firmware for USB1 and the right firmware for USB3.",
+          "flashing": "Click on the firmware in the dropdown to start flashing. The progress will be shown in the log window.",
+          "completing": "When the flash has completed, remove the USB cable. Then repeat the process with the other side (hold the other button down, connect USB cable, wait for USB sound, release button, connect at top right, and flash)."
+        },
+        "baud_rate": {
+          "title": "Baud Rate",
+          "description": "The baud rate is usually 115200. Please refer to the troubleshooting page for information on how to change the baud rate if needed."
+        },
+        "power_requirements": {
+          "title": "Power Requirements",
+          "description": "Understanding how MAKCU receives power is critical for proper operation.",
+          "normal_mode": "In normal mode, USB 1 + USB 2 must be connected to power MAKCU. USB 2 does not provide power to MAKCU - this is done to ensure there is no back feeding to the main PC and the 2nd PC from both USB ports.",
+          "flash_mode": "Flash mode uses 1 cable at a time. Only connect USB 1 OR USB 3, not both simultaneously.",
+          "warning": "Failing to follow these power requirements will lead to incorrect usage, MAKCU showing signs of not being functional, and being unable to flash. These broken symptoms are due to not understanding the power requirements."
+        }
+      },
+      "requirements": {
+        "title": "Requirements",
+        "ch343_driver": "CH343 Driver Installed",
+        "ch343_desc": "MAKCU requires the CH343 USB-to-serial driver to be loaded on your computer (the computer you will use for flashing). The driver download link is provided in the section below.",
+        "com_port": "Correct COM Port",
+        "com_port_desc": "The COM port for USB 2 should be below 10. If your COM port number is 10 or higher, you may experience connection issues.",
+        "both_sides": "Both Sides Flashed",
+        "both_sides_desc": "Make sure you have correctly set up and flashed MAKCU on both the left side (device) and right side (host).",
+        "supported_device": "Supported Device",
+        "supported_device_desc": "Ensure you have a supported mouse or keyboard connected. MAKCU supports both keyboard and mouse devices."
+      }
+    }
+  },
+  "api": {
+    "sections": {
+      "transport": "Transport & Framing",
+      "mouse_buttons": {
+        "title": "Mouse Buttons",
+        "buttons_individual": "Individual Buttons (GET/SET)",
+        "click": "Click Scheduling (SET)",
+        "turbo": "turbo() (GET/SET)"
+      },
+      "mouse_movement": {
+        "title": "Mouse Movement",
+        "move": "move() (SET)",
+        "moveto": "moveto() (SET)",
+        "wheel": "wheel() (SET)",
+        "pan": "pan() (GET/SET)",
+        "tilt": "tilt() (GET/SET)",
+        "getpos": "getpos() (GET)",
+        "silent": "silent() (SET)"
+      },
+      "mouse_advanced": {
+        "title": "Mouse Advanced",
+        "mo": "mo() - Raw Mouse Frame (SET)",
+        "lock": "lock_<target>() (GET/SET)",
+        "catch": "catch_<target>() (GET/SET)"
+      },
+      "mouse_remap": {
+        "title": "Mouse Remap (Physical)",
+        "remap_button": "remap_button() (GET/SET)",
+        "remap_axis": "remap_axis() (GET/SET)",
+        "invert_x": "invert_x() (GET/SET)",
+        "invert_y": "invert_y() (GET/SET)",
+        "swap_xy": "swap_xy() (GET/SET)"
+      },
+      "keyboard": {
+        "title": "Keyboard",
+        "down": "down() (SET)",
+        "up": "up() (SET)",
+        "press": "press() (SET)",
+        "string": "string() (SET)",
+        "init": "init() (SET)",
+        "isdown": "isdown() (GET)",
+        "mask": "mask() (GET/SET)",
+        "remap": "remap() (GET/SET)"
+      },
+      "streaming": {
+        "title": "Streaming",
+        "keys": "keys() (GET/SET)",
+        "buttons": "buttons() (GET/SET)",
+        "axis": "axis() (GET/SET)",
+        "mouse": "mouse() (GET/SET)"
+      },
+      "screen": {
+        "title": "Position & Screen",
+        "screen_cmd": "screen() (GET/SET)"
+      },
+      "system": {
+        "title": "System Commands",
+        "help": "help() (GET)",
+        "info": "info() (GET)",
+        "version": "version() (GET)",
+        "device": "device() (GET)",
+        "fault": "fault() (GET)",
+        "reboot": "reboot() (SET)",
+        "serial": "serial() (GET/SET)"
+      },
+      "config": {
+        "title": "Configuration",
+        "log": "log() (GET/SET)",
+        "echo": "echo() (GET/SET)",
+        "baud": "baud() (GET/SET)",
+        "hs": "hs() (GET/SET)",
+        "release": "release() (GET/SET)"
+      },
+      "baud_binary": "Baud Rate (Binary)",
+      "no_usb": "Functions Without USB Device",
+      "limits": "Limits & Parsing"
+    }
+  },
+  "xim": {
+    "title": "XIM Setup Guide",
+    "description": "Learn how to set up XIM with MAKCU for controller support.",
+    "sections": {
+      "setup": {
+        "title": "How to Setup XIM with MAKCU for Controller",
+        "prerequisites": {
+          "title": "Prerequisites",
+          "important_note": "Important: This guide is only for using controller with MAKCU.",
+          "baud_rate_warning": "Baud Rate Configuration",
+          "baud_rate_warning_desc": "MAKCU's baud rate must match your software's expected speed. Ensure the baud rate is correctly configured before proceeding.",
+          "mouse_conversion_important": "Mouse Functionality",
+          "mouse_conversion_important_desc": "When using XIM with controller, the mouse attached to USB 3 will no longer function as a mouse due to XIM converting MAKCU's mouse inputs to controller inputs. If you need a mouse to navigate your gaming PC while XIM + MAKCU is connected, connect another mouse directly to your PC (this means you need 2 mice: one for MAKCU, one for your PC).",
+          "mouse_removal_warning": "Critical Warning",
+          "mouse_removal_warning_desc": "The mouse must remain connected to USB 3 at all times. If you remove the mouse from USB 3, MAKCU will shut down and the software will stop!"
+        },
+        "step1_prepare_xim": {
+          "title": "Step 1: Prepare XIM",
+          "description": "Before connecting MAKCU, your XIM must be fully functional with your game.",
+          "xim_must_work": "XIM Must Work First",
+          "xim_must_work_desc": "The XIM should be fully functional with the game of your choice. Refer to XIM setup guides for configuring XIM with a mouse and controller, ensuring buttons and sticks are mapped to the mouse.",
+          "xim_testing": "Test XIM Setup",
+          "xim_testing_desc": "Test that the mouse can move the right thumb stick in your game and that mouse buttons function as controller buttons. Only proceed once XIM is working correctly."
+        },
+        "step2_prepare_makcu": {
+          "title": "Step 2: Prepare MAKCU",
+          "description": "Ensure MAKCU is fully functional before connecting to XIM.",
+          "makcu_functional": "MAKCU Must Be Fully Functional",
+          "makcu_functional_desc": "MAKCU should be fully functional and working in normal mouse mode. Ensure MAKCU works correctly with a working mouse connected to USB 3.",
+          "mouse_requirement": "Working Mouse Required",
+          "mouse_requirement_desc": "A working mouse must be connected to USB 3. This mouse will remain connected at all times for MAKCU to function with the aimbot."
+        },
+        "step3_connect": {
+          "title": "Step 3: Connect XIM and MAKCU",
+          "description": "Once both XIM and MAKCU are fully prepared, connect them together.",
+          "final_steps": "Connection Steps",
+          "final_steps_desc": "Connect XIM and MAKCU as shown in the video below. Ensure both devices are fully functional before connecting."
+        }
+      }
+    }
+  },
+  "information": {
+    "title": "MAKCU Information",
+    "description": "Learn about what MAKCU is, what it does, and how it works.",
+    "what_is_makcu": {
+      "title": "What is MAKCU?",
+      "description": "MAKCU is a USB passthrough device that acts as a bridge between your gaming PC and your mouse or keyboard. It consists of two ESP32-S3 microcontrollers working together to create a transparent connection that allows software to intercept and modify input signals in real-time.",
+      "key_points": [
+        "Dual-chip architecture with independent processing on each side",
+        "Full USB passthrough capability for mice and keyboards",
+        "Real-time input interception and modification",
+        "Web-based configuration and firmware updates",
+        "Requires software control via USB 2 (COM port) from a second PC",
+        "Cannot function in standalone mode - requires active software connection",
+        "Must have a mouse or keyboard attached to USB 3 to function"
+      ],
+      "important_notes": {
+        "title": "Important Requirements",
+        "standalone": "MAKCU cannot function in standalone mode. It requires software running on a second PC (connected via USB 2) to control and operate the device.",
+        "attached_device": "MAKCU cannot function without an attached mouse or keyboard device. A mouse or keyboard must be connected to USB 3 for MAKCU to operate.",
+        "software_control": "MAKCU requires software to control it via the COM port (USB 2) from a second PC. Without this software connection, MAKCU will not process or modify inputs."
+      }
+    },
+    "what_is_it_used_for": {
+      "title": "What is MAKCU Used For?",
+      "description": "MAKCU is designed for advanced users who need precise control over their input devices for gaming, automation, or accessibility purposes.",
+      "use_cases": [
+        "Gaming: Enhanced mouse and keyboard control with custom scripts and automation",
+        "Accessibility: Custom input remapping and assistive features",
+        "Automation: Programmatic control of input devices for testing or automation",
+        "Customization: Fine-tuned control over mouse sensitivity, key remapping, and input behavior",
+        "Device Control: Enables your computer to communicate directly with your mouse or keyboard, allowing you to change LEDs, DPI settings, and other device-specific features through the mouse/keyboard manufacturer's software"
+      ],
+      "device_communication": {
+        "title": "Direct Device Communication",
+        "description": "MAKCU enables your computer to talk directly to your mouse or keyboard through USB 1. This allows you to use the manufacturer's software (such as Logitech G HUB, Razer Synapse, etc.) to control device-specific features.",
+        "features": [
+          "Change RGB LED colors and effects",
+          "Adjust DPI settings and profiles",
+          "Configure mouse button assignments",
+          "Update device firmware",
+          "Access all manufacturer software features"
+        ]
+      }
+    },
+    "capabilities": {
+      "title": "What MAKCU Can and Cannot Do",
+      "can_do": {
+        "title": "What MAKCU Can Do",
+        "items": [
+          "Pass through mouse and keyboard input with full compatibility",
+          "Intercept and modify mouse movements, clicks, and keyboard presses in real-time",
+          "Remap keys and mouse buttons",
+          "Adjust mouse sensitivity and acceleration",
+          "Execute custom scripts and automation",
+          "Support both wired and wireless devices (when connected via USB adapter)",
+          "Work with most standard USB HID mice and keyboards",
+          "Enable direct communication between your PC and mouse/keyboard for LED control, DPI changes, and other device features",
+          "Support console gaming directly if the game supports mouse and keyboard input"
+        ]
+      },
+      "cannot_do": {
+        "title": "What MAKCU Cannot Do",
+        "items": [
+          "Cannot work with Bluetooth devices directly (requires USB adapter)",
+          "Cannot modify encrypted or proprietary protocols",
+          "Cannot function without proper firmware installation",
+          "Cannot work with non-USB input devices",
+          "Limited compatibility with some specialized gaming peripherals with proprietary drivers",
+          "Cannot function in standalone mode - requires software control",
+          "Cannot function without an attached mouse or keyboard device",
+          "Cannot provide ESP (wallhacks), self-aiming, or aimbot capabilities",
+          "Cannot load or execute game scripts - it only processes input/output signals",
+          "Cannot work with consoles that don't support mouse and keyboard natively (requires XIM adapter)"
+        ]
+      },
+      "important_reminders": {
+        "title": "Important Reminders",
+        "no_cheats": "MAKCU cannot provide ESP (wallhacks), self-aiming, or aimbot capabilities. It is a hardware passthrough device that only processes input and output signals. It cannot load scripts, modify game memory, or provide visual overlays.",
+        "input_only": "MAKCU works at the input level only. It can modify what you send to your computer, but it cannot read game data, provide visual information, or interact with game software directly."
+      },
+      "console_support": {
+        "title": "Console Support",
+        "description": "MAKCU can support console gaming, but the requirements depend on the console and game.",
+        "direct_support": {
+          "title": "Direct Console Support",
+          "description": "If your console's game natively supports mouse and keyboard input, MAKCU can work directly. Simply connect MAKCU to your console via USB 1, and connect your mouse/keyboard to USB 3.",
+          "examples": [
+            "PlayStation 5 games with native mouse/keyboard support",
+            "Xbox Series X/S games with native mouse/keyboard support",
+            "Any console game that officially supports mouse and keyboard input"
+          ]
+        },
+        "xim_required": {
+          "title": "XIM Adapter Required",
+          "description": "If your console or game does not support mouse and keyboard natively, you will need a XIM adapter to convert MAKCU's mouse input into controller input.",
+          "note": "Please see the XIM setup page for detailed instructions on how to configure MAKCU with XIM.",
+          "link_text": "See XIM Setup Guide"
+        }
+      }
+    },
+    "preflashed_vs_unflashed": {
+      "title": "Pre-flashed vs Unflashed",
+      "description": "MAKCU devices can come in two states depending on whether your reseller has prepared the device before shipping.",
+      "preflashed": {
+        "title": "Pre-flashed MAKCU",
+        "description": "A pre-flashed MAKCU has been set up by your reseller before shipping. The firmware has been loaded and the device has been tested to ensure it works correctly.",
+        "benefits": [
+          "Ready to use immediately after connecting",
+          "Tested and verified by the reseller",
+          "No initial flashing required",
+          "Both sides (left and right) are already configured"
+        ],
+        "indicator": "If your MAKCU is pre-flashed, it will connect normally when you plug it in, and you can start using it right away."
+      },
+      "unflashed": {
+        "title": "Unflashed MAKCU",
+        "description": "An unflashed MAKCU comes directly from the factory without firmware installed. This is the default state of ESP32-S3 chips from the manufacturer.",
+        "characteristics": [
+          "Requires firmware flashing before first use",
+          "Will show USB disconnection loops in Device Manager until flashed",
+          "USB connection sound will loop endlessly when connected without holding buttons",
+          "This is normal behavior and not a defect"
+        ],
+        "what_to_do": "If your MAKCU is unflashed, you'll need to flash the firmware using the firmware flashing page. After the first successful flash, this behavior will stop and never return."
+      }
+    },
+    "usb_ports": {
+      "title": "Understanding USB Ports",
+      "description": "MAKCU has three USB ports, each serving a specific purpose. Understanding how they work is essential for proper setup.",
+      "usb1": {
+        "title": "USB 1 - Left Side (Device Port)",
+        "description": "USB 1 is connected to the left-side ESP32-S3 chip and serves as the device connection to your gaming PC or console.",
+        "purpose": "This is where MAKCU appears as a USB device to your computer or console. Your gaming PC or console connects here.",
+        "usage": "Connect USB 1 to your gaming PC or console. This is the primary connection that allows your computer/console to recognize MAKCU as a mouse or keyboard device.",
+        "power": "USB 1 provides power to the left side of MAKCU.",
+        "device_communication": "This port also enables direct communication between your PC and the connected mouse/keyboard, allowing you to use manufacturer software to control device features."
+      },
+      "usb2": {
+        "title": "USB 2 - COM Port (Communication)",
+        "description": "USB 2 is the communication port used for sending commands and configuring MAKCU. This is essential for MAKCU to function.",
+        "purpose": "This port creates a serial COM port connection that allows software and the MAKCU website to communicate with the device. MAKCU requires active software control via this port to operate.",
+        "usage": "Connect USB 2 to the same computer you're using to configure MAKCU (typically your gaming PC or a separate configuration PC). This is used for settings, firmware updates, device control, and is required for MAKCU to process inputs.",
+        "power": "USB 2 does NOT provide power to MAKCU. This prevents back-feeding power between your main PC and a second PC.",
+        "important": "In normal mode, both USB 1 and USB 2 must be connected for MAKCU to receive power. USB 2 is only for communication, not power. Without software connected via USB 2, MAKCU cannot function.",
+        "software_requirement": "MAKCU requires software running on the PC connected to USB 2 to control and operate the device. Without this software connection, MAKCU will not process or modify inputs."
+      },
+      "usb3": {
+        "title": "USB 3 - Right Side (Host Port)",
+        "description": "USB 3 is connected to the right-side ESP32-S3 chip and serves as the host port for your mouse or keyboard.",
+        "purpose": "This is where you connect your actual mouse or keyboard. MAKCU acts as a USB host and receives input from your device.",
+        "usage": "Connect your mouse or keyboard to USB 3. This is the input device that MAKCU will pass through to your gaming PC via USB 1. A device must be connected here for MAKCU to function.",
+        "power": "USB 3 provides power to the right side of MAKCU and also powers the connected mouse/keyboard.",
+        "required": "A mouse or keyboard must be connected to USB 3 for MAKCU to operate. MAKCU cannot function without an attached device."
+      },
+      "summary": {
+        "title": "Quick Summary",
+        "connections": {
+          "normal_mode": "Normal Mode: USB 1 → Gaming PC/Console, USB 2 → Configuration PC (COM port - REQUIRED for operation), USB 3 → Mouse/Keyboard (REQUIRED)",
+          "flash_mode": "Flash Mode: Only USB 1 OR USB 3 connected (one at a time, not both)"
+        },
+        "power_requirement": "Power Requirement: USB 1 + USB 2 must both be connected in normal mode for MAKCU to receive power. USB 2 does not provide power - it's communication only.",
+        "operation_requirement": "Operation Requirement: MAKCU requires both USB 2 (for software control) and USB 3 (with attached device) to function. It cannot operate in standalone mode."
+      }
+    }
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "code": "cn",
+  "name": "Chinese",
+  "nativeName": "中文",
+  "flag": "🇨🇳",
+  "browserCodes": ["zh", "zh-CN", "zh-TW", "zh-HK", "cn"]
+}
+

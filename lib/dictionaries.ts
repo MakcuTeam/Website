@@ -1,14 +1,37 @@
-import { Locale } from "./locale";
+import { Locale, getLocales } from "./locale";
 import { cache } from "react";
+
 export type LangProps = { params: Promise<{ lang: Locale }> };
 
-export const dictionaries = {
-    en: () => import("@/dictionaries/en.json").then((module) => module.default),
-    cn: () => import("@/dictionaries/cn.json").then((module) => module.default),
+// Dynamically create dictionary loaders based on available locales
+function createDictionaryLoaders() {
+  const locales = getLocales();
+  const loaders: Record<string, () => Promise<any>> = {};
+
+  for (const locale of locales) {
+    loaders[locale] = () =>
+      import(`@/langs/${locale}.dict.json`).then((module) => module.default);
+  }
+
+  return loaders;
+}
+
+// Get dictionary loaders (cached)
+const getDictionaryLoaders = cache(() => createDictionaryLoaders());
+
+const getDictionaryUncached = async (locale: Locale) => {
+  const loaders = getDictionaryLoaders();
+  const loader = loaders[locale];
+  
+  if (!loader) {
+    // Fallback to first locale if locale not found
+    const locales = getLocales();
+    const fallbackLoader = loaders[locales[0]];
+    return fallbackLoader();
+  }
+  
+  return loader();
 };
-
-
-const getDictionaryUncached = async (locale: Locale) => dictionaries[locale]();
 
 export const getDictionary = cache(getDictionaryUncached);
 

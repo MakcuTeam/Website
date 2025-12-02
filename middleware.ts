@@ -1,15 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getLocale, pathnameHasLocale } from "./lib/locale";
+import { getLocale, pathnameHasLocale, detectBrowserLocale } from "./lib/locale";
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const hasLocale = pathnameHasLocale(pathname);
+  
   if (hasLocale) return;
+  
   if (pathname.includes("favicon.ico")) {
     return;
   }
-  const locale = getLocale(pathname);
-  request.nextUrl.pathname = `/${locale}${pathname}`;
+
+  // Detect browser language from Accept-Language header
+  const acceptLanguage = request.headers.get("accept-language");
+  const detectedLocale = detectBrowserLocale(acceptLanguage);
+  
+  request.nextUrl.pathname = `/${detectedLocale}${pathname}`;
   return NextResponse.redirect(request.nextUrl);
 }
 
