@@ -4,6 +4,166 @@ import React, { createContext, useContext, useState, useRef, useEffect, useCallb
 import { ESPLoader, LoaderOptions, Transport } from "esptool-js";
 import { serial } from "web-serial-polyfill";
 import { toast } from "sonner";
+import { getBaudRate } from "@/components/baud-select";
+
+const DEVICE_INFO_COOKIE = "makcu_device_info";
+const DEVICE_INFO_EXPIRY_HOURS = 1;
+
+function setCookie(name: string, value: string, hours: number): void {
+  if (typeof document === "undefined") return;
+  const expires = new Date();
+  expires.setTime(expires.getTime() + hours * 60 * 60 * 1000);
+  document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/`;
+}
+
+function parseAndStoreDeviceInfoBinary(data: Uint8Array): void {
+  if (data.length < 1) {
+    setCookie(DEVICE_INFO_COOKIE, "", 0);
+    return;
+  }
+
+  let pos = 0;
+  const header = data[pos++];
+  
+  // Header: 0x00 = no device, 0x01 = has device
+  if (header === 0x00) {
+    setCookie(DEVICE_INFO_COOKIE, "", 0);
+    return;
+  }
+
+  if (header !== 0x01 || data.length < 290) {
+    // Invalid or incomplete response
+    setCookie(DEVICE_INFO_COOKIE, "", 0);
+    return;
+  }
+
+  const deviceInfo: Record<string, any> = {};
+
+  // MAC1 (6 bytes)
+  const mac1 = Array.from(data.slice(pos, pos + 6))
+    .map(b => b.toString(16).padStart(2, '0').toUpperCase())
+    .join(':');
+  deviceInfo.MAC1 = mac1;
+  pos += 6;
+
+  // MAC2 (6 bytes)
+  const mac2 = Array.from(data.slice(pos, pos + 6))
+    .map(b => b.toString(16).padStart(2, '0').toUpperCase())
+    .join(':');
+  deviceInfo.MAC2 = mac2;
+  pos += 6;
+
+  // TEMP (float, 4 bytes)
+  const tempView = new DataView(data.buffer, data.byteOffset + pos, 4);
+  const temp = tempView.getFloat32(0, true); // little-endian
+  if (temp >= 0) {
+    deviceInfo.TEMP = `${temp.toFixed(1)}c`;
+  } else {
+    deviceInfo.TEMP = "na";
+  }
+  pos += 4;
+
+  // RAM (uint32_t, 4 bytes)
+  const ramView = new DataView(data.buffer, data.byteOffset + pos, 4);
+  const ram = ramView.getUint32(0, true); // little-endian
+  deviceInfo.RAM = `${ram}kb`;
+  pos += 4;
+
+  // CPU (uint32_t, 4 bytes)
+  const cpuView = new DataView(data.buffer, data.byteOffset + pos, 4);
+  const cpu = cpuView.getUint32(0, true); // little-endian
+  deviceInfo.CPU = `${cpu}mhz`;
+  pos += 4;
+
+  // Uptime (uint32_t, 4 bytes, seconds)
+  const uptimeView = new DataView(data.buffer, data.byteOffset + pos, 4);
+  const uptimeSeconds = uptimeView.getUint32(0, true); // little-endian
+  const hours = Math.floor(uptimeSeconds / 3600);
+  const minutes = Math.floor((uptimeSeconds % 3600) / 60);
+  const seconds = uptimeSeconds % 60;
+  deviceInfo.UP = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  pos += 4;
+
+  // VID (uint16_t, 2 bytes)
+  const vidView = new DataView(data.buffer, data.byteOffset + pos, 2);
+  const vid = vidView.getUint16(0, true); // little-endian
+  deviceInfo.VID = vid.toString(16).toUpperCase().padStart(4, '0');
+  pos += 2;
+
+  // PID (uint16_t, 2 bytes)
+  const pidView = new DataView(data.buffer, data.byteOffset + pos, 2);
+  const pid = pidView.getUint16(0, true); // little-endian
+  deviceInfo.PID = pid.toString(16).toUpperCase().padStart(4, '0');
+  pos += 2;
+
+  // MOUSE_BINT (uint8_t, 1 byte)
+  deviceInfo.MOUSE_BINT = data[pos++].toString();
+
+  // KBD_BINT (uint8_t, 1 byte)
+  deviceInfo.KBD_BINT = data[pos++].toString();
+
+  // FW version string (null-terminated, max 32 bytes)
+  const fwEnd = data.indexOf(0, pos);
+  if (fwEnd >= pos) {
+    deviceInfo.FW = new TextDecoder().decode(data.slice(pos, fwEnd));
+  }
+  pos += 32;
+
+  // MAKCU version string (null-terminated, max 32 bytes)
+  const makcuEnd = data.indexOf(0, pos);
+  if (makcuEnd >= pos) {
+    deviceInfo.MAKCU = new TextDecoder().decode(data.slice(pos, makcuEnd));
+  }
+  pos += 32;
+
+  // VENDOR string (null-terminated, max 64 bytes)
+  const vendorEnd = data.indexOf(0, pos);
+  if (vendorEnd >= pos) {
+    const vendor = new TextDecoder().decode(data.slice(pos, vendorEnd));
+    if (vendor) deviceInfo.VENDOR = vendor;
+  }
+  pos += 64;
+
+  // MODEL string (null-terminated, max 64 bytes)
+  const modelEnd = data.indexOf(0, pos);
+  if (modelEnd >= pos) {
+    const model = new TextDecoder().decode(data.slice(pos, modelEnd));
+    if (model) deviceInfo.MODEL = model;
+  }
+  pos += 64;
+
+  // SERIAL string (null-terminated, max 64 bytes)
+  const serialEnd = data.indexOf(0, pos);
+  if (serialEnd >= pos) {
+    const serial = new TextDecoder().decode(data.slice(pos, serialEnd));
+    if (serial) deviceInfo.SERIAL = serial;
+  }
+  pos += 64;
+
+  // Store in cookie as JSON (only if we have vendor or model)
+  if (deviceInfo.VENDOR || deviceInfo.MODEL) {
+    setCookie(DEVICE_INFO_COOKIE, JSON.stringify(deviceInfo), DEVICE_INFO_EXPIRY_HOURS);
+  } else {
+    setCookie(DEVICE_INFO_COOKIE, "", 0);
+  }
+}
+
+export function getDeviceInfo(): Record<string, string> | null {
+  if (typeof document === "undefined") return null;
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${DEVICE_INFO_COOKIE}=`);
+  if (parts.length === 2) {
+    const cookieValue = parts.pop()?.split(";").shift();
+    if (cookieValue) {
+      try {
+        return JSON.parse(cookieValue);
+      } catch (e) {
+        return null;
+      }
+    }
+  }
+  return null;
+}
 
 export type ConnectionMode = "normal" | "flash" | null;
 export type ConnectionStatus = "disconnected" | "connecting" | "connected" | "fault";
@@ -100,9 +260,9 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
       const writer = port.writable.getWriter();
       writerRef.current = writer;
 
-      // Send version command
-      const versionCommand = "km.version()\r";
-      await writer.write(new TextEncoder().encode(versionCommand));
+      // Send website command (binary format)
+      const websiteCommand = "website()\r";
+      await writer.write(new TextEncoder().encode(websiteCommand));
 
       // Get reader
       const reader = port.readable.getReader();
@@ -110,7 +270,7 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
 
       // Read response with timeout
       let timeoutId: NodeJS.Timeout | null = null;
-      const timeoutPromise = new Promise<string>((_, reject) => {
+      const timeoutPromise = new Promise<Uint8Array>((_, reject) => {
         timeoutId = setTimeout(() => {
           reader.cancel().catch(() => {});
           reject(new Error("Timeout waiting for response"));
@@ -118,19 +278,50 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
       });
 
       const readPromise = (async () => {
-        let receivedData = "";
+        const chunks: Uint8Array[] = [];
         try {
           while (true) {
             const { value, done } = await reader.read();
             if (done) break;
-            receivedData += new TextDecoder().decode(value);
+            chunks.push(value);
             
-            // Check if we have the expected response
-            if (receivedData.includes("km.MAKCU()\r\n>>> ")) {
+            // Combine chunks to check for binary data
+            const totalLength = chunks.reduce((sum, chunk) => sum + chunk.length, 0);
+            const combined = new Uint8Array(totalLength);
+            let offset = 0;
+            for (const chunk of chunks) {
+              combined.set(chunk, offset);
+              offset += chunk.length;
+            }
+            
+            // Look for binary header (0x00 or 0x01) - might be preceded by text
+            let binaryStart = -1;
+            for (let i = 0; i < combined.length; i++) {
+              if (combined[i] === 0x00 || combined[i] === 0x01) {
+                // Check if this looks like the start of our binary data
+                // Binary data should be at least 290 bytes after header
+                if (i + 290 <= combined.length) {
+                  binaryStart = i;
+                  break;
+                }
+              }
+            }
+            
+            // If we found binary data and have enough bytes, return it
+            if (binaryStart >= 0 && combined.length >= binaryStart + 290) {
+              // Wait a bit more to ensure we have the complete response
+              await new Promise(resolve => setTimeout(resolve, 200));
               if (timeoutId) {
                 clearTimeout(timeoutId);
               }
-              return receivedData;
+              // Return only the binary portion
+              return combined.slice(binaryStart);
+            }
+            
+            // If we have data but no binary header yet, keep reading
+            if (totalLength > 500) {
+              // Too much data without finding binary - might be an error
+              break;
             }
           }
         } catch (error) {
@@ -139,13 +330,43 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
           }
           throw error;
         }
-        return receivedData;
+        // Combine all chunks into single Uint8Array
+        const totalLength = chunks.reduce((sum, chunk) => sum + chunk.length, 0);
+        const combined = new Uint8Array(totalLength);
+        let offset = 0;
+        for (const chunk of chunks) {
+          combined.set(chunk, offset);
+          offset += chunk.length;
+        }
+        
+        // Try to find binary data in the final combined array
+        let binaryStart = -1;
+        for (let i = 0; i < combined.length; i++) {
+          if (combined[i] === 0x00 || combined[i] === 0x01) {
+            if (i + 290 <= combined.length) {
+              binaryStart = i;
+              break;
+            }
+          }
+        }
+        
+        if (binaryStart >= 0) {
+          return combined.slice(binaryStart);
+        }
+        
+        return combined;
       })();
 
       try {
         const response = await Promise.race([readPromise, timeoutPromise]);
         
-        if (response && response.includes("km.MAKCU()\r\n>>> ")) {
+        // Parse and store device info from binary response
+        if (response && response instanceof Uint8Array) {
+          parseAndStoreDeviceInfoBinary(response);
+        }
+        
+        // Check if we got a valid response (at least 1 byte)
+        if (response && response instanceof Uint8Array && response.length >= 1) {
           // Keep reader active for monitoring
           if (writerRef.current) {
             writerRef.current.releaseLock();
@@ -228,9 +449,12 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
       // Request port
       const selectedPort = await Navigator.serial.requestPort();
       
+      // Get baud rate from cookie
+      const baudRate = getBaudRate();
+      
       // Try normal mode first
       await selectedPort.open({
-        baudRate: 115200,
+        baudRate: baudRate,
         dataBits: 8,
         stopBits: 1,
         parity: "none",

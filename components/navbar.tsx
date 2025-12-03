@@ -7,6 +7,7 @@ import { MakcuConnectionButton } from "./makcu-connection-button";
 import { SheetLeftbar } from "./leftbar";
 import { SheetClose } from "@/components/ui/sheet";
 import LangSelect from "./lang-select";
+import BaudSelect from "./baud-select";
 import { Dictionary } from "@/lib/dictionaries";
 import LocalizedLink from "./localized-link";
 import SearchBar from "./search-bar";
@@ -37,6 +38,7 @@ export function Navbar({ dict }: { dict: Dictionary }) {
               <ModeToggle dict={dict} />
             </div>
           </div>
+          <BaudSelect />
           <MakcuConnectionButton dict={dict} />
           <AudioToggle />
         </div>
