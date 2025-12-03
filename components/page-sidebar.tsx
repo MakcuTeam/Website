@@ -7,7 +7,6 @@ import type { Locale } from "@/lib/locale";
 import type { SectionItem } from "@/lib/sections-config";
 import { Dictionary } from "@/lib/dictionaries";
 import { ChevronRight } from "lucide-react";
-import { DeviceInfoSidebar } from "./device-info-sidebar";
 
 type PageSidebarProps = {
   sections: SectionItem[];
@@ -121,8 +120,6 @@ export default function PageSidebar({
                 )}
               </div>
             ))}
-            {/* Show device info for settings page */}
-            {currentPage === "/settings" && <DeviceInfoSidebar />}
           </nav>
         </CardContent>
       </Card>

@@ -11,6 +11,7 @@ import BaudSelect from "./baud-select";
 import { Dictionary } from "@/lib/dictionaries";
 import LocalizedLink from "./localized-link";
 import SearchBar from "./search-bar";
+import { DeviceInfoDisplay } from "./device-info-display";
 
 export function Navbar({ dict }: { dict: Dictionary }) {
   return (
@@ -32,6 +33,7 @@ export function Navbar({ dict }: { dict: Dictionary }) {
           <div className="hidden md:block">
             <SearchBar />
           </div>
+          <DeviceInfoDisplay />
           <div className="flex items-center gap-2">
             <div className="flex ml-2.5 sm:ml-0">
               <LangSelect />

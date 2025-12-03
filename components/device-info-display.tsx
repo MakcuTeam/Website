@@ -1,27 +1,33 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getDeviceInfo } from "./contexts/makcu-connection-provider";
+import { getDeviceInfo, useMakcuConnection } from "./contexts/makcu-connection-provider";
 
 export function DeviceInfoDisplay() {
+  const { status } = useMakcuConnection();
   const [deviceInfo, setDeviceInfo] = useState<Record<string, string> | null>(null);
 
   useEffect(() => {
-    // Load device info from cookie
-    const info = getDeviceInfo();
-    setDeviceInfo(info);
+    // Only check for device info if connected
+    if (status === "connected") {
+      const info = getDeviceInfo();
+      setDeviceInfo(info);
+      
+      // Check for updates periodically
+      const interval = setInterval(() => {
+        const updatedInfo = getDeviceInfo();
+        setDeviceInfo(updatedInfo);
+      }, 500);
 
-    // Check for updates periodically (when connection happens)
-    const interval = setInterval(() => {
-      const updatedInfo = getDeviceInfo();
-      setDeviceInfo(updatedInfo);
-    }, 1000);
+      return () => clearInterval(interval);
+    } else {
+      // Clear device info when disconnected
+      setDeviceInfo(null);
+    }
+  }, [status]);
 
-    return () => clearInterval(interval);
-  }, []);
-
-  // Only show if we have vendor and/or model
-  if (!deviceInfo || (!deviceInfo.VENDOR && !deviceInfo.MODEL)) {
+  // Only show if connected and we have vendor and/or model
+  if (status !== "connected" || !deviceInfo || (!deviceInfo.VENDOR && !deviceInfo.MODEL)) {
     return null;
   }
 

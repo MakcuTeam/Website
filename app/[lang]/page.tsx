@@ -12,9 +12,6 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/store";
 import HomeSidebar from "@/components/home-sidebar";
 import useLocale from "@/components/hooks/useLocale";
-import { DeviceInfoDisplay } from "@/components/device-info-display";
-
-
 export default function Home() {
   const dict = useDictionary();
   const lang = useLocale();
@@ -47,10 +44,6 @@ export default function Home() {
 
         {/* Content */}
         <div className="relative flex gap-3 flex-col" style={{ zIndex: 10 }}>
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex-1" />
-          <DeviceInfoDisplay />
-        </div>
         <span className="flex gap-3 items-center mb-12 ">
           <div className="w-full border-b dark:border-b-[hsl(var(--border))] rounded flex-1" />
           <div className="w-auto text-center flex-grow-1 flex-2 text-3xl font-logo">
