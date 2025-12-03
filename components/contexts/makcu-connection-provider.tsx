@@ -263,7 +263,7 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
       writerRef.current = writer;
 
       // Send website command (binary format)
-      const websiteCommand = "website()\r";
+      const websiteCommand = ".website()\r";
       console.log("[DEBUG] tryNormalMode: Sending command:", websiteCommand);
       console.log("[DEBUG] tryNormalMode: Command bytes:", Array.from(new TextEncoder().encode(websiteCommand)));
       await writer.write(new TextEncoder().encode(websiteCommand));
