@@ -17,40 +17,52 @@ function setCookie(name: string, value: string, hours: number): void {
 }
 
 function parseAndStoreDeviceInfoBinary(data: Uint8Array): void {
+  console.log("[DEBUG] parseAndStoreDeviceInfoBinary: Starting parse, data length:", data.length);
+  console.log("[DEBUG] parseAndStoreDeviceInfoBinary: First 50 bytes:", Array.from(data.slice(0, Math.min(50, data.length))));
+  
   if (data.length < 1) {
+    console.warn("[DEBUG] parseAndStoreDeviceInfoBinary: Data too short (< 1 byte)");
     setCookie(DEVICE_INFO_COOKIE, "", 0);
     return;
   }
 
   let pos = 0;
   const header = data[pos++];
+  console.log("[DEBUG] parseAndStoreDeviceInfoBinary: Header byte:", header, `(0x${header.toString(16).padStart(2, '0').toUpperCase()})`);
   
   // Header: 0x00 = no device, 0x01 = has device
   if (header === 0x00) {
+    console.log("[DEBUG] parseAndStoreDeviceInfoBinary: Header indicates no device (0x00)");
     setCookie(DEVICE_INFO_COOKIE, "", 0);
     return;
   }
 
   if (header !== 0x01 || data.length < 290) {
     // Invalid or incomplete response
+    console.warn("[DEBUG] parseAndStoreDeviceInfoBinary: Invalid header or data too short. Header:", header, "Expected: 1, Data length:", data.length, "Required: 290");
     setCookie(DEVICE_INFO_COOKIE, "", 0);
     return;
   }
 
+  console.log("[DEBUG] parseAndStoreDeviceInfoBinary: Valid header (0x01), starting to parse fields...");
   const deviceInfo: Record<string, any> = {};
 
   // MAC1 (6 bytes)
-  const mac1 = Array.from(data.slice(pos, pos + 6))
+  const mac1Bytes = data.slice(pos, pos + 6);
+  const mac1 = Array.from(mac1Bytes)
     .map(b => b.toString(16).padStart(2, '0').toUpperCase())
     .join(':');
   deviceInfo.MAC1 = mac1;
+  console.log("[DEBUG] parseAndStoreDeviceInfoBinary: MAC1:", mac1, "bytes:", Array.from(mac1Bytes));
   pos += 6;
 
   // MAC2 (6 bytes)
-  const mac2 = Array.from(data.slice(pos, pos + 6))
+  const mac2Bytes = data.slice(pos, pos + 6);
+  const mac2 = Array.from(mac2Bytes)
     .map(b => b.toString(16).padStart(2, '0').toUpperCase())
     .join(':');
   deviceInfo.MAC2 = mac2;
+  console.log("[DEBUG] parseAndStoreDeviceInfoBinary: MAC2:", mac2, "bytes:", Array.from(mac2Bytes));
   pos += 6;
 
   // TEMP (float, 4 bytes)
@@ -61,18 +73,21 @@ function parseAndStoreDeviceInfoBinary(data: Uint8Array): void {
   } else {
     deviceInfo.TEMP = "na";
   }
+  console.log("[DEBUG] parseAndStoreDeviceInfoBinary: TEMP:", deviceInfo.TEMP, "raw float:", temp);
   pos += 4;
 
   // RAM (uint32_t, 4 bytes)
   const ramView = new DataView(data.buffer, data.byteOffset + pos, 4);
   const ram = ramView.getUint32(0, true); // little-endian
   deviceInfo.RAM = `${ram}kb`;
+  console.log("[DEBUG] parseAndStoreDeviceInfoBinary: RAM:", deviceInfo.RAM, "raw:", ram);
   pos += 4;
 
   // CPU (uint32_t, 4 bytes)
   const cpuView = new DataView(data.buffer, data.byteOffset + pos, 4);
   const cpu = cpuView.getUint32(0, true); // little-endian
   deviceInfo.CPU = `${cpu}mhz`;
+  console.log("[DEBUG] parseAndStoreDeviceInfoBinary: CPU:", deviceInfo.CPU, "raw:", cpu);
   pos += 4;
 
   // Uptime (uint32_t, 4 bytes, seconds)
@@ -82,30 +97,38 @@ function parseAndStoreDeviceInfoBinary(data: Uint8Array): void {
   const minutes = Math.floor((uptimeSeconds % 3600) / 60);
   const seconds = uptimeSeconds % 60;
   deviceInfo.UP = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  console.log("[DEBUG] parseAndStoreDeviceInfoBinary: UP:", deviceInfo.UP, "raw seconds:", uptimeSeconds);
   pos += 4;
 
   // VID (uint16_t, 2 bytes)
   const vidView = new DataView(data.buffer, data.byteOffset + pos, 2);
   const vid = vidView.getUint16(0, true); // little-endian
   deviceInfo.VID = vid.toString(16).toUpperCase().padStart(4, '0');
+  console.log("[DEBUG] parseAndStoreDeviceInfoBinary: VID:", deviceInfo.VID, "raw:", vid);
   pos += 2;
 
   // PID (uint16_t, 2 bytes)
   const pidView = new DataView(data.buffer, data.byteOffset + pos, 2);
   const pid = pidView.getUint16(0, true); // little-endian
   deviceInfo.PID = pid.toString(16).toUpperCase().padStart(4, '0');
+  console.log("[DEBUG] parseAndStoreDeviceInfoBinary: PID:", deviceInfo.PID, "raw:", pid);
   pos += 2;
 
   // MOUSE_BINT (uint8_t, 1 byte)
   deviceInfo.MOUSE_BINT = data[pos++].toString();
+  console.log("[DEBUG] parseAndStoreDeviceInfoBinary: MOUSE_BINT:", deviceInfo.MOUSE_BINT);
 
   // KBD_BINT (uint8_t, 1 byte)
   deviceInfo.KBD_BINT = data[pos++].toString();
+  console.log("[DEBUG] parseAndStoreDeviceInfoBinary: KBD_BINT:", deviceInfo.KBD_BINT);
 
   // FW version string (null-terminated, max 32 bytes)
   const fwEnd = data.indexOf(0, pos);
   if (fwEnd >= pos) {
     deviceInfo.FW = new TextDecoder().decode(data.slice(pos, fwEnd));
+    console.log("[DEBUG] parseAndStoreDeviceInfoBinary: FW:", deviceInfo.FW);
+  } else {
+    console.log("[DEBUG] parseAndStoreDeviceInfoBinary: FW: not found (no null terminator)");
   }
   pos += 32;
 
@@ -113,6 +136,9 @@ function parseAndStoreDeviceInfoBinary(data: Uint8Array): void {
   const makcuEnd = data.indexOf(0, pos);
   if (makcuEnd >= pos) {
     deviceInfo.MAKCU = new TextDecoder().decode(data.slice(pos, makcuEnd));
+    console.log("[DEBUG] parseAndStoreDeviceInfoBinary: MAKCU:", deviceInfo.MAKCU);
+  } else {
+    console.log("[DEBUG] parseAndStoreDeviceInfoBinary: MAKCU: not found (no null terminator)");
   }
   pos += 32;
 
@@ -121,6 +147,9 @@ function parseAndStoreDeviceInfoBinary(data: Uint8Array): void {
   if (vendorEnd >= pos) {
     const vendor = new TextDecoder().decode(data.slice(pos, vendorEnd));
     if (vendor) deviceInfo.VENDOR = vendor;
+    console.log("[DEBUG] parseAndStoreDeviceInfoBinary: VENDOR:", deviceInfo.VENDOR || "(empty)");
+  } else {
+    console.log("[DEBUG] parseAndStoreDeviceInfoBinary: VENDOR: not found (no null terminator)");
   }
   pos += 64;
 
@@ -129,6 +158,9 @@ function parseAndStoreDeviceInfoBinary(data: Uint8Array): void {
   if (modelEnd >= pos) {
     const model = new TextDecoder().decode(data.slice(pos, modelEnd));
     if (model) deviceInfo.MODEL = model;
+    console.log("[DEBUG] parseAndStoreDeviceInfoBinary: MODEL:", deviceInfo.MODEL || "(empty)");
+  } else {
+    console.log("[DEBUG] parseAndStoreDeviceInfoBinary: MODEL: not found (no null terminator)");
   }
   pos += 64;
 
@@ -137,13 +169,20 @@ function parseAndStoreDeviceInfoBinary(data: Uint8Array): void {
   if (serialEnd >= pos) {
     const serial = new TextDecoder().decode(data.slice(pos, serialEnd));
     if (serial) deviceInfo.SERIAL = serial;
+    console.log("[DEBUG] parseAndStoreDeviceInfoBinary: SERIAL:", deviceInfo.SERIAL || "(empty)");
+  } else {
+    console.log("[DEBUG] parseAndStoreDeviceInfoBinary: SERIAL: not found (no null terminator)");
   }
   pos += 64;
 
   // Store in cookie as JSON (only if we have vendor or model)
+  console.log("[DEBUG] parseAndStoreDeviceInfoBinary: Final parsed deviceInfo:", JSON.stringify(deviceInfo, null, 2));
   if (deviceInfo.VENDOR || deviceInfo.MODEL) {
-    setCookie(DEVICE_INFO_COOKIE, JSON.stringify(deviceInfo), DEVICE_INFO_EXPIRY_HOURS);
+    const jsonStr = JSON.stringify(deviceInfo);
+    console.log("[DEBUG] parseAndStoreDeviceInfoBinary: Storing deviceInfo in cookie, length:", jsonStr.length);
+    setCookie(DEVICE_INFO_COOKIE, jsonStr, DEVICE_INFO_EXPIRY_HOURS);
   } else {
+    console.warn("[DEBUG] parseAndStoreDeviceInfoBinary: No VENDOR or MODEL found, not storing in cookie");
     setCookie(DEVICE_INFO_COOKIE, "", 0);
   }
 }
@@ -322,6 +361,8 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
             // If we found binary data and have enough bytes, return it
             if (binaryStart >= 0 && combined.length >= binaryStart + 290) {
               console.log("[DEBUG] tryNormalMode: Found binary data at offset", binaryStart, "total length:", combined.length);
+              console.log("[DEBUG] tryNormalMode: Data before binary start:", Array.from(combined.slice(0, binaryStart)).map(b => String.fromCharCode(b)).join(''));
+              console.log("[DEBUG] tryNormalMode: Binary header byte:", combined[binaryStart], `(0x${combined[binaryStart].toString(16).padStart(2, '0').toUpperCase()})`);
               // Wait a bit more to ensure we have the complete response
               await new Promise(resolve => setTimeout(resolve, 200));
               if (timeoutId) {
@@ -330,6 +371,7 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
               // Return only the binary portion
               const binaryData = combined.slice(binaryStart);
               console.log("[DEBUG] tryNormalMode: Returning binary data, length:", binaryData.length);
+              console.log("[DEBUG] tryNormalMode: First 20 bytes of binary data:", Array.from(binaryData.slice(0, 20)));
               return binaryData;
             }
             
@@ -369,10 +411,14 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
         
         if (binaryStart >= 0) {
           console.log("[DEBUG] tryNormalMode: Found binary data in final combined array at offset", binaryStart);
-          return combined.slice(binaryStart);
+          const binaryData = combined.slice(binaryStart);
+          console.log("[DEBUG] tryNormalMode: Binary header byte:", binaryData[0], `(0x${binaryData[0].toString(16).padStart(2, '0').toUpperCase()})`);
+          console.log("[DEBUG] tryNormalMode: First 20 bytes of binary data:", Array.from(binaryData.slice(0, 20)));
+          return binaryData;
         }
         
         console.log("[DEBUG] tryNormalMode: No binary header found, returning all data, length:", combined.length);
+        console.log("[DEBUG] tryNormalMode: First 50 bytes of all data:", Array.from(combined.slice(0, Math.min(50, combined.length))));
         return combined;
       })();
 
@@ -384,6 +430,8 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
         // Parse and store device info from binary response
         if (response && response instanceof Uint8Array) {
           console.log("[DEBUG] tryNormalMode: Parsing device info from binary response");
+          console.log("[DEBUG] tryNormalMode: Response data being passed to parser - length:", response.length);
+          console.log("[DEBUG] tryNormalMode: Response data first 20 bytes:", Array.from(response.slice(0, Math.min(20, response.length))));
           parseAndStoreDeviceInfoBinary(response);
         }
         
