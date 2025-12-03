@@ -75,9 +75,23 @@ export function DeviceInformationDisplay({ lang }: DeviceInformationDisplayProps
     return label ? (isCn ? label.cn : label.en) : key;
   };
 
+  // Helper function to format value (especially for polling rates)
+  const formatValue = (key: string, value: string): string => {
+    // Convert bInterval to polling rate in Hz
+    if (key === "MOUSE_BINT" || key === "KBD_BINT") {
+      const bInterval = parseInt(value, 10);
+      if (!isNaN(bInterval) && bInterval > 0) {
+        const pollingRate = Math.round(1000 / bInterval);
+        return `${pollingRate}Hz`;
+      }
+    }
+    return value;
+  };
+
   // Filter out empty values and organize display
   const displayItems = Object.entries(deviceInfo)
     .filter(([_, value]) => value && value.trim() !== "")
+    .map(([key, value]) => [key, formatValue(key, value)] as [string, string])
     .sort(([keyA], [keyB]) => {
       // Custom sort order for better readability
       const order: Record<string, number> = {

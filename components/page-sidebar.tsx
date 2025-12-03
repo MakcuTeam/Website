@@ -29,11 +29,37 @@ export default function PageSidebar({
     // Navigate through the dictionary using the key path
     const keys = labelKey.split(".");
     let value: any = dict;
+    
     for (const key of keys) {
-      value = value?.[key];
-      if (value === undefined) return labelKey; // Fallback to key if not found
+      if (value === null || value === undefined) {
+        // Try to provide a human-readable fallback
+        const lastKey = keys[keys.length - 1];
+        if (lastKey.includes("_")) {
+          // Convert snake_case to Title Case as fallback
+          return lastKey
+            .split("_")
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(" ");
+        }
+        return lastKey.charAt(0).toUpperCase() + lastKey.slice(1);
+      }
+      value = value[key];
     }
-    return typeof value === "string" ? value : labelKey;
+    
+    if (value === undefined || value === null || typeof value !== "string") {
+      // Try to provide a human-readable fallback
+      const lastKey = keys[keys.length - 1];
+      if (lastKey.includes("_")) {
+        // Convert snake_case to Title Case as fallback
+        return lastKey
+          .split("_")
+          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(" ");
+      }
+      return lastKey.charAt(0).toUpperCase() + lastKey.slice(1);
+    }
+    
+    return value;
   };
 
   const [hoveredSection, setHoveredSection] = useState<string | null>(null);
