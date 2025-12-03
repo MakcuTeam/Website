@@ -268,13 +268,13 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
       const reader = port.readable.getReader();
       readerRef.current = reader;
 
-      // Read response with timeout
+      // Read response with timeout (500ms for normal mode)
       let timeoutId: NodeJS.Timeout | null = null;
       const timeoutPromise = new Promise<Uint8Array>((_, reject) => {
         timeoutId = setTimeout(() => {
           reader.cancel().catch(() => {});
           reject(new Error("Timeout waiting for response"));
-        }, 5000);
+        }, 500);
       });
 
       const readPromise = (async () => {
@@ -391,21 +391,25 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
   };
 
   // Try to connect in flash mode
+  // Note: Flash mode uses its own baud rates (921600 for flash, 115200 for ROM)
+  // The website baud rate setting is ignored - ESPLoader handles its own baud rates
+  // After flashing, users reconnect anyway, so baud rate returns to website value
   const tryFlashMode = async (port: SerialPort): Promise<{ transport: Transport; loader: ESPLoader } | null> => {
     try {
-      // Close the port first if it's open
+      // Close the port first if it's open (required before reopening for flash mode)
       try {
         await port.close();
       } catch (e) {
         // Port might not be open
       }
 
-      // Reopen for flash mode
+      // Reopen for flash mode - Transport/ESPLoader will use its own baud rates
+      // This ignores the website baud rate setting (115200 or 4M)
       const transport = new Transport(port as any, false, false);
       const flashOptions: LoaderOptions = {
         transport,
-        baudrate: 921600,
-        romBaudrate: 115200,
+        baudrate: 921600,  // Flash mode baud rate (independent of website setting)
+        romBaudrate: 115200,  // ROM bootloader baud rate
         terminal: {
           clean() {},
           writeLine() {},
@@ -449,12 +453,12 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
       // Request port
       const selectedPort = await Navigator.serial.requestPort();
       
-      // Get baud rate from cookie
+      // Get baud rate from cookie (115200 or 4000000)
       const baudRate = getBaudRate();
       
-      // Try normal mode first
+      // Try normal mode first (500ms timeout for website() command)
       await selectedPort.open({
-        baudRate: baudRate,
+        baudRate: baudRate,  // Uses website baud rate setting
         dataBits: 8,
         stopBits: 1,
         parity: "none",
@@ -464,7 +468,7 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
       const normalModeSuccess = await tryNormalMode(selectedPort);
 
       if (normalModeSuccess) {
-        // Normal mode connected
+        // Normal mode connected successfully
         const comPort = getComPort(selectedPort);
         setState({
           status: "connected",
@@ -478,12 +482,13 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
         return;
       }
 
-      // Normal mode failed, try flash mode
+      // Normal mode failed (timeout or error), try flash mode
+      // Flash mode will close and reopen port with its own baud rates
       await cleanup();
       const flashResult = await tryFlashMode(selectedPort);
 
       if (flashResult) {
-        // Flash mode connected
+        // Flash mode connected successfully
         const comPort = getComPort(selectedPort);
         setState({
           status: "connected",
@@ -497,7 +502,8 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
         return;
       }
 
-      // Both modes failed
+      // Both normal mode (500ms timeout) and flash mode failed
+      // Set status to fault
       try {
         await selectedPort.close();
       } catch (e) {
