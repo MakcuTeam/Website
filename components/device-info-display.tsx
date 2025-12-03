@@ -39,11 +39,15 @@ export function DeviceInfoDisplay() {
     return null;
   }
 
+  // Build device name - if vendor is empty, start from model
+  const deviceName = vendor 
+    ? `${vendor} ${model}`.trim()
+    : model;
+
   return (
-    <div className="text-sm text-muted-foreground flex items-center gap-2">
-      {vendor && <span className="font-medium">{vendor}</span>}
-      {vendor && model && <span>/</span>}
-      {model && <span>{model}</span>}
+    <div className="text-sm text-muted-foreground flex items-center gap-1">
+      <span>Device:</span>
+      <span className="font-medium">{deviceName}</span>
     </div>
   );
 }
