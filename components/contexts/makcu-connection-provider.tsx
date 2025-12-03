@@ -252,7 +252,9 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
   // Try to connect in normal mode
   const tryNormalMode = async (port: SerialPort): Promise<boolean> => {
     try {
+      console.log("[DEBUG] tryNormalMode: Starting normal mode connection");
       if (!port.writable || !port.readable) {
+        console.error("[DEBUG] tryNormalMode: Port not writable or readable");
         return false;
       }
 
@@ -262,16 +264,21 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
 
       // Send website command (binary format)
       const websiteCommand = "website()\r";
+      console.log("[DEBUG] tryNormalMode: Sending command:", websiteCommand);
+      console.log("[DEBUG] tryNormalMode: Command bytes:", Array.from(new TextEncoder().encode(websiteCommand)));
       await writer.write(new TextEncoder().encode(websiteCommand));
+      console.log("[DEBUG] tryNormalMode: Command sent, waiting for response...");
 
       // Get reader
       const reader = port.readable.getReader();
       readerRef.current = reader;
+      console.log("[DEBUG] tryNormalMode: Reader obtained, starting to read...");
 
       // Read response with timeout (500ms for normal mode)
       let timeoutId: NodeJS.Timeout | null = null;
       const timeoutPromise = new Promise<Uint8Array>((_, reject) => {
         timeoutId = setTimeout(() => {
+          console.warn("[DEBUG] tryNormalMode: Timeout (500ms) waiting for response");
           reader.cancel().catch(() => {});
           reject(new Error("Timeout waiting for response"));
         }, 500);
@@ -281,8 +288,13 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
         const chunks: Uint8Array[] = [];
         try {
           while (true) {
+            console.log("[DEBUG] tryNormalMode: Reading chunk...");
             const { value, done } = await reader.read();
-            if (done) break;
+            if (done) {
+              console.log("[DEBUG] tryNormalMode: Reader done");
+              break;
+            }
+            console.log("[DEBUG] tryNormalMode: Received chunk, length:", value.length, "bytes:", Array.from(value.slice(0, Math.min(50, value.length))));
             chunks.push(value);
             
             // Combine chunks to check for binary data
@@ -309,22 +321,27 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
             
             // If we found binary data and have enough bytes, return it
             if (binaryStart >= 0 && combined.length >= binaryStart + 290) {
+              console.log("[DEBUG] tryNormalMode: Found binary data at offset", binaryStart, "total length:", combined.length);
               // Wait a bit more to ensure we have the complete response
               await new Promise(resolve => setTimeout(resolve, 200));
               if (timeoutId) {
                 clearTimeout(timeoutId);
               }
               // Return only the binary portion
-              return combined.slice(binaryStart);
+              const binaryData = combined.slice(binaryStart);
+              console.log("[DEBUG] tryNormalMode: Returning binary data, length:", binaryData.length);
+              return binaryData;
             }
             
             // If we have data but no binary header yet, keep reading
             if (totalLength > 500) {
               // Too much data without finding binary - might be an error
+              console.warn("[DEBUG] tryNormalMode: Too much data (>500 bytes) without finding binary header");
               break;
             }
           }
         } catch (error) {
+          console.error("[DEBUG] tryNormalMode: Error during read:", error);
           if (timeoutId) {
             clearTimeout(timeoutId);
           }
@@ -351,30 +368,39 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
         }
         
         if (binaryStart >= 0) {
+          console.log("[DEBUG] tryNormalMode: Found binary data in final combined array at offset", binaryStart);
           return combined.slice(binaryStart);
         }
         
+        console.log("[DEBUG] tryNormalMode: No binary header found, returning all data, length:", combined.length);
         return combined;
       })();
 
       try {
+        console.log("[DEBUG] tryNormalMode: Racing read promise vs timeout...");
         const response = await Promise.race([readPromise, timeoutPromise]);
+        console.log("[DEBUG] tryNormalMode: Got response, type:", typeof response, "length:", response instanceof Uint8Array ? response.length : "N/A");
         
         // Parse and store device info from binary response
         if (response && response instanceof Uint8Array) {
+          console.log("[DEBUG] tryNormalMode: Parsing device info from binary response");
           parseAndStoreDeviceInfoBinary(response);
         }
         
         // Check if we got a valid response (at least 1 byte)
         if (response && response instanceof Uint8Array && response.length >= 1) {
+          console.log("[DEBUG] tryNormalMode: Valid response received, connection successful!");
           // Keep reader active for monitoring
           if (writerRef.current) {
             writerRef.current.releaseLock();
             writerRef.current = null;
           }
           return true;
+        } else {
+          console.warn("[DEBUG] tryNormalMode: Invalid or empty response");
         }
       } catch (error) {
+        console.error("[DEBUG] tryNormalMode: Error in Promise.race:", error);
         if (timeoutId) {
           clearTimeout(timeoutId);
         }
@@ -383,8 +409,10 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
         // Don't release reader - keep it for monitoring
       }
 
+      console.warn("[DEBUG] tryNormalMode: Returning false - connection failed");
       return false;
     } catch (error) {
+      console.error("[DEBUG] tryNormalMode: Exception caught:", error);
       cleanup();
       return false;
     }
@@ -396,15 +424,19 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
   // After flashing, users reconnect anyway, so baud rate returns to website value
   const tryFlashMode = async (port: SerialPort): Promise<{ transport: Transport; loader: ESPLoader } | null> => {
     try {
+      console.log("[DEBUG] tryFlashMode: Starting flash mode connection");
       // Close the port first if it's open (required before reopening for flash mode)
       try {
+        console.log("[DEBUG] tryFlashMode: Closing port...");
         await port.close();
+        console.log("[DEBUG] tryFlashMode: Port closed");
       } catch (e) {
-        // Port might not be open
+        console.log("[DEBUG] tryFlashMode: Port might not be open, error:", e);
       }
 
       // Reopen for flash mode - Transport/ESPLoader will use its own baud rates
       // This ignores the website baud rate setting (115200 or 4M)
+      console.log("[DEBUG] tryFlashMode: Creating Transport...");
       const transport = new Transport(port as any, false, false);
       const flashOptions: LoaderOptions = {
         transport,
@@ -418,11 +450,15 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
         debugLogging: false,
       };
 
+      console.log("[DEBUG] tryFlashMode: Creating ESPLoader...");
       const loader = new ESPLoader(flashOptions);
+      console.log("[DEBUG] tryFlashMode: Calling loader.main()...");
       await loader.main();
+      console.log("[DEBUG] tryFlashMode: Flash mode connection successful!");
       
       return { transport, loader };
     } catch (error) {
+      console.error("[DEBUG] tryFlashMode: Error:", error);
       return null;
     }
   };
@@ -438,11 +474,21 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
   };
 
   const connect = useCallback(async () => {
-    if (isConnecting) return;
-    if (state.status === "connected") return;
+    // Very visible console message
+    console.log("%c[DEBUG] ========== CONNECTION STARTING ==========", "color: blue; font-size: 14px; font-weight: bold");
+    console.log("[DEBUG] connect: Starting connection process");
+    if (isConnecting) {
+      console.log("[DEBUG] connect: Already connecting, aborting");
+      return;
+    }
+    if (state.status === "connected") {
+      console.log("[DEBUG] connect: Already connected, aborting");
+      return;
+    }
 
     setIsConnecting(true);
     setState((prev) => ({ ...prev, status: "connecting" }));
+    console.log("[DEBUG] connect: Status set to 'connecting'");
 
     try {
       const Navigator = navigator as Navigator & { serial?: Serial };
@@ -451,10 +497,14 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
       }
 
       // Request port
+      console.log("[DEBUG] connect: Requesting serial port...");
       const selectedPort = await Navigator.serial.requestPort();
+      console.log("[DEBUG] connect: Port selected:", selectedPort);
       
       // Get baud rate from cookie (115200 or 4000000)
       const baudRate = getBaudRate();
+      console.log("%c[DEBUG] BAUD RATE:", "color: orange; font-weight: bold", baudRate);
+      console.log("[DEBUG] connect: Opening port with baud rate:", baudRate);
       
       // Try normal mode first (500ms timeout for website() command)
       await selectedPort.open({
@@ -464,11 +514,15 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
         parity: "none",
         flowControl: "none",
       });
+      console.log("[DEBUG] connect: Port opened successfully");
 
+      console.log("[DEBUG] connect: Attempting normal mode connection...");
       const normalModeSuccess = await tryNormalMode(selectedPort);
+      console.log("[DEBUG] connect: Normal mode result:", normalModeSuccess);
 
       if (normalModeSuccess) {
         // Normal mode connected successfully
+        console.log("[DEBUG] connect: Normal mode successful!");
         const comPort = getComPort(selectedPort);
         setState({
           status: "connected",
@@ -484,11 +538,14 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
 
       // Normal mode failed (timeout or error), try flash mode
       // Flash mode will close and reopen port with its own baud rates
+      console.log("[DEBUG] connect: Normal mode failed, trying flash mode...");
       await cleanup();
       const flashResult = await tryFlashMode(selectedPort);
+      console.log("[DEBUG] connect: Flash mode result:", flashResult ? "success" : "failed");
 
       if (flashResult) {
         // Flash mode connected successfully
+        console.log("[DEBUG] connect: Flash mode successful!");
         const comPort = getComPort(selectedPort);
         setState({
           status: "connected",
@@ -504,23 +561,28 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
 
       // Both normal mode (500ms timeout) and flash mode failed
       // Set status to fault
+      console.error("[DEBUG] connect: Both normal and flash mode failed");
       try {
         await selectedPort.close();
       } catch (e) {
-        // Ignore
+        console.warn("[DEBUG] connect: Error closing port:", e);
       }
       setState((prev) => ({ ...prev, status: "fault", mode: null, port: null }));
       toast.error("Connection failed - device not responding");
 
     } catch (error) {
+      console.error("[DEBUG] connect: Exception caught:", error);
       const message = error instanceof Error ? error.message : String(error);
+      console.error("[DEBUG] connect: Error message:", message);
       if (!message.includes("Must be handling a user gesture")) {
         setState((prev) => ({ ...prev, status: "fault" }));
         toast.error(message);
       } else {
+        console.log("[DEBUG] connect: User gesture error, setting to disconnected");
         setState((prev) => ({ ...prev, status: "disconnected" }));
       }
     } finally {
+      console.log("[DEBUG] connect: Connection process finished, setting isConnecting to false");
       setIsConnecting(false);
     }
   }, [isConnecting, state.status, cleanup]);
