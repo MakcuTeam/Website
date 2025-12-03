@@ -66,7 +66,7 @@ export function DeviceInformationDisplay({ lang }: DeviceInformationDisplayProps
       KBD_BINT: { en: "Keyboard Polling Rate", cn: "键盘轮询率" },
       FW: { en: "Firmware Version", cn: "固件版本" },
       MAKCU: { en: "MAKCU Version", cn: "MAKCU 版本" },
-      VENDOR: { en: "Vendor", cn: "供应商" },
+      VENDOR: { en: "Make", cn: "制造商" },
       MODEL: { en: "Model", cn: "型号" },
       SERIAL: { en: "Serial Number", cn: "序列号" },
     };
@@ -76,7 +76,12 @@ export function DeviceInformationDisplay({ lang }: DeviceInformationDisplayProps
   };
 
   // Helper function to format value (especially for polling rates)
-  const formatValue = (key: string, value: string): string => {
+  const formatValue = (key: string, value: string | undefined): string => {
+    // Handle empty values
+    if (!value || value.trim() === "") {
+      return "—";
+    }
+    
     // Convert bInterval to polling rate in Hz
     if (key === "MOUSE_BINT" || key === "KBD_BINT") {
       const bInterval = parseInt(value, 10);
@@ -88,43 +93,30 @@ export function DeviceInformationDisplay({ lang }: DeviceInformationDisplayProps
     return value;
   };
 
-  // Filter out empty values and organize display
-  const displayItems = Object.entries(deviceInfo)
-    .filter(([_, value]) => value && value.trim() !== "")
-    .map(([key, value]) => [key, formatValue(key, value)] as [string, string])
-    .sort(([keyA], [keyB]) => {
-      // Custom sort order for better readability
-      const order: Record<string, number> = {
-        VENDOR: 1,
-        MODEL: 2,
-        SERIAL: 3,
-        FW: 4,
-        MAKCU: 5,
-        MAC1: 6,
-        MAC2: 7,
-        VID: 8,
-        PID: 9,
-        TEMP: 10,
-        RAM: 11,
-        CPU: 12,
-        UP: 13,
-        MOUSE_BINT: 14,
-        KBD_BINT: 15,
-      };
-      return (order[keyA] || 999) - (order[keyB] || 999);
-    });
+  // Define the expected fields in order (show all, even if empty)
+  const expectedFields: string[] = [
+    "VENDOR",
+    "MODEL",
+    "SERIAL",
+    "FW",
+    "MAKCU",
+    "MAC1",
+    "MAC2",
+    "VID",
+    "PID",
+    "TEMP",
+    "RAM",
+    "CPU",
+    "UP",
+    "MOUSE_BINT",
+    "KBD_BINT",
+  ];
 
-  if (displayItems.length === 0) {
-    return (
-      <Card className="border-border/60 bg-card/90 shadow-lg">
-        <CardContent className="p-4">
-          <div className="text-sm text-muted-foreground">
-            {isCn ? "设备信息不可用。" : "Device information not available."}
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
+  // Build display items - include all expected fields, even if empty
+  const displayItems = expectedFields.map((key) => {
+    const value = deviceInfo[key];
+    return [key, formatValue(key, value)] as [string, string];
+  });
 
   return (
     <Card className="border-border/60 bg-card/90 shadow-lg">
