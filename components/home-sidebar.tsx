@@ -5,6 +5,7 @@ import Link from "next/link";
 import type { Locale } from "@/lib/locale";
 import { getAllSections } from "@/lib/sections-config";
 import { Dictionary } from "@/lib/dictionaries";
+import { DeviceInfoSidebar } from "./device-info-sidebar";
 
 type HomeSidebarProps = {
   lang: Locale;
@@ -51,28 +52,33 @@ export default function HomeSidebar({ lang, dict }: HomeSidebarProps) {
             {isCn ? "所有章节" : "All Sections"}
           </div>
           <nav className="space-y-4 text-sm">
-            {allPages.map((pageConfig) => {
+            {allPages.map((pageConfig, index) => {
               const pageKey = pageConfig.page;
+              const isTroubleshooting = pageKey === "troubleshooting";
 
               return (
-                <div key={pageKey} className="space-y-2">
-                  <Link
-                    href={`/${lang}${pageConfig.route}`}
-                    className="font-medium text-foreground/80 transition hover:text-foreground block"
-                  >
-                    {getPageTitle(pageKey)}
-                  </Link>
-                  <div className="space-y-2 pl-4 border-l border-border/60">
-                    {pageConfig.sections.map((section) => (
-                      <Link
-                        key={section.id}
-                        href={`/${lang}${pageConfig.route}#${section.id}`}
-                        className="block text-xs text-muted-foreground transition hover:text-foreground"
-                      >
-                        {getLabel(section.labelKey)}
-                      </Link>
-                    ))}
+                <div key={pageKey}>
+                  <div className="space-y-2">
+                    <Link
+                      href={`/${lang}${pageConfig.route}`}
+                      className="font-medium text-foreground/80 transition hover:text-foreground block"
+                    >
+                      {getPageTitle(pageKey)}
+                    </Link>
+                    <div className="space-y-2 pl-4 border-l border-border/60">
+                      {pageConfig.sections.map((section) => (
+                        <Link
+                          key={section.id}
+                          href={`/${lang}${pageConfig.route}#${section.id}`}
+                          className="block text-xs text-muted-foreground transition hover:text-foreground"
+                        >
+                          {getLabel(section.labelKey)}
+                        </Link>
+                      ))}
+                    </div>
                   </div>
+                  {/* Insert device info after troubleshooting */}
+                  {isTroubleshooting && <DeviceInfoSidebar />}
                 </div>
               );
             })}

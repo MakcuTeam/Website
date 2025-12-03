@@ -686,6 +686,9 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
       }
     }
 
+    // Clear device info cookie when disconnecting
+    setCookie(DEVICE_INFO_COOKIE, "", 0);
+    
     // Reset state
     setState({
       status: "disconnected",
