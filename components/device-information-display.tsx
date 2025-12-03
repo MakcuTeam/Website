@@ -42,7 +42,7 @@ export function DeviceInformationDisplay({ lang }: DeviceInformationDisplayProps
   if (status !== "connected" || !deviceInfo) {
     return (
       <Card className="border-border/60 bg-card/90 shadow-lg">
-        <CardContent className="p-6">
+        <CardContent className="p-4">
           <div className="text-sm text-muted-foreground">
             {isCn ? "设备未连接。连接设备后，设备信息将显示在这里。" : "Device not connected. Device information will appear here once connected."}
           </div>
@@ -117,7 +117,7 @@ export function DeviceInformationDisplay({ lang }: DeviceInformationDisplayProps
   if (displayItems.length === 0) {
     return (
       <Card className="border-border/60 bg-card/90 shadow-lg">
-        <CardContent className="p-6">
+        <CardContent className="p-4">
           <div className="text-sm text-muted-foreground">
             {isCn ? "设备信息不可用。" : "Device information not available."}
           </div>
@@ -128,11 +128,11 @@ export function DeviceInformationDisplay({ lang }: DeviceInformationDisplayProps
 
   return (
     <Card className="border-border/60 bg-card/90 shadow-lg">
-      <CardContent className="p-6">
-        <div className="space-y-4">
+      <CardContent className="p-4">
+        <div className="space-y-2">
           {displayItems.map(([key, value]) => (
-            <div key={key} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 py-2 border-b border-border/40 last:border-b-0">
-              <div className="text-sm font-medium text-foreground/80">
+            <div key={key} className="flex items-center gap-3 py-1.5 border-b border-border/40 last:border-b-0">
+              <div className="text-sm font-medium text-foreground/80 min-w-[140px]">
                 {formatLabel(key)}
               </div>
               <div className="text-sm text-muted-foreground font-mono break-all">
