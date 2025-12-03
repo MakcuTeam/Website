@@ -382,10 +382,6 @@ export const SECTIONS_CONFIG: PageSections[] = sortPagesAlphabetically([
     route: "/settings",
     sections: [
       {
-        id: "status",
-        labelKey: "settings.sections.status",
-      },
-      {
         id: "device-information",
         labelKey: "settings.sections.device_information",
       },

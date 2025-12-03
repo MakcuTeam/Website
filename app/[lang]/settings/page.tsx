@@ -4,7 +4,6 @@ import type { Locale } from "@/lib/locale";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getDictionary } from "@/lib/dictionaries";
-import { MakcuSettings } from "@/components/makcu-settings";
 import { Section, SubSection } from "@/components/section";
 import PageSidebar from "@/components/page-sidebar";
 import { getSectionsForPage } from "@/lib/sections-config";
@@ -18,13 +17,11 @@ type TocItem = {
 
 const tocByLang: Record<Locale, TocItem[]> = {
   en: [
-    { id: "status", label: "Status" },
     { id: "device-information", label: "Device Information" },
     { id: "prerequisites", label: "Prerequisites" },
     { id: "baud-rate", label: "Baud Rate" },
   ],
   cn: [
-    { id: "status", label: "状态" },
     { id: "device-information", label: "设备信息" },
     { id: "prerequisites", label: "前提条件" },
     { id: "baud-rate", label: "波特率" },
@@ -89,11 +86,6 @@ export default async function SettingsPage({ params }: LangProps) {
         />
 
         <div className="space-y-20">
-          {/* Status Section */}
-          <Section id="status" title={t("MAKCU Status", "MAKCU 状态")}>
-            <MakcuSettings lang={lang} dict={dict} />
-          </Section>
-
           {/* Device Information Section */}
           <Section id="device-information" title={dict.settings.sections.device_information}>
             <DeviceInformationDisplay lang={lang} />

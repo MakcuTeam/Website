@@ -132,7 +132,7 @@ export function DeviceInformationDisplay({ lang }: DeviceInformationDisplayProps
         <div className="space-y-2">
           {displayItems.map(([key, value]) => (
             <div key={key} className="flex items-center gap-3 py-1.5 border-b border-border/40 last:border-b-0">
-              <div className="text-sm font-medium text-foreground/80 min-w-[140px]">
+              <div className="text-sm font-medium text-foreground/80 min-w-[175px]">
                 {formatLabel(key)}
               </div>
               <div className="text-sm text-muted-foreground font-mono break-all">
