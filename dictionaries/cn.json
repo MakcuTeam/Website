@@ -408,7 +408,8 @@
       "power_requirement": "必须连接 USB 1 + USB 2 才能为 MAKCU 供电以更改波特率。USB 2 不为 MAKCU 提供电源 - 这是为了确保不会从两个 USB 端口向主 PC 和第二台 PC 反向供电。"
     },
     "sections": {
-      "status": "状态"
+      "status": "状态",
+      "device_information": "设备信息"
     }
   },
   "setup": {

@@ -386,6 +386,10 @@ export const SECTIONS_CONFIG: PageSections[] = sortPagesAlphabetically([
         labelKey: "settings.sections.status",
       },
       {
+        id: "device-information",
+        labelKey: "settings.sections.device_information",
+      },
+      {
         id: "prerequisites",
         labelKey: "settings.prerequisites.title",
       },
