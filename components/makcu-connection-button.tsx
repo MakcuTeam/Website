@@ -97,13 +97,6 @@ export function MakcuConnectionButton({ dict }: { dict: Dictionary }) {
     return null;
   };
 
-  const getModeDisplay = () => {
-    if (status === "connected" && mode) {
-      return mode === "normal" ? "Normal" : "Flash";
-    }
-    return null;
-  };
-
   return (
     <div className="flex items-center gap-2">
       <Button
@@ -118,15 +111,9 @@ export function MakcuConnectionButton({ dict }: { dict: Dictionary }) {
           {status === "connected" ? dict.settings.connection.disconnect : dict.settings.connection.connect}
         </span>
       </Button>
-      {status === "connected" && (
-        <div className="text-xs text-muted-foreground hidden md:inline flex items-center gap-1">
-          {getBaudRateDisplay() && <span>{getBaudRateDisplay()}</span>}
-          {getModeDisplay() && (
-            <>
-              {getBaudRateDisplay() && <span>•</span>}
-              <span>{getModeDisplay()}</span>
-            </>
-          )}
+      {status === "connected" && detectedBaudRate && (
+        <div className="text-xs text-muted-foreground hidden md:inline">
+          {getBaudRateDisplay()}
         </div>
       )}
       <div className={`text-xs ${getStatusColor()} hidden md:inline`}>
