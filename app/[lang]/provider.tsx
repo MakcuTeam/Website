@@ -12,7 +12,7 @@ import { Dictionary } from "@/lib/dictionaries";
 import { AudioProvider } from "@/components/contexts/audio-provider";
 import { AudioPlayer } from "@/components/audio-player";
 import { MakcuConnectionProvider } from "@/components/contexts/makcu-connection-provider";
-import { PreventOverScroll } from "@/components/prevent-over-scroll";
+import { FixScrollbarHeight } from "@/components/fix-scrollbar-height";
 
 export default function RootLayoutProvider({
   children,
@@ -61,7 +61,7 @@ function RootLayoutContent({
               {children}
             </main>
             <Footer />
-            <PreventOverScroll />
+            <FixScrollbarHeight />
           </ThemeProvider>
         </ClientDictionary>
       </AudioProvider>
