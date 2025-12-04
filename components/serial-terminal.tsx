@@ -25,7 +25,10 @@ export function SerialTerminal({ lang }: SerialTerminalProps) {
   const [lines, setLines] = useState<SerialLine[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [isSending, setIsSending] = useState(false);
+  const [commandHistory, setCommandHistory] = useState<string[]>([]);
+  const [historyIndex, setHistoryIndex] = useState<number>(-1);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const lineIdRef = useRef(0);
   const currentLineBufferRef = useRef("");
   const isCn = lang === "cn";
@@ -170,8 +173,18 @@ export function SerialTerminal({ lang }: SerialTerminalProps) {
       },
     ]);
 
+    // Add command to history (avoid duplicates if it's the same as the last command)
+    setCommandHistory((prev) => {
+      const newHistory = prev.length > 0 && prev[prev.length - 1] === command
+        ? prev
+        : [...prev, command];
+      // Limit history to last 100 commands
+      return newHistory.slice(-100);
+    });
+
     setIsSending(true);
     setInputValue("");
+    setHistoryIndex(-1); // Reset history index after sending
 
     try {
       // Get writer
@@ -197,13 +210,45 @@ export function SerialTerminal({ lang }: SerialTerminalProps) {
       ]);
     } finally {
       setIsSending(false);
+      // Refocus the input box after sending
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 0);
     }
   }, [port, status, inputValue, isSending]);
 
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" && !e.shiftKey) {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "ArrowUp") {
+      e.preventDefault();
+      if (commandHistory.length > 0) {
+        setHistoryIndex((prevIndex) => {
+          const newIndex = prevIndex < 0 ? commandHistory.length - 1 : Math.max(0, prevIndex - 1);
+          setInputValue(commandHistory[newIndex]);
+          return newIndex;
+        });
+      }
+    } else if (e.key === "ArrowDown") {
+      e.preventDefault();
+      if (commandHistory.length > 0 && historyIndex >= 0) {
+        setHistoryIndex((prevIndex) => {
+          const newIndex = prevIndex + 1;
+          if (newIndex >= commandHistory.length) {
+            // Reached the end, clear input
+            setInputValue("");
+            return -1;
+          }
+          setInputValue(commandHistory[newIndex]);
+          return newIndex;
+        });
+      }
+    } else if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       sendCommand();
+    } else {
+      // If user starts typing, reset history index
+      if (historyIndex !== -1) {
+        setHistoryIndex(-1);
+      }
     }
   };
 
@@ -291,17 +336,32 @@ export function SerialTerminal({ lang }: SerialTerminalProps) {
         {/* Input Area */}
         <div className="flex gap-2">
           <Input
+            ref={inputRef}
             value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            onKeyPress={handleKeyPress}
+            onChange={(e) => {
+              setInputValue(e.target.value);
+              // Reset history index when user manually types
+              if (historyIndex !== -1) {
+                setHistoryIndex(-1);
+              }
+            }}
+            onKeyDown={handleKeyDown}
             placeholder={isCn ? "输入命令并按 Enter 发送..." : "Enter command and press Enter to send..."}
             disabled={status !== "connected" || isSending}
             className="font-mono"
           />
           <Button
-            onClick={sendCommand}
+            onClick={(e) => {
+              e.preventDefault();
+              sendCommand();
+            }}
             disabled={status !== "connected" || !inputValue.trim() || isSending}
             size="default"
+            type="button"
+            onMouseDown={(e) => {
+              // Prevent button from taking focus when clicked
+              e.preventDefault();
+            }}
           >
             {isSending ? (
               <span className="flex items-center gap-2">
