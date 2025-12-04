@@ -22,6 +22,71 @@ function parseAndStoreDeviceInfoBinary(data: Uint8Array): void {
   console.log("[DEBUG] parseAndStoreDeviceInfoBinary: Data as hex:", Array.from(data).map(b => `0x${b.toString(16).padStart(2, '0').toUpperCase()}`).join(' '));
   console.log("[DEBUG] parseAndStoreDeviceInfoBinary: First 100 bytes:", Array.from(data.slice(0, Math.min(100, data.length))));
   
+  // Try to decode readable strings from the data
+  console.log("[DEBUG] parseAndStoreDeviceInfoBinary: ========== DECODING READABLE STRINGS ==========");
+  const decoder = new TextDecoder();
+  let searchPos = 0;
+  const foundStrings: string[] = [];
+  while (searchPos < data.length - 1) {
+    // Look for null-terminated strings (printable ASCII)
+    if (data[searchPos] >= 0x20 && data[searchPos] < 0x7F) {
+      let strStart = searchPos;
+      let strEnd = searchPos;
+      while (strEnd < data.length && data[strEnd] >= 0x20 && data[strEnd] < 0x7F) {
+        strEnd++;
+      }
+      if (strEnd < data.length && data[strEnd] === 0x00 && strEnd - strStart >= 2) {
+        const str = decoder.decode(data.slice(strStart, strEnd));
+        foundStrings.push(`[${strStart}-${strEnd}]: "${str}"`);
+        searchPos = strEnd + 1;
+      } else {
+        searchPos++;
+      }
+    } else {
+      searchPos++;
+    }
+  }
+  console.log("[DEBUG] parseAndStoreDeviceInfoBinary: Found readable strings:", foundStrings);
+  
+  // Show structure breakdown
+  console.log("[DEBUG] parseAndStoreDeviceInfoBinary: ========== STRUCTURE BREAKDOWN ==========");
+  let debugPos = 1; // After header
+  console.log("[DEBUG] Position", debugPos, "-", debugPos + 5, ": MAC1");
+  debugPos += 6;
+  console.log("[DEBUG] Position", debugPos, "-", debugPos + 5, ": MAC2");
+  debugPos += 6;
+  console.log("[DEBUG] Position", debugPos, "-", debugPos + 3, ": TEMP (float)");
+  debugPos += 4;
+  console.log("[DEBUG] Position", debugPos, "-", debugPos + 3, ": RAM (uint32)");
+  debugPos += 4;
+  console.log("[DEBUG] Position", debugPos, "-", debugPos + 3, ": CPU (uint32)");
+  debugPos += 4;
+  console.log("[DEBUG] Position", debugPos, "-", debugPos + 3, ": UP (uint32)");
+  debugPos += 4;
+  console.log("[DEBUG] Position", debugPos, "-", debugPos + 1, ": VID (uint16)");
+  debugPos += 2;
+  console.log("[DEBUG] Position", debugPos, "-", debugPos + 1, ": PID (uint16)");
+  debugPos += 2;
+  console.log("[DEBUG] Position", debugPos, ": MOUSE_BINT (uint8)");
+  debugPos += 1;
+  console.log("[DEBUG] Position", debugPos, ": KBD_BINT (uint8)");
+  debugPos += 1;
+  console.log("[DEBUG] Position", debugPos, "-", debugPos + 31, ": FW (32 bytes)");
+  debugPos += 32;
+  console.log("[DEBUG] Position", debugPos, "-", debugPos + 31, ": MAKCU (32 bytes)");
+  debugPos += 32;
+  console.log("[DEBUG] Position", debugPos, "-", debugPos + 63, ": VENDOR (64 bytes)");
+  debugPos += 64;
+  console.log("[DEBUG] Position", debugPos, "-", debugPos + 63, ": MODEL (64 bytes)");
+  debugPos += 64;
+  console.log("[DEBUG] Position", debugPos, "-", debugPos + 63, ": ORIGINAL_SERIAL (64 bytes) - CURRENT POSITION");
+  debugPos += 64;
+  console.log("[DEBUG] Position", debugPos, "-", debugPos + 63, ": SPOOFED_SERIAL (64 bytes)");
+  debugPos += 64;
+  console.log("[DEBUG] Position", debugPos, ": SPOOF_ACTIVE (1 byte)");
+  console.log("[DEBUG] parseAndStoreDeviceInfoBinary: Expected total:", debugPos + 1, "bytes");
+  console.log("[DEBUG] parseAndStoreDeviceInfoBinary: Actual received:", data.length, "bytes");
+  
   if (data.length < 1) {
     console.warn("[DEBUG] parseAndStoreDeviceInfoBinary: Data too short (< 1 byte)");
     setCookie(DEVICE_INFO_COOKIE, "", 0);
