@@ -234,6 +234,91 @@ export function getDeviceInfo(): Record<string, string> | null {
   return null;
 }
 
+/* ═══ Device Test Types ═══ */
+export type TestStatus = "pass" | "fail" | "not_supported" | "not_tested";
+
+export interface MouseTestResults {
+  button1: TestStatus;
+  button2: TestStatus;
+  button3: TestStatus;
+  button4: TestStatus;
+  button5: TestStatus;
+  xAxis: TestStatus;
+  yAxis: TestStatus;
+  wheel: TestStatus;
+  pan: TestStatus;
+  tilt: TestStatus;
+}
+
+export interface KeyboardTestResults {
+  keyPress: TestStatus;
+  keyRelease: TestStatus;
+  modifiers: TestStatus;
+}
+
+export interface DeviceTestResult {
+  success: boolean;
+  testMode: number;
+  mousePresent: boolean;
+  keyboardPresent: boolean;
+  mouse?: MouseTestResults;
+  keyboard?: KeyboardTestResults;
+}
+
+function parseTestByte(value: number): TestStatus {
+  if (value === 1) return "pass";
+  if (value === 2) return "not_supported";
+  return "fail";
+}
+
+export function parseDeviceTestResponse(data: Uint8Array): DeviceTestResult | null {
+  if (data.length < 4) return null;
+  
+  const header = data[0];
+  if (header !== 0x01) {
+    return { success: false, testMode: 0, mousePresent: false, keyboardPresent: false };
+  }
+  
+  const testMode = data[1];
+  const mousePresent = data[2] === 1;
+  const keyboardPresent = data[3] === 1;
+  
+  let pos = 4;
+  const result: DeviceTestResult = {
+    success: true,
+    testMode,
+    mousePresent,
+    keyboardPresent,
+  };
+  
+  // Parse mouse results (10 bytes)
+  if (mousePresent && (testMode & 0x01) && pos + 10 <= data.length) {
+    result.mouse = {
+      button1: parseTestByte(data[pos++]),
+      button2: parseTestByte(data[pos++]),
+      button3: parseTestByte(data[pos++]),
+      button4: parseTestByte(data[pos++]),
+      button5: parseTestByte(data[pos++]),
+      xAxis: parseTestByte(data[pos++]),
+      yAxis: parseTestByte(data[pos++]),
+      wheel: parseTestByte(data[pos++]),
+      pan: parseTestByte(data[pos++]),
+      tilt: parseTestByte(data[pos++]),
+    };
+  }
+  
+  // Parse keyboard results (3 bytes)
+  if (keyboardPresent && (testMode & 0x02) && pos + 3 <= data.length) {
+    result.keyboard = {
+      keyPress: parseTestByte(data[pos++]),
+      keyRelease: parseTestByte(data[pos++]),
+      modifiers: parseTestByte(data[pos++]),
+    };
+  }
+  
+  return result;
+}
+
 export type ConnectionMode = "normal" | "flash" | null;
 export type ConnectionStatus = "disconnected" | "connecting" | "connected" | "fault";
 

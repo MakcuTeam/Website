@@ -8,6 +8,7 @@ import { Section, SubSection } from "@/components/section";
 import PageSidebar from "@/components/page-sidebar";
 import { getSectionsForPage } from "@/lib/sections-config";
 import { DeviceInformationDisplay } from "@/components/device-information-display";
+import { DeviceTestDisplay } from "@/components/device-test-display";
 
 type TocItem = {
   id: string;
@@ -18,11 +19,13 @@ type TocItem = {
 const tocByLang: Record<Locale, TocItem[]> = {
   en: [
     { id: "device-information", label: "Device Information" },
+    { id: "device-test", label: "Device Test" },
     { id: "prerequisites", label: "Prerequisites" },
     { id: "baud-rate", label: "Baud Rate" },
   ],
   cn: [
     { id: "device-information", label: "设备信息" },
+    { id: "device-test", label: "设备测试" },
     { id: "prerequisites", label: "前提条件" },
     { id: "baud-rate", label: "波特率" },
   ],
@@ -83,6 +86,11 @@ export default async function SettingsPage({ params }: LangProps) {
           {/* Device Information Section */}
           <Section id="device-information" title={dict.settings.sections.device_information}>
             <DeviceInformationDisplay lang={lang} />
+          </Section>
+
+          {/* Device Test Section */}
+          <Section id="device-test" title={t("Device Test", "设备测试")}>
+            <DeviceTestDisplay lang={lang} />
           </Section>
 
           {/* Prerequisites Section */}
