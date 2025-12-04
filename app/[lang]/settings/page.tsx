@@ -138,12 +138,12 @@ export default async function SettingsPage({ params }: LangProps) {
           </Section>
 
           {/* Device Test Section */}
-          <Section id="device-test" title={t("Device Test", "设备测试")}>
+          <Section id="device-test" title={dict.settings.sections.device_test}>
             <DeviceTestDisplay lang={lang} />
           </Section>
 
           {/* Serial Terminal Section */}
-          <Section id="serial-terminal" title={t("Serial Terminal", "串口终端")}>
+          <Section id="serial-terminal" title={dict.settings.sections.serial_terminal}>
             <SerialTerminal lang={lang} />
           </Section>
         </div>

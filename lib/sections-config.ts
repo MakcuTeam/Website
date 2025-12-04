@@ -388,16 +388,14 @@ export const SECTIONS_CONFIG: PageSections[] = sortPagesAlphabetically([
       {
         id: "device-information",
         labelKey: "settings.sections.device_information",
-        children: [
-          {
-            id: "device-test",
-            labelKey: "settings.sections.device_test",
-          },
-          {
-            id: "serial-terminal",
-            labelKey: "settings.sections.serial_terminal",
-          },
-        ],
+      },
+      {
+        id: "device-test",
+        labelKey: "settings.sections.device_test",
+      },
+      {
+        id: "serial-terminal",
+        labelKey: "settings.sections.serial_terminal",
       },
     ],
   },
