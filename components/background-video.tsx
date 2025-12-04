@@ -7,7 +7,8 @@ export function BackgroundVideo() {
 
   // GitHub raw URL - works even if file isn't deployed to Vercel
   // Repo: https://github.com/MakcuTeam/Website
-  // Browser will automatically cache this video based on HTTP headers
+  // Browser will automatically cache this video in temp files based on HTTP headers
+  // When users return, browser loads from cache (no download needed)
   const githubVideoSrc = "https://raw.githubusercontent.com/MakcuTeam/Website/main/public/background.mp4";
   const fallbackVideoSrc = "/background.mp4";
 
@@ -22,7 +23,20 @@ export function BackgroundVideo() {
     video.playsInline = true;
     video.preload = "auto";
     
-    // Try to play (browser will cache automatically)
+    // Track if video was loaded from cache (for debugging)
+    const startTime = performance.now();
+    let loadedFromCache = false;
+
+    // Monitor network activity to detect cache hits
+    const handleProgress = () => {
+      const loadTime = performance.now() - startTime;
+      // If video loads very quickly (<100ms), it's likely from cache
+      if (loadTime < 100 && video.readyState >= 3) {
+        loadedFromCache = true;
+      }
+    };
+
+    // Try to play (browser will cache automatically in temp files)
     const playVideo = () => {
       video.play().catch((err) => {
         // Autoplay might be blocked, but that's okay since we're muted
@@ -32,19 +46,37 @@ export function BackgroundVideo() {
     };
 
     const handleCanPlay = () => {
-      console.log("✓ Background video loaded and ready, src:", video.currentSrc);
+      const loadTime = performance.now() - startTime;
+      const cacheStatus = loadedFromCache || loadTime < 200 
+        ? "✓ Loaded from browser cache (no download)" 
+        : "↓ Downloaded from network (will be cached for next visit)";
+      
+      console.log("✓ Background video ready:", cacheStatus);
+      console.log("  Source:", video.currentSrc);
+      console.log("  Load time:", Math.round(loadTime), "ms");
+      
       playVideo();
     };
 
-    // If video is already loaded, try playing immediately
+    const handleLoadedMetadata = () => {
+      console.log("📹 Background video metadata loaded, duration:", video.duration, "seconds");
+    };
+
+    video.addEventListener("progress", handleProgress);
+    video.addEventListener("canplay", handleCanPlay, { once: true });
+    video.addEventListener("loadedmetadata", handleLoadedMetadata, { once: true });
+
+    // If video is already loaded (from previous visit), try playing immediately
     if (video.readyState >= 3) {
+      loadedFromCache = true;
+      console.log("⚡ Background video already cached, loading instantly");
       playVideo();
-    } else {
-      video.addEventListener("canplay", handleCanPlay, { once: true });
     }
 
     return () => {
+      video.removeEventListener("progress", handleProgress);
       video.removeEventListener("canplay", handleCanPlay);
+      video.removeEventListener("loadedmetadata", handleLoadedMetadata);
     };
   }, []);
 
