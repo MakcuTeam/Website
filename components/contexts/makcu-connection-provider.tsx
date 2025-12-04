@@ -450,11 +450,26 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
             }
             chunks.push(value);
             
+            // Console log RX bytes from connection provider
+            if (value && value.length > 0) {
+              const hexBytes = Array.from(new Uint8Array(value))
+                .map((b) => b.toString(16).padStart(2, "0").toUpperCase())
+                .join(" ");
+              console.log(`[CONNECTION PROVIDER] RX (${value.length} bytes):`, hexBytes);
+              
+              try {
+                const textData = new TextDecoder("utf-8", { fatal: false }).decode(value);
+                console.log(`[CONNECTION PROVIDER] RX (text):`, textData.replace(/\n/g, "\\n").replace(/\r/g, "\\r").replace(/\0/g, "\\0"));
+              } catch (e) {
+                console.log(`[CONNECTION PROVIDER] RX: Binary data (not text)`);
+              }
+            }
+            
             // Broadcast to subscribers (for serial terminal)
             if (value && value.length > 0) {
               // Use setTimeout to avoid blocking
               setTimeout(() => {
-                serialDataSubscribersRef.current.forEach((callback) => {
+                serialDataSubscribersRef.current.forEach((callback: SerialDataCallback) => {
                   try {
                     callback(value, false);
                   } catch (e) {
@@ -898,17 +913,27 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
       // Check if readable is locked
       const readable = currentState.port.readable;
       if (!readable) {
+        console.log(`[SEND COMMAND] Port readable stream not available`);
         return null;
       }
 
       // Get a writer (temporarily)
       const writer = currentState.port.writable?.getWriter();
       if (!writer) {
+        console.log(`[SEND COMMAND] Port not writable`);
         return null;
       }
 
       // Send command
-      await writer.write(new TextEncoder().encode(command));
+      const commandBytes = new TextEncoder().encode(command);
+      const hexBytes = Array.from(commandBytes)
+        .map((b) => b.toString(16).padStart(2, "0").toUpperCase())
+        .join(" ");
+      console.log(`[SEND COMMAND] TX (${commandBytes.length} bytes):`, hexBytes);
+      console.log(`[SEND COMMAND] TX (text):`, command.replace(/\n/g, "\\n").replace(/\r/g, "\\r"));
+      
+      await writer.write(commandBytes);
+      console.log(`[SEND COMMAND] Successfully wrote ${commandBytes.length} bytes`);
       writer.releaseLock();
 
       // Use existing reader if available (it's kept for monitoring)
