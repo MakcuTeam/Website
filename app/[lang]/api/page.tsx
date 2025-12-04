@@ -321,7 +321,7 @@ export default async function ApiPage({ params }: LangProps) {
   return (
     <div className="flex flex-col">
       <header className="flex flex-col gap-3 pt-8">
-        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">MAKCU API</h1>
+        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl text-muted-foreground dark:text-foreground">MAKCU API</h1>
         <p className="max-w-2xl text-sm text-muted-foreground sm:text-base">
           {isCn
             ? "KM 主机协议 — v3.9 · MAKCU 生态的完整指令参考。"

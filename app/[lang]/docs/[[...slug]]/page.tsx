@@ -24,7 +24,7 @@ export default async function DocsPage(props: PageProps) {
     <div className="flex items-start gap-10">
       <div className="flex-[4.5] pt-10">
         <Typography>
-          <h1 className="text-3xl !-mt-1.5">{res.frontmatter.title}</h1>
+          <h1 className="text-3xl !-mt-1.5 text-muted-foreground dark:text-foreground">{res.frontmatter.title}</h1>
           <p className="-mt-4 text-muted-foreground text-[16.5px]">
             {res.frontmatter.description}
           </p>

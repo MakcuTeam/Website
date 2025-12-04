@@ -50,7 +50,7 @@ export function Navbar({ dict }: { dict: Dictionary }) {
 export function Logo() {
   return (
     <LocalizedLink href="/" className="flex items-center gap-2.5">
-      <h2 className="text-3xl font-bold font-logo tracking-[5px]">Makcu</h2>
+      <h2 className="text-3xl font-bold font-logo tracking-[5px] text-muted-foreground dark:text-foreground">Makcu</h2>
     </LocalizedLink>
   );
 }
