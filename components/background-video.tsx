@@ -25,16 +25,7 @@ export function BackgroundVideo() {
   const fallbackVideoSrc = "/background.mp4";
 
   useEffect(() => {
-    // Pause and stop video if in light mode
-    if (videoRef.current && isLightMode) {
-      const video = videoRef.current;
-      video.pause();
-      video.currentTime = 0;
-      return;
-    }
-
-    // Don't load video if in light mode or not mounted yet
-    if (!videoRef.current || isLightMode || !mounted) return;
+    if (!videoRef.current || !mounted) return;
 
     const video = videoRef.current;
 
@@ -59,11 +50,16 @@ export function BackgroundVideo() {
 
     // Try to play (browser will cache automatically in temp files)
     const playVideo = () => {
-      video.play().catch((err) => {
-        // Autoplay might be blocked, but that's okay since we're muted
-        // Video will play once user interacts with page
-        console.log("Background video autoplay:", err.message);
-      });
+      // Only play if in dark mode
+      if (!isLightMode) {
+        video.play().catch((err) => {
+          // Autoplay might be blocked, but that's okay since we're muted
+          // Video will play once user interacts with page
+          console.log("Background video autoplay:", err.message);
+        });
+      } else {
+        video.pause();
+      }
     };
 
     const handleCanPlay = () => {
@@ -94,6 +90,13 @@ export function BackgroundVideo() {
       playVideo();
     }
 
+    // Handle theme changes
+    if (isLightMode) {
+      video.pause();
+    } else {
+      playVideo();
+    }
+
     return () => {
       video.removeEventListener("progress", handleProgress);
       video.removeEventListener("canplay", handleCanPlay);
@@ -102,55 +105,36 @@ export function BackgroundVideo() {
   }, [isLightMode, mounted]);
 
   return (
-    <>
-      {/* White background for light mode */}
-      {isLightMode && (
-        <div
-          className="fixed inset-0 w-full h-full pointer-events-none bg-white"
-          style={{
-            zIndex: -1,
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            width: "100vw",
-            height: "100vh",
-          }}
-        />
-      )}
-      
-      {/* Video background for dark mode */}
-      {!isLightMode && (
-        <video
-          ref={videoRef}
-          className="fixed inset-0 w-full h-full object-cover pointer-events-none"
-          style={{
-            zIndex: -1,
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            width: "100vw",
-            height: "100vh",
-            objectFit: "cover",
-            transform: "none",
-            willChange: "transform",
-          }}
-          loop
-          muted
-          playsInline
-          autoPlay
-          preload="auto"
-        >
-          {/* Primary source: GitHub raw URL (will be cached by browser) */}
-          <source src={githubVideoSrc} type="video/mp4" />
-          {/* Fallback: Local file if GitHub source fails */}
-          <source src={fallbackVideoSrc} type="video/mp4" />
-          Your browser does not support the video element.
-        </video>
-      )}
-    </>
+    <video
+      ref={videoRef}
+      className="fixed inset-0 w-full h-full object-cover pointer-events-none transition-all duration-300"
+      style={{
+        zIndex: -1,
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        width: "100vw",
+        height: "100vh",
+        objectFit: "cover",
+        transform: "none",
+        willChange: "transform",
+        // Invert video in light mode for clean light background
+        filter: isLightMode ? "invert(1) brightness(1.2)" : "none",
+        transition: "filter 0.3s ease-in-out",
+      }}
+      loop
+      muted
+      playsInline
+      autoPlay
+      preload="auto"
+    >
+      {/* Primary source: GitHub raw URL (will be cached by browser) */}
+      <source src={githubVideoSrc} type="video/mp4" />
+      {/* Fallback: Local file if GitHub source fails */}
+      <source src={fallbackVideoSrc} type="video/mp4" />
+      Your browser does not support the video element.
+    </video>
   );
 }
