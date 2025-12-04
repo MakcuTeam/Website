@@ -23,8 +23,9 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
       const newMutedState = !isMuted;
       console.log("Toggle mute:", { from: isMuted, to: newMutedState });
       
-      // If unmuting, ensure audio is playing first
+      // If unmuting, ensure audio is playing first and set volume
       if (!newMutedState) {
+        audioRef.current.volume = 1.0; // 100% for testing
         try {
           if (audioRef.current.paused) {
             console.log("Audio is paused, attempting to play");

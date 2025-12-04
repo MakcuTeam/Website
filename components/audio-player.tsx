@@ -16,7 +16,7 @@ export function AudioPlayer() {
     const audio = audioRef.current;
     
     // Set initial state
-    audio.volume = 0.5;
+    audio.volume = 1.0; // 100% for testing
     audio.muted = true;
     setIsMuted(true);
     
@@ -70,7 +70,7 @@ export function AudioPlayer() {
       
       // Set up audio state FIRST (must be before play)
       audio.muted = false;
-      audio.volume = 0.5;
+      audio.volume = 1.0; // 100% for testing
       setIsMuted(false);
       
       // CRITICAL: play() MUST be called synchronously in the event handler
@@ -93,6 +93,7 @@ export function AudioPlayer() {
               audio.oncanplaythrough = () => {
                 audio.oncanplaythrough = null;
                 audio.muted = false;
+                audio.volume = 1.0; // 100% for testing
                 audio.play()
                   .then(() => {
                     console.log("✓ Retry successful!");
