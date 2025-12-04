@@ -21,14 +21,15 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
   const toggleMute = async () => {
     if (audioRef.current) {
       const newMutedState = !isMuted;
-      console.log("Toggle mute:", { from: isMuted, to: newMutedState });
+      console.log("🔊 Toggle mute:", { from: isMuted, to: newMutedState });
       
       // If unmuting, ensure audio is playing first and set volume
       if (!newMutedState) {
         audioRef.current.volume = 0.15; // 15% volume
+        console.log("🔊 Unmuting - Setting volume to 0.15 (15%)");
         try {
           if (audioRef.current.paused) {
-            console.log("Audio is paused, attempting to play");
+            console.log("🔊 Audio is paused, attempting to play");
             await audioRef.current.play();
           }
         } catch (error) {
@@ -42,12 +43,20 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
       audioRef.current.muted = newMutedState;
       setIsMuted(newMutedState);
       
-      console.log("Audio state after toggle:", {
+      // Force volume to 15% even after unmuting
+      audioRef.current.volume = 0.15;
+      
+      console.log("🔊 Audio state after toggle:", {
         paused: audioRef.current.paused,
         muted: audioRef.current.muted,
         volume: audioRef.current.volume,
+        expectedVolume: 0.15,
         readyState: audioRef.current.readyState
       });
+      
+      if (Math.abs(audioRef.current.volume - 0.15) > 0.01) {
+        console.warn("⚠️ Volume mismatch! Expected 0.15, got:", audioRef.current.volume);
+      }
     }
   };
 

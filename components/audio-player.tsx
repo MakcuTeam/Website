@@ -20,11 +20,21 @@ export function AudioPlayer() {
     audio.muted = true;
     setIsMuted(true);
     
-    console.log("Audio initialized, src:", audio.src || audio.querySelector("source")?.src);
+    console.log("🔊 Audio initialized, src:", audio.src || audio.querySelector("source")?.src);
+    console.log("🔊 Initial volume set to:", audio.volume, "(15%)");
     
-    // Add event listeners for debugging
+    // Force volume function - ensures volume stays at 15%
+    const enforceVolume = () => {
+      if (Math.abs(audio.volume - 0.15) > 0.01) {
+        console.warn("⚠️ Volume changed from", audio.volume, "to 0.15 (15%)");
+        audio.volume = 0.15;
+      }
+    };
+    
+    // Add event listeners for debugging and volume enforcement
     const handleLoadedData = () => {
-      console.log("Audio loaded successfully, readyState:", audio.readyState);
+      console.log("🔊 Audio loaded successfully, readyState:", audio.readyState);
+      enforceVolume();
     };
     
     const handleError = (e: Event) => {
@@ -44,22 +54,31 @@ export function AudioPlayer() {
     };
     
     const handlePlay = () => {
-      console.log("Audio play event fired - Volume:", audio.volume, "Muted:", audio.muted);
+      enforceVolume();
+      console.log("🔊 Audio play event - Volume:", audio.volume, "(expected: 0.15)", "Muted:", audio.muted);
+    };
+
+    const handleVolumeChange = () => {
+      console.log("🔊 Volume changed event - Current volume:", audio.volume, "(expected: 0.15)");
+      enforceVolume();
     };
 
     const handleCanPlayThrough = () => {
-      console.log("Audio can play through, readyState:", audio.readyState);
+      console.log("🔊 Audio can play through, readyState:", audio.readyState);
+      enforceVolume();
     };
     
     audio.addEventListener("loadeddata", handleLoadedData);
     audio.addEventListener("error", handleError);
     audio.addEventListener("play", handlePlay);
+    audio.addEventListener("volumechange", handleVolumeChange);
     audio.addEventListener("canplaythrough", handleCanPlayThrough);
 
     return () => {
       audio.removeEventListener("loadeddata", handleLoadedData);
       audio.removeEventListener("error", handleError);
       audio.removeEventListener("play", handlePlay);
+      audio.removeEventListener("volumechange", handleVolumeChange);
       audio.removeEventListener("canplaythrough", handleCanPlayThrough);
     };
   }, [audioRef, setIsMuted]);
@@ -81,6 +100,8 @@ export function AudioPlayer() {
       audio.muted = false;
       audio.volume = 0.15; // 15% volume
       setIsMuted(false);
+      console.log("🔊 User interaction - Setting volume to 0.15 (15%)");
+      console.log("🔊 Audio state - Volume:", audio.volume, "Muted:", audio.muted);
       
       // CRITICAL: play() MUST be called synchronously in the event handler
       // This is Chrome's requirement for user gesture
@@ -89,7 +110,9 @@ export function AudioPlayer() {
       if (playPromise !== undefined) {
         playPromise
           .then(() => {
-            console.log("✓ Audio playing! duration:", audio.duration);
+            console.log("✓ Audio playing! duration:", audio.duration, "seconds");
+            console.log("🔊 Volume after play:", audio.volume, "(expected: 0.15)");
+            console.log("🔊 Muted state:", audio.muted);
             setHasInteracted(true);
           })
           .catch((error) => {
@@ -103,9 +126,10 @@ export function AudioPlayer() {
                 audio.oncanplaythrough = null;
                 audio.muted = false;
                 audio.volume = 0.15; // 15% volume
+                console.log("🔊 Retry - Setting volume to 0.15 (15%)");
                 audio.play()
                   .then(() => {
-                    console.log("✓ Retry successful!");
+                    console.log("✓ Retry successful! Volume:", audio.volume, "(expected: 0.15)");
                     setHasInteracted(true);
                   })
                   .catch((e) => {
@@ -133,6 +157,21 @@ export function AudioPlayer() {
       document.removeEventListener("touchstart", handleInteraction);
     };
   }, [hasInteracted, audioRef, setHasInteracted, setIsMuted]);
+
+  // Continuous volume monitoring - ensures volume stays at 15%
+  useEffect(() => {
+    if (!audioRef.current) return;
+
+    const audio = audioRef.current;
+    const volumeCheckInterval = setInterval(() => {
+      if (audio && !audio.muted && Math.abs(audio.volume - 0.15) > 0.01) {
+        console.warn("⚠️ Volume was changed to", audio.volume, "- resetting to 0.15 (15%)");
+        audio.volume = 0.15;
+      }
+    }, 1000); // Check every second
+
+    return () => clearInterval(volumeCheckInterval);
+  }, [audioRef]);
 
   // Use GitHub raw URL directly - works even if file isn't deployed to Vercel
   // Repo: https://github.com/MakcuTeam/Website
