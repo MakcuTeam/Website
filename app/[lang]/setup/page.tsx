@@ -132,23 +132,27 @@ export default async function SetupPage({ params }: LangProps) {
             title={dict.setup.sections.install_driver.title}
             lead={<p className="text-base leading-relaxed text-muted-foreground">{dict.setup.sections.install_driver.description}</p>}
           >
-            <div className="space-y-4">
-              <ol className="list-decimal list-inside space-y-2 text-sm leading-relaxed text-muted-foreground">
-                {dict.setup.sections.install_driver.steps.map((step: string, index: number) => (
-                  <li key={index}>{step}</li>
-                ))}
-              </ol>
-              <div className="mt-4">
-                <a
-                  href="https://raw.githubusercontent.com/terrafirma2021/MAKCM_v2_files/main/CH343SER.EXE"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition"
-                >
-                  {dict.setup.sections.install_driver.driver_link}
-                </a>
-              </div>
-            </div>
+            <Card className="border-border/60 bg-card/90 shadow-lg">
+              <CardContent className="p-6">
+                <div className="space-y-4">
+                  <ol className="list-decimal list-inside space-y-2 text-sm leading-relaxed text-muted-foreground">
+                    {dict.setup.sections.install_driver.steps.map((step: string, index: number) => (
+                      <li key={index}>{step}</li>
+                    ))}
+                  </ol>
+                  <div className="mt-4">
+                    <a
+                      href="https://raw.githubusercontent.com/terrafirma2021/MAKCM_v2_files/main/CH343SER.EXE"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition"
+                    >
+                      {dict.setup.sections.install_driver.driver_link}
+                    </a>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </Section>
 
           {/* Flash MAKCU Section */}
@@ -157,49 +161,53 @@ export default async function SetupPage({ params }: LangProps) {
             title={dict.setup.sections.flash_makcu.title}
             lead={<p className="text-base leading-relaxed text-muted-foreground">{dict.setup.sections.flash_makcu.description}</p>}
           >
-            <div className="space-y-6">
-              <p className="text-sm leading-relaxed text-muted-foreground">
-                {dict.setup.sections.flash_makcu.dropdown_explanation}
-              </p>
+            <Card className="border-border/60 bg-card/90 shadow-lg">
+              <CardContent className="p-6">
+                <div className="space-y-6">
+                  <p className="text-sm leading-relaxed text-muted-foreground">
+                    {dict.setup.sections.flash_makcu.dropdown_explanation}
+                  </p>
 
-              <SubSection
-                id="flashing-process"
-                title={dict.setup.sections.flash_makcu.flashing_process.title}
-              >
-                <div className="space-y-4">
-                  <div>
-                    <h4 className="font-semibold mb-2">{t("Flash Mode", "刷写模式")}</h4>
-                    <p className="text-sm leading-relaxed text-muted-foreground">
-                      {dict.setup.sections.flash_makcu.flashing_process.flash_mode}
-                    </p>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold mb-2">{t("Connecting", "连接")}</h4>
-                    <p className="text-sm leading-relaxed text-muted-foreground">
-                      {dict.setup.sections.flash_makcu.flashing_process.connecting}
-                    </p>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold mb-2">{t("Selecting Firmware", "选择固件")}</h4>
-                    <p className="text-sm leading-relaxed text-muted-foreground">
-                      {dict.setup.sections.flash_makcu.flashing_process.selecting_firmware}
-                    </p>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold mb-2">{t("Flashing", "刷写")}</h4>
-                    <p className="text-sm leading-relaxed text-muted-foreground">
-                      {dict.setup.sections.flash_makcu.flashing_process.flashing}
-                    </p>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold mb-2">{t("Completing", "完成")}</h4>
-                    <p className="text-sm leading-relaxed text-muted-foreground">
-                      {dict.setup.sections.flash_makcu.flashing_process.completing}
-                    </p>
-                  </div>
+                  <SubSection
+                    id="flashing-process"
+                    title={dict.setup.sections.flash_makcu.flashing_process.title}
+                  >
+                    <div className="space-y-4">
+                      <div>
+                        <h4 className="font-semibold text-black dark:text-white mb-2">{t("Flash Mode", "刷写模式")}</h4>
+                        <p className="text-sm leading-relaxed text-muted-foreground">
+                          {dict.setup.sections.flash_makcu.flashing_process.flash_mode}
+                        </p>
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-black dark:text-white mb-2">{t("Connecting", "连接")}</h4>
+                        <p className="text-sm leading-relaxed text-muted-foreground">
+                          {dict.setup.sections.flash_makcu.flashing_process.connecting}
+                        </p>
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-black dark:text-white mb-2">{t("Selecting Firmware", "选择固件")}</h4>
+                        <p className="text-sm leading-relaxed text-muted-foreground">
+                          {dict.setup.sections.flash_makcu.flashing_process.selecting_firmware}
+                        </p>
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-black dark:text-white mb-2">{t("Flashing", "刷写")}</h4>
+                        <p className="text-sm leading-relaxed text-muted-foreground">
+                          {dict.setup.sections.flash_makcu.flashing_process.flashing}
+                        </p>
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-black dark:text-white mb-2">{t("Completing", "完成")}</h4>
+                        <p className="text-sm leading-relaxed text-muted-foreground">
+                          {dict.setup.sections.flash_makcu.flashing_process.completing}
+                        </p>
+                      </div>
+                    </div>
+                  </SubSection>
                 </div>
-              </SubSection>
-            </div>
+              </CardContent>
+            </Card>
           </Section>
 
           {/* Flash Mode vs Normal Mode */}
