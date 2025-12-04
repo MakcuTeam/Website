@@ -289,7 +289,7 @@
           "Verify baud rate matches between MAKCU and your software",
           "If using MAKCU website or AIO tool, ensure baud rate is set to 115200"
         ],
-        "usb2_warning": "Warning: Only one software can connect to USB2 at the same time. If you already have the website/AIO tool/chair connected, then you will have to shut the software to connect with something else.",
+        "usb2_warning": "Only one software can connect to USB2 at the same time. If you already have the website/AIO tool/chair connected, then you will have to shut the software to connect with something else.",
         "important": "USB 1 + USB 2 must be connected for MAKCU to take power. USB 2 does not provide power to MAKCU - this prevents back feeding to the main PC and 2nd PC from both USB ports."
       },
       "cannot_flash_website": {
@@ -316,7 +316,7 @@
       "slow_blink": "Slow Blink",
       "working": "Working - no action needed",
       "connect_device": "Connect device",
-      "wait_resolves": "wait, or reconnect all cables"
+      "wait_resolves": "Wait, or reconnect all cables"
     },
     "still_issues": {
       "title": "Still Having Issues?",
