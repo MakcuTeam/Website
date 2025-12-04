@@ -4,7 +4,6 @@ import React, { createContext, useContext, useState, useRef, useEffect, useCallb
 import { ESPLoader, LoaderOptions, Transport } from "esptool-js";
 import { serial } from "web-serial-polyfill";
 import { toast } from "sonner";
-import { getBaudRate } from "@/components/baud-select";
 
 const DEVICE_INFO_COOKIE = "makcu_device_info";
 const DEVICE_INFO_EXPIRY_HOURS = 1;
@@ -214,6 +213,7 @@ interface MakcuConnectionState {
   transport: Transport | null;
   loader: ESPLoader | null;
   comPort: string | null;
+  detectedBaudRate: number | null;
 }
 
 interface MakcuConnectionContextType extends MakcuConnectionState {
@@ -233,6 +233,7 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
     transport: null,
     loader: null,
     comPort: null,
+    detectedBaudRate: null,
   });
   const [isConnecting, setIsConnecting] = useState(false);
   const [browserSupported, setBrowserSupported] = useState(true);
@@ -288,8 +289,8 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
     }
   }, []);
 
-  // Try to connect in normal mode
-  const tryNormalMode = async (port: SerialPort): Promise<boolean> => {
+  // Try to connect in normal mode with specific baud rate and timeout
+  const tryNormalMode = async (port: SerialPort, baudRate: number, timeout: number): Promise<boolean> => {
     try {
       console.log("[DEBUG] tryNormalMode: Starting normal mode connection");
       if (!port.writable || !port.readable) {
@@ -302,25 +303,25 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
       writerRef.current = writer;
 
       // Send website command (binary format)
-      const websiteCommand = ".website()\r";
-      console.log("[DEBUG] tryNormalMode: Sending command:", websiteCommand);
+      const websiteCommand = ".website()\n";
+      console.log(`[DEBUG] tryNormalMode: Sending command at ${baudRate} baud:`, websiteCommand);
       console.log("[DEBUG] tryNormalMode: Command bytes:", Array.from(new TextEncoder().encode(websiteCommand)));
       await writer.write(new TextEncoder().encode(websiteCommand));
-      console.log("[DEBUG] tryNormalMode: Command sent, waiting for response...");
+      console.log(`[DEBUG] tryNormalMode: Command sent, waiting for response (timeout: ${timeout}ms)...`);
 
       // Get reader
       const reader = port.readable.getReader();
       readerRef.current = reader;
       console.log("[DEBUG] tryNormalMode: Reader obtained, starting to read...");
 
-      // Read response with timeout (500ms for normal mode)
+      // Read response with timeout (configurable)
       let timeoutId: NodeJS.Timeout | null = null;
       const timeoutPromise = new Promise<Uint8Array>((_, reject) => {
         timeoutId = setTimeout(() => {
-          console.warn("[DEBUG] tryNormalMode: Timeout (500ms) waiting for response");
+          console.warn(`[DEBUG] tryNormalMode: Timeout (${timeout}ms) waiting for response at ${baudRate} baud`);
           reader.cancel().catch(() => {});
           reject(new Error("Timeout waiting for response"));
-        }, 500);
+        }, timeout);
       });
 
       const readPromise = (async () => {
@@ -549,28 +550,71 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
       const selectedPort = await Navigator.serial.requestPort();
       console.log("[DEBUG] connect: Port selected:", selectedPort);
       
-      // Get baud rate from cookie (115200 or 4000000)
-      const baudRate = getBaudRate();
-      console.log("%c[DEBUG] BAUD RATE:", "color: orange; font-weight: bold", baudRate);
-      console.log("[DEBUG] connect: Opening port with baud rate:", baudRate);
-      
-      // Try normal mode first (500ms timeout for website() command)
-      await selectedPort.open({
-        baudRate: baudRate,  // Uses website baud rate setting
-        dataBits: 8,
-        stopBits: 1,
-        parity: "none",
-        flowControl: "none",
-      });
-      console.log("[DEBUG] connect: Port opened successfully");
+      // Auto-detect baud rate: Try 115200 first, then 4M, then flash mode
+      let detectedBaudRate: number | null = null;
+      let normalModeSuccess = false;
 
-      console.log("[DEBUG] connect: Attempting normal mode connection...");
-      const normalModeSuccess = await tryNormalMode(selectedPort);
-      console.log("[DEBUG] connect: Normal mode result:", normalModeSuccess);
+      // Step 1: Try 115200 with 100ms timeout
+      console.log("[DEBUG] connect: Step 1 - Trying 115200 baud with 100ms timeout...");
+      try {
+        await selectedPort.open({
+          baudRate: 115200,
+          dataBits: 8,
+          stopBits: 1,
+          parity: "none",
+          flowControl: "none",
+        });
+        console.log("[DEBUG] connect: Port opened at 115200 baud");
+        normalModeSuccess = await tryNormalMode(selectedPort, 115200, 100);
+        if (normalModeSuccess) {
+          detectedBaudRate = 115200;
+          console.log("[DEBUG] connect: Success at 115200 baud!");
+        } else {
+          console.log("[DEBUG] connect: Failed at 115200 baud, closing port...");
+          await selectedPort.close();
+        }
+      } catch (error) {
+        console.error("[DEBUG] connect: Error at 115200 baud:", error);
+        try {
+          await selectedPort.close();
+        } catch (e) {
+          // Ignore close errors
+        }
+      }
 
-      if (normalModeSuccess) {
-        // Normal mode connected successfully
-        console.log("[DEBUG] connect: Normal mode successful!");
+      // Step 2: If 115200 failed, try 4M (4000000) with 500ms timeout
+      if (!normalModeSuccess) {
+        console.log("[DEBUG] connect: Step 2 - Trying 4M baud with 500ms timeout...");
+        try {
+          await selectedPort.open({
+            baudRate: 4000000,
+            dataBits: 8,
+            stopBits: 1,
+            parity: "none",
+            flowControl: "none",
+          });
+          console.log("[DEBUG] connect: Port opened at 4M baud");
+          normalModeSuccess = await tryNormalMode(selectedPort, 4000000, 500);
+          if (normalModeSuccess) {
+            detectedBaudRate = 4000000;
+            console.log("[DEBUG] connect: Success at 4M baud!");
+          } else {
+            console.log("[DEBUG] connect: Failed at 4M baud, closing port...");
+            await selectedPort.close();
+          }
+        } catch (error) {
+          console.error("[DEBUG] connect: Error at 4M baud:", error);
+          try {
+            await selectedPort.close();
+          } catch (e) {
+            // Ignore close errors
+          }
+        }
+      }
+
+      // Step 3: If normal mode succeeded, set state
+      if (normalModeSuccess && detectedBaudRate) {
+        console.log("[DEBUG] connect: Normal mode successful at", detectedBaudRate, "baud!");
         const comPort = getComPort(selectedPort);
         setState({
           status: "connected",
@@ -579,14 +623,14 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
           transport: null,
           loader: null,
           comPort,
+          detectedBaudRate,
         });
-        toast.success("Connected in Normal mode");
+        toast.success(`Connected in Normal mode (${detectedBaudRate === 115200 ? "115200" : "4M"})`);
         return;
       }
 
-      // Normal mode failed (timeout or error), try flash mode
-      // Flash mode will close and reopen port with its own baud rates
-      console.log("[DEBUG] connect: Normal mode failed, trying flash mode...");
+      // Step 4: If both normal mode attempts failed, try flash mode
+      console.log("[DEBUG] connect: Step 3 - Both normal mode attempts failed, trying flash mode...");
       await cleanup();
       const flashResult = await tryFlashMode(selectedPort);
       console.log("[DEBUG] connect: Flash mode result:", flashResult ? "success" : "failed");
@@ -602,6 +646,7 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
           transport: flashResult.transport,
           loader: flashResult.loader,
           comPort,
+          detectedBaudRate: null, // Flash mode doesn't use website baud rates
         });
         toast.success("Connected in Flash mode");
         return;
@@ -615,7 +660,7 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
       } catch (e) {
         console.warn("[DEBUG] connect: Error closing port:", e);
       }
-      setState((prev) => ({ ...prev, status: "fault", mode: null, port: null }));
+      setState((prev) => ({ ...prev, status: "fault", mode: null, port: null, detectedBaudRate: null }));
       toast.error("Connection failed - device not responding");
 
     } catch (error) {
@@ -690,14 +735,15 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
     setCookie(DEVICE_INFO_COOKIE, "", 0);
     
     // Reset state
-    setState({
-      status: "disconnected",
-      mode: null,
-      port: null,
-      transport: null,
-      loader: null,
-      comPort: null,
-    });
+      setState({
+        status: "disconnected",
+        mode: null,
+        port: null,
+        transport: null,
+        loader: null,
+        comPort: null,
+        detectedBaudRate: null,
+      });
     
     toast.info("Disconnected");
   }, [cleanup]);
