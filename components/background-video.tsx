@@ -85,13 +85,17 @@ export function BackgroundVideo() {
       ref={videoRef}
       className="fixed inset-0 w-full h-full object-cover pointer-events-none"
       style={{
-        zIndex: 0,
+        zIndex: -1,
         position: "fixed",
         top: 0,
         left: 0,
-        width: "100%",
-        height: "100%",
+        right: 0,
+        bottom: 0,
+        width: "100vw",
+        height: "100vh",
         objectFit: "cover",
+        transform: "none",
+        willChange: "transform",
       }}
       loop
       muted

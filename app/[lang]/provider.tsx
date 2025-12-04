@@ -12,7 +12,6 @@ import { Dictionary } from "@/lib/dictionaries";
 import { AudioProvider } from "@/components/contexts/audio-provider";
 import { AudioPlayer } from "@/components/audio-player";
 import { MakcuConnectionProvider } from "@/components/contexts/makcu-connection-provider";
-import { BackgroundVideo } from "@/components/background-video";
 
 export default function RootLayoutProvider({
   children,
@@ -47,7 +46,6 @@ function RootLayoutContent({
   return (
     <>
       <Toaster />
-      <BackgroundVideo />
       <AudioProvider>
         <AudioPlayer />
         <ClientDictionary dict={dict}>
