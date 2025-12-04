@@ -41,7 +41,7 @@ export default async function InformationPage({ params }: LangProps) {
   return (
     <div className="flex flex-col">
       <header className="flex flex-col gap-3 pt-8">
-        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl text-foreground">
+        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl text-black dark:text-white">
           {dict.information.title}
         </h1>
         <p className="max-w-2xl text-sm text-muted-foreground sm:text-base">
@@ -262,7 +262,7 @@ export default async function InformationPage({ params }: LangProps) {
 
                     <div className="space-y-4">
                       <div>
-                        <h4 className="font-semibold text-foreground mb-2">
+                        <h4 className="font-semibold text-black dark:text-white mb-2">
                           {dict.information.capabilities.console_support.direct_support.title}
                         </h4>
                         <p className="text-sm leading-relaxed text-muted-foreground mb-3">
@@ -391,7 +391,7 @@ export default async function InformationPage({ params }: LangProps) {
                     </p>
                     <div className="space-y-3">
                       <div>
-                        <h4 className="font-semibold text-foreground mb-1">
+                        <h4 className="font-semibold text-black dark:text-white mb-1">
                           {t("Purpose", "用途")}:
                         </h4>
                         <p className="text-sm leading-relaxed text-muted-foreground">
@@ -399,7 +399,7 @@ export default async function InformationPage({ params }: LangProps) {
                         </p>
                       </div>
                       <div>
-                        <h4 className="font-semibold text-foreground mb-1">
+                        <h4 className="font-semibold text-black dark:text-white mb-1">
                           {t("Usage", "用法")}:
                         </h4>
                         <p className="text-sm leading-relaxed text-muted-foreground">
@@ -407,7 +407,7 @@ export default async function InformationPage({ params }: LangProps) {
                         </p>
                       </div>
                       <div>
-                        <h4 className="font-semibold text-foreground mb-1">
+                        <h4 className="font-semibold text-black dark:text-white mb-1">
                           {t("Power", "电源")}:
                         </h4>
                         <p className="text-sm leading-relaxed text-muted-foreground">
@@ -415,7 +415,7 @@ export default async function InformationPage({ params }: LangProps) {
                         </p>
                       </div>
                       <div>
-                        <h4 className="font-semibold text-foreground mb-1">
+                        <h4 className="font-semibold text-black dark:text-white mb-1">
                           {t("Device Communication", "设备通信")}:
                         </h4>
                         <p className="text-sm leading-relaxed text-muted-foreground">
@@ -440,7 +440,7 @@ export default async function InformationPage({ params }: LangProps) {
                     </p>
                     <div className="space-y-3">
                       <div>
-                        <h4 className="font-semibold text-foreground mb-1">
+                        <h4 className="font-semibold text-black dark:text-white mb-1">
                           {t("Purpose", "用途")}:
                         </h4>
                         <p className="text-sm leading-relaxed text-muted-foreground">
@@ -448,7 +448,7 @@ export default async function InformationPage({ params }: LangProps) {
                         </p>
                       </div>
                       <div>
-                        <h4 className="font-semibold text-foreground mb-1">
+                        <h4 className="font-semibold text-black dark:text-white mb-1">
                           {t("Usage", "用法")}:
                         </h4>
                         <p className="text-sm leading-relaxed text-muted-foreground">
@@ -456,7 +456,7 @@ export default async function InformationPage({ params }: LangProps) {
                         </p>
                       </div>
                       <div>
-                        <h4 className="font-semibold text-foreground mb-1">
+                        <h4 className="font-semibold text-black dark:text-white mb-1">
                           {t("Power", "电源")}:
                         </h4>
                         <p className="text-sm leading-relaxed text-muted-foreground">
@@ -489,7 +489,7 @@ export default async function InformationPage({ params }: LangProps) {
                     </p>
                     <div className="space-y-3">
                       <div>
-                        <h4 className="font-semibold text-foreground mb-1">
+                        <h4 className="font-semibold text-black dark:text-white mb-1">
                           {t("Purpose", "用途")}:
                         </h4>
                         <p className="text-sm leading-relaxed text-muted-foreground">
@@ -497,7 +497,7 @@ export default async function InformationPage({ params }: LangProps) {
                         </p>
                       </div>
                       <div>
-                        <h4 className="font-semibold text-foreground mb-1">
+                        <h4 className="font-semibold text-black dark:text-white mb-1">
                           {t("Usage", "用法")}:
                         </h4>
                         <p className="text-sm leading-relaxed text-muted-foreground">
@@ -505,7 +505,7 @@ export default async function InformationPage({ params }: LangProps) {
                         </p>
                       </div>
                       <div>
-                        <h4 className="font-semibold text-foreground mb-1">
+                        <h4 className="font-semibold text-black dark:text-white mb-1">
                           {t("Power", "电源")}:
                         </h4>
                         <p className="text-sm leading-relaxed text-muted-foreground">
@@ -531,15 +531,15 @@ export default async function InformationPage({ params }: LangProps) {
                 <CardContent className="p-6">
                   <div className="space-y-4">
                     <div>
-                      <h4 className="font-semibold text-foreground mb-2">
+                      <h4 className="font-semibold text-black dark:text-white mb-2">
                         {t("Connections", "连接")}:
                       </h4>
                       <div className="space-y-2 text-sm leading-relaxed text-muted-foreground">
                         <p>
-                          <strong className="text-foreground">{t("Normal Mode", "正常模式")}:</strong> {dict.information.usb_ports.summary.connections.normal_mode}
+                          <strong className="text-black dark:text-white">{t("Normal Mode", "正常模式")}:</strong> {dict.information.usb_ports.summary.connections.normal_mode}
                         </p>
                         <p>
-                          <strong className="text-foreground">{t("Flash Mode", "刷写模式")}:</strong> {dict.information.usb_ports.summary.connections.flash_mode}
+                          <strong className="text-black dark:text-white">{t("Flash Mode", "刷写模式")}:</strong> {dict.information.usb_ports.summary.connections.flash_mode}
                         </p>
                       </div>
                     </div>
@@ -578,7 +578,7 @@ export default async function InformationPage({ params }: LangProps) {
                     <div className="space-y-2">
                       <div className="flex items-center gap-2">
                         <div className="w-3 h-3 rounded-full bg-muted-foreground"></div>
-                        <h4 className="font-semibold text-foreground">
+                        <h4 className="font-semibold text-black dark:text-white">
                           {dict.troubleshooting.connection_status.statuses.not_supported.label}
                         </h4>
                       </div>
@@ -591,7 +591,7 @@ export default async function InformationPage({ params }: LangProps) {
                     <div className="space-y-2">
                       <div className="flex items-center gap-2">
                         <div className="w-3 h-3 rounded-full bg-muted-foreground"></div>
-                        <h4 className="font-semibold text-foreground">
+                        <h4 className="font-semibold text-black dark:text-white">
                           {dict.troubleshooting.connection_status.statuses.disconnected.label}
                         </h4>
                       </div>
@@ -604,7 +604,7 @@ export default async function InformationPage({ params }: LangProps) {
                     <div className="space-y-2">
                       <div className="flex items-center gap-2">
                         <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-                        <h4 className="font-semibold text-foreground">
+                        <h4 className="font-semibold text-black dark:text-white">
                           {dict.troubleshooting.connection_status.statuses.connecting.label}
                         </h4>
                       </div>
@@ -617,7 +617,7 @@ export default async function InformationPage({ params }: LangProps) {
                     <div className="space-y-2">
                       <div className="flex items-center gap-2">
                         <div className="w-3 h-3 rounded-full bg-emerald-500"></div>
-                        <h4 className="font-semibold text-foreground">
+                        <h4 className="font-semibold text-black dark:text-white">
                           {dict.troubleshooting.connection_status.statuses.normal_mode.label}
                         </h4>
                       </div>
@@ -635,7 +635,7 @@ export default async function InformationPage({ params }: LangProps) {
                     <div className="space-y-2">
                       <div className="flex items-center gap-2">
                         <div className="w-3 h-3 rounded-full bg-blue-500"></div>
-                        <h4 className="font-semibold text-foreground">
+                        <h4 className="font-semibold text-black dark:text-white">
                           {dict.troubleshooting.connection_status.statuses.flash_mode.label}
                         </h4>
                       </div>
@@ -648,7 +648,7 @@ export default async function InformationPage({ params }: LangProps) {
                     <div className="space-y-2">
                       <div className="flex items-center gap-2">
                         <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                        <h4 className="font-semibold text-foreground">
+                        <h4 className="font-semibold text-black dark:text-white">
                           {dict.troubleshooting.connection_status.statuses.fault.label}
                         </h4>
                       </div>

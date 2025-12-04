@@ -82,7 +82,7 @@ export default function HomeSidebar({ lang, dict }: HomeSidebarProps) {
                 <div key={pageKey} className="space-y-2">
                   <Link
                     href={`/${lang}${pageConfig.route}`}
-                    className="font-medium text-foreground transition hover:text-foreground block"
+                    className="font-medium text-black dark:text-white transition block"
                   >
                     {getPageTitle(pageKey)}
                   </Link>
@@ -99,7 +99,7 @@ export default function HomeSidebar({ lang, dict }: HomeSidebarProps) {
                       <Link
                         key={section.id}
                         href={`/${lang}${pageConfig.route}#${section.id}`}
-                        className="block text-xs text-muted-foreground transition hover:text-foreground"
+                        className="block text-xs text-muted-foreground transition hover:text-black dark:hover:text-white"
                       >
                         {getLabel(section.labelKey)}
                       </Link>

@@ -50,7 +50,7 @@ export default async function TroubleshootingPage({ params }: LangProps) {
   return (
     <div className="flex flex-col">
       <header className="flex flex-col gap-3 pt-8">
-        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl text-foreground">
+        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl text-black dark:text-white">
           {dict.troubleshooting.title}
         </h1>
         <p className="max-w-2xl text-sm text-muted-foreground sm:text-base">
@@ -91,7 +91,7 @@ export default async function TroubleshootingPage({ params }: LangProps) {
                     </thead>
                     <tbody className="text-sm text-muted-foreground">
                       <tr className="border-b border-border/60">
-                        <td className="py-3 px-4 font-medium text-foreground">
+                        <td className="py-3 px-4 font-medium text-black dark:text-white">
                           {dict.troubleshooting.quick_reference.solid_on}
                         </td>
                         <td className="py-3 px-4">{t("Device connected", "设备已连接")}</td>
@@ -99,7 +99,7 @@ export default async function TroubleshootingPage({ params }: LangProps) {
                         <td className="py-3 px-4">{dict.troubleshooting.quick_reference.working}</td>
                       </tr>
                       <tr className="border-b border-border/60">
-                        <td className="py-3 px-4 font-medium text-foreground">
+                        <td className="py-3 px-4 font-medium text-black dark:text-white">
                           {dict.troubleshooting.quick_reference.solid_off}
                         </td>
                         <td className="py-3 px-4">{t("No device", "无设备")}</td>
@@ -107,7 +107,7 @@ export default async function TroubleshootingPage({ params }: LangProps) {
                         <td className="py-3 px-4">{dict.troubleshooting.quick_reference.connect_device}</td>
                       </tr>
                       <tr>
-                        <td className="py-3 px-4 font-medium text-foreground">
+                        <td className="py-3 px-4 font-medium text-black dark:text-white">
                           {dict.troubleshooting.quick_reference.slow_blink}
                         </td>
                         <td className="py-3 px-4">{t("Warning/Adjusting", "警告/调整中")}</td>
@@ -135,7 +135,7 @@ export default async function TroubleshootingPage({ params }: LangProps) {
                 <CardContent className="p-6">
                   <div className="space-y-4">
                     <div>
-                      <h4 className="font-semibold text-foreground mb-2">
+                      <h4 className="font-semibold text-black dark:text-white mb-2">
                         {t("Problem", "问题")}:
                       </h4>
                       <p className="text-sm leading-relaxed text-muted-foreground">
@@ -143,7 +143,7 @@ export default async function TroubleshootingPage({ params }: LangProps) {
                       </p>
                     </div>
                     <div>
-                      <h4 className="font-semibold text-foreground mb-2">
+                      <h4 className="font-semibold text-black dark:text-white mb-2">
                         {t("Possible Causes", "可能原因")}:
                       </h4>
                       <p className="text-sm leading-relaxed text-muted-foreground">
@@ -151,7 +151,7 @@ export default async function TroubleshootingPage({ params }: LangProps) {
                       </p>
                     </div>
                     <div>
-                      <h4 className="font-semibold text-foreground mb-2">
+                      <h4 className="font-semibold text-black dark:text-white mb-2">
                         {t("What to Do", "解决方法")}:
                       </h4>
                       <p className="text-sm leading-relaxed text-muted-foreground">
@@ -172,7 +172,7 @@ export default async function TroubleshootingPage({ params }: LangProps) {
                 <CardContent className="p-6">
                   <div className="space-y-4">
                     <div>
-                      <h4 className="font-semibold text-foreground mb-2">
+                      <h4 className="font-semibold text-black dark:text-white mb-2">
                         {t("Problem", "问题")}:
                       </h4>
                       <p className="text-sm leading-relaxed text-muted-foreground">
@@ -180,7 +180,7 @@ export default async function TroubleshootingPage({ params }: LangProps) {
                       </p>
                     </div>
                     <div>
-                      <h4 className="font-semibold text-foreground mb-2">
+                      <h4 className="font-semibold text-black dark:text-white mb-2">
                         {t("Possible Causes", "可能原因")}:
                       </h4>
                       <p className="text-sm leading-relaxed text-muted-foreground">
@@ -188,7 +188,7 @@ export default async function TroubleshootingPage({ params }: LangProps) {
                       </p>
                     </div>
                     <div>
-                      <h4 className="font-semibold text-foreground mb-2">
+                      <h4 className="font-semibold text-black dark:text-white mb-2">
                         {t("What to Do", "解决方法")}:
                       </h4>
                       <p className="text-sm leading-relaxed text-muted-foreground">
@@ -209,7 +209,7 @@ export default async function TroubleshootingPage({ params }: LangProps) {
                 <CardContent className="p-6">
                   <div className="space-y-4">
                     <div>
-                      <h4 className="font-semibold text-foreground mb-2">
+                      <h4 className="font-semibold text-black dark:text-white mb-2">
                         {t("Problem", "问题")}:
                       </h4>
                       <p className="text-sm leading-relaxed text-muted-foreground">
@@ -217,7 +217,7 @@ export default async function TroubleshootingPage({ params }: LangProps) {
                       </p>
                     </div>
                     <div>
-                      <h4 className="font-semibold text-foreground mb-2">
+                      <h4 className="font-semibold text-black dark:text-white mb-2">
                         {t("Possible Causes", "可能原因")}:
                       </h4>
                       <p className="text-sm leading-relaxed text-muted-foreground">
@@ -225,7 +225,7 @@ export default async function TroubleshootingPage({ params }: LangProps) {
                       </p>
                     </div>
                     <div>
-                      <h4 className="font-semibold text-foreground mb-2">
+                      <h4 className="font-semibold text-black dark:text-white mb-2">
                         {t("What to Do", "解决方法")}:
                       </h4>
                       <p className="text-sm leading-relaxed text-muted-foreground">
@@ -246,7 +246,7 @@ export default async function TroubleshootingPage({ params }: LangProps) {
                 <CardContent className="p-6">
                   <div className="space-y-4">
                     <div>
-                      <h4 className="font-semibold text-foreground mb-2">
+                      <h4 className="font-semibold text-black dark:text-white mb-2">
                         {t("Problem", "问题")}:
                       </h4>
                       <p className="text-sm leading-relaxed text-muted-foreground">
@@ -254,7 +254,7 @@ export default async function TroubleshootingPage({ params }: LangProps) {
                       </p>
                     </div>
                     <div>
-                      <h4 className="font-semibold text-foreground mb-2">
+                      <h4 className="font-semibold text-black dark:text-white mb-2">
                         {t("Symptoms", "症状")}:
                       </h4>
                       <ul className="list-disc list-inside space-y-1 text-sm leading-relaxed text-muted-foreground">
@@ -264,7 +264,7 @@ export default async function TroubleshootingPage({ params }: LangProps) {
                       </ul>
                     </div>
                     <div>
-                      <h4 className="font-semibold text-foreground mb-2">
+                      <h4 className="font-semibold text-black dark:text-white mb-2">
                         {t("Solution", "解决方案")}:
                       </h4>
                       <p className="text-sm leading-relaxed text-muted-foreground mb-3">
@@ -300,7 +300,7 @@ export default async function TroubleshootingPage({ params }: LangProps) {
                 <CardContent className="p-6">
                   <div className="space-y-4">
                     <div>
-                      <h4 className="font-semibold text-foreground mb-2">
+                      <h4 className="font-semibold text-black dark:text-white mb-2">
                         {t("Problem", "问题")}:
                       </h4>
                       <p className="text-sm leading-relaxed text-muted-foreground">
@@ -308,7 +308,7 @@ export default async function TroubleshootingPage({ params }: LangProps) {
                       </p>
                     </div>
                     <div>
-                      <h4 className="font-semibold text-foreground mb-2">
+                      <h4 className="font-semibold text-black dark:text-white mb-2">
                         {t("Possible Causes", "可能原因")}:
                       </h4>
                       <p className="text-sm leading-relaxed text-muted-foreground">
@@ -316,7 +316,7 @@ export default async function TroubleshootingPage({ params }: LangProps) {
                       </p>
                     </div>
                     <div>
-                      <h4 className="font-semibold text-foreground mb-2">
+                      <h4 className="font-semibold text-black dark:text-white mb-2">
                         {t("What to Do", "解决方法")}:
                       </h4>
                       <p className="text-sm leading-relaxed text-muted-foreground">
@@ -337,7 +337,7 @@ export default async function TroubleshootingPage({ params }: LangProps) {
                 <CardContent className="p-6">
                   <div className="space-y-4">
                     <div>
-                      <h4 className="font-semibold text-foreground mb-2">
+                      <h4 className="font-semibold text-black dark:text-white mb-2">
                         {t("Problem", "问题")}:
                       </h4>
                       <p className="text-sm leading-relaxed text-muted-foreground">
@@ -345,7 +345,7 @@ export default async function TroubleshootingPage({ params }: LangProps) {
                       </p>
                     </div>
                     <div>
-                      <h4 className="font-semibold text-foreground mb-2">
+                      <h4 className="font-semibold text-black dark:text-white mb-2">
                         {t("Possible Causes", "可能原因")}:
                       </h4>
                       <p className="text-sm leading-relaxed text-muted-foreground">
@@ -353,7 +353,7 @@ export default async function TroubleshootingPage({ params }: LangProps) {
                       </p>
                     </div>
                     <div>
-                      <h4 className="font-semibold text-foreground mb-2">
+                      <h4 className="font-semibold text-black dark:text-white mb-2">
                         {t("What to Do", "解决方法")}:
                       </h4>
                       <p className="text-sm leading-relaxed text-muted-foreground">
@@ -381,7 +381,7 @@ export default async function TroubleshootingPage({ params }: LangProps) {
                 <ul className="space-y-6">
                   <li>
                     <div className="space-y-2">
-                      <h4 className="font-semibold text-foreground">
+                      <h4 className="font-semibold text-black dark:text-white">
                         {dict.troubleshooting.still_issues.verify_setup}
                       </h4>
                       <p className="text-sm leading-relaxed text-muted-foreground">
@@ -391,7 +391,7 @@ export default async function TroubleshootingPage({ params }: LangProps) {
                   </li>
                   <li>
                     <div className="space-y-2">
-                      <h4 className="font-semibold text-foreground">
+                      <h4 className="font-semibold text-black dark:text-white">
                         {dict.troubleshooting.still_issues.check_connections}
                       </h4>
                       <p className="text-sm leading-relaxed text-muted-foreground">
@@ -401,7 +401,7 @@ export default async function TroubleshootingPage({ params }: LangProps) {
                   </li>
                   <li>
                     <div className="space-y-2">
-                      <h4 className="font-semibold text-foreground">
+                      <h4 className="font-semibold text-black dark:text-white">
                         {dict.troubleshooting.still_issues.driver_check}
                       </h4>
                       <p className="text-sm leading-relaxed text-muted-foreground">
@@ -411,7 +411,7 @@ export default async function TroubleshootingPage({ params }: LangProps) {
                   </li>
                   <li>
                     <div className="space-y-2">
-                      <h4 className="font-semibold text-foreground">
+                      <h4 className="font-semibold text-black dark:text-white">
                         {dict.troubleshooting.still_issues.supported_device}
                       </h4>
                       <p className="text-sm leading-relaxed text-muted-foreground">
@@ -421,7 +421,7 @@ export default async function TroubleshootingPage({ params }: LangProps) {
                   </li>
                   <li>
                     <div className="space-y-2">
-                      <h4 className="font-semibold text-foreground">
+                      <h4 className="font-semibold text-black dark:text-white">
                         {dict.troubleshooting.still_issues.reflash}
                       </h4>
                       <p className="text-sm leading-relaxed text-muted-foreground">
@@ -431,7 +431,7 @@ export default async function TroubleshootingPage({ params }: LangProps) {
                   </li>
                   <li>
                     <div className="space-y-2">
-                      <h4 className="font-semibold text-foreground">
+                      <h4 className="font-semibold text-black dark:text-white">
                         {dict.troubleshooting.still_issues.hardware_check}
                       </h4>
                       <p className="text-sm leading-relaxed text-muted-foreground">

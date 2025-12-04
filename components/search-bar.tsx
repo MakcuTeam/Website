@@ -133,7 +133,7 @@ export default function SearchBar() {
                   index === selectedIndex && "bg-accent"
                 )}
               >
-                <div className="font-medium text-sm text-foreground">
+                <div className="font-medium text-sm text-black dark:text-white">
                   {result.label}
                 </div>
                 <div className="text-xs text-muted-foreground mt-0.5">

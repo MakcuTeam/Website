@@ -66,7 +66,7 @@ export default async function SettingsPage({ params }: LangProps) {
   return (
     <div className="flex flex-col">
       <header className="flex flex-col gap-3 pt-8">
-        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl text-foreground">
+        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl text-black dark:text-white">
           {dict.settings.title}
         </h1>
         <p className="max-w-2xl text-sm text-muted-foreground sm:text-base">
@@ -93,7 +93,7 @@ export default async function SettingsPage({ params }: LangProps) {
                 <ul className="space-y-4">
                   <li>
                     <div className="space-y-2">
-                      <h4 className="font-semibold text-foreground">
+                      <h4 className="font-semibold text-black dark:text-white">
                         {dict.settings.prerequisites.firmware}
                       </h4>
                       <p className="text-sm leading-relaxed text-muted-foreground">
@@ -103,7 +103,7 @@ export default async function SettingsPage({ params }: LangProps) {
                   </li>
                   <li>
                     <div className="space-y-2">
-                      <h4 className="font-semibold text-foreground">
+                      <h4 className="font-semibold text-black dark:text-white">
                         {dict.settings.prerequisites.usb1}
                       </h4>
                       <p className="text-sm leading-relaxed text-muted-foreground">
@@ -113,7 +113,7 @@ export default async function SettingsPage({ params }: LangProps) {
                   </li>
                   <li>
                     <div className="space-y-2">
-                      <h4 className="font-semibold text-foreground">
+                      <h4 className="font-semibold text-black dark:text-white">
                         {dict.settings.prerequisites.usb2}
                       </h4>
                       <p className="text-sm leading-relaxed text-muted-foreground">

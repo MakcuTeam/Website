@@ -72,29 +72,32 @@
   body {
     background-color: transparent;
     background-image: none;
-    color: hsl(var(--foreground));
   }
 
-  /* Ensure text colors invert properly in light mode */
+  /* Light mode - force dark text */
   :root:not(.dark) {
     color-scheme: light;
+    color: #000000;
   }
 
+  :root:not(.dark) body {
+    color: #000000;
+  }
+
+  /* Dark mode - force light text */
   .dark {
     color-scheme: dark;
+    color: #ffffff;
   }
 
-  /* Force white text to become black in light mode */
-  :root:not(.dark) * {
-    /* Text will automatically use foreground color which is dark in light mode */
-  }
-
-  .light body{
+  .dark body {
+    color: #ffffff;
     background-color: transparent;
     background-image: none;
-      
-   }
-  .dark body {
+  }
+
+  .light body {
+    color: #000000;
     background-color: transparent;
     background-image: none;
   }

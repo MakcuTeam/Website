@@ -80,9 +80,9 @@ export default function PageSidebar({
       >
         <Link
           href={href}
-          className={`flex items-center gap-1.5 transition hover:text-foreground ${
+          className={`flex items-center gap-1.5 transition hover:text-black dark:hover:text-white ${
             level === 0
-              ? "font-medium text-foreground text-sm"
+              ? "font-medium text-black dark:text-white text-sm"
               : "text-xs text-muted-foreground"
           }`}
         >
@@ -101,7 +101,7 @@ export default function PageSidebar({
               <li key={child.id}>
                 <Link
                   href={`/${lang}${currentPage}#${child.id}`}
-                  className="block text-xs text-muted-foreground transition hover:text-foreground py-1"
+                  className="block text-xs text-muted-foreground transition hover:text-black dark:hover:text-white py-1"
                 >
                   {getLabel(child.labelKey)}
                 </Link>
@@ -128,7 +128,7 @@ export default function PageSidebar({
                 <div key={section.id} className="space-y-2">
                   {isDeviceInformation ? (
                     <>
-                      <div className="font-medium text-foreground">
+                      <div className="font-medium text-black dark:text-white">
                         {getLabel(section.labelKey)}
                       </div>
                       <div className="mt-2 pt-2 border-t border-border/60">
@@ -140,7 +140,7 @@ export default function PageSidebar({
                             <li key={child.id}>
                               <Link
                                 href={`/${lang}${currentPage}#${child.id}`}
-                                className="transition hover:text-foreground"
+                                className="transition hover:text-black dark:hover:text-white"
                               >
                                 {getLabel(child.labelKey)}
                               </Link>
@@ -153,7 +153,7 @@ export default function PageSidebar({
                     <>
                       <Link
                         href={`/${lang}${currentPage}#${section.id}`}
-                        className="font-medium text-foreground transition hover:text-foreground"
+                        className="font-medium text-black dark:text-white transition"
                       >
                         {getLabel(section.labelKey)}
                       </Link>
@@ -163,7 +163,7 @@ export default function PageSidebar({
                             <li key={child.id}>
                               <Link
                                 href={`/${lang}${currentPage}#${child.id}`}
-                                className="transition hover:text-foreground"
+                                className="transition hover:text-black dark:hover:text-white"
                               >
                                 {getLabel(child.labelKey)}
                               </Link>

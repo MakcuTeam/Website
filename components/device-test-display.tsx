@@ -57,7 +57,7 @@ function TestResultRow({
   return (
     <div className="flex items-center gap-2 py-1">
       <TestResultIcon status={status} />
-      <span className="text-sm text-foreground">
+      <span className="text-sm text-black dark:text-white">
         {isCn ? labels[label].cn : labels[label].en}
       </span>
       {status === "not_supported" && (

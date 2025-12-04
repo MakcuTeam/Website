@@ -39,7 +39,7 @@ export default async function SetupPage({ params }: LangProps) {
   return (
     <div className="flex flex-col">
       <header className="flex flex-col gap-3 pt-8">
-        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl text-foreground">
+        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl text-black dark:text-white">
           {dict.setup.title}
         </h1>
         <p className="max-w-2xl text-sm text-muted-foreground sm:text-base">
@@ -66,7 +66,7 @@ export default async function SetupPage({ params }: LangProps) {
                 <ul className="space-y-6">
                   <li>
                     <div className="space-y-2">
-                      <h4 className="font-semibold text-foreground">
+                      <h4 className="font-semibold text-black dark:text-white">
                         {dict.setup.sections.requirements.ch343_driver}
                       </h4>
                       <p className="text-sm leading-relaxed text-muted-foreground">
@@ -76,7 +76,7 @@ export default async function SetupPage({ params }: LangProps) {
                   </li>
                   <li>
                     <div className="space-y-2">
-                      <h4 className="font-semibold text-foreground">
+                      <h4 className="font-semibold text-black dark:text-white">
                         {dict.setup.sections.requirements.com_port}
                       </h4>
                       <p className="text-sm leading-relaxed text-muted-foreground">
@@ -86,7 +86,7 @@ export default async function SetupPage({ params }: LangProps) {
                   </li>
                   <li>
                     <div className="space-y-2">
-                      <h4 className="font-semibold text-foreground">
+                      <h4 className="font-semibold text-black dark:text-white">
                         {t("Baud Rate", "波特率")}
                       </h4>
                       <p className="text-sm leading-relaxed text-muted-foreground">
@@ -103,7 +103,7 @@ export default async function SetupPage({ params }: LangProps) {
                   </li>
                   <li>
                     <div className="space-y-2">
-                      <h4 className="font-semibold text-foreground">
+                      <h4 className="font-semibold text-black dark:text-white">
                         {dict.setup.sections.requirements.both_sides}
                       </h4>
                       <p className="text-sm leading-relaxed text-muted-foreground">
@@ -113,7 +113,7 @@ export default async function SetupPage({ params }: LangProps) {
                   </li>
                   <li>
                     <div className="space-y-2">
-                      <h4 className="font-semibold text-foreground">
+                      <h4 className="font-semibold text-black dark:text-white">
                         {dict.setup.sections.requirements.supported_device}
                       </h4>
                       <p className="text-sm leading-relaxed text-muted-foreground">
@@ -236,7 +236,7 @@ export default async function SetupPage({ params }: LangProps) {
                 <CardContent className="p-6">
                   <div className="space-y-4">
                     <div>
-                      <h4 className="font-semibold text-foreground mb-2">
+                      <h4 className="font-semibold text-black dark:text-white mb-2">
                         {t("How to Enter Flash Mode", "如何进入刷写模式")}:
                       </h4>
                       <ol className="list-decimal list-inside space-y-2 text-sm leading-relaxed text-muted-foreground">
@@ -271,7 +271,7 @@ export default async function SetupPage({ params }: LangProps) {
                 <CardContent className="p-6">
                   <div className="space-y-4">
                     <div>
-                      <h4 className="font-semibold text-foreground mb-2">
+                      <h4 className="font-semibold text-black dark:text-white mb-2">
                         {t("Normal Mode Connections", "正常模式连接")}:
                       </h4>
                       <ul className="list-disc list-inside space-y-2 text-sm leading-relaxed text-muted-foreground">
@@ -300,7 +300,7 @@ export default async function SetupPage({ params }: LangProps) {
                 <CardContent className="p-6">
                   <div className="space-y-4">
                     <div>
-                      <h4 className="font-semibold text-foreground mb-2">
+                      <h4 className="font-semibold text-black dark:text-white mb-2">
                         {t("Normal Mode", "正常模式")}:
                       </h4>
                       <p className="text-sm leading-relaxed text-muted-foreground">
@@ -308,7 +308,7 @@ export default async function SetupPage({ params }: LangProps) {
                       </p>
                     </div>
                     <div>
-                      <h4 className="font-semibold text-foreground mb-2">
+                      <h4 className="font-semibold text-black dark:text-white mb-2">
                         {t("Flash Mode", "刷写模式")}:
                       </h4>
                       <p className="text-sm leading-relaxed text-muted-foreground">
@@ -330,7 +330,7 @@ export default async function SetupPage({ params }: LangProps) {
               <CardContent className="p-6">
                 <div className="space-y-4">
                   <div>
-                    <h4 className="font-semibold text-foreground mb-2">
+                    <h4 className="font-semibold text-black dark:text-white mb-2">
                       {t("Problem", "问题")}:
                     </h4>
                     <p className="text-sm leading-relaxed text-muted-foreground">
@@ -338,7 +338,7 @@ export default async function SetupPage({ params }: LangProps) {
                     </p>
                   </div>
                   <div>
-                    <h4 className="font-semibold text-foreground mb-2">
+                    <h4 className="font-semibold text-black dark:text-white mb-2">
                       {t("Solution", "解决方法")}:
                     </h4>
                     <p className="text-sm leading-relaxed text-muted-foreground">

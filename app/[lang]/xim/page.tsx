@@ -41,7 +41,7 @@ export default async function XimPage({ params }: LangProps) {
   return (
     <div className="flex flex-col">
       <header className="flex flex-col gap-3 pt-8">
-        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl text-foreground">
+        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl text-black dark:text-white">
           {dict.xim.title}
         </h1>
         <p className="max-w-2xl text-sm text-muted-foreground sm:text-base">
@@ -79,7 +79,7 @@ export default async function XimPage({ params }: LangProps) {
                 <CardContent className="p-6">
                   <div className="space-y-6">
                     <div>
-                      <h4 className="font-semibold text-foreground mb-2">
+                      <h4 className="font-semibold text-black dark:text-white mb-2">
                         {dict.xim.sections.setup.prerequisites.baud_rate_warning}
                       </h4>
                       <div className="p-4 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
@@ -89,7 +89,7 @@ export default async function XimPage({ params }: LangProps) {
                       </div>
                     </div>
                     <div>
-                      <h4 className="font-semibold text-foreground mb-2">
+                      <h4 className="font-semibold text-black dark:text-white mb-2">
                         {dict.xim.sections.setup.prerequisites.mouse_conversion_important}
                       </h4>
                       <div className="p-4 rounded-lg bg-blue-500/10 border border-blue-500/20">
@@ -99,7 +99,7 @@ export default async function XimPage({ params }: LangProps) {
                       </div>
                     </div>
                     <div>
-                      <h4 className="font-semibold text-foreground mb-2">
+                      <h4 className="font-semibold text-black dark:text-white mb-2">
                         {dict.xim.sections.setup.prerequisites.mouse_removal_warning}
                       </h4>
                       <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/20">
@@ -125,7 +125,7 @@ export default async function XimPage({ params }: LangProps) {
                       {dict.xim.sections.setup.step1_prepare_xim.description}
                     </p>
                     <div>
-                      <h4 className="font-semibold text-foreground mb-2">
+                      <h4 className="font-semibold text-black dark:text-white mb-2">
                         {dict.xim.sections.setup.step1_prepare_xim.xim_must_work}
                       </h4>
                       <p className="text-sm leading-relaxed text-muted-foreground">
@@ -133,7 +133,7 @@ export default async function XimPage({ params }: LangProps) {
                       </p>
                     </div>
                     <div>
-                      <h4 className="font-semibold text-foreground mb-2">
+                      <h4 className="font-semibold text-black dark:text-white mb-2">
                         {dict.xim.sections.setup.step1_prepare_xim.xim_testing}
                       </h4>
                       <p className="text-sm leading-relaxed text-muted-foreground">
@@ -157,7 +157,7 @@ export default async function XimPage({ params }: LangProps) {
                       {dict.xim.sections.setup.step2_prepare_makcu.description}
                     </p>
                     <div>
-                      <h4 className="font-semibold text-foreground mb-2">
+                      <h4 className="font-semibold text-black dark:text-white mb-2">
                         {dict.xim.sections.setup.step2_prepare_makcu.makcu_functional}
                       </h4>
                       <p className="text-sm leading-relaxed text-muted-foreground">
@@ -165,7 +165,7 @@ export default async function XimPage({ params }: LangProps) {
                       </p>
                     </div>
                     <div>
-                      <h4 className="font-semibold text-foreground mb-2">
+                      <h4 className="font-semibold text-black dark:text-white mb-2">
                         {dict.xim.sections.setup.step2_prepare_makcu.mouse_requirement}
                       </h4>
                       <p className="text-sm leading-relaxed text-muted-foreground">
@@ -189,7 +189,7 @@ export default async function XimPage({ params }: LangProps) {
                       {dict.xim.sections.setup.step3_connect.description}
                     </p>
                     <div>
-                      <h4 className="font-semibold text-foreground mb-2">
+                      <h4 className="font-semibold text-black dark:text-white mb-2">
                         {dict.xim.sections.setup.step3_connect.final_steps}
                       </h4>
                       <p className="text-sm leading-relaxed text-muted-foreground">

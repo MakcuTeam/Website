@@ -63,7 +63,7 @@ export default async function FirmwarePage({ params }: LangProps) {
   return (
     <div className="flex flex-col">
       <header className="flex flex-col gap-3 pt-8">
-        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl text-foreground">
+        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl text-black dark:text-white">
           {dict.tools.title}
         </h1>
         <p className="max-w-2xl text-sm text-muted-foreground sm:text-base">
@@ -80,7 +80,7 @@ export default async function FirmwarePage({ params }: LangProps) {
                   <div key={item.id} className="space-y-2">
                     <Link
                       href={`/${lang}/firmware#${item.id}`}
-                      className="font-medium text-foreground transition hover:text-foreground"
+                      className="font-medium text-black dark:text-white transition"
                     >
                       {item.label}
                     </Link>
@@ -90,7 +90,7 @@ export default async function FirmwarePage({ params }: LangProps) {
                           <li key={child.id}>
                             <Link
                               href={`/${lang}/firmware#${child.id}`}
-                              className="transition hover:text-foreground"
+                              className="transition hover:text-black dark:hover:text-white"
                             >
                               {child.label}
                             </Link>

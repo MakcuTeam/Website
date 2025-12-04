@@ -321,7 +321,7 @@ export default async function ApiPage({ params }: LangProps) {
   return (
     <div className="flex flex-col">
       <header className="flex flex-col gap-3 pt-8">
-        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl text-foreground">MAKCU API</h1>
+        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl text-black dark:text-white">MAKCU API</h1>
         <p className="max-w-2xl text-sm text-muted-foreground sm:text-base">
           {isCn
             ? "KM 主机协议 — v3.9 · MAKCU 生态的完整指令参考。"
@@ -338,7 +338,7 @@ export default async function ApiPage({ params }: LangProps) {
                   <div key={item.id} className="space-y-2">
                     <Link
                       href={`/${lang}/api#${item.id}`}
-                      className="font-medium text-foreground transition hover:text-foreground"
+                      className="font-medium text-black dark:text-white transition"
                     >
                       {item.label}
                     </Link>
@@ -348,7 +348,7 @@ export default async function ApiPage({ params }: LangProps) {
                           <li key={child.id}>
                             <Link
                               href={`/${lang}/api#${child.id}`}
-                              className="transition hover:text-foreground"
+                              className="transition hover:text-black dark:hover:text-white"
                             >
                               {child.label}
                             </Link>

@@ -47,7 +47,7 @@ export default function TocObserver({ data }: Props) {
   }, [data]);
 
   return (
-    <div className="flex flex-col gap-2.5 text-sm text-foreground ml-0.5">
+    <div className="flex flex-col gap-2.5 text-sm text-black dark:text-white ml-0.5">
       {data.map(({ href, level, text }, index) => {
         return (
           <Link
