@@ -16,8 +16,11 @@ function setCookie(name: string, value: string, hours: number): void {
 }
 
 function parseAndStoreDeviceInfoBinary(data: Uint8Array): void {
-  console.log("[DEBUG] parseAndStoreDeviceInfoBinary: Starting parse, data length:", data.length);
-  console.log("[DEBUG] parseAndStoreDeviceInfoBinary: First 50 bytes:", Array.from(data.slice(0, Math.min(50, data.length))));
+  console.log("[DEBUG] parseAndStoreDeviceInfoBinary: ========== STARTING PARSE ==========");
+  console.log("[DEBUG] parseAndStoreDeviceInfoBinary: Data length:", data.length);
+  console.log("[DEBUG] parseAndStoreDeviceInfoBinary: Full data array:", Array.from(data));
+  console.log("[DEBUG] parseAndStoreDeviceInfoBinary: Data as hex:", Array.from(data).map(b => `0x${b.toString(16).padStart(2, '0').toUpperCase()}`).join(' '));
+  console.log("[DEBUG] parseAndStoreDeviceInfoBinary: First 100 bytes:", Array.from(data.slice(0, Math.min(100, data.length))));
   
   if (data.length < 1) {
     console.warn("[DEBUG] parseAndStoreDeviceInfoBinary: Data too short (< 1 byte)");
@@ -39,9 +42,14 @@ function parseAndStoreDeviceInfoBinary(data: Uint8Array): void {
   // New format: 356 bytes (1 header + 6 MAC1 + 6 MAC2 + 4 TEMP + 4 RAM + 4 CPU + 4 UP + 2 VID + 2 PID + 1 MOUSE_BINT + 1 KBD_BINT + 32 FW + 32 MAKCU + 64 VENDOR + 64 MODEL + 64 ORIGINAL_SERIAL + 64 SPOOFED_SERIAL + 1 SPOOF_ACTIVE)
   const NEW_FORMAT_SIZE = 356;
   
+  console.log("[DEBUG] parseAndStoreDeviceInfoBinary: Expected size:", NEW_FORMAT_SIZE, "Actual size:", data.length, "Difference:", data.length - NEW_FORMAT_SIZE);
+  console.log("[DEBUG] parseAndStoreDeviceInfoBinary: Missing bytes:", Math.max(0, NEW_FORMAT_SIZE - data.length));
+  
   if (header !== 0x01 || data.length < NEW_FORMAT_SIZE) {
     // Invalid or incomplete response
     console.warn("[DEBUG] parseAndStoreDeviceInfoBinary: Invalid header or data too short. Header:", header, "Expected: 1, Data length:", data.length, "Required:", NEW_FORMAT_SIZE);
+    console.warn("[DEBUG] parseAndStoreDeviceInfoBinary: Missing", Math.max(0, NEW_FORMAT_SIZE - data.length), "bytes");
+    console.warn("[DEBUG] parseAndStoreDeviceInfoBinary: Last 20 bytes received:", Array.from(data.slice(Math.max(0, data.length - 20))));
     setCookie(DEVICE_INFO_COOKIE, "", 0);
     return;
   }
@@ -167,31 +175,44 @@ function parseAndStoreDeviceInfoBinary(data: Uint8Array): void {
   pos += 64;
 
   // ORIGINAL_SERIAL string (null-terminated, max 64 bytes)
+  console.log("[DEBUG] parseAndStoreDeviceInfoBinary: At position", pos, "for ORIGINAL_SERIAL, remaining bytes:", data.length - pos);
+  console.log("[DEBUG] parseAndStoreDeviceInfoBinary: ORIGINAL_SERIAL bytes:", Array.from(data.slice(pos, pos + 64)));
   const origSerialEnd = data.indexOf(0, pos);
+  console.log("[DEBUG] parseAndStoreDeviceInfoBinary: ORIGINAL_SERIAL null terminator at:", origSerialEnd);
   if (origSerialEnd >= pos) {
     const origSerial = new TextDecoder().decode(data.slice(pos, origSerialEnd));
     if (origSerial) deviceInfo.ORIGINAL_SERIAL = origSerial;
-    console.log("[DEBUG] parseAndStoreDeviceInfoBinary: ORIGINAL_SERIAL:", deviceInfo.ORIGINAL_SERIAL || "(empty)");
+    console.log("[DEBUG] parseAndStoreDeviceInfoBinary: ORIGINAL_SERIAL decoded:", deviceInfo.ORIGINAL_SERIAL || "(empty)");
   } else {
     console.log("[DEBUG] parseAndStoreDeviceInfoBinary: ORIGINAL_SERIAL: not found (no null terminator)");
   }
   pos += 64;
+  console.log("[DEBUG] parseAndStoreDeviceInfoBinary: After ORIGINAL_SERIAL, pos:", pos, "remaining:", data.length - pos);
 
   // SPOOFED_SERIAL string (null-terminated, max 64 bytes)
+  console.log("[DEBUG] parseAndStoreDeviceInfoBinary: At position", pos, "for SPOOFED_SERIAL, remaining bytes:", data.length - pos);
+  console.log("[DEBUG] parseAndStoreDeviceInfoBinary: SPOOFED_SERIAL bytes:", Array.from(data.slice(pos, pos + 64)));
   const spoofSerialEnd = data.indexOf(0, pos);
+  console.log("[DEBUG] parseAndStoreDeviceInfoBinary: SPOOFED_SERIAL null terminator at:", spoofSerialEnd);
   if (spoofSerialEnd >= pos) {
     const spoofSerial = new TextDecoder().decode(data.slice(pos, spoofSerialEnd));
     if (spoofSerial) deviceInfo.SPOOFED_SERIAL = spoofSerial;
-    console.log("[DEBUG] parseAndStoreDeviceInfoBinary: SPOOFED_SERIAL:", deviceInfo.SPOOFED_SERIAL || "(empty)");
+    console.log("[DEBUG] parseAndStoreDeviceInfoBinary: SPOOFED_SERIAL decoded:", deviceInfo.SPOOFED_SERIAL || "(empty)");
   } else {
     console.log("[DEBUG] parseAndStoreDeviceInfoBinary: SPOOFED_SERIAL: not found (no null terminator)");
   }
   pos += 64;
+  console.log("[DEBUG] parseAndStoreDeviceInfoBinary: After SPOOFED_SERIAL, pos:", pos, "remaining:", data.length - pos);
 
   // SPOOF_ACTIVE flag (1 byte: 0=not spoofed, 1=spoofed)
-  const spoofActive = data[pos++];
-  deviceInfo.SPOOF_ACTIVE = spoofActive === 1;
-  console.log("[DEBUG] parseAndStoreDeviceInfoBinary: SPOOF_ACTIVE:", deviceInfo.SPOOF_ACTIVE, "raw:", spoofActive);
+  if (pos < data.length) {
+    const spoofActive = data[pos++];
+    deviceInfo.SPOOF_ACTIVE = spoofActive === 1;
+    console.log("[DEBUG] parseAndStoreDeviceInfoBinary: SPOOF_ACTIVE at pos", pos - 1, "value:", spoofActive, "boolean:", deviceInfo.SPOOF_ACTIVE);
+  } else {
+    console.error("[DEBUG] parseAndStoreDeviceInfoBinary: SPOOF_ACTIVE: position", pos, "exceeds data length", data.length);
+    deviceInfo.SPOOF_ACTIVE = false;
+  }
 
   // Store in cookie as JSON (only if we have vendor or model)
   console.log("[DEBUG] parseAndStoreDeviceInfoBinary: Final parsed deviceInfo:", JSON.stringify(deviceInfo, null, 2));
