@@ -70,96 +70,34 @@ function TestResultRow({
 }
 
 export function DeviceTestDisplay({ lang }: DeviceTestDisplayProps) {
-  const { status, port } = useMakcuConnection();
+  const { status, sendCommandAndReadResponse } = useMakcuConnection();
   const [testResult, setTestResult] = useState<DeviceTestResult | null>(null);
   const [testing, setTesting] = useState(false);
   const [testError, setTestError] = useState<string | null>(null);
   const isCn = lang === "cn";
 
   const runTest = async (mode: number) => {
-    if (!port || status !== "connected") return;
+    if (status !== "connected" || !sendCommandAndReadResponse) return;
 
     setTesting(true);
     setTestError(null);
     setTestResult(null);
 
     try {
-      // Get writer
-      const writer = port.writable?.getWriter();
-      if (!writer) {
-        throw new Error("Port not writable");
-      }
-
-      // Send device test command
+      // Send command and read response using the connection provider's helper
       const command = `.devicetest(${mode})\n`;
-      await writer.write(new TextEncoder().encode(command));
-      writer.releaseLock();
+      const response = await sendCommandAndReadResponse(command, 10000); // 10 second timeout
 
-      // Get reader
-      const reader = port.readable?.getReader();
-      if (!reader) {
-        throw new Error("Port not readable");
+      if (!response || response.length < 4) {
+        setTestError(isCn ? "未收到响应或响应不完整" : "No response or incomplete response");
+        return;
       }
 
-      // Read response with timeout
-      const chunks: Uint8Array[] = [];
-      const timeout = setTimeout(() => {
-        reader.cancel().catch(() => {});
-      }, 5000); // 5 second timeout for test
-
-      try {
-        while (true) {
-          const { value, done } = await reader.read();
-          if (done) break;
-          chunks.push(value);
-
-          // Check if we have enough data
-          const totalLength = chunks.reduce((sum, chunk) => sum + chunk.length, 0);
-          if (totalLength >= 4) {
-            // Combine chunks
-            const combined = new Uint8Array(totalLength);
-            let offset = 0;
-            for (const chunk of chunks) {
-              combined.set(chunk, offset);
-              offset += chunk.length;
-            }
-
-            // Look for binary response (starts with 0x00 or 0x01)
-            let binaryStart = -1;
-            for (let i = 0; i < combined.length; i++) {
-              if (combined[i] === 0x00 || combined[i] === 0x01) {
-                // Estimate expected size based on mode
-                const expectedSize = 4 + (mode & 0x01 ? 10 : 0) + (mode & 0x02 ? 3 : 0);
-                if (i + expectedSize <= combined.length || i + 4 <= combined.length) {
-                  binaryStart = i;
-                  break;
-                }
-              }
-            }
-
-            if (binaryStart >= 0) {
-              clearTimeout(timeout);
-              const binaryData = combined.slice(binaryStart);
-              const result = parseDeviceTestResponse(binaryData);
-              if (result) {
-                setTestResult(result);
-              } else {
-                setTestError(isCn ? "解析响应失败" : "Failed to parse response");
-              }
-              break;
-            }
-          }
-
-          // Safety limit
-          if (totalLength > 200) break;
-        }
-      } finally {
-        clearTimeout(timeout);
-        try {
-          reader.releaseLock();
-        } catch (e) {
-          // Ignore
-        }
+      const result = parseDeviceTestResponse(response);
+      if (result) {
+        setTestResult(result);
+      } else {
+        setTestError(isCn ? "解析响应失败" : "Failed to parse response");
       }
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);

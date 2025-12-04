@@ -335,6 +335,7 @@ interface MakcuConnectionState {
 interface MakcuConnectionContextType extends MakcuConnectionState {
   connect: () => Promise<void>;
   disconnect: () => Promise<void>;
+  sendCommandAndReadResponse: (command: string, timeoutMs?: number) => Promise<Uint8Array | null>;
   isConnecting: boolean;
   browserSupported: boolean;
 }
@@ -866,10 +867,138 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
     };
   }, [state.status, state.port, performDisconnect]);
 
+  // Send command and read response using existing reader
+  const sendCommandAndReadResponse = useCallback(async (command: string, timeoutMs: number = 5000): Promise<Uint8Array | null> => {
+    const currentState = stateRef.current;
+    if (!currentState.port || currentState.status !== "connected") {
+      return null;
+    }
+
+    try {
+      // Check if readable is locked
+      const readable = currentState.port.readable;
+      if (!readable) {
+        return null;
+      }
+
+      // Get a writer (temporarily)
+      const writer = currentState.port.writable?.getWriter();
+      if (!writer) {
+        return null;
+      }
+
+      // Send command
+      await writer.write(new TextEncoder().encode(command));
+      writer.releaseLock();
+
+      // Use existing reader if available (it's kept for monitoring)
+      const reader = readerRef.current;
+      if (!reader) {
+        return null;
+      }
+
+      // Read response with timeout using the existing reader
+      const chunks: Uint8Array[] = [];
+      let responseReceived = false;
+      let timeoutId: NodeJS.Timeout | null = null;
+
+      const timeoutPromise = new Promise<Uint8Array | null>((resolve) => {
+        timeoutId = setTimeout(() => {
+          resolve(null);
+        }, timeoutMs);
+      });
+
+      const readPromise = (async (): Promise<Uint8Array | null> => {
+        try {
+          // Read until we get a complete response or timeout
+          let readCount = 0;
+          const maxReads = 100; // Safety limit
+          
+          while (readCount < maxReads && !responseReceived) {
+            const { value, done } = await reader.read();
+            if (done) break;
+            
+            if (value) {
+              chunks.push(value);
+              
+              // Combine chunks and check for binary response
+              const totalLength = chunks.reduce((sum, chunk) => sum + chunk.length, 0);
+              const combined = new Uint8Array(totalLength);
+              let offset = 0;
+              for (const chunk of chunks) {
+                combined.set(chunk, offset);
+                offset += chunk.length;
+              }
+
+              // Look for binary response (starts with 0x00 or 0x01)
+              for (let i = 0; i < combined.length; i++) {
+                if (combined[i] === 0x00 || combined[i] === 0x01) {
+                  // Found binary header, check if we have enough data (at least 4 bytes)
+                  if (i + 4 <= combined.length) {
+                    // Estimate expected size - we need at least the header
+                    // For devicetest, minimum is 4 bytes, max is around 20 bytes
+                    // If we have at least 4 bytes, we can parse it
+                    responseReceived = true;
+                    if (timeoutId) clearTimeout(timeoutId);
+                    return combined.slice(i);
+                  }
+                }
+              }
+
+              // Safety: if we have a lot of data and found a binary header, try to return it
+              if (totalLength >= 4) {
+                for (let i = 0; i < combined.length; i++) {
+                  if (combined[i] === 0x00 || combined[i] === 0x01) {
+                    responseReceived = true;
+                    if (timeoutId) clearTimeout(timeoutId);
+                    return combined.slice(i);
+                  }
+                }
+              }
+            }
+            
+            readCount++;
+          }
+
+          // Final attempt to find binary data
+          if (chunks.length > 0) {
+            const totalLength = chunks.reduce((sum, chunk) => sum + chunk.length, 0);
+            const combined = new Uint8Array(totalLength);
+            let offset = 0;
+            for (const chunk of chunks) {
+              combined.set(chunk, offset);
+              offset += chunk.length;
+            }
+            
+            for (let i = 0; i < combined.length; i++) {
+              if (combined[i] === 0x00 || combined[i] === 0x01) {
+                responseReceived = true;
+                if (timeoutId) clearTimeout(timeoutId);
+                return combined.slice(i);
+              }
+            }
+          }
+
+          return null;
+        } catch (error) {
+          return null;
+        }
+      })();
+
+      const result = await Promise.race([readPromise, timeoutPromise]);
+      if (timeoutId) clearTimeout(timeoutId);
+      
+      return result;
+    } catch (error) {
+      return null;
+    }
+  }, []);
+
   const value: MakcuConnectionContextType = {
     ...state,
     connect,
     disconnect,
+    sendCommandAndReadResponse,
     isConnecting,
     browserSupported,
   };
