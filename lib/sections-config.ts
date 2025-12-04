@@ -324,18 +324,8 @@ export const SECTIONS_CONFIG: PageSections[] = sortPagesAlphabetically([
     route: "/troubleshooting",
     sections: [
       {
-        id: "led-guide",
-        labelKey: "troubleshooting.led_guide.title",
-        children: [
-          {
-            id: "left-side",
-            labelKey: "troubleshooting.led_guide.left_side.title",
-          },
-          {
-            id: "right-side",
-            labelKey: "troubleshooting.led_guide.right_side.title",
-          },
-        ],
+        id: "led-status",
+        labelKey: "troubleshooting.quick_reference.title",
       },
       {
         id: "troubleshooting-steps",
@@ -366,10 +356,6 @@ export const SECTIONS_CONFIG: PageSections[] = sortPagesAlphabetically([
             labelKey: "troubleshooting.troubleshooting_steps.button_held_still_looping.title",
           },
         ],
-      },
-      {
-        id: "quick-reference",
-        labelKey: "troubleshooting.quick_reference.title",
       },
       {
         id: "still-issues",

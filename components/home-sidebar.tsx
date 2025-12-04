@@ -96,14 +96,14 @@ export default function HomeSidebar({ lang, dict }: HomeSidebarProps) {
                         return true;
                       })
                       .map((section) => (
-                        <Link
-                          key={section.id}
-                          href={`/${lang}${pageConfig.route}#${section.id}`}
-                          className="block text-xs text-muted-foreground transition hover:text-foreground"
-                        >
-                          {getLabel(section.labelKey)}
-                        </Link>
-                      ))}
+                      <Link
+                        key={section.id}
+                        href={`/${lang}${pageConfig.route}#${section.id}`}
+                        className="block text-xs text-muted-foreground transition hover:text-foreground"
+                      >
+                        {getLabel(section.labelKey)}
+                      </Link>
+                    ))}
                   </div>
                 </div>
               );

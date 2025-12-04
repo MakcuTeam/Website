@@ -289,6 +289,7 @@
           "Verify baud rate matches between MAKCU and your software",
           "Only one software can be connected to USB2 COM port at the same time. Ensure other software that might be using the COM port is closed before connecting.",
         ],
+        "usb2_warning": "Warning: Only one software can connect to USB2 at the same time. If you already have the website/AIO tool/chair connected, then you will have to shut the software to connect with something else.",
         "important": "USB 1 + USB 2 must be connected for MAKCU to take power. USB 2 does not provide power to MAKCU - this prevents back feeding to the main PC and 2nd PC from both USB ports."
       },
       "cannot_flash_website": {
@@ -305,7 +306,7 @@
       }
     },
     "quick_reference": {
-      "title": "Quick Reference",
+      "title": "LED Status",
       "led_state": "LED State",
       "left_meaning": "Left Side Meaning",
       "right_meaning": "Right Side Meaning",
@@ -315,7 +316,7 @@
       "slow_blink": "Slow Blink",
       "working": "Working - no action needed",
       "connect_device": "Connect device",
-      "wait_resolves": "Wait, usually resolves"
+      "wait_resolves": "wait, or reconnect all cables"
     },
     "still_issues": {
       "title": "Still Having Issues?",
