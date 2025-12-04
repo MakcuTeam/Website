@@ -398,7 +398,7 @@
       "usb1": "USB 1 connected to your gaming PC",
       "usb1_desc": "USB 1 must be connected to your gaming PC",
       "usb2": "USB 2 connected to this PC",
-      "usb2_desc": "USB 2 must be connected to the same computer. Otherwise, MAKCU is not functional.",
+      "usb2_desc": "USB 2 must be connected to the same computer.",
       "note": "Note: If you encounter connection issues, please see the troubleshooting page for detailed setup instructions."
     },
     "warnings": {

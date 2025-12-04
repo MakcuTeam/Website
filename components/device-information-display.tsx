@@ -42,11 +42,7 @@ export function DeviceInformationDisplay({ lang, variant = "card" }: DeviceInfor
   // Only show if connected and we have valid device info
   if (status !== "connected" || !deviceInfo) {
     if (variant === "inline") {
-      return (
-        <div className="text-sm text-muted-foreground">
-          {isCn ? "设备未连接。连接设备后，设备信息将显示在这里。" : "Device not connected. Device information will appear here once connected."}
-        </div>
-      );
+      return null;
     }
     return (
       <Card className="border-border/60 bg-card/90 shadow-lg">

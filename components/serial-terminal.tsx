@@ -245,7 +245,7 @@ export function SerialTerminal({ lang }: SerialTerminalProps) {
         {/* Terminal Output */}
         <div
           ref={scrollContainerRef}
-          className="w-full h-[500px] bg-slate-950 dark:bg-slate-900 border border-border rounded-md p-4 font-mono text-sm overflow-y-auto overflow-x-auto"
+          className="w-full h-[500px] bg-card/50 border border-border rounded-md p-4 font-mono text-sm overflow-y-auto overflow-x-auto"
           style={{ scrollbarWidth: "thin" }}
         >
           {status !== "connected" ? (

@@ -63,15 +63,25 @@ export default function HomeSidebar({ lang, dict }: HomeSidebarProps) {
                     {getPageTitle(pageKey)}
                   </Link>
                   <div className="space-y-2 pl-4 border-l border-border/60">
-                    {pageConfig.sections
-                      .filter((section) => {
-                        // Filter out device-information from settings page on main page sidebar
-                        if (pageKey === "settings" && section.id === "device-information") {
-                          return false;
+                    {pageConfig.sections.flatMap((section) => {
+                      // For device-information on settings page, only show its children, not the parent
+                      if (pageKey === "settings" && section.id === "device-information") {
+                        if (section.children && section.children.length > 0) {
+                          return section.children.map((child) => (
+                            <Link
+                              key={child.id}
+                              href={`/${lang}${pageConfig.route}#${child.id}`}
+                              className="block text-xs text-muted-foreground transition hover:text-foreground"
+                            >
+                              {getLabel(child.labelKey)}
+                            </Link>
+                          ));
                         }
-                        return true;
-                      })
-                      .map((section) => (
+                        return [];
+                      }
+                      
+                      // For all other sections, show the section link
+                      return [
                         <Link
                           key={section.id}
                           href={`/${lang}${pageConfig.route}#${section.id}`}
@@ -79,7 +89,8 @@ export default function HomeSidebar({ lang, dict }: HomeSidebarProps) {
                         >
                           {getLabel(section.labelKey)}
                         </Link>
-                      ))}
+                      ];
+                    })}
                   </div>
                 </div>
               );
