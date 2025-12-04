@@ -29,11 +29,11 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
       if (!newMutedState) {
         // Use GainNode for volume control if available, otherwise fallback to HTML5 volume
         if (gainNodeRef.current) {
-          gainNodeRef.current.gain.value = 0.15; // 15% volume using Web Audio API
-          console.log("🔊 Unmuting - Setting GainNode gain to 0.15 (15%)");
+          gainNodeRef.current.gain.value = 0.25; // 25% volume using Web Audio API
+          console.log("🔊 Unmuting - Setting GainNode gain to 0.25 (25%)");
         } else {
-          audioRef.current.volume = 0.15; // Fallback to HTML5 volume
-          console.log("🔊 Unmuting - Setting HTML5 volume to 0.15 (15%)");
+          audioRef.current.volume = 0.25; // Fallback to HTML5 volume
+          console.log("🔊 Unmuting - Setting HTML5 volume to 0.25 (25%)");
         }
         try {
           if (audioRef.current.paused) {
@@ -51,11 +51,11 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
       audioRef.current.muted = newMutedState;
       setIsMuted(newMutedState);
       
-      // Force volume to 15% even after unmuting using GainNode
+      // Force volume to 25% even after unmuting using GainNode
       if (gainNodeRef.current) {
-        gainNodeRef.current.gain.value = 0.15;
+        gainNodeRef.current.gain.value = 0.25;
       } else {
-        audioRef.current.volume = 0.15;
+        audioRef.current.volume = 0.25;
       }
       
       const currentGain = gainNodeRef.current?.gain.value ?? audioRef.current.volume;
@@ -63,12 +63,12 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
         paused: audioRef.current.paused,
         muted: audioRef.current.muted,
         gain: currentGain,
-        expectedGain: 0.15,
+        expectedGain: 0.25,
         readyState: audioRef.current.readyState
       });
       
-      if (Math.abs(currentGain - 0.15) > 0.01) {
-        console.warn("⚠️ Gain mismatch! Expected 0.15, got:", currentGain);
+      if (Math.abs(currentGain - 0.25) > 0.01) {
+        console.warn("⚠️ Gain mismatch! Expected 0.25, got:", currentGain);
       }
     }
   };

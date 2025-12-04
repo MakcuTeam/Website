@@ -22,9 +22,9 @@ export function AudioPlayer() {
       const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
       audioContextRef.current = audioContext;
       
-      // Create gain node with 15% volume (0.15)
+      // Create gain node with 25% volume (0.25)
       const gainNode = audioContext.createGain();
-      gainNode.gain.value = 0.15; // 15% volume using Web Audio API
+      gainNode.gain.value = 0.25; // 25% volume using Web Audio API
       gainNodeRef.current = gainNode;
       
       // Create source from audio element
@@ -36,29 +36,29 @@ export function AudioPlayer() {
       gainNode.connect(audioContext.destination);
       
       console.log("🔊 Web Audio API initialized");
-      console.log("🔊 GainNode gain set to:", gainNode.gain.value, "(15%)");
+      console.log("🔊 GainNode gain set to:", gainNode.gain.value, "(25%)");
       console.log("🔊 Audio src:", audio.src || audio.querySelector("source")?.src);
     } catch (error) {
       console.error("❌ Failed to initialize Web Audio API:", error);
       // Fallback to HTML5 audio volume
-      audio.volume = 0.15;
+      audio.volume = 0.25;
     }
     
     // Set initial state
     audio.muted = true;
     setIsMuted(true);
     
-    // Force volume function - ensures volume stays at 15% using GainNode
+    // Force volume function - ensures volume stays at 25% using GainNode
     const enforceVolume = () => {
       if (gainNodeRef.current) {
-        if (Math.abs(gainNodeRef.current.gain.value - 0.15) > 0.01) {
-          console.warn("⚠️ GainNode gain changed from", gainNodeRef.current.gain.value, "to 0.15 (15%)");
-          gainNodeRef.current.gain.value = 0.15;
+        if (Math.abs(gainNodeRef.current.gain.value - 0.25) > 0.01) {
+          console.warn("⚠️ GainNode gain changed from", gainNodeRef.current.gain.value, "to 0.25 (25%)");
+          gainNodeRef.current.gain.value = 0.25;
         }
-      } else if (audio.volume !== 0.15) {
+      } else if (audio.volume !== 0.25) {
         // Fallback to HTML5 volume
-        console.warn("⚠️ Volume changed from", audio.volume, "to 0.15 (15%)");
-        audio.volume = 0.15;
+        console.warn("⚠️ Volume changed from", audio.volume, "to 0.25 (25%)");
+        audio.volume = 0.25;
       }
     };
     
@@ -87,12 +87,12 @@ export function AudioPlayer() {
     const handlePlay = () => {
       enforceVolume();
       const currentGain = gainNodeRef.current?.gain.value ?? audio.volume;
-      console.log("🔊 Audio play event - GainNode gain:", currentGain, "(expected: 0.15)", "Muted:", audio.muted);
+      console.log("🔊 Audio play event - GainNode gain:", currentGain, "(expected: 0.25)", "Muted:", audio.muted);
     };
 
     const handleVolumeChange = () => {
       const currentGain = gainNodeRef.current?.gain.value ?? audio.volume;
-      console.log("🔊 Volume changed event - Current gain:", currentGain, "(expected: 0.15)");
+      console.log("🔊 Volume changed event - Current gain:", currentGain, "(expected: 0.25)");
       enforceVolume();
     };
 
@@ -134,12 +134,12 @@ export function AudioPlayer() {
       
       // Use GainNode for volume control if available, otherwise fallback to HTML5 volume
       if (gainNodeRef.current) {
-        gainNodeRef.current.gain.value = 0.15; // 15% volume using Web Audio API
-        console.log("🔊 User interaction - Setting GainNode gain to 0.15 (15%)");
+        gainNodeRef.current.gain.value = 0.25; // 25% volume using Web Audio API
+        console.log("🔊 User interaction - Setting GainNode gain to 0.25 (25%)");
         console.log("🔊 GainNode gain:", gainNodeRef.current.gain.value);
       } else {
-        audio.volume = 0.15; // Fallback to HTML5 volume
-        console.log("🔊 User interaction - Setting HTML5 volume to 0.15 (15%)");
+        audio.volume = 0.25; // Fallback to HTML5 volume
+        console.log("🔊 User interaction - Setting HTML5 volume to 0.25 (25%)");
       }
       
       setIsMuted(false);
@@ -154,7 +154,7 @@ export function AudioPlayer() {
           .then(() => {
             console.log("✓ Audio playing! duration:", audio.duration, "seconds");
             const currentGain = gainNodeRef.current?.gain.value ?? audio.volume;
-            console.log("🔊 Gain after play:", currentGain, "(expected: 0.15)");
+            console.log("🔊 Gain after play:", currentGain, "(expected: 0.25)");
             console.log("🔊 Muted state:", audio.muted);
             setHasInteracted(true);
           })
@@ -169,16 +169,16 @@ export function AudioPlayer() {
                 audio.oncanplaythrough = null;
                 audio.muted = false;
                 if (gainNodeRef.current) {
-                  gainNodeRef.current.gain.value = 0.15;
-                  console.log("🔊 Retry - Setting GainNode gain to 0.15 (15%)");
+                  gainNodeRef.current.gain.value = 0.25;
+                  console.log("🔊 Retry - Setting GainNode gain to 0.25 (25%)");
                 } else {
-                  audio.volume = 0.15;
-                  console.log("🔊 Retry - Setting HTML5 volume to 0.15 (15%)");
+                  audio.volume = 0.25;
+                  console.log("🔊 Retry - Setting HTML5 volume to 0.25 (25%)");
                 }
                 audio.play()
                   .then(() => {
                     const currentGain = gainNodeRef.current?.gain.value ?? audio.volume;
-                    console.log("✓ Retry successful! Gain:", currentGain, "(expected: 0.15)");
+                    console.log("✓ Retry successful! Gain:", currentGain, "(expected: 0.25)");
                     setHasInteracted(true);
                   })
                   .catch((e) => {
@@ -207,21 +207,21 @@ export function AudioPlayer() {
     };
   }, [hasInteracted, audioRef, setHasInteracted, setIsMuted]);
 
-  // Continuous volume monitoring - ensures volume stays at 15% using GainNode
+  // Continuous volume monitoring - ensures volume stays at 25% using GainNode
   useEffect(() => {
     if (!audioRef.current) return;
 
     const audio = audioRef.current;
     const volumeCheckInterval = setInterval(() => {
       if (gainNodeRef.current && !audio.muted) {
-        if (Math.abs(gainNodeRef.current.gain.value - 0.15) > 0.01) {
-          console.warn("⚠️ GainNode gain was changed to", gainNodeRef.current.gain.value, "- resetting to 0.15 (15%)");
-          gainNodeRef.current.gain.value = 0.15;
+        if (Math.abs(gainNodeRef.current.gain.value - 0.25) > 0.01) {
+          console.warn("⚠️ GainNode gain was changed to", gainNodeRef.current.gain.value, "- resetting to 0.25 (25%)");
+          gainNodeRef.current.gain.value = 0.25;
         }
-      } else if (!audio.muted && Math.abs(audio.volume - 0.15) > 0.01) {
+      } else if (!audio.muted && Math.abs(audio.volume - 0.25) > 0.01) {
         // Fallback to HTML5 volume
-        console.warn("⚠️ Volume was changed to", audio.volume, "- resetting to 0.15 (15%)");
-        audio.volume = 0.15;
+        console.warn("⚠️ Volume was changed to", audio.volume, "- resetting to 0.25 (25%)");
+        audio.volume = 0.25;
       }
     }, 1000); // Check every second
 
