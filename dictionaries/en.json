@@ -418,7 +418,9 @@
     },
     "sections": {
       "status": "Status",
-      "device_information": "Device Information"
+      "device_information": "Device Information",
+      "device_test": "Device Test",
+      "serial_terminal": "Serial Terminal"
     }
   },
   "setup": {

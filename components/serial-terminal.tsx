@@ -317,18 +317,6 @@ export function SerialTerminal({ lang }: SerialTerminalProps) {
           </Button>
         </div>
 
-        {/* Status */}
-        <div className="text-xs text-muted-foreground">
-          {status === "connected" ? (
-            <span className="text-green-500">
-              {isCn ? "● 已连接" : "● Connected"} ({lines.length} {isCn ? "行" : "lines"})
-            </span>
-          ) : (
-            <span className="text-red-500">
-              {isCn ? "○ 未连接" : "○ Disconnected"}
-            </span>
-          )}
-        </div>
       </CardContent>
     </Card>
   );

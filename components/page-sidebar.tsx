@@ -7,6 +7,7 @@ import type { Locale } from "@/lib/locale";
 import type { SectionItem } from "@/lib/sections-config";
 import { Dictionary } from "@/lib/dictionaries";
 import { ChevronRight } from "lucide-react";
+import { DeviceInformationDisplay } from "./device-information-display";
 
 type PageSidebarProps = {
   sections: SectionItem[];
@@ -122,30 +123,62 @@ export default function PageSidebar({
             {isCn ? "目录" : "Contents"}
           </div>
           <nav className="mt-4 space-y-3 text-sm">
-            {sections.map((section) => (
-              <div key={section.id} className="space-y-2">
-                <Link
-                  href={`/${lang}${currentPage}#${section.id}`}
-                  className="font-medium text-foreground/80 transition hover:text-foreground"
-                >
-                  {getLabel(section.labelKey)}
-                </Link>
-                {section.children && section.children.length > 0 && (
-                  <ul className="space-y-1 border-l border-border/60 pl-3 text-xs text-muted-foreground">
-                    {section.children.map((child) => (
-                      <li key={child.id}>
-                        <Link
-                          href={`/${lang}${currentPage}#${child.id}`}
-                          className="transition hover:text-foreground"
-                        >
-                          {getLabel(child.labelKey)}
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            ))}
+            {sections.map((section) => {
+              const isDeviceInformation = section.id === "device-information" && currentPage === "/settings";
+              const hasChildren = section.children && section.children.length > 0;
+              
+              return (
+                <div key={section.id} className="space-y-2">
+                  {isDeviceInformation ? (
+                    <>
+                      <div className="font-medium text-foreground/80">
+                        {getLabel(section.labelKey)}
+                      </div>
+                      <div className="mt-2 pt-2 border-t border-border/60">
+                        <DeviceInformationDisplay lang={lang} variant="inline" />
+                      </div>
+                      {hasChildren && (
+                        <ul className="space-y-1 border-l border-border/60 pl-3 text-xs text-muted-foreground mt-2">
+                          {section.children.map((child) => (
+                            <li key={child.id}>
+                              <Link
+                                href={`/${lang}${currentPage}#${child.id}`}
+                                className="transition hover:text-foreground"
+                              >
+                                {getLabel(child.labelKey)}
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      <Link
+                        href={`/${lang}${currentPage}#${section.id}`}
+                        className="font-medium text-foreground/80 transition hover:text-foreground"
+                      >
+                        {getLabel(section.labelKey)}
+                      </Link>
+                      {hasChildren && (
+                        <ul className="space-y-1 border-l border-border/60 pl-3 text-xs text-muted-foreground">
+                          {section.children.map((child) => (
+                            <li key={child.id}>
+                              <Link
+                                href={`/${lang}${currentPage}#${child.id}`}
+                                className="transition hover:text-foreground"
+                              >
+                                {getLabel(child.labelKey)}
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </>
+                  )}
+                </div>
+              );
+            })}
           </nav>
         </CardContent>
       </Card>

@@ -7,7 +7,6 @@ import { getDictionary } from "@/lib/dictionaries";
 import { Section, SubSection } from "@/components/section";
 import PageSidebar from "@/components/page-sidebar";
 import { getSectionsForPage } from "@/lib/sections-config";
-import { DeviceInformationDisplay } from "@/components/device-information-display";
 import { DeviceTestDisplay } from "@/components/device-test-display";
 import { SerialTerminal } from "@/components/serial-terminal";
 
@@ -19,18 +18,16 @@ type TocItem = {
 
 const tocByLang: Record<Locale, TocItem[]> = {
   en: [
+    { id: "prerequisites", label: "Prerequisites" },
     { id: "device-information", label: "Device Information" },
     { id: "device-test", label: "Device Test" },
     { id: "serial-terminal", label: "Serial Terminal" },
-    { id: "prerequisites", label: "Prerequisites" },
-    { id: "baud-rate", label: "Baud Rate" },
   ],
   cn: [
+    { id: "prerequisites", label: "前提条件" },
     { id: "device-information", label: "设备信息" },
     { id: "device-test", label: "设备测试" },
     { id: "serial-terminal", label: "串口终端" },
-    { id: "prerequisites", label: "前提条件" },
-    { id: "baud-rate", label: "波特率" },
   ],
 };
 
@@ -86,21 +83,6 @@ export default async function SettingsPage({ params }: LangProps) {
         />
 
         <div className="space-y-20">
-          {/* Device Information Section */}
-          <Section id="device-information" title={dict.settings.sections.device_information}>
-            <DeviceInformationDisplay lang={lang} />
-          </Section>
-
-          {/* Device Test Section */}
-          <Section id="device-test" title={t("Device Test", "设备测试")}>
-            <DeviceTestDisplay lang={lang} />
-          </Section>
-
-          {/* Serial Terminal Section */}
-          <Section id="serial-terminal" title={t("Serial Terminal", "串口终端")}>
-            <SerialTerminal lang={lang} />
-          </Section>
-
           {/* Prerequisites Section */}
           <Section
             id="prerequisites"
@@ -155,23 +137,14 @@ export default async function SettingsPage({ params }: LangProps) {
             </Card>
           </Section>
 
-          {/* Baud Rate Section */}
-          <Section
-            id="baud-rate"
-            title={dict.settings.baud_rate.title}
-            lead={<p className="text-base leading-relaxed text-muted-foreground">{dict.settings.baud_rate.description}</p>}
-          >
-            <Card className="border-border/60 bg-card/90 shadow-lg">
-              <CardContent className="p-6">
-                <p className="text-sm leading-relaxed text-muted-foreground">
-                  <Link href={`https://www.makcu.com/${lang}/setup#baud-rate`} className="text-blue-600 dark:text-blue-400 hover:underline">
-                    {t("Please refer to the setup page", "请参考设置页面")}
-                  </Link>
-                  {" "}
-                  {t("for detailed information on baud rate configuration.", "了解波特率配置的详细信息。")}
-                </p>
-              </CardContent>
-            </Card>
+          {/* Device Test Section */}
+          <Section id="device-test" title={t("Device Test", "设备测试")}>
+            <DeviceTestDisplay lang={lang} />
+          </Section>
+
+          {/* Serial Terminal Section */}
+          <Section id="serial-terminal" title={t("Serial Terminal", "串口终端")}>
+            <SerialTerminal lang={lang} />
           </Section>
         </div>
       </div>

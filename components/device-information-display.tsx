@@ -8,13 +8,14 @@ import type { Locale } from "@/lib/locale";
 
 type DeviceInformationDisplayProps = {
   lang: Locale;
+  variant?: "card" | "inline";
 };
 
 /**
  * Device Information display component for settings page.
  * Shows all parsed cookie information in a formatted card.
  */
-export function DeviceInformationDisplay({ lang }: DeviceInformationDisplayProps) {
+export function DeviceInformationDisplay({ lang, variant = "card" }: DeviceInformationDisplayProps) {
   const { status } = useMakcuConnection();
   const [deviceInfo, setDeviceInfo] = useState<Record<string, string | boolean> | null>(null);
   const isCn = lang === "cn";
@@ -40,6 +41,13 @@ export function DeviceInformationDisplay({ lang }: DeviceInformationDisplayProps
 
   // Only show if connected and we have valid device info
   if (status !== "connected" || !deviceInfo) {
+    if (variant === "inline") {
+      return (
+        <div className="text-sm text-muted-foreground">
+          {isCn ? "设备未连接。连接设备后，设备信息将显示在这里。" : "Device not connected. Device information will appear here once connected."}
+        </div>
+      );
+    }
     return (
       <Card className="border-border/60 bg-card/90 shadow-lg">
         <CardContent className="p-4">
@@ -141,21 +149,35 @@ export function DeviceInformationDisplay({ lang }: DeviceInformationDisplayProps
     return [key, formatValue(key, value)] as [string, string];
   });
 
+  const isInline = variant === "inline";
+  
+  const content = (
+    <div className={isInline ? "space-y-1.5" : "space-y-2"}>
+      {displayItems.map(([key, value]) => (
+        <div key={key} className={`flex items-start gap-3 ${isInline ? "py-1 text-xs" : "py-1.5"} border-b border-border/40 last:border-b-0`}>
+          <div className={`${isInline ? "text-xs" : "text-sm"} font-medium text-foreground/80 ${isInline ? "min-w-[120px]" : "min-w-[175px]"}`}>
+            {formatLabel(key)}
+          </div>
+          <div className={`${isInline ? "text-xs" : "text-sm"} text-muted-foreground ${isInline ? "" : "font-mono"} break-all`}>
+            {value}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+
+  if (variant === "inline") {
+    return (
+      <div className="bg-transparent">
+        {content}
+      </div>
+    );
+  }
+
   return (
     <Card className="border-border/60 bg-card/90 shadow-lg">
       <CardContent className="p-4">
-        <div className="space-y-2">
-          {displayItems.map(([key, value]) => (
-            <div key={key} className="flex items-center gap-3 py-1.5 border-b border-border/40 last:border-b-0">
-              <div className="text-sm font-medium text-foreground/80 min-w-[175px]">
-                {formatLabel(key)}
-              </div>
-              <div className="text-sm text-muted-foreground font-mono break-all">
-                {value}
-              </div>
-            </div>
-          ))}
-        </div>
+        {content}
       </CardContent>
     </Card>
   );

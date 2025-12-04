@@ -382,16 +382,22 @@ export const SECTIONS_CONFIG: PageSections[] = sortPagesAlphabetically([
     route: "/settings",
     sections: [
       {
-        id: "device-information",
-        labelKey: "settings.sections.device_information",
-      },
-      {
         id: "prerequisites",
         labelKey: "settings.prerequisites.title",
       },
       {
-        id: "baud-rate",
-        labelKey: "settings.baud_rate.title",
+        id: "device-information",
+        labelKey: "settings.sections.device_information",
+        children: [
+          {
+            id: "device-test",
+            labelKey: "settings.sections.device_test",
+          },
+          {
+            id: "serial-terminal",
+            labelKey: "settings.sections.serial_terminal",
+          },
+        ],
       },
     ],
   },

@@ -63,15 +63,23 @@ export default function HomeSidebar({ lang, dict }: HomeSidebarProps) {
                     {getPageTitle(pageKey)}
                   </Link>
                   <div className="space-y-2 pl-4 border-l border-border/60">
-                    {pageConfig.sections.map((section) => (
-                      <Link
-                        key={section.id}
-                        href={`/${lang}${pageConfig.route}#${section.id}`}
-                        className="block text-xs text-muted-foreground transition hover:text-foreground"
-                      >
-                        {getLabel(section.labelKey)}
-                      </Link>
-                    ))}
+                    {pageConfig.sections
+                      .filter((section) => {
+                        // Filter out device-information from settings page on main page sidebar
+                        if (pageKey === "settings" && section.id === "device-information") {
+                          return false;
+                        }
+                        return true;
+                      })
+                      .map((section) => (
+                        <Link
+                          key={section.id}
+                          href={`/${lang}${pageConfig.route}#${section.id}`}
+                          className="block text-xs text-muted-foreground transition hover:text-foreground"
+                        >
+                          {getLabel(section.labelKey)}
+                        </Link>
+                      ))}
                   </div>
                 </div>
               );
