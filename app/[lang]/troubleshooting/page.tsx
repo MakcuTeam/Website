@@ -49,7 +49,7 @@ export default async function TroubleshootingPage({ params }: LangProps) {
 
   return (
     <div className="flex flex-col">
-      <header className="flex flex-col gap-3">
+      <header className="flex flex-col gap-3 pt-8">
         <h1 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
           {dict.troubleshooting.title}
         </h1>
