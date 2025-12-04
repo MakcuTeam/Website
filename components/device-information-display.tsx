@@ -54,8 +54,8 @@ export function DeviceInformationDisplay({ lang }: DeviceInformationDisplayProps
   // Helper function to format label
   const formatLabel = (key: string): string => {
     const labels: Record<string, { en: string; cn: string }> = {
-      MAC1: { en: "MAC Address 1", cn: "MAC 地址 1" },
-      MAC2: { en: "MAC Address 2", cn: "MAC 地址 2" },
+      MAC1: { en: "Left Chip Serial", cn: "左芯片序列号" },
+      MAC2: { en: "Right Chip Serial", cn: "右芯片序列号" },
       TEMP: { en: "Temperature", cn: "温度" },
       RAM: { en: "RAM", cn: "内存" },
       CPU: { en: "CPU Frequency", cn: "CPU 频率" },
@@ -65,7 +65,7 @@ export function DeviceInformationDisplay({ lang }: DeviceInformationDisplayProps
       MOUSE_BINT: { en: "Mouse Polling Rate", cn: "鼠标轮询率" },
       KBD_BINT: { en: "Keyboard Polling Rate", cn: "键盘轮询率" },
       FW: { en: "Firmware Version", cn: "固件版本" },
-      MAKCU: { en: "MAKCU Version", cn: "MAKCU 版本" },
+      MAKCU: { en: "MAKCU Board", cn: "MAKCU 主板" },
       VENDOR: { en: "Make", cn: "制造商" },
       MODEL: { en: "Model", cn: "型号" },
       ORIGINAL_SERIAL: { en: "Original Serial", cn: "原始序列号" },
