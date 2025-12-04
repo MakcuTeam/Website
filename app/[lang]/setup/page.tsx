@@ -59,7 +59,6 @@ export default async function SetupPage({ params }: LangProps) {
           {/* Requirements Section */}
           <Section
             id="requirements"
-            badge={t("Setup", "设置")}
             title={dict.setup.sections.requirements.title}
           >
             <Card className="border-border/60 bg-card/90 shadow-lg">
@@ -206,7 +205,6 @@ export default async function SetupPage({ params }: LangProps) {
           {/* Flash Mode vs Normal Mode */}
           <Section
             id="flash-vs-normal-mode"
-            badge={t("Mode", "模式")}
             title={dict.troubleshooting.flash_vs_normal_mode.title}
             lead={
               <p className="text-base leading-relaxed text-muted-foreground">

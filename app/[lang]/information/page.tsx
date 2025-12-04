@@ -61,7 +61,6 @@ export default async function InformationPage({ params }: LangProps) {
           {/* What is MAKCU */}
           <Section
             id="what-is-makcu"
-            badge={t("Overview", "概述")}
             title={dict.information.what_is_makcu.title}
             lead={
               <p className="text-base leading-relaxed text-muted-foreground">
@@ -132,7 +131,6 @@ export default async function InformationPage({ params }: LangProps) {
           {/* What is it used for */}
           <Section
             id="what-is-it-used-for"
-            badge={t("Usage", "用途")}
             title={dict.information.what_is_it_used_for.title}
             lead={
               <p className="text-base leading-relaxed text-muted-foreground">
@@ -180,7 +178,6 @@ export default async function InformationPage({ params }: LangProps) {
           {/* Capabilities */}
           <Section
             id="capabilities"
-            badge={t("Capabilities", "功能")}
             title={dict.information.capabilities.title}
           >
             <SubSection
@@ -308,7 +305,6 @@ export default async function InformationPage({ params }: LangProps) {
           {/* Pre-flashed vs Unflashed */}
           <Section
             id="preflashed-vs-unflashed"
-            badge={t("Setup", "设置")}
             title={dict.information.preflashed_vs_unflashed.title}
             lead={
               <p className="text-base leading-relaxed text-muted-foreground">
@@ -376,7 +372,6 @@ export default async function InformationPage({ params }: LangProps) {
           {/* USB Ports */}
           <Section
             id="usb-ports"
-            badge={t("Hardware", "硬件")}
             title={dict.information.usb_ports.title}
             lead={
               <p className="text-base leading-relaxed text-muted-foreground">
@@ -565,7 +560,6 @@ export default async function InformationPage({ params }: LangProps) {
           {/* Connection Status */}
           <Section
             id="connection-status"
-            badge={t("Connection", "连接")}
             title={dict.troubleshooting.connection_status.title}
             lead={
               <p className="text-base leading-relaxed text-muted-foreground">
@@ -678,7 +672,6 @@ export default async function InformationPage({ params }: LangProps) {
           {/* Baud Rate Section */}
           <Section
             id="baud-rate"
-            badge={t("Important", "重要")}
             title={dict.setup.sections.flash_makcu.baud_rate.title}
             lead={<p className="text-base leading-relaxed text-muted-foreground">{dict.setup.sections.flash_makcu.baud_rate.description}</p>}
           >

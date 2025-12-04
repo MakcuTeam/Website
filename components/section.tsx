@@ -16,13 +16,6 @@ type SubSectionProps = {
 export function Section({ id, badge, title, lead, children }: SectionProps) {
   return (
     <section id={id} className="scroll-mt-28">
-      <div className="sticky top-24 z-10 mb-4">
-        {badge ? (
-          <div className="inline-flex items-center gap-2 rounded-full border bg-background/80 px-4 py-1 text-[11px] uppercase tracking-[0.3em] text-muted-foreground backdrop-blur">
-            {badge}
-          </div>
-        ) : null}
-      </div>
       <div className="space-y-4">
         <h2 className="text-3xl font-semibold tracking-tight lg:text-4xl">{title}</h2>
         {lead ? <div className="text-base leading-relaxed text-muted-foreground">{lead}</div> : null}

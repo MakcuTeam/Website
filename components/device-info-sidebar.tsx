@@ -47,9 +47,6 @@ export function DeviceInfoSidebar() {
 
   return (
     <div className="space-y-2 pt-2 border-t border-border/60">
-      <div className="text-xs font-semibold uppercase tracking-[0.3em] text-muted-foreground">
-        Connected Device
-      </div>
       <div className="pl-4 border-l border-border/60">
         <div className="text-xs text-foreground/80 font-medium">
           {vendor}

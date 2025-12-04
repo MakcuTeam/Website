@@ -74,9 +74,6 @@ export default function HomeSidebar({ lang, dict }: HomeSidebarProps) {
     <aside>
       <Card className="border-border/60 bg-card/90 shadow-lg">
         <CardContent className="p-5">
-          <div className="text-xs font-semibold uppercase tracking-[0.3em] text-muted-foreground mb-4">
-            {isCn ? "所有章节" : "All Sections"}
-          </div>
           <nav className="space-y-4 text-sm">
             {allPages.map((pageConfig) => {
               const pageKey = pageConfig.page;

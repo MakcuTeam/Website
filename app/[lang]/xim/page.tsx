@@ -61,7 +61,6 @@ export default async function XimPage({ params }: LangProps) {
           {/* Main Setup Section */}
           <Section
             id="xim-setup"
-            badge={t("Controller", "控制器")}
             title={dict.xim.sections.setup.title}
             lead={
               <div className="space-y-2">

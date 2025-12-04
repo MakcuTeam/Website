@@ -70,7 +70,6 @@ export default async function TroubleshootingPage({ params }: LangProps) {
           {/* LED Status Guide */}
           <Section
             id="led-guide"
-            badge={t("LED", "LED")}
             title={dict.troubleshooting.led_guide.title}
             lead={
               <p className="text-base leading-relaxed text-muted-foreground">
@@ -262,7 +261,6 @@ export default async function TroubleshootingPage({ params }: LangProps) {
           {/* Troubleshooting Steps */}
           <Section
             id="troubleshooting-steps"
-            badge={t("Steps", "步骤")}
             title={dict.troubleshooting.troubleshooting_steps.title}
           >
             {/* Slow Persists */}
@@ -502,7 +500,7 @@ export default async function TroubleshootingPage({ params }: LangProps) {
 
 
           {/* Quick Reference */}
-          <Section id="quick-reference" badge={t("Reference", "参考")} title={dict.troubleshooting.quick_reference.title}>
+          <Section id="quick-reference" title={dict.troubleshooting.quick_reference.title}>
             <Card className="border-border/60 bg-card/90 shadow-lg">
               <CardContent className="p-6">
                 <div className="overflow-x-auto">
@@ -558,7 +556,6 @@ export default async function TroubleshootingPage({ params }: LangProps) {
           {/* Still Having Issues */}
           <Section
             id="still-issues"
-            badge={t("Help", "帮助")}
             title={dict.troubleshooting.still_issues.title}
             lead={
               <p className="text-base leading-relaxed text-muted-foreground">

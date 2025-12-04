@@ -119,10 +119,7 @@ export default function PageSidebar({
     <aside>
       <Card className="border-border/60 bg-card/90 shadow-lg">
         <CardContent className="p-5">
-          <div className="text-xs font-semibold uppercase tracking-[0.3em] text-muted-foreground">
-            {isCn ? "目录" : "Contents"}
-          </div>
-          <nav className="mt-4 space-y-3 text-sm">
+          <nav className="space-y-3 text-sm">
             {sections.map((section) => {
               const isDeviceInformation = section.id === "device-information" && currentPage === "/settings";
               const hasChildren = section.children && section.children.length > 0;

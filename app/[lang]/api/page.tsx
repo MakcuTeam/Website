@@ -333,10 +333,7 @@ export default async function ApiPage({ params }: LangProps) {
         <aside>
           <Card className="border-border/60 bg-card/90 shadow-lg">
             <CardContent className="p-5">
-              <div className="text-xs font-semibold uppercase tracking-[0.3em] text-muted-foreground">
-                {isCn ? "目录" : "Contents"}
-              </div>
-              <nav className="mt-4 space-y-3 text-sm">
+              <nav className="space-y-3 text-sm">
                 {toc.map((item) => (
                   <div key={item.id} className="space-y-2">
                     <Link
@@ -370,7 +367,6 @@ export default async function ApiPage({ params }: LangProps) {
           {/* Transport */}
           <Section
             id="transport"
-            badge={t("Protocol", "协议")}
             title={t("Transport & Framing", "传输与封装")}
             lead={
               isCn ? (
@@ -501,7 +497,7 @@ export default async function ApiPage({ params }: LangProps) {
           </Section>
 
           {/* Mouse Buttons */}
-          <Section id="mouse-buttons" badge={t("Mouse", "鼠标")} title={t("Mouse Buttons", "鼠标按键")}>
+          <Section id="mouse-buttons" title={t("Mouse Buttons", "鼠标按键")}>
             <SubSection
               id="buttons-individual"
               title={t("Individual Buttons (GET/SET)", "单个按键 (GET/SET)")}
@@ -663,7 +659,7 @@ export default async function ApiPage({ params }: LangProps) {
           </Section>
 
           {/* Mouse Movement */}
-          <Section id="mouse-movement" badge={t("Motion", "移动")} title={t("Mouse Movement", "鼠标移动")}>
+          <Section id="mouse-movement" title={t("Mouse Movement", "鼠标移动")}>
             <SubSection id="move" title="move(dx,dy[,segments[,cx1,cy1[,cx2,cy2]]]) — SET">
               <SpecCard
                 entries={[
@@ -893,7 +889,7 @@ export default async function ApiPage({ params }: LangProps) {
           </Section>
 
           {/* Mouse Advanced */}
-          <Section id="mouse-advanced" badge={t("Advanced", "高级")} title={t("Mouse Advanced", "鼠标高级")}>
+          <Section id="mouse-advanced" title={t("Mouse Advanced", "鼠标高级")}>
             <SubSection id="mo" title="mo(buttons,x,y,wheel,pan,tilt) — SET">
               <SpecCard
                 entries={[
@@ -1121,7 +1117,7 @@ export default async function ApiPage({ params }: LangProps) {
           </Section>
 
           {/* Mouse Remap (Physical Only) */}
-          <Section id="mouse-remap" badge={t("Remap", "重映射")} title={t("Mouse Remap (Physical Only)", "鼠标重映射（仅物理）")}>
+          <Section id="mouse-remap" title={t("Mouse Remap (Physical Only)", "鼠标重映射（仅物理）")}>
             <Tip>
               {isCn ? (
                 <span>
@@ -1326,7 +1322,7 @@ export default async function ApiPage({ params }: LangProps) {
           </Section>
 
           {/* Keyboard */}
-          <Section id="keyboard" badge={t("Keyboard", "键盘")} title={t("Keyboard Commands", "键盘命令")}>
+          <Section id="keyboard" title={t("Keyboard Commands", "键盘命令")}>
             <Tip>
               {isCn ? (
                 <span>
@@ -2136,7 +2132,7 @@ export default async function ApiPage({ params }: LangProps) {
           </Section>
 
           {/* Streaming */}
-          <Section id="streaming" badge={t("Streaming", "流式")} title={t("Streaming", "流式")}>
+          <Section id="streaming" title={t("Streaming", "流式")}>
             <SubSection
               id="keys-stream"
               title={t("keyboard([mode[,period]]) — GET/SET", "keyboard([mode[,period]]) — GET/SET")}
@@ -2316,7 +2312,7 @@ export default async function ApiPage({ params }: LangProps) {
           </Section>
 
           {/* Position & Screen */}
-          <Section id="screen" badge={t("Screen", "屏幕")} title={t("Position & Screen", "位置与屏幕")}>
+          <Section id="screen" title={t("Position & Screen", "位置与屏幕")}>
             <SubSection id="screen-cmd" title="screen([W,H]) — GET/SET">
               <SpecCard
                 entries={[
@@ -2346,7 +2342,7 @@ export default async function ApiPage({ params }: LangProps) {
           </Section>
 
           {/* System Commands */}
-          <Section id="system" badge={t("System", "系统")} title={t("System Commands", "系统命令")}>
+          <Section id="system" title={t("System Commands", "系统命令")}>
             <SubSection id="help" title="help() — GET">
               <SpecCard
                 entries={[
@@ -2540,7 +2536,7 @@ export default async function ApiPage({ params }: LangProps) {
           </Section>
 
           {/* Configuration */}
-          <Section id="config" badge={t("Config", "配置")} title={t("Configuration", "配置")}>
+          <Section id="config" title={t("Configuration", "配置")}>
             <SubSection id="log" title="log([level]) — GET/SET">
               <SpecCard
                 entries={[
@@ -2877,7 +2873,6 @@ export default async function ApiPage({ params }: LangProps) {
           {/* Functions Without USB Device */}
           <Section
             id="no-usb"
-            badge={t("No USB", "无需 USB")}
             title={t("Functions That Work Without USB Device Attached", "无需 USB 设备即可工作的函数")}
           >
             <Card className="border-border/60 bg-card/90 shadow-lg">
@@ -2914,7 +2909,6 @@ export default async function ApiPage({ params }: LangProps) {
           {/* Baud Binary */}
           <Section
             id="baud-binary"
-            badge={t("Binary", "二进制")}
             title={t("Baud Rate Change (Binary)", "波特率变更（二进制）")}
           >
             <SpecCard
@@ -2961,7 +2955,6 @@ export default async function ApiPage({ params }: LangProps) {
           {/* Limits & Parsing */}
           <Section
             id="limits"
-            badge={t("Spec", "规格")}
             title={t("Limits & Parsing", "限制与解析")}
           >
             <Card className="border-border/60 bg-card/90 shadow-lg">
