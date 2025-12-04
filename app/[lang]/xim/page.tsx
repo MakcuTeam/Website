@@ -39,7 +39,7 @@ export default async function XimPage({ params }: LangProps) {
   const t = (en: string, cn: string) => (isCn ? cn : en);
 
   return (
-    <div className="flex flex-col pb-20">
+    <div className="flex flex-col">
       <header className="flex flex-col gap-3">
         <h1 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
           {dict.xim.title}
