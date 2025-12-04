@@ -134,6 +134,11 @@ export function AudioPlayer() {
     };
   }, [hasInteracted, audioRef, setHasInteracted, setIsMuted]);
 
+  // Use GitHub raw URL directly - works even if file isn't deployed to Vercel
+  // Repo: https://github.com/MakcuTeam/Website
+  // This loads directly from GitHub, bypassing Vercel deployment issues
+  const audioSrc = "https://raw.githubusercontent.com/MakcuTeam/Website/main/public/audio.mp3";
+
   return (
     <audio 
       ref={audioRef} 
@@ -142,6 +147,8 @@ export function AudioPlayer() {
       style={{ display: "none" }}
       playsInline
     >
+      <source src={audioSrc} type="audio/mpeg" />
+      {/* Fallback to local path */}
       <source src="/audio.mp3" type="audio/mpeg" />
       Your browser does not support the audio element.
     </audio>
