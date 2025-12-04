@@ -12,7 +12,6 @@ import { Dictionary } from "@/lib/dictionaries";
 import { AudioProvider } from "@/components/contexts/audio-provider";
 import { AudioPlayer } from "@/components/audio-player";
 import { MakcuConnectionProvider } from "@/components/contexts/makcu-connection-provider";
-import { FixScrollbarHeight } from "@/components/fix-scrollbar-height";
 
 export default function RootLayoutProvider({
   children,
@@ -57,11 +56,10 @@ function RootLayoutContent({
             disableTransitionOnChange
           >
             <Navbar dict={dict} />
-            <main className="w-full h-auto scroll-smooth px-4 sm:px-6 lg:px-8 relative" style={{ zIndex: 1 }}>
+            <main className="w-full h-auto px-4 sm:px-6 lg:px-8 relative" style={{ zIndex: 1 }}>
               {children}
             </main>
             <Footer />
-            <FixScrollbarHeight />
           </ThemeProvider>
         </ClientDictionary>
       </AudioProvider>
