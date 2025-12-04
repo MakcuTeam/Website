@@ -36,9 +36,12 @@ function parseAndStoreDeviceInfoBinary(data: Uint8Array): void {
     return;
   }
 
-  if (header !== 0x01 || data.length < 355) {
-    // Invalid or incomplete response (new format: 355 bytes with both serials + spoof flag)
-    console.warn("[DEBUG] parseAndStoreDeviceInfoBinary: Invalid header or data too short. Header:", header, "Expected: 1, Data length:", data.length, "Required: 355");
+  // New format: 356 bytes (1 header + 6 MAC1 + 6 MAC2 + 4 TEMP + 4 RAM + 4 CPU + 4 UP + 2 VID + 2 PID + 1 MOUSE_BINT + 1 KBD_BINT + 32 FW + 32 MAKCU + 64 VENDOR + 64 MODEL + 64 ORIGINAL_SERIAL + 64 SPOOFED_SERIAL + 1 SPOOF_ACTIVE)
+  const NEW_FORMAT_SIZE = 356;
+  
+  if (header !== 0x01 || data.length < NEW_FORMAT_SIZE) {
+    // Invalid or incomplete response
+    console.warn("[DEBUG] parseAndStoreDeviceInfoBinary: Invalid header or data too short. Header:", header, "Expected: 1, Data length:", data.length, "Required:", NEW_FORMAT_SIZE);
     setCookie(DEVICE_INFO_COOKIE, "", 0);
     return;
   }
