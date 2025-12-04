@@ -63,9 +63,6 @@ export default async function FirmwarePage({ params }: LangProps) {
   return (
     <div className="flex flex-col pb-20">
       <header className="flex flex-col gap-3">
-        <span className="inline-flex w-max items-center gap-2 text-xs uppercase tracking-[0.3em] text-muted-foreground">
-          {isCn ? "工具" : "Tool"}
-        </span>
         <h1 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
           {dict.tools.title}
         </h1>
