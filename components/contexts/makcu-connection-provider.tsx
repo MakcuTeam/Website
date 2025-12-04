@@ -427,9 +427,10 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
       const websiteCommand = ".website()\n";
       await writer.write(new TextEncoder().encode(websiteCommand));
 
-      // Get reader
+      // Get reader (keep it for continuous reading after connection)
       const reader = port.readable.getReader();
       readerRef.current = reader;
+      console.log("[TRY NORMAL MODE] Reader obtained and stored in readerRef");
 
       // Read response with timeout (configurable)
       let timeoutId: NodeJS.Timeout | null = null;
@@ -450,34 +451,8 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
             }
             chunks.push(value);
             
-            // Console log RX bytes from connection provider
-            if (value && value.length > 0) {
-              const hexBytes = Array.from(new Uint8Array(value))
-                .map((b) => b.toString(16).padStart(2, "0").toUpperCase())
-                .join(" ");
-              console.log(`[CONNECTION PROVIDER] RX (${value.length} bytes):`, hexBytes);
-              
-              try {
-                const textData = new TextDecoder("utf-8", { fatal: false }).decode(value);
-                console.log(`[CONNECTION PROVIDER] RX (text):`, textData.replace(/\n/g, "\\n").replace(/\r/g, "\\r").replace(/\0/g, "\\0"));
-              } catch (e) {
-                console.log(`[CONNECTION PROVIDER] RX: Binary data (not text)`);
-              }
-            }
-            
-            // Broadcast to subscribers (for serial terminal)
-            if (value && value.length > 0) {
-              // Use setTimeout to avoid blocking
-              setTimeout(() => {
-                serialDataSubscribersRef.current.forEach((callback: SerialDataCallback) => {
-                  try {
-                    callback(value, false);
-                  } catch (e) {
-                    // Ignore subscriber errors
-                  }
-                });
-              }, 0);
-            }
+            // Note: Broadcasting to subscribers is now handled by the continuous reader loop
+            // This ensures all incoming data is captured and broadcast, not just during connection
             
             // Combine chunks to check for binary data
             const totalLength = chunks.reduce((sum, chunk) => sum + chunk.length, 0);
@@ -563,11 +538,12 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
         
         // Check if we got a valid response (at least 1 byte)
         if (response && response instanceof Uint8Array && response.length >= 1) {
-          // Keep reader active for monitoring
+          // Keep reader active - it will be used by continuous reader loop
           if (writerRef.current) {
             writerRef.current.releaseLock();
             writerRef.current = null;
           }
+          // Note: Reader is kept in readerRef.current for continuous reading
           return true;
         }
       } catch (error) {
@@ -576,7 +552,8 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
         }
         throw error;
       } finally {
-        // Don't release reader - keep it for monitoring
+        // Don't release reader - keep it for continuous monitoring
+        // The continuous reader loop will use it
       }
 
       return false;
@@ -865,6 +842,111 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
       Navigator.serial?.removeEventListener("disconnect", handleDisconnect);
     };
   }, [performDisconnect]);
+
+  // Continuous serial data reading and broadcasting for subscribers (serial terminal)
+  // This loop continuously reads from the port and broadcasts to all subscribers
+  useEffect(() => {
+    if (state.status !== "connected" || !state.port || !state.port.readable) {
+      return;
+    }
+
+    let isReading = false;
+    let shouldStop = false;
+
+    const startContinuousReading = async () => {
+      if (isReading) {
+        console.log("[CONTINUOUS READER] Already reading, skipping");
+        return;
+      }
+      
+      // Wait a bit for connection to stabilize and readerRef to be set
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      if (shouldStop || stateRef.current.status !== "connected") {
+        return;
+      }
+
+      isReading = true;
+
+      // Get the reader (reuse existing if available, otherwise create new)
+      let reader = readerRef.current;
+      if (!reader) {
+        try {
+          console.log("[CONTINUOUS READER] Creating new reader");
+          reader = stateRef.current.port!.readable!.getReader();
+          readerRef.current = reader;
+        } catch (e) {
+          console.error("[CONTINUOUS READER] Failed to get reader:", e);
+          isReading = false;
+          return;
+        }
+      } else {
+        console.log("[CONTINUOUS READER] Reusing existing reader");
+      }
+
+      console.log("[CONTINUOUS READER] Started continuous reading loop");
+      
+      // NOTE: This is NOT a busy loop! await reader.read() suspends the async function
+      // and waits for OS-level COM port notifications. CPU usage is ~0% when idle.
+      // The browser uses OS APIs (WaitCommEvent on Windows, epoll on Linux) to wake
+      // this promise only when data arrives - it's event-driven, not polling.
+
+      try {
+        while (!shouldStop && stateRef.current.status === "connected" && stateRef.current.port) {
+          try {
+            // This await suspends the function until data arrives - NO CPU USED while waiting
+            const { value, done } = await reader.read();
+            if (done) {
+              console.log("[CONTINUOUS READER] Reader done");
+              break;
+            }
+
+            if (value && value.length > 0) {
+              // Console log RX bytes
+              const hexBytes = Array.from(new Uint8Array(value))
+                .map((b) => b.toString(16).padStart(2, "0").toUpperCase())
+                .join(" ");
+              console.log(`[CONTINUOUS READER] RX (${value.length} bytes):`, hexBytes);
+              
+              try {
+                const textData = new TextDecoder("utf-8", { fatal: false }).decode(value);
+                console.log(`[CONTINUOUS READER] RX (text):`, textData.replace(/\n/g, "\\n").replace(/\r/g, "\\r").replace(/\0/g, "\\0"));
+              } catch (e) {
+                console.log(`[CONTINUOUS READER] RX: Binary data (not text)`);
+              }
+
+              // Broadcast to all subscribers immediately
+              serialDataSubscribersRef.current.forEach((callback: SerialDataCallback) => {
+                try {
+                  callback(value, false);
+                } catch (e) {
+                  console.error("[CONTINUOUS READER] Subscriber error:", e);
+                }
+              });
+            }
+          } catch (error) {
+            console.error("[CONTINUOUS READER] Read error:", error);
+            // Don't break on error - might be temporary, keep trying
+            await new Promise(resolve => setTimeout(resolve, 100));
+          }
+        }
+      } catch (error) {
+        console.error("[CONTINUOUS READER] Reader loop error:", error);
+      } finally {
+        isReading = false;
+        console.log("[CONTINUOUS READER] Stopped continuous reading loop");
+      }
+    };
+
+    // Start reading after connection is established
+    startContinuousReading();
+
+    return () => {
+      shouldStop = true;
+      isReading = false;
+      console.log("[CONTINUOUS READER] Cleanup - stopping reader loop");
+    };
+  }, [state.status, state.port]);
 
   // Health check for connection - detects when port becomes inaccessible
   // Uses performDisconnect to ensure all components are updated
