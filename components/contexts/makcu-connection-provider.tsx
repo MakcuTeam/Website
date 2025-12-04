@@ -554,8 +554,8 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
       let detectedBaudRate: number | null = null;
       let normalModeSuccess = false;
 
-      // Step 1: Try 115200 with 500ms timeout
-      console.log("[DEBUG] connect: Step 1 - Trying 115200 baud with 500ms timeout...");
+      // Step 1: Try 115200 with 1000ms timeout (1 second)
+      console.log("[DEBUG] connect: Step 1 - Trying 115200 baud with 1000ms timeout...");
       try {
         await selectedPort.open({
           baudRate: 115200,
@@ -565,7 +565,7 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
           flowControl: "none",
         });
         console.log("[DEBUG] connect: Port opened at 115200 baud");
-        normalModeSuccess = await tryNormalMode(selectedPort, 115200, 500);
+        normalModeSuccess = await tryNormalMode(selectedPort, 115200, 1000);
         if (normalModeSuccess) {
           detectedBaudRate = 115200;
           console.log("[DEBUG] connect: Success at 115200 baud!");
@@ -582,9 +582,9 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
         }
       }
 
-      // Step 2: If 115200 failed, try 4M (4000000) with 150ms timeout
+      // Step 2: If 115200 failed, try 4M (4000000) with 500ms timeout
       if (!normalModeSuccess) {
-        console.log("[DEBUG] connect: Step 2 - Trying 4M baud with 150ms timeout...");
+        console.log("[DEBUG] connect: Step 2 - Trying 4M baud with 500ms timeout...");
         try {
           await selectedPort.open({
             baudRate: 4000000,
@@ -594,7 +594,7 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
             flowControl: "none",
           });
           console.log("[DEBUG] connect: Port opened at 4M baud");
-          normalModeSuccess = await tryNormalMode(selectedPort, 4000000, 150);
+          normalModeSuccess = await tryNormalMode(selectedPort, 4000000, 500);
           if (normalModeSuccess) {
             detectedBaudRate = 4000000;
             console.log("[DEBUG] connect: Success at 4M baud!");
