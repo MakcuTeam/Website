@@ -22,26 +22,31 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     if (audioRef.current) {
       const newMutedState = !isMuted;
       console.log("Toggle mute:", { from: isMuted, to: newMutedState });
-      audioRef.current.muted = newMutedState;
-      setIsMuted(newMutedState);
       
-      // If unmuting, ensure audio is playing
+      // If unmuting, ensure audio is playing first
       if (!newMutedState) {
         try {
           if (audioRef.current.paused) {
             console.log("Audio is paused, attempting to play");
             await audioRef.current.play();
           }
-          console.log("Audio state after unmute:", {
-            paused: audioRef.current.paused,
-            muted: audioRef.current.muted,
-            volume: audioRef.current.volume,
-            readyState: audioRef.current.readyState
-          });
         } catch (error) {
-          console.error("Error playing audio:", error);
+          console.error("Error playing audio when unmuting:", error);
+          // If play fails, don't unmute
+          return;
         }
       }
+      
+      // Set muted state
+      audioRef.current.muted = newMutedState;
+      setIsMuted(newMutedState);
+      
+      console.log("Audio state after toggle:", {
+        paused: audioRef.current.paused,
+        muted: audioRef.current.muted,
+        volume: audioRef.current.volume,
+        readyState: audioRef.current.readyState
+      });
     }
   };
 

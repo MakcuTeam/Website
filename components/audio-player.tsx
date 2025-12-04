@@ -7,84 +7,119 @@ export function AudioPlayer() {
   const { audioRef, hasInteracted, setHasInteracted, setIsMuted } = useAudio();
 
   useEffect(() => {
-    // Set volume to 30% and start muted
-    if (audioRef.current) {
-      audioRef.current.volume = 0.5; // Temporarily increased to 50% for testing
-      audioRef.current.muted = true;
-      
-      // Add event listeners for debugging
-      audioRef.current.addEventListener("loadeddata", () => {
-        console.log("Audio loaded successfully");
-      });
-      
-      audioRef.current.addEventListener("error", (e) => {
-        console.error("Audio error:", e);
-        console.error("Audio error details:", audioRef.current?.error);
-      });
-      
-      audioRef.current.addEventListener("play", () => {
-        console.log("Audio started playing");
-        console.log("Volume:", audioRef.current?.volume);
-        console.log("Muted:", audioRef.current?.muted);
-      });
-      
-      // Try to play (will likely be blocked by browser)
-      const playPromise = audioRef.current.play();
-      
-      if (playPromise !== undefined) {
-        playPromise
-          .then(() => {
-            console.log("Audio play promise resolved");
-          })
-          .catch((error) => {
-            // Autoplay was prevented - this is expected
-            console.log("Autoplay prevented, waiting for user interaction:", error);
-          });
+    if (!audioRef.current) return;
+
+    const audio = audioRef.current;
+    
+    // Set initial volume
+    audio.volume = 0.5;
+    
+    // Add event listeners for debugging
+    const handleLoadedData = () => {
+      console.log("Audio loaded successfully");
+    };
+    
+    const handleError = (e: Event) => {
+      console.error("Audio error:", e);
+      console.error("Audio error details:", audio.error);
+    };
+    
+    const handlePlay = () => {
+      console.log("Audio started playing");
+      console.log("Volume:", audio.volume);
+      console.log("Muted:", audio.muted);
+    };
+
+    const handleCanPlay = () => {
+      console.log("Audio can play, readyState:", audio.readyState);
+      // Don't try to autoplay - wait for user interaction
+      if (!hasInteracted) {
+        audio.muted = true;
+        setIsMuted(true);
       }
-    }
-  }, [audioRef]);
+    };
+    
+    audio.addEventListener("loadeddata", handleLoadedData);
+    audio.addEventListener("error", handleError);
+    audio.addEventListener("play", handlePlay);
+    audio.addEventListener("canplay", handleCanPlay);
+    
+    // Load the audio
+    audio.load();
+
+    return () => {
+      audio.removeEventListener("loadeddata", handleLoadedData);
+      audio.removeEventListener("error", handleError);
+      audio.removeEventListener("play", handlePlay);
+      audio.removeEventListener("canplay", handleCanPlay);
+    };
+  }, [audioRef, hasInteracted, setIsMuted]);
 
   useEffect(() => {
-    // Listen for first user interaction to unmute and play
-    const handleInteraction = async () => {
-      if (!hasInteracted && audioRef.current) {
-        try {
-          console.log("User interaction detected, attempting to play audio");
-          
-          // Unmute and play
-          audioRef.current.muted = false;
-          setIsMuted(false);
-          
-          // Ensure audio is playing
-          if (audioRef.current.paused) {
-            console.log("Audio is paused, attempting to play");
-            await audioRef.current.play();
-            console.log("Audio play() called, current state:", {
-              paused: audioRef.current.paused,
-              muted: audioRef.current.muted,
-              volume: audioRef.current.volume,
-              readyState: audioRef.current.readyState
-            });
-          } else {
-            console.log("Audio is already playing");
-          }
-          
-          setHasInteracted(true);
-        } catch (error) {
-          console.error("Error playing audio:", error);
+    if (hasInteracted) return;
+
+    // Listen for first user interaction to unlock audio and play with sound
+    const handleInteraction = (e: Event) => {
+      if (!audioRef.current) return;
+
+      const audio = audioRef.current;
+      console.log("User interaction detected, attempting to unlock and play audio");
+      
+      // For Chrome: Play must happen synchronously in the event handler
+      // Unmute immediately
+      audio.muted = false;
+      setIsMuted(false);
+      
+      // If audio is paused or not playing, start it
+      if (audio.paused) {
+        // Reset to beginning if needed
+        if (audio.currentTime > 0) {
+          audio.currentTime = 0;
         }
+        
+        // Play immediately - Chrome requires this to be in the event handler
+        const playPromise = audio.play();
+        
+        if (playPromise !== undefined) {
+          playPromise
+            .then(() => {
+              console.log("Audio play promise resolved");
+              setHasInteracted(true);
+              console.log("Audio play() successful, current state:", {
+                paused: audio.paused,
+                muted: audio.muted,
+                volume: audio.volume,
+                readyState: audio.readyState,
+                networkState: audio.networkState
+              });
+            })
+            .catch((error) => {
+              console.error("Error playing audio:", error);
+              // If play fails, keep trying on next interaction
+            });
+        } else {
+          setHasInteracted(true);
+        }
+      } else {
+        // Already playing, just unmute
+        setHasInteracted(true);
+        console.log("Audio already playing, unmuted");
       }
     };
 
-    // Listen for any user interaction
-    document.addEventListener("click", handleInteraction, { once: true });
-    document.addEventListener("keydown", handleInteraction, { once: true });
-    document.addEventListener("touchstart", handleInteraction, { once: true });
+    // Use capture phase and non-passive to ensure we catch the event
+    const options = { capture: true, passive: false, once: false };
+    
+    document.addEventListener("click", handleInteraction, options);
+    document.addEventListener("keydown", handleInteraction, options);
+    document.addEventListener("touchstart", handleInteraction, options);
+    document.addEventListener("pointerdown", handleInteraction, options);
 
     return () => {
-      document.removeEventListener("click", handleInteraction);
-      document.removeEventListener("keydown", handleInteraction);
-      document.removeEventListener("touchstart", handleInteraction);
+      document.removeEventListener("click", handleInteraction, { capture: true } as any);
+      document.removeEventListener("keydown", handleInteraction, { capture: true } as any);
+      document.removeEventListener("touchstart", handleInteraction, { capture: true } as any);
+      document.removeEventListener("pointerdown", handleInteraction, { capture: true } as any);
     };
   }, [hasInteracted, audioRef, setHasInteracted, setIsMuted]);
 
@@ -94,9 +129,11 @@ export function AudioPlayer() {
       loop 
       preload="auto" 
       style={{ display: "none" }}
-      autoPlay
+      playsInline
+      crossOrigin="anonymous"
     >
       <source src="/audio.mp3" type="audio/mpeg" />
+      <source src="/audio.mp3" type="audio/mp3" />
       Your browser does not support the audio element.
     </audio>
   );
