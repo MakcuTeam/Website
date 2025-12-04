@@ -25,7 +25,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
       
       // If unmuting, ensure audio is playing first and set volume
       if (!newMutedState) {
-        audioRef.current.volume = 0.3; // 30% volume
+        audioRef.current.volume = 0.15; // 15% volume
         try {
           if (audioRef.current.paused) {
             console.log("Audio is paused, attempting to play");

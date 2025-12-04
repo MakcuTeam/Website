@@ -12,6 +12,7 @@ import { Dictionary } from "@/lib/dictionaries";
 import { AudioProvider } from "@/components/contexts/audio-provider";
 import { AudioPlayer } from "@/components/audio-player";
 import { MakcuConnectionProvider } from "@/components/contexts/makcu-connection-provider";
+import { BackgroundVideo } from "@/components/background-video";
 
 export default function RootLayoutProvider({
   children,
@@ -46,6 +47,7 @@ function RootLayoutContent({
   return (
     <>
       <Toaster />
+      <BackgroundVideo />
       <AudioProvider>
         <AudioPlayer />
         <ClientDictionary dict={dict}>
@@ -56,7 +58,7 @@ function RootLayoutContent({
             disableTransitionOnChange
           >
             <Navbar dict={dict} />
-            <main className="w-full h-auto scroll-smooth px-4 sm:px-6 lg:px-8">
+            <main className="w-full h-auto scroll-smooth px-4 sm:px-6 lg:px-8 relative" style={{ zIndex: 1 }}>
               {children}
             </main>
             <Footer />
