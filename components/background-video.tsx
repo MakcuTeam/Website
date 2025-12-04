@@ -8,8 +8,37 @@ export function BackgroundVideo() {
   const { theme } = useTheme();
   const [mounted, setMounted] = useState(false);
   
-  // Determine if we're in light mode
-  const isLightMode = mounted && theme === "light";
+  // Determine if we're in light mode - check HTML class directly for accuracy
+  const [isLightMode, setIsLightMode] = useState(false);
+
+  useEffect(() => {
+    if (!mounted) return;
+    
+    const checkTheme = () => {
+      const htmlElement = document.documentElement;
+      const hasDarkClass = htmlElement.classList.contains("dark");
+      const isLight = theme === "light" || !hasDarkClass;
+      setIsLightMode(isLight);
+      
+      console.log("🎨 Video theme check:", {
+        theme,
+        hasDarkClass,
+        isLight,
+        htmlClasses: htmlElement.className
+      });
+    };
+
+    checkTheme();
+
+    // Watch for class changes
+    const observer = new MutationObserver(checkTheme);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"]
+    });
+
+    return () => observer.disconnect();
+  }, [theme, mounted]);
 
   // Debug logging
   useEffect(() => {

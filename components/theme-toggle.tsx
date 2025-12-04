@@ -30,22 +30,35 @@ export function ModeToggle({}: { dict: Dictionary }) {
     }
   };
 
-  // Log theme changes and verify HTML class
+  // Log theme changes and verify HTML class - also force update if needed
   useEffect(() => {
-    if (mounted) {
-      console.log("🎨 Theme changed:", theme);
-      // Check if HTML class is being updated
-      const htmlElement = document.documentElement;
-      console.log("📋 HTML classes:", htmlElement.className);
-      console.log("🌓 Has 'dark' class:", htmlElement.classList.contains("dark"));
-      
-      // Check computed styles to verify theme is applied
+    if (!mounted) return;
+    
+    console.log("🎨 Theme changed:", theme);
+    
+    // Force update HTML class to match theme
+    const htmlElement = document.documentElement;
+    
+    if (theme === "light") {
+      htmlElement.classList.remove("dark");
+      console.log("✅ Removed 'dark' class from HTML (light mode)");
+    } else {
+      htmlElement.classList.add("dark");
+      console.log("✅ Added 'dark' class to HTML (dark mode)");
+    }
+    
+    // Check if HTML class is being updated
+    console.log("📋 HTML classes:", htmlElement.className);
+    console.log("🌓 Has 'dark' class:", htmlElement.classList.contains("dark"));
+    
+    // Check computed styles to verify theme is applied
+    setTimeout(() => {
       const computedStyle = window.getComputedStyle(htmlElement);
       console.log("🎨 CSS variables:", {
         foreground: computedStyle.getPropertyValue("--foreground"),
         background: computedStyle.getPropertyValue("--background")
       });
-    }
+    }, 100);
   }, [theme, mounted]);
 
   // Don't render until mounted to avoid hydration mismatch

@@ -12,6 +12,7 @@ import { Dictionary } from "@/lib/dictionaries";
 import { AudioProvider } from "@/components/contexts/audio-provider";
 import { AudioPlayer } from "@/components/audio-player";
 import { MakcuConnectionProvider } from "@/components/contexts/makcu-connection-provider";
+import { ThemeSync } from "@/components/theme-sync";
 
 export default function RootLayoutProvider({
   children,
@@ -53,7 +54,10 @@ function RootLayoutContent({
             attribute="class"
             defaultTheme="dark"
             disableTransitionOnChange
+            storageKey="makcu-theme"
+            themes={["light", "dark"]}
           >
+            <ThemeSync />
             <Navbar dict={dict} />
             <main className="w-full h-auto px-4 sm:px-6 lg:px-8 relative" style={{ zIndex: 1 }}>
               {children}
