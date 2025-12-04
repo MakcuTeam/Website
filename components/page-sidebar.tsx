@@ -137,7 +137,7 @@ export default function PageSidebar({
                       <div className="mt-2 pt-2 border-t border-border/60">
                         <DeviceInformationDisplay lang={lang} variant="inline" />
                       </div>
-                      {hasChildren && (
+                      {hasChildren && section.children && (
                         <ul className="space-y-1 border-l border-border/60 pl-3 text-xs text-muted-foreground mt-2">
                           {section.children.map((child) => (
                             <li key={child.id}>
@@ -160,7 +160,7 @@ export default function PageSidebar({
                       >
                         {getLabel(section.labelKey)}
                       </Link>
-                      {hasChildren && (
+                      {hasChildren && section.children && (
                         <ul className="space-y-1 border-l border-border/60 pl-3 text-xs text-muted-foreground">
                           {section.children.map((child) => (
                             <li key={child.id}>
