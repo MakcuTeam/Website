@@ -287,7 +287,7 @@
           "Ensure USB 1 + USB 2 are connected for MAKCU to have power to change baud rate",
           "Change COM port in your software settings to match MAKCU's",
           "Verify baud rate matches between MAKCU and your software",
-          "If using MAKCU website or AIO tool, ensure baud rate is set to 115200"
+          "Only one software can be connected to USB2 COM port at the same time. Ensure other software that might be using the COM port is closed before connecting.",
         ],
         "important": "USB 1 + USB 2 must be connected for MAKCU to take power. USB 2 does not provide power to MAKCU - this prevents back feeding to the main PC and 2nd PC from both USB ports."
       },
@@ -408,11 +408,12 @@
     "baud_rate": {
       "title": "Baud Rate",
       "description": "Ensure makcu is configured with 115200 baud rate to use the settings, otherwise makcu will fail to function",
-      "warning": "Baud rate change is PERMANENT and should only be set if your software has told you to use a different baud rate. A mismatched baud rate will stop your software from communicating with MAKCU.",
+      "warning": "A mismatched baud rate will stop your software from communicating with MAKCU. The baud rate setting resets on startup, so it needs to be configured each time if you're using a non-default value.",
       "how_to_change": "Press the left button on MAKCU 4 times fast to change the baud rate from 115200 to 4mbps. The LED will flash 1 or 4 times and the baud rate will be saved.",
       "led_indicator": "When MAKCU starts, the baud rate indicator LED (left) will show what speed MAKCU is running at.",
       "startup_indicator": "When MAKCU starts, the baud rate indicator LED (left) will flash to indicate the current baud rate: 1 flash = 115200, 4 flashes = 4mbps.",
-      "website_requirement": "The MAKCU website expects to use 115200 baud rate. Ensure if you are trying to use normal mode with the MAKCU website, you set the baud rate to 115200.",
+      "website_requirement": "The MAKCU website accepts both 4M (4000000) or 115200 baud rates and will automatically detect and select the baud rate you are using.",
+      "com_port_limit": "Only one software can be connected to USB2 COM port at the same time. Ensure other software that might be using the COM port is closed before connecting to avoid connection conflicts.",
       "setting_methods": "The baud rate can be set by the user (using the button method), or by the developer in code.",
       "power_requirement": "USB 1 + USB 2 must be connected for MAKCU to take power to change the baud rate. USB 2 does not provide power to MAKCU - this is done to ensure there is no back feeding to the main PC and the 2nd PC from both USB ports."
     },

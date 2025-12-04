@@ -715,6 +715,9 @@ export default async function InformationPage({ params }: LangProps) {
                     <p className="text-sm leading-relaxed text-muted-foreground">
                       {dict.settings.baud_rate.website_requirement}
                     </p>
+                    <p className="text-sm leading-relaxed text-muted-foreground mt-2">
+                      {dict.settings.baud_rate.com_port_limit}
+                    </p>
                   </div>
 
                   <div>
