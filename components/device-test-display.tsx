@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useMakcuConnection } from "./contexts/makcu-connection-provider";
 import {
@@ -131,13 +130,7 @@ export function DeviceTestDisplay({ lang }: DeviceTestDisplayProps) {
     (!keyboardSummary || keyboardSummary.passed === keyboardSummary.total);
 
   return (
-    <Card className="border-border/60 bg-card/90 shadow-lg">
-      <CardHeader className="pb-3">
-        <CardTitle className="text-lg flex items-center gap-2">
-          🧪 {isCn ? "设备测试" : "Device Test"}
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
+    <div className="space-y-4">
         {/* Description */}
         <p className="text-sm text-muted-foreground">
           {isCn
@@ -273,8 +266,7 @@ export function DeviceTestDisplay({ lang }: DeviceTestDisplayProps) {
             )}
           </div>
         )}
-      </CardContent>
-    </Card>
+    </div>
   );
 }
 

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useMakcuConnection } from "./contexts/makcu-connection-provider";
@@ -262,24 +261,19 @@ export function SerialTerminal({ lang }: SerialTerminalProps) {
   };
 
   return (
-    <Card className="border-border/60 bg-card/90 shadow-lg">
-      <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-lg flex items-center gap-2">
-            📺 {isCn ? "串口终端" : "Serial Terminal"}
-          </CardTitle>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={clearTerminal}
-            disabled={lines.length === 0}
-          >
-            <Trash2 className="w-4 h-4 mr-2" />
-            {isCn ? "清空" : "Clear"}
-          </Button>
-        </div>
-      </CardHeader>
-      <CardContent className="space-y-4">
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={clearTerminal}
+          disabled={lines.length === 0}
+          className="ml-auto"
+        >
+          <Trash2 className="w-4 h-4 mr-2" />
+          {isCn ? "清空" : "Clear"}
+        </Button>
+      </div>
         {/* Description */}
         <p className="text-sm text-muted-foreground">
           {isCn
@@ -376,9 +370,7 @@ export function SerialTerminal({ lang }: SerialTerminalProps) {
             )}
           </Button>
         </div>
-
-      </CardContent>
-    </Card>
+    </div>
   );
 }
 

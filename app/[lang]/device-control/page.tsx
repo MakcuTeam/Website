@@ -139,12 +139,20 @@ export default async function DeviceControlPage({ params }: LangProps) {
 
           {/* Device Test Section */}
           <Section id="device-test" title={dict.device_control.sections.device_test}>
-            <DeviceTestDisplay lang={lang} />
+            <Card className="border-border/60 bg-card/90 shadow-lg">
+              <CardContent className="p-6">
+                <DeviceTestDisplay lang={lang} />
+              </CardContent>
+            </Card>
           </Section>
 
           {/* Serial Terminal Section */}
           <Section id="serial-terminal" title={dict.device_control.sections.serial_terminal}>
-            <SerialTerminal lang={lang} />
+            <Card className="border-border/60 bg-card/90 shadow-lg">
+              <CardContent className="p-6">
+                <SerialTerminal lang={lang} />
+              </CardContent>
+            </Card>
           </Section>
         </div>
       </div>
