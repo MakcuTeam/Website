@@ -332,10 +332,15 @@ interface MakcuConnectionState {
   detectedBaudRate: number | null;
 }
 
+interface SerialDataCallback {
+  (data: Uint8Array, isBinary: boolean): void;
+}
+
 interface MakcuConnectionContextType extends MakcuConnectionState {
   connect: () => Promise<void>;
   disconnect: () => Promise<void>;
   sendCommandAndReadResponse: (command: string, timeoutMs?: number) => Promise<Uint8Array | null>;
+  subscribeToSerialData: (callback: SerialDataCallback) => () => void;
   isConnecting: boolean;
   browserSupported: boolean;
 }
@@ -359,6 +364,7 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const healthCheckRef = useRef<NodeJS.Timeout | null>(null);
   const stateRef = useRef<MakcuConnectionState>(state);
+  const serialDataSubscribersRef = useRef<Set<SerialDataCallback>>(new Set());
 
   // Keep stateRef in sync with state
   useEffect(() => {
@@ -443,6 +449,20 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
               break;
             }
             chunks.push(value);
+            
+            // Broadcast to subscribers (for serial terminal)
+            if (value && value.length > 0) {
+              // Use setTimeout to avoid blocking
+              setTimeout(() => {
+                serialDataSubscribersRef.current.forEach((callback) => {
+                  try {
+                    callback(value, false);
+                  } catch (e) {
+                    // Ignore subscriber errors
+                  }
+                });
+              }, 0);
+            }
             
             // Combine chunks to check for binary data
             const totalLength = chunks.reduce((sum, chunk) => sum + chunk.length, 0);
@@ -994,11 +1014,21 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
     }
   }, []);
 
+  // Subscribe to serial data
+  const subscribeToSerialData = useCallback((callback: SerialDataCallback) => {
+    serialDataSubscribersRef.current.add(callback);
+    // Return unsubscribe function
+    return () => {
+      serialDataSubscribersRef.current.delete(callback);
+    };
+  }, []);
+
   const value: MakcuConnectionContextType = {
     ...state,
     connect,
     disconnect,
     sendCommandAndReadResponse,
+    subscribeToSerialData,
     isConnecting,
     browserSupported,
   };

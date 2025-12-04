@@ -9,6 +9,7 @@ import PageSidebar from "@/components/page-sidebar";
 import { getSectionsForPage } from "@/lib/sections-config";
 import { DeviceInformationDisplay } from "@/components/device-information-display";
 import { DeviceTestDisplay } from "@/components/device-test-display";
+import { SerialTerminal } from "@/components/serial-terminal";
 
 type TocItem = {
   id: string;
@@ -20,12 +21,14 @@ const tocByLang: Record<Locale, TocItem[]> = {
   en: [
     { id: "device-information", label: "Device Information" },
     { id: "device-test", label: "Device Test" },
+    { id: "serial-terminal", label: "Serial Terminal" },
     { id: "prerequisites", label: "Prerequisites" },
     { id: "baud-rate", label: "Baud Rate" },
   ],
   cn: [
     { id: "device-information", label: "设备信息" },
     { id: "device-test", label: "设备测试" },
+    { id: "serial-terminal", label: "串口终端" },
     { id: "prerequisites", label: "前提条件" },
     { id: "baud-rate", label: "波特率" },
   ],
@@ -91,6 +94,11 @@ export default async function SettingsPage({ params }: LangProps) {
           {/* Device Test Section */}
           <Section id="device-test" title={t("Device Test", "设备测试")}>
             <DeviceTestDisplay lang={lang} />
+          </Section>
+
+          {/* Serial Terminal Section */}
+          <Section id="serial-terminal" title={t("Serial Terminal", "串口终端")}>
+            <SerialTerminal lang={lang} />
           </Section>
 
           {/* Prerequisites Section */}
