@@ -11,6 +11,19 @@ export function BackgroundVideo() {
   // Determine if we're in light mode
   const isLightMode = mounted && theme === "light";
 
+  // Debug logging
+  useEffect(() => {
+    if (mounted) {
+      console.log("🎥 Background video theme state:", {
+        theme,
+        isLightMode,
+        mounted,
+        shouldPause: isLightMode,
+        shouldInvert: isLightMode
+      });
+    }
+  }, [theme, isLightMode, mounted]);
+
   // Handle mounted state to avoid hydration mismatch
   useEffect(() => {
     setMounted(true);
@@ -91,8 +104,10 @@ export function BackgroundVideo() {
 
     // Handle theme changes
     if (isLightMode) {
+      console.log("⏸️ Pausing video (light mode)");
       video.pause();
     } else {
+      console.log("▶️ Playing video (dark mode)");
       playVideo();
     }
 
@@ -102,6 +117,21 @@ export function BackgroundVideo() {
       video.removeEventListener("loadedmetadata", handleLoadedMetadata);
     };
   }, [isLightMode, mounted]);
+
+  // Determine filter value
+  const videoFilter = isLightMode ? "invert(1) brightness(1.2)" : "none";
+  
+  // Debug filter value
+  useEffect(() => {
+    if (mounted) {
+      console.log("🎬 Video filter applied:", {
+        isLightMode,
+        filter: videoFilter,
+        theme,
+        htmlHasDarkClass: document.documentElement.classList.contains("dark")
+      });
+    }
+  }, [isLightMode, videoFilter, theme, mounted]);
 
   return (
     <video
@@ -120,7 +150,7 @@ export function BackgroundVideo() {
         transform: "none",
         willChange: "transform",
         // Invert video in light mode for clean light background
-        filter: isLightMode ? "invert(1) brightness(1.2)" : "none",
+        filter: videoFilter,
         transition: "filter 0.3s ease-in-out",
       }}
       loop

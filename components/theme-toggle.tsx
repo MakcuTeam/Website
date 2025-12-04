@@ -20,12 +20,33 @@ export function ModeToggle({}: { dict: Dictionary }) {
 
   const toggleTheme = () => {
     // Simply toggle between light and dark
+    console.log("🔄 Theme toggle clicked. Current theme:", theme);
     if (theme === "light") {
+      console.log("➡️ Switching to dark mode");
       setTheme("dark");
     } else {
+      console.log("➡️ Switching to light mode");
       setTheme("light");
     }
   };
+
+  // Log theme changes and verify HTML class
+  useEffect(() => {
+    if (mounted) {
+      console.log("🎨 Theme changed:", theme);
+      // Check if HTML class is being updated
+      const htmlElement = document.documentElement;
+      console.log("📋 HTML classes:", htmlElement.className);
+      console.log("🌓 Has 'dark' class:", htmlElement.classList.contains("dark"));
+      
+      // Check computed styles to verify theme is applied
+      const computedStyle = window.getComputedStyle(htmlElement);
+      console.log("🎨 CSS variables:", {
+        foreground: computedStyle.getPropertyValue("--foreground"),
+        background: computedStyle.getPropertyValue("--background")
+      });
+    }
+  }, [theme, mounted]);
 
   // Don't render until mounted to avoid hydration mismatch
   if (!mounted) {
