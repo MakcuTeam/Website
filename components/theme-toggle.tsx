@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Dictionary } from "@/lib/dictionaries";
 
 export function ModeToggle({}: { dict: Dictionary }) {
-  const { theme, setTheme, resolvedTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
   // Handle mounted state to avoid hydration mismatch
@@ -18,19 +18,11 @@ export function ModeToggle({}: { dict: Dictionary }) {
     setMounted(true);
   }, []);
 
-  // Determine current theme - resolvedTheme is the actual theme after system preference
-  // If system theme, use resolvedTheme; otherwise use theme directly
-  const currentTheme = resolvedTheme || theme;
-
   const toggleTheme = () => {
-    // Get the actual current theme (resolvedTheme is what's actually showing)
-    const actualTheme = resolvedTheme || theme;
-    
-    // Toggle between light and dark
-    if (actualTheme === "light") {
+    // Simply toggle between light and dark
+    if (theme === "light") {
       setTheme("dark");
     } else {
-      // If it's dark, system, or undefined, set to light
       setTheme("light");
     }
   };

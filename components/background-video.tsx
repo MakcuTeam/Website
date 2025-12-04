@@ -5,12 +5,11 @@ import { useTheme } from "next-themes";
 
 export function BackgroundVideo() {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const { theme, resolvedTheme } = useTheme();
+  const { theme } = useTheme();
   const [mounted, setMounted] = useState(false);
   
   // Determine if we're in light mode
-  // resolvedTheme is the actual theme after system preference is resolved
-  const isLightMode = mounted && (resolvedTheme === "light" || (resolvedTheme === undefined && theme === "light"));
+  const isLightMode = mounted && theme === "light";
 
   // Handle mounted state to avoid hydration mismatch
   useEffect(() => {

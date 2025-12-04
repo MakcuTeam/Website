@@ -51,8 +51,7 @@ function RootLayoutContent({
         <ClientDictionary dict={dict}>
           <ThemeProvider
             attribute="class"
-            defaultTheme="system"
-            enableSystem
+            defaultTheme="dark"
             disableTransitionOnChange
           >
             <Navbar dict={dict} />
