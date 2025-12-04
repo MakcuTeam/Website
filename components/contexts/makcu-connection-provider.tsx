@@ -456,8 +456,8 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
             for (let i = 0; i < combined.length; i++) {
               if (combined[i] === 0x00 || combined[i] === 0x01) {
                 // Check if this looks like the start of our binary data
-                // Binary data should be at least 290 bytes after header
-                if (i + 290 <= combined.length) {
+                // Binary data should be at least 356 bytes after header (new format with both serials)
+                if (i + 356 <= combined.length) {
                   binaryStart = i;
                   break;
                 }
@@ -465,7 +465,7 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
             }
             
             // If we found binary data and have enough bytes, return it
-            if (binaryStart >= 0 && combined.length >= binaryStart + 290) {
+            if (binaryStart >= 0 && combined.length >= binaryStart + 356) {
               console.log("[DEBUG] tryNormalMode: Found binary data at offset", binaryStart, "total length:", combined.length);
               console.log("[DEBUG] tryNormalMode: Data before binary start:", Array.from(combined.slice(0, binaryStart)).map(b => String.fromCharCode(b)).join(''));
               console.log("[DEBUG] tryNormalMode: Binary header byte:", combined[binaryStart], `(0x${combined[binaryStart].toString(16).padStart(2, '0').toUpperCase()})`);
@@ -508,7 +508,7 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
         let binaryStart = -1;
         for (let i = 0; i < combined.length; i++) {
           if (combined[i] === 0x00 || combined[i] === 0x01) {
-            if (i + 290 <= combined.length) {
+            if (i + 356 <= combined.length) {
               binaryStart = i;
               break;
             }
