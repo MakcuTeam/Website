@@ -151,10 +151,10 @@ export function DeviceInformationDisplay({ lang, variant = "card" }: DeviceInfor
     <div className={isInline ? "space-y-1.5" : "space-y-2"}>
       {displayItems.map(([key, value]) => (
         <div key={key} className={`flex items-start gap-3 ${isInline ? "py-1 text-xs" : "py-1.5"} border-b border-border/40 last:border-b-0`}>
-          <div className={`${isInline ? "text-xs" : "text-sm"} font-medium text-foreground/80 ${isInline ? "min-w-[120px]" : "min-w-[175px]"}`}>
+          <div className={`${isInline ? "text-xs" : "text-sm"} font-medium text-foreground/80 ${isInline ? "min-w-[148px]" : "min-w-[203px]"} shrink-0`}>
             {formatLabel(key)}
           </div>
-          <div className={`${isInline ? "text-xs" : "text-sm"} text-muted-foreground ${isInline ? "" : "font-mono"} break-all`}>
+          <div className={`${isInline ? "text-xs" : "text-sm"} text-muted-foreground ${isInline ? "" : "font-mono"} flex-1`}>
             {value}
           </div>
         </div>
