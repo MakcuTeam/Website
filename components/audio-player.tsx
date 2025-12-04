@@ -1,125 +1,126 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useAudio } from "@/components/contexts/audio-provider";
 
 export function AudioPlayer() {
   const { audioRef, hasInteracted, setHasInteracted, setIsMuted } = useAudio();
+  const isInitialized = useRef(false);
+  const interactionHandled = useRef(false);
 
+  // Initialize audio once on mount - NO dependencies that change!
   useEffect(() => {
-    if (!audioRef.current) return;
+    if (!audioRef.current || isInitialized.current) return;
+    isInitialized.current = true;
 
     const audio = audioRef.current;
     
-    // Set initial volume
+    // Set initial state
     audio.volume = 0.5;
+    audio.muted = true;
+    setIsMuted(true);
+    
+    console.log("Audio initialized, src:", audio.src || audio.querySelector("source")?.src);
     
     // Add event listeners for debugging
     const handleLoadedData = () => {
-      console.log("Audio loaded successfully");
+      console.log("Audio loaded successfully, readyState:", audio.readyState);
     };
     
     const handleError = (e: Event) => {
       console.error("Audio error:", e);
-      console.error("Audio error details:", audio.error);
+      if (audio.error) {
+        console.error("Error code:", audio.error.code, "Message:", audio.error.message);
+      }
     };
     
     const handlePlay = () => {
-      console.log("Audio started playing");
-      console.log("Volume:", audio.volume);
-      console.log("Muted:", audio.muted);
+      console.log("Audio play event fired - Volume:", audio.volume, "Muted:", audio.muted);
     };
 
-    const handleCanPlay = () => {
-      console.log("Audio can play, readyState:", audio.readyState);
-      // Don't try to autoplay - wait for user interaction
-      if (!hasInteracted) {
-        audio.muted = true;
-        setIsMuted(true);
-      }
+    const handleCanPlayThrough = () => {
+      console.log("Audio can play through, readyState:", audio.readyState);
     };
     
     audio.addEventListener("loadeddata", handleLoadedData);
     audio.addEventListener("error", handleError);
     audio.addEventListener("play", handlePlay);
-    audio.addEventListener("canplay", handleCanPlay);
-    
-    // Load the audio
-    audio.load();
+    audio.addEventListener("canplaythrough", handleCanPlayThrough);
 
     return () => {
       audio.removeEventListener("loadeddata", handleLoadedData);
       audio.removeEventListener("error", handleError);
       audio.removeEventListener("play", handlePlay);
-      audio.removeEventListener("canplay", handleCanPlay);
+      audio.removeEventListener("canplaythrough", handleCanPlayThrough);
     };
-  }, [audioRef, hasInteracted, setIsMuted]);
+  }, [audioRef, setIsMuted]);
 
+  // Handle user interaction - MUST be synchronous for Chrome!
   useEffect(() => {
     if (hasInteracted) return;
 
-    // Listen for first user interaction to unlock audio and play with sound
-    const handleInteraction = (e: Event) => {
-      if (!audioRef.current) return;
+    const handleInteraction = () => {
+      // Prevent multiple handlers from firing
+      if (interactionHandled.current || !audioRef.current) return;
+      interactionHandled.current = true;
 
       const audio = audioRef.current;
-      console.log("User interaction detected, attempting to unlock and play audio");
+      console.log("User interaction - playing audio SYNCHRONOUSLY");
+      console.log("readyState:", audio.readyState, "src:", audio.currentSrc || audio.src);
       
-      // For Chrome: Play must happen synchronously in the event handler
-      // Unmute immediately
+      // Set up audio state FIRST (must be before play)
       audio.muted = false;
+      audio.volume = 0.5;
       setIsMuted(false);
       
-      // If audio is paused or not playing, start it
-      if (audio.paused) {
-        // Reset to beginning if needed
-        if (audio.currentTime > 0) {
-          audio.currentTime = 0;
-        }
-        
-        // Play immediately - Chrome requires this to be in the event handler
-        const playPromise = audio.play();
-        
-        if (playPromise !== undefined) {
-          playPromise
-            .then(() => {
-              console.log("Audio play promise resolved");
-              setHasInteracted(true);
-              console.log("Audio play() successful, current state:", {
-                paused: audio.paused,
-                muted: audio.muted,
-                volume: audio.volume,
-                readyState: audio.readyState,
-                networkState: audio.networkState
-              });
-            })
-            .catch((error) => {
-              console.error("Error playing audio:", error);
-              // If play fails, keep trying on next interaction
-            });
-        } else {
-          setHasInteracted(true);
-        }
+      // CRITICAL: play() MUST be called synchronously in the event handler
+      // This is Chrome's requirement for user gesture
+      const playPromise = audio.play();
+      
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            console.log("✓ Audio playing! duration:", audio.duration);
+            setHasInteracted(true);
+          })
+          .catch((error) => {
+            console.error("✗ Play failed:", error.name, error.message);
+            
+            // If it failed because audio isn't loaded, load and retry
+            if (audio.readyState === 0) {
+              console.log("Loading audio and retrying...");
+              audio.load();
+              audio.oncanplaythrough = () => {
+                audio.oncanplaythrough = null;
+                audio.muted = false;
+                audio.play()
+                  .then(() => {
+                    console.log("✓ Retry successful!");
+                    setHasInteracted(true);
+                  })
+                  .catch((e) => {
+                    console.error("Retry failed:", e);
+                    interactionHandled.current = false;
+                  });
+              };
+            } else {
+              interactionHandled.current = false;
+            }
+          });
       } else {
-        // Already playing, just unmute
         setHasInteracted(true);
-        console.log("Audio already playing, unmuted");
       }
     };
 
-    // Use capture phase and non-passive to ensure we catch the event
-    const options = { capture: true, passive: false, once: false };
-    
-    document.addEventListener("click", handleInteraction, options);
-    document.addEventListener("keydown", handleInteraction, options);
-    document.addEventListener("touchstart", handleInteraction, options);
-    document.addEventListener("pointerdown", handleInteraction, options);
+    // Add listeners
+    document.addEventListener("click", handleInteraction, { once: true });
+    document.addEventListener("keydown", handleInteraction, { once: true });
+    document.addEventListener("touchstart", handleInteraction, { once: true });
 
     return () => {
-      document.removeEventListener("click", handleInteraction, { capture: true } as any);
-      document.removeEventListener("keydown", handleInteraction, { capture: true } as any);
-      document.removeEventListener("touchstart", handleInteraction, { capture: true } as any);
-      document.removeEventListener("pointerdown", handleInteraction, { capture: true } as any);
+      document.removeEventListener("click", handleInteraction);
+      document.removeEventListener("keydown", handleInteraction);
+      document.removeEventListener("touchstart", handleInteraction);
     };
   }, [hasInteracted, audioRef, setHasInteracted, setIsMuted]);
 
@@ -130,10 +131,8 @@ export function AudioPlayer() {
       preload="auto" 
       style={{ display: "none" }}
       playsInline
-      crossOrigin="anonymous"
     >
       <source src="/audio.mp3" type="audio/mpeg" />
-      <source src="/audio.mp3" type="audio/mp3" />
       Your browser does not support the audio element.
     </audio>
   );
