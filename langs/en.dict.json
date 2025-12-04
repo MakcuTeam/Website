@@ -418,7 +418,10 @@
       "power_requirement": "USB 1 + USB 2 must be connected for MAKCU to take power to change the baud rate. USB 2 does not provide power to MAKCU - this is done to ensure there is no back feeding to the main PC and the 2nd PC from both USB ports."
     },
     "sections": {
-      "status": "Status"
+      "status": "Status",
+      "device_information": "Device Information",
+      "device_test": "Device Test",
+      "serial_terminal": "Serial Terminal"
     }
   },
   "setup": {
