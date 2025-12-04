@@ -71,6 +71,7 @@ export function DeviceInformationDisplay({ lang }: DeviceInformationDisplayProps
       ORIGINAL_SERIAL: { en: "Original Serial", cn: "原始序列号" },
       SPOOFED_SERIAL: { en: "Spoofed Serial", cn: "伪装序列号" },
       SPOOF_ACTIVE: { en: "Spoof Active", cn: "伪装激活" },
+      SCREEN_SIZE: { en: "Screen Size", cn: "屏幕尺寸" },
     };
     
     const label = labels[key];
@@ -99,8 +100,17 @@ export function DeviceInformationDisplay({ lang }: DeviceInformationDisplayProps
         const pollingRate = Math.round(1000 / bInterval);
         return `${pollingRate}Hz`;
       }
+      // If invalid or zero, return empty dash
+      return "—";
     }
-    return String(value);
+    
+    // For all other values, ensure empty strings show as dash
+    const strValue = String(value);
+    if (strValue === "" || strValue === "undefined" || strValue === "null" || strValue === "NaN") {
+      return "—";
+    }
+    
+    return strValue;
   };
 
   // Define the expected fields in order (show all, even if empty)
@@ -122,6 +132,7 @@ export function DeviceInformationDisplay({ lang }: DeviceInformationDisplayProps
     "UP",
     "MOUSE_BINT",
     "KBD_BINT",
+    "SCREEN_SIZE",
   ];
 
   // Build display items - include all expected fields, even if empty

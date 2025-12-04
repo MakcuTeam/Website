@@ -54,8 +54,8 @@ function parseAndStoreDeviceInfoBinary(data: Uint8Array): void {
     return;
   }
 
-  // New format: 356 bytes (1 header + 6 MAC1 + 6 MAC2 + 4 TEMP + 4 RAM + 4 CPU + 4 UP + 2 VID + 2 PID + 1 MOUSE_BINT + 1 KBD_BINT + 32 FW + 32 MAKCU + 64 VENDOR + 64 MODEL + 64 ORIGINAL_SERIAL + 64 SPOOFED_SERIAL + 1 SPOOF_ACTIVE)
-  const NEW_FORMAT_SIZE = 356;
+  // New format: 360 bytes (1 header + 6 MAC1 + 6 MAC2 + 4 TEMP + 4 RAM + 4 CPU + 4 UP + 2 VID + 2 PID + 1 MOUSE_BINT + 1 KBD_BINT + 32 FW + 32 MAKCU + 64 VENDOR + 64 MODEL + 64 ORIGINAL_SERIAL + 64 SPOOFED_SERIAL + 1 SPOOF_ACTIVE + 2 SCREEN_W + 2 SCREEN_H)
+  const NEW_FORMAT_SIZE = 360;
   
   if (header !== 0x01 || data.length < NEW_FORMAT_SIZE) {
     // Invalid or incomplete response
@@ -181,6 +181,31 @@ function parseAndStoreDeviceInfoBinary(data: Uint8Array): void {
     deviceInfo.SPOOF_ACTIVE = spoofActive === 1;
   } else {
     deviceInfo.SPOOF_ACTIVE = false;
+  }
+
+  // SCREEN_W (int16_t, 2 bytes, little-endian)
+  let screenW = 0;
+  if (pos + 1 < data.length) {
+    const screenWView = new DataView(data.buffer, data.byteOffset + pos, 2);
+    screenW = screenWView.getInt16(0, true); // little-endian
+    pos += 2;
+  } else {
+    pos += 2;
+  }
+
+  // SCREEN_H (int16_t, 2 bytes, little-endian)
+  let screenH = 0;
+  if (pos + 1 < data.length) {
+    const screenHView = new DataView(data.buffer, data.byteOffset + pos, 2);
+    screenH = screenHView.getInt16(0, true); // little-endian
+    pos += 2;
+  } else {
+    pos += 2;
+  }
+
+  // Combine screen dimensions into a single field
+  if (screenW > 0 && screenH > 0) {
+    deviceInfo.SCREEN_SIZE = `${screenW}x${screenH}`;
   }
 
   // Store in cookie as JSON (only if we have vendor or model)
@@ -347,8 +372,8 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
             for (let i = 0; i < combined.length; i++) {
               if (combined[i] === 0x00 || combined[i] === 0x01) {
                 // Check if this looks like the start of our binary data
-                // Binary data should be at least 356 bytes after header (new format with both serials)
-                if (i + 356 <= combined.length) {
+                // Binary data should be at least 360 bytes after header (new format with screen size)
+                if (i + 360 <= combined.length) {
                   binaryStart = i;
                   break;
                 }
@@ -356,7 +381,7 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
             }
             
             // If we found binary data and have enough bytes, return it
-            if (binaryStart >= 0 && combined.length >= binaryStart + 356) {
+            if (binaryStart >= 0 && combined.length >= binaryStart + 360) {
               // Wait a bit more to ensure we have the complete response
               await new Promise(resolve => setTimeout(resolve, 200));
               if (timeoutId) {
@@ -392,7 +417,7 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
         let binaryStart = -1;
         for (let i = 0; i < combined.length; i++) {
           if (combined[i] === 0x00 || combined[i] === 0x01) {
-            if (i + 356 <= combined.length) {
+            if (i + 360 <= combined.length) {
               binaryStart = i;
               break;
             }
