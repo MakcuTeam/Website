@@ -25,16 +25,10 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
       const newMutedState = !isMuted;
       console.log("🔊 Toggle mute:", { from: isMuted, to: newMutedState });
       
-      // If unmuting, ensure audio is playing first and set volume using GainNode
+      // If unmuting, ensure audio is playing first and set volume using HTML5 audio volume
       if (!newMutedState) {
-        // Use GainNode for volume control if available, otherwise fallback to HTML5 volume
-        if (gainNodeRef.current) {
-          gainNodeRef.current.gain.value = 0.25; // 25% volume using Web Audio API
-          console.log("🔊 Unmuting - Setting GainNode gain to 0.25 (25%)");
-        } else {
-          audioRef.current.volume = 0.25; // Fallback to HTML5 volume
-          console.log("🔊 Unmuting - Setting HTML5 volume to 0.25 (25%)");
-        }
+        audioRef.current.volume = 0.25; // 25% volume using HTML5 audio volume
+        console.log("🔊 Unmuting - Setting HTML5 volume to 0.25 (25%)");
         try {
           if (audioRef.current.paused) {
             console.log("🔊 Audio is paused, attempting to play");
@@ -51,24 +45,19 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
       audioRef.current.muted = newMutedState;
       setIsMuted(newMutedState);
       
-      // Force volume to 25% even after unmuting using GainNode
-      if (gainNodeRef.current) {
-        gainNodeRef.current.gain.value = 0.25;
-      } else {
-        audioRef.current.volume = 0.25;
-      }
+      // Force volume to 25% even after unmuting
+      audioRef.current.volume = 0.25;
       
-      const currentGain = gainNodeRef.current?.gain.value ?? audioRef.current.volume;
       console.log("🔊 Audio state after toggle:", {
         paused: audioRef.current.paused,
         muted: audioRef.current.muted,
-        gain: currentGain,
-        expectedGain: 0.25,
+        volume: audioRef.current.volume,
+        expectedVolume: 0.25,
         readyState: audioRef.current.readyState
       });
       
-      if (Math.abs(currentGain - 0.25) > 0.01) {
-        console.warn("⚠️ Gain mismatch! Expected 0.25, got:", currentGain);
+      if (Math.abs(audioRef.current.volume - 0.25) > 0.01) {
+        console.warn("⚠️ Volume mismatch! Expected 0.25, got:", audioRef.current.volume);
       }
     }
   };
