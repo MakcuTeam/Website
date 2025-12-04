@@ -554,8 +554,8 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
       let detectedBaudRate: number | null = null;
       let normalModeSuccess = false;
 
-      // Step 1: Try 115200 with 100ms timeout
-      console.log("[DEBUG] connect: Step 1 - Trying 115200 baud with 100ms timeout...");
+      // Step 1: Try 115200 with 1000ms timeout (slower baud rate needs more time)
+      console.log("[DEBUG] connect: Step 1 - Trying 115200 baud with 1000ms timeout...");
       try {
         await selectedPort.open({
           baudRate: 115200,
@@ -565,7 +565,7 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
           flowControl: "none",
         });
         console.log("[DEBUG] connect: Port opened at 115200 baud");
-        normalModeSuccess = await tryNormalMode(selectedPort, 115200, 100);
+        normalModeSuccess = await tryNormalMode(selectedPort, 115200, 1000);
         if (normalModeSuccess) {
           detectedBaudRate = 115200;
           console.log("[DEBUG] connect: Success at 115200 baud!");
