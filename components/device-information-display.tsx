@@ -16,7 +16,7 @@ type DeviceInformationDisplayProps = {
  */
 export function DeviceInformationDisplay({ lang }: DeviceInformationDisplayProps) {
   const { status } = useMakcuConnection();
-  const [deviceInfo, setDeviceInfo] = useState<Record<string, string> | null>(null);
+  const [deviceInfo, setDeviceInfo] = useState<Record<string, string | boolean> | null>(null);
   const isCn = lang === "cn";
 
   useEffect(() => {
@@ -68,36 +68,48 @@ export function DeviceInformationDisplay({ lang }: DeviceInformationDisplayProps
       MAKCU: { en: "MAKCU Version", cn: "MAKCU 版本" },
       VENDOR: { en: "Make", cn: "制造商" },
       MODEL: { en: "Model", cn: "型号" },
-      SERIAL: { en: "Serial Number", cn: "序列号" },
+      ORIGINAL_SERIAL: { en: "Original Serial", cn: "原始序列号" },
+      SPOOFED_SERIAL: { en: "Spoofed Serial", cn: "伪装序列号" },
+      SPOOF_ACTIVE: { en: "Spoof Active", cn: "伪装激活" },
     };
     
     const label = labels[key];
     return label ? (isCn ? label.cn : label.en) : key;
   };
 
-  // Helper function to format value (especially for polling rates)
-  const formatValue = (key: string, value: string | undefined): string => {
+  // Helper function to format value (especially for polling rates and boolean fields)
+  const formatValue = (key: string, value: string | boolean | undefined): string => {
+    // Handle SPOOF_ACTIVE boolean
+    if (key === "SPOOF_ACTIVE") {
+      if (typeof value === "boolean") {
+        return value ? (isCn ? "是" : "Yes") : (isCn ? "否" : "No");
+      }
+      return "—";
+    }
+    
     // Handle empty values
-    if (!value || value.trim() === "") {
+    if (value === undefined || value === null || (typeof value === "string" && value.trim() === "")) {
       return "—";
     }
     
     // Convert bInterval to polling rate in Hz
     if (key === "MOUSE_BINT" || key === "KBD_BINT") {
-      const bInterval = parseInt(value, 10);
+      const bInterval = parseInt(String(value), 10);
       if (!isNaN(bInterval) && bInterval > 0) {
         const pollingRate = Math.round(1000 / bInterval);
         return `${pollingRate}Hz`;
       }
     }
-    return value;
+    return String(value);
   };
 
   // Define the expected fields in order (show all, even if empty)
   const expectedFields: string[] = [
     "VENDOR",
     "MODEL",
-    "SERIAL",
+    "ORIGINAL_SERIAL",
+    "SPOOFED_SERIAL",
+    "SPOOF_ACTIVE",
     "FW",
     "MAKCU",
     "MAC1",
@@ -114,7 +126,7 @@ export function DeviceInformationDisplay({ lang }: DeviceInformationDisplayProps
 
   // Build display items - include all expected fields, even if empty
   const displayItems = expectedFields.map((key) => {
-    const value = deviceInfo[key];
+    const value = deviceInfo[key] as string | boolean | undefined;
     return [key, formatValue(key, value)] as [string, string];
   });
 

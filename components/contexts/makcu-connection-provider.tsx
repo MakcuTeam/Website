@@ -36,9 +36,9 @@ function parseAndStoreDeviceInfoBinary(data: Uint8Array): void {
     return;
   }
 
-  if (header !== 0x01 || data.length < 290) {
-    // Invalid or incomplete response
-    console.warn("[DEBUG] parseAndStoreDeviceInfoBinary: Invalid header or data too short. Header:", header, "Expected: 1, Data length:", data.length, "Required: 290");
+  if (header !== 0x01 || data.length < 355) {
+    // Invalid or incomplete response (new format: 355 bytes with both serials + spoof flag)
+    console.warn("[DEBUG] parseAndStoreDeviceInfoBinary: Invalid header or data too short. Header:", header, "Expected: 1, Data length:", data.length, "Required: 355");
     setCookie(DEVICE_INFO_COOKIE, "", 0);
     return;
   }
@@ -163,16 +163,32 @@ function parseAndStoreDeviceInfoBinary(data: Uint8Array): void {
   }
   pos += 64;
 
-  // SERIAL string (null-terminated, max 64 bytes)
-  const serialEnd = data.indexOf(0, pos);
-  if (serialEnd >= pos) {
-    const serial = new TextDecoder().decode(data.slice(pos, serialEnd));
-    if (serial) deviceInfo.SERIAL = serial;
-    console.log("[DEBUG] parseAndStoreDeviceInfoBinary: SERIAL:", deviceInfo.SERIAL || "(empty)");
+  // ORIGINAL_SERIAL string (null-terminated, max 64 bytes)
+  const origSerialEnd = data.indexOf(0, pos);
+  if (origSerialEnd >= pos) {
+    const origSerial = new TextDecoder().decode(data.slice(pos, origSerialEnd));
+    if (origSerial) deviceInfo.ORIGINAL_SERIAL = origSerial;
+    console.log("[DEBUG] parseAndStoreDeviceInfoBinary: ORIGINAL_SERIAL:", deviceInfo.ORIGINAL_SERIAL || "(empty)");
   } else {
-    console.log("[DEBUG] parseAndStoreDeviceInfoBinary: SERIAL: not found (no null terminator)");
+    console.log("[DEBUG] parseAndStoreDeviceInfoBinary: ORIGINAL_SERIAL: not found (no null terminator)");
   }
   pos += 64;
+
+  // SPOOFED_SERIAL string (null-terminated, max 64 bytes)
+  const spoofSerialEnd = data.indexOf(0, pos);
+  if (spoofSerialEnd >= pos) {
+    const spoofSerial = new TextDecoder().decode(data.slice(pos, spoofSerialEnd));
+    if (spoofSerial) deviceInfo.SPOOFED_SERIAL = spoofSerial;
+    console.log("[DEBUG] parseAndStoreDeviceInfoBinary: SPOOFED_SERIAL:", deviceInfo.SPOOFED_SERIAL || "(empty)");
+  } else {
+    console.log("[DEBUG] parseAndStoreDeviceInfoBinary: SPOOFED_SERIAL: not found (no null terminator)");
+  }
+  pos += 64;
+
+  // SPOOF_ACTIVE flag (1 byte: 0=not spoofed, 1=spoofed)
+  const spoofActive = data[pos++];
+  deviceInfo.SPOOF_ACTIVE = spoofActive === 1;
+  console.log("[DEBUG] parseAndStoreDeviceInfoBinary: SPOOF_ACTIVE:", deviceInfo.SPOOF_ACTIVE, "raw:", spoofActive);
 
   // Store in cookie as JSON (only if we have vendor or model)
   console.log("[DEBUG] parseAndStoreDeviceInfoBinary: Final parsed deviceInfo:", JSON.stringify(deviceInfo, null, 2));
