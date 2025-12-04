@@ -1,9 +1,21 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useTheme } from "next-themes";
 
 export function BackgroundVideo() {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const { theme, resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  
+  // Determine if we're in light mode
+  // resolvedTheme is the actual theme after system preference is resolved
+  const isLightMode = mounted && (resolvedTheme === "light" || (resolvedTheme === undefined && theme === "light"));
+
+  // Handle mounted state to avoid hydration mismatch
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // GitHub raw URL - works even if file isn't deployed to Vercel
   // Repo: https://github.com/MakcuTeam/Website
@@ -13,7 +25,16 @@ export function BackgroundVideo() {
   const fallbackVideoSrc = "/background.mp4";
 
   useEffect(() => {
-    if (!videoRef.current) return;
+    // Pause and stop video if in light mode
+    if (videoRef.current && isLightMode) {
+      const video = videoRef.current;
+      video.pause();
+      video.currentTime = 0;
+      return;
+    }
+
+    // Don't load video if in light mode or not mounted yet
+    if (!videoRef.current || isLightMode || !mounted) return;
 
     const video = videoRef.current;
 
@@ -78,36 +99,58 @@ export function BackgroundVideo() {
       video.removeEventListener("canplay", handleCanPlay);
       video.removeEventListener("loadedmetadata", handleLoadedMetadata);
     };
-  }, []);
+  }, [isLightMode, mounted]);
 
   return (
-    <video
-      ref={videoRef}
-      className="fixed inset-0 w-full h-full object-cover pointer-events-none"
-      style={{
-        zIndex: -1,
-        position: "fixed",
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        width: "100vw",
-        height: "100vh",
-        objectFit: "cover",
-        transform: "none",
-        willChange: "transform",
-      }}
-      loop
-      muted
-      playsInline
-      autoPlay
-      preload="auto"
-    >
-      {/* Primary source: GitHub raw URL (will be cached by browser) */}
-      <source src={githubVideoSrc} type="video/mp4" />
-      {/* Fallback: Local file if GitHub source fails */}
-      <source src={fallbackVideoSrc} type="video/mp4" />
-      Your browser does not support the video element.
-    </video>
+    <>
+      {/* White background for light mode */}
+      {isLightMode && (
+        <div
+          className="fixed inset-0 w-full h-full pointer-events-none bg-white"
+          style={{
+            zIndex: -1,
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            width: "100vw",
+            height: "100vh",
+          }}
+        />
+      )}
+      
+      {/* Video background for dark mode */}
+      {!isLightMode && (
+        <video
+          ref={videoRef}
+          className="fixed inset-0 w-full h-full object-cover pointer-events-none"
+          style={{
+            zIndex: -1,
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            width: "100vw",
+            height: "100vh",
+            objectFit: "cover",
+            transform: "none",
+            willChange: "transform",
+          }}
+          loop
+          muted
+          playsInline
+          autoPlay
+          preload="auto"
+        >
+          {/* Primary source: GitHub raw URL (will be cached by browser) */}
+          <source src={githubVideoSrc} type="video/mp4" />
+          {/* Fallback: Local file if GitHub source fails */}
+          <source src={fallbackVideoSrc} type="video/mp4" />
+          Your browser does not support the video element.
+        </video>
+      )}
+    </>
   );
 }
