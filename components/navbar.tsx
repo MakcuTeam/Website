@@ -50,7 +50,7 @@ export function Navbar({ dict }: { dict: Dictionary }) {
 export function Logo() {
   return (
     <LocalizedLink href="/" className="flex items-center gap-2.5">
-      <h2 className="text-3xl font-bold font-logo tracking-[5px] text-stone-800 dark:text-foreground">Makcu</h2>
+      <h2 className="text-3xl font-bold font-logo tracking-[5px] text-foreground">Makcu</h2>
     </LocalizedLink>
   );
 }
@@ -103,8 +103,8 @@ export function NavMenu({
         const Comp = (
           <LocalizedLink
             key={item.title + item.href}
-            className="flex items-center gap-1 dark:text-stone-300/85 text-stone-800 "
-            activeClassName={item.href ? "dark:text-white font-extrabold" : ""}
+            className="flex items-center gap-1 text-foreground/80 hover:text-foreground"
+            activeClassName={item.href ? "text-foreground font-extrabold" : ""}
             href={item.href ?? ""}
             target={item.target}
           >

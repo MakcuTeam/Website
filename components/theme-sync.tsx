@@ -24,8 +24,40 @@ export function ThemeSync() {
       console.log("🔄 ThemeSync: Added 'dark' class (dark mode)");
     }
 
-    // Verify sync
+    // Verify sync and log CSS variables
+    const computedStyle = getComputedStyle(htmlElement);
+    const foreground = computedStyle.getPropertyValue("--foreground");
+    const background = computedStyle.getPropertyValue("--background");
+    const card = computedStyle.getPropertyValue("--card");
+    const cardForeground = computedStyle.getPropertyValue("--card-foreground");
+    const mutedForeground = computedStyle.getPropertyValue("--muted-foreground");
+
     console.log("✅ ThemeSync: HTML classes after sync:", htmlElement.className);
+    console.log("🎨 ThemeSync: CSS Variables:", {
+      theme,
+      hasDarkClass: htmlElement.classList.contains("dark"),
+      "--foreground": foreground,
+      "--background": background,
+      "--card": card,
+      "--card-foreground": cardForeground,
+      "--muted-foreground": mutedForeground,
+    });
+
+    // Convert HSL to readable format
+    const hslToDesc = (hsl: string) => {
+      const parts = hsl.trim().split(" ");
+      if (parts.length >= 3) {
+        const l = parseFloat(parts[2]);
+        return l > 50 ? "light" : "dark";
+      }
+      return "unknown";
+    };
+
+    console.log("📝 ThemeSync: Color interpretation:", {
+      foregroundColor: hslToDesc(foreground),
+      backgroundColor: hslToDesc(background),
+      cardColor: hslToDesc(card),
+    });
   }, [theme]);
 
   return null;
