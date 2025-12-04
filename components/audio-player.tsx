@@ -31,6 +31,15 @@ export function AudioPlayer() {
       console.error("Audio error:", e);
       if (audio.error) {
         console.error("Error code:", audio.error.code, "Message:", audio.error.message);
+        console.error("Audio src:", audio.src);
+        console.error("Audio currentSrc:", audio.currentSrc);
+        
+        // Error code 2 = NETWORK ERROR (file not found)
+        if (audio.error.code === 2) {
+          console.error("❌ NETWORK ERROR: Audio file not found!");
+          console.error("💡 File should be at: https://www.makcu.com/audio.mp3");
+          console.error("💡 Make sure public/audio.mp3 is committed and deployed to Vercel");
+        }
       }
     };
     
