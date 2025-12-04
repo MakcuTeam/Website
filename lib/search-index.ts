@@ -70,7 +70,7 @@ export function buildSearchIndex(dict: Dictionary, lang: Locale): SearchResult[]
       troubleshooting: dict.navbar.links.troubleshooting,
       api: dict.navbar.links.api,
       firmware: dict.navbar.links.makcu_tools,
-      settings: dict.navbar.links.settings,
+      "device-control": dict.navbar.links.device_control,
       xim: dict.navbar.links.xim,
     };
     return pageTitles[page] || page;

@@ -121,7 +121,7 @@ export default function PageSidebar({
         <CardContent className="p-5">
           <nav className="space-y-3 text-sm">
             {sections.map((section) => {
-              const isDeviceInformation = section.id === "device-information" && currentPage === "/settings";
+              const isDeviceInformation = section.id === "device-information" && currentPage === "/device-control";
               const hasChildren = section.children && section.children.length > 0;
               
               return (

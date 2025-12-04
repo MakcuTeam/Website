@@ -830,7 +830,7 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
         // The port has been physically disconnected - use the main disconnect function
         // This will update the global state, which will automatically update:
         // - The navbar button (via MakcuConnectionButton)
-        // - The settings page (via MakcuSettings component)
+        // - The Device Control page (via MakcuSettings component)
         // - The firmware page (via DeviceTool component)
         await performDisconnect();
       }

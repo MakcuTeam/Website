@@ -85,8 +85,8 @@ export function NavMenu({
       href: "/setup",
     },
     {
-      title: "settings",
-      href: "/settings",
+      title: "device_control",
+      href: "/device-control",
     },
     {
       title: "xim",

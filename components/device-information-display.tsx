@@ -12,7 +12,7 @@ type DeviceInformationDisplayProps = {
 };
 
 /**
- * Device Information display component for settings page.
+ * Device Information display component for Device Control page.
  * Shows all parsed cookie information in a formatted card.
  */
 export function DeviceInformationDisplay({ lang, variant = "card" }: DeviceInformationDisplayProps) {

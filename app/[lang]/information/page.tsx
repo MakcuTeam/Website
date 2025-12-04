@@ -680,18 +680,18 @@ export default async function InformationPage({ params }: LangProps) {
                 <div className="space-y-6">
                   <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/20">
                     <p className="text-sm text-red-600 dark:text-red-400">
-                      <strong>{t("Important Warning", "重要警告")}:</strong> {dict.settings.baud_rate.warning}
+                      <strong>{t("Important Warning", "重要警告")}:</strong> {dict.device_control.baud_rate.warning}
                     </p>
                   </div>
 
                   <div>
                     <h4 className="font-semibold mb-2">{t("How to Change Baud Rate", "如何更改波特率")}</h4>
                     <p className="text-sm leading-relaxed text-muted-foreground mb-3">
-                      {dict.settings.baud_rate.how_to_change}
+                      {dict.device_control.baud_rate.how_to_change}
                     </p>
                     <div className="p-4 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
                       <p className="text-sm text-yellow-600 dark:text-yellow-400">
-                        <strong>{t("Note", "注意")}:</strong> {dict.settings.baud_rate.led_indicator}
+                        <strong>{t("Note", "注意")}:</strong> {dict.device_control.baud_rate.led_indicator}
                       </p>
                     </div>
                   </div>
@@ -699,24 +699,24 @@ export default async function InformationPage({ params }: LangProps) {
                   <div>
                     <h4 className="font-semibold mb-2">{t("Baud Rate Indicator", "波特率指示器")}</h4>
                     <p className="text-sm leading-relaxed text-muted-foreground">
-                      {dict.settings.baud_rate.startup_indicator}
+                      {dict.device_control.baud_rate.startup_indicator}
                     </p>
                   </div>
 
                   <div>
                     <h4 className="font-semibold mb-2">{t("Website and Tool Requirements", "网站和工具要求")}</h4>
                     <p className="text-sm leading-relaxed text-muted-foreground">
-                      {dict.settings.baud_rate.website_requirement}
+                      {dict.device_control.baud_rate.website_requirement}
                     </p>
                     <p className="text-sm leading-relaxed text-muted-foreground mt-2">
-                      {dict.settings.baud_rate.com_port_limit}
+                      {dict.device_control.baud_rate.com_port_limit}
                     </p>
                   </div>
 
                   <div>
                     <h4 className="font-semibold mb-2">{t("Setting Baud Rate", "设置波特率")}</h4>
                     <p className="text-sm leading-relaxed text-muted-foreground">
-                      {dict.settings.baud_rate.setting_methods}
+                      {dict.device_control.baud_rate.setting_methods}
                     </p>
                     <p className="text-sm leading-relaxed text-muted-foreground mt-2">
                       {t("For API usage, please refer to the", "对于 API 使用，请参考")}{" "}
@@ -732,7 +732,7 @@ export default async function InformationPage({ params }: LangProps) {
 
                   <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/20">
                     <p className="text-sm text-red-600 dark:text-red-400">
-                      <strong>{t("Critical", "关键")}:</strong> {dict.settings.baud_rate.power_requirement}
+                      <strong>{t("Critical", "关键")}:</strong> {dict.device_control.baud_rate.power_requirement}
                     </p>
                   </div>
 

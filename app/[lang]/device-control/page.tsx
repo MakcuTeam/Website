@@ -33,11 +33,11 @@ const tocByLang: Record<Locale, TocItem[]> = {
 
 const metadataCopy: Record<Locale, { title: string; description: string }> = {
   en: {
-    title: "MAKCU Settings — Device Configuration",
+    title: "MAKCU Device Control — Device Configuration",
     description: "Configure and interact with your MAKCU device via WebSerial connection.",
   },
   cn: {
-    title: "MAKCU 设置 — 设备配置",
+    title: "MAKCU 设备控制 — 设备配置",
     description: "通过 WebSerial 连接配置和交互您的 MAKCU 设备。",
   },
 };
@@ -50,12 +50,12 @@ export async function generateMetadata({ params }: LangProps): Promise<Metadata>
     title: meta.title,
     description: meta.description,
     alternates: {
-      canonical: `/${lang}/settings`,
+      canonical: `/${lang}/device-control`,
     },
   };
 }
 
-export default async function SettingsPage({ params }: LangProps) {
+export default async function DeviceControlPage({ params }: LangProps) {
   const { lang } = await params;
   const dict = await getDictionary(lang);
   const isCn = lang === "cn";
@@ -67,17 +67,17 @@ export default async function SettingsPage({ params }: LangProps) {
     <div className="flex flex-col">
       <header className="flex flex-col gap-3 pt-8">
         <h1 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl text-black dark:text-white">
-          {dict.settings.title}
+          {dict.device_control.title}
         </h1>
         <p className="max-w-2xl text-sm text-muted-foreground sm:text-base">
-          {dict.settings.description}
+          {dict.device_control.description}
         </p>
       </header>
 
       <div className="mt-10 grid gap-8 lg:grid-cols-[280px_minmax(0,1fr)] xl:grid-cols-[300px_minmax(0,1fr)]">
         <PageSidebar
-          sections={getSectionsForPage("settings")}
-          currentPage="/settings"
+          sections={getSectionsForPage("device-control")}
+          currentPage="/device-control"
           lang={lang}
           dict={dict}
         />
@@ -86,7 +86,7 @@ export default async function SettingsPage({ params }: LangProps) {
           {/* Prerequisites Section */}
           <Section
             id="prerequisites"
-            title={dict.settings.prerequisites.title}
+            title={dict.device_control.prerequisites.title}
           >
             <Card className="border-border/60 bg-card/90 shadow-lg">
               <CardContent className="p-6">
@@ -94,37 +94,37 @@ export default async function SettingsPage({ params }: LangProps) {
                   <li>
                     <div className="space-y-2">
                       <h4 className="font-semibold text-black dark:text-white">
-                        {dict.settings.prerequisites.firmware}
+                        {dict.device_control.prerequisites.firmware}
                       </h4>
                       <p className="text-sm leading-relaxed text-muted-foreground">
-                        {dict.settings.prerequisites.firmware_desc}
+                        {dict.device_control.prerequisites.firmware_desc}
                       </p>
                     </div>
                   </li>
                   <li>
                     <div className="space-y-2">
                       <h4 className="font-semibold text-black dark:text-white">
-                        {dict.settings.prerequisites.usb1}
+                        {dict.device_control.prerequisites.usb1}
                       </h4>
                       <p className="text-sm leading-relaxed text-muted-foreground">
-                        {dict.settings.prerequisites.usb1_desc}
+                        {dict.device_control.prerequisites.usb1_desc}
                       </p>
                     </div>
                   </li>
                   <li>
                     <div className="space-y-2">
                       <h4 className="font-semibold text-black dark:text-white">
-                        {dict.settings.prerequisites.usb2}
+                        {dict.device_control.prerequisites.usb2}
                       </h4>
                       <p className="text-sm leading-relaxed text-muted-foreground">
-                        {dict.settings.prerequisites.usb2_desc}
+                        {dict.device_control.prerequisites.usb2_desc}
                       </p>
                     </div>
                   </li>
                 </ul>
                 <div className="mt-4 p-4 rounded-lg bg-blue-500/10 border border-blue-500/20">
                   <p className="text-sm text-blue-600 dark:text-blue-400">
-                    {dict.settings.prerequisites.note}{" "}
+                    {dict.device_control.prerequisites.note}{" "}
                     <Link
                       href={`/${lang}/troubleshooting`}
                       className="underline hover:text-blue-700 dark:hover:text-blue-300"
@@ -138,12 +138,12 @@ export default async function SettingsPage({ params }: LangProps) {
           </Section>
 
           {/* Device Test Section */}
-          <Section id="device-test" title={dict.settings.sections.device_test}>
+          <Section id="device-test" title={dict.device_control.sections.device_test}>
             <DeviceTestDisplay lang={lang} />
           </Section>
 
           {/* Serial Terminal Section */}
-          <Section id="serial-terminal" title={dict.settings.sections.serial_terminal}>
+          <Section id="serial-terminal" title={dict.device_control.sections.serial_terminal}>
             <SerialTerminal lang={lang} />
           </Section>
         </div>
@@ -151,3 +151,4 @@ export default async function SettingsPage({ params }: LangProps) {
     </div>
   );
 }
+

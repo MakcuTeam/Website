@@ -63,7 +63,7 @@ export default function HomeSidebar({ lang, dict }: HomeSidebarProps) {
       troubleshooting: dict.navbar.links.troubleshooting,
       api: dict.navbar.links.api,
       firmware: dict.navbar.links.makcu_tools,
-      settings: dict.navbar.links.settings,
+      "device-control": dict.navbar.links.device_control,
       xim: dict.navbar.links.xim,
       information: dict.navbar.links.information,
     };
@@ -89,8 +89,8 @@ export default function HomeSidebar({ lang, dict }: HomeSidebarProps) {
                   <div className="space-y-2 pl-4 border-l border-border/60">
                     {pageConfig.sections
                       .filter((section) => {
-                        // Filter out device-information from settings page on main page sidebar
-                        if (pageKey === "settings" && section.id === "device-information") {
+                        // Filter out device-information from device-control page on main page sidebar
+                        if (pageKey === "device-control" && section.id === "device-information") {
                           return false;
                         }
                         return true;

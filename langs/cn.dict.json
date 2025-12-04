@@ -43,7 +43,7 @@
       "discord": "Discord",
       "information": "信息",
       "troubleshooting": "故障排除",
-      "settings": "设置",
+      "device_control": "设备控制",
       "home": "首页",
       "setup": "设置",
       "xim": "XIM"
@@ -368,8 +368,8 @@
       "solution": "要进入刷写模式：按住按钮，连接 USB 线，等待 USB 声音，然后松开按钮。要使用正常模式：将 USB 1 连接到游戏 PC，USB 2 用于 COM 端口，USB 3 连接到鼠标 - 无需按住任何按钮。"
     }
   },
-  "settings": {
-    "title": "MAKCU 设置",
+  "device_control": {
+    "title": "MAKCU 设备控制",
     "description": "通过 WebSerial 连接配置和交互您的 MAKCU 设备。",
     "status": {
       "disconnected": "未连接",

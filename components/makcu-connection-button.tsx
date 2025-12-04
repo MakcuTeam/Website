@@ -108,7 +108,7 @@ export function MakcuConnectionButton({ dict }: { dict: Dictionary }) {
       >
         {getStatusIcon()}
         <span className="ml-1 hidden sm:inline">
-          {status === "connected" ? dict.settings.connection.disconnect : dict.settings.connection.connect}
+          {status === "connected" ? dict.device_control.connection.disconnect : dict.device_control.connection.connect}
         </span>
       </Button>
       {status === "connected" && detectedBaudRate && (

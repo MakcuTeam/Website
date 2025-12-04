@@ -159,7 +159,7 @@ export const DeviceTool: React.FC<{ lang: Locale; dict: Dictionary }> = ({ lang,
   // Check if device is in normal mode on load
   useEffect(() => {
     if (status === "connected" && mode === "normal" && dict) {
-      toast.warning(dict.settings.warnings.normal_mode_detected);
+      toast.warning(dict.device_control.warnings.normal_mode_detected);
     }
   }, [status, mode, dict]);
 
@@ -239,7 +239,7 @@ export const DeviceTool: React.FC<{ lang: Locale; dict: Dictionary }> = ({ lang,
     
     // Check if device is in normal mode
     if (status === "connected" && mode === "normal") {
-      toast.error(dict?.settings.warnings.normal_mode_detected || "Cannot flash in normal mode. Please disconnect and reconnect in flash mode.");
+      toast.error(dict?.device_control.warnings.normal_mode_detected || "Cannot flash in normal mode. Please disconnect and reconnect in flash mode.");
       return;
     }
 
@@ -339,23 +339,23 @@ export const DeviceTool: React.FC<{ lang: Locale; dict: Dictionary }> = ({ lang,
       return dict.troubleshooting.connection_status.statuses.not_supported.label;
     }
     if (status === "disconnected") {
-      return dict.settings.status.disconnected;
+      return dict.device_control.status.disconnected;
     }
     if (status === "connecting") {
-      return dict.settings.status.connecting;
+      return dict.device_control.status.connecting;
     }
     if (status === "fault") {
-      return dict.settings.status.fault;
+      return dict.device_control.status.fault;
     }
     if (status === "connected") {
       if (mode === "normal") {
-        return dict.settings.status.connected_normal;
+        return dict.device_control.status.connected_normal;
       }
       if (mode === "flash") {
-        return dict.settings.status.connected_flash;
+        return dict.device_control.status.connected_flash;
       }
     }
-    return dict.settings.status.disconnected;
+    return dict.device_control.status.disconnected;
   };
 
   // Get status color dot - matching Connection Status Overview colors
@@ -408,7 +408,7 @@ export const DeviceTool: React.FC<{ lang: Locale; dict: Dictionary }> = ({ lang,
             {contextBrowserSupported && status === "connected" && mode === "normal" && (
               <div className="p-4 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
                 <p className="text-sm text-yellow-600 dark:text-yellow-400">
-                  {dict.settings.warnings.normal_mode_detected}
+                  {dict.device_control.warnings.normal_mode_detected}
                 </p>
               </div>
             )}

@@ -26,7 +26,7 @@ const sortPagesAlphabetically = (pages: PageSections[]): PageSections[] => {
     firmware: 1,
     information: 2,
     setup: 3,
-    settings: 4,
+    "device-control": 4,
     troubleshooting: 5,
     xim: 6,
   };
@@ -364,24 +364,24 @@ export const SECTIONS_CONFIG: PageSections[] = sortPagesAlphabetically([
     ],
   },
   {
-    page: "settings",
-    route: "/settings",
+    page: "device-control",
+    route: "/device-control",
     sections: [
       {
         id: "prerequisites",
-        labelKey: "settings.prerequisites.title",
+        labelKey: "device_control.prerequisites.title",
       },
       {
         id: "device-information",
-        labelKey: "settings.sections.device_information",
+        labelKey: "device_control.sections.device_information",
       },
       {
         id: "device-test",
-        labelKey: "settings.sections.device_test",
+        labelKey: "device_control.sections.device_test",
       },
       {
         id: "serial-terminal",
-        labelKey: "settings.sections.serial_terminal",
+        labelKey: "device_control.sections.serial_terminal",
       },
     ],
   },

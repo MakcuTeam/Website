@@ -51,7 +51,7 @@
       "discord": "Discord",
       "information": "Information",
       "troubleshooting": "Troubleshooting",
-      "settings": "Settings",
+      "device_control": "Device Control",
       "home": "Home",
       "setup": "Setup",
       "xim": "XIM"
@@ -178,7 +178,7 @@
         },
         "normal_mode": {
           "label": "Normal mode",
-          "description": "MAKCU is connected and running in normal mode. You can use the settings page to configure and test MAKCU. USB 1 is connected to gaming PC, USB 2 is the COM port, USB 3 should be connected to either your mouse or keyboard. **3.9 fw only supports keyboard.",
+          "description": "MAKCU is connected and running in normal mode. You can use the Device Control page to configure and test MAKCU. USB 1 is connected to gaming PC, USB 2 is the COM port, USB 3 should be connected to either your mouse or keyboard. **3.9 fw only supports keyboard.",
           "color": "Green (emerald)",
           "com_port_warning": "Important: MAKCU only allows one device connected to USB 2 (COM port) at a time. Close this tool before using MAKCU with your software."
         },
@@ -375,8 +375,8 @@
       "solution": "To enter flash mode: Hold the button, connect USB cable, wait for USB sound, then release button. To use normal mode: Connect USB 1 to gaming PC, USB 2 for COM port, and USB 3 to mouse - no buttons need to be held."
     }
   },
-  "settings": {
-    "title": "MAKCU Settings",
+  "device_control": {
+    "title": "MAKCU Device Control",
     "description": "Configure and interact with your MAKCU device via WebSerial connection.",
     "status": {
       "disconnected": "Disconnected",
@@ -395,7 +395,7 @@
     "prerequisites": {
       "title": "Prerequisites",
       "firmware": "MAKCU flashed with 3.9 firmware",
-      "firmware_desc": "The settings page requires firmware version 3.9 or later",
+      "firmware_desc": "The Device Control page requires firmware version 3.9 or later",
       "usb1": "USB 1 connected to your gaming PC",
       "usb1_desc": "USB 1 must be connected to your gaming PC",
       "usb2": "USB 2 connected to this PC",

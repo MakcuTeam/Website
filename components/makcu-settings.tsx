@@ -28,23 +28,23 @@ export const MakcuSettings: React.FC<MakcuSettingsProps> = ({ lang, dict }) => {
       return dict.troubleshooting.connection_status.statuses.not_supported.label;
     }
     if (status === "disconnected") {
-      return dict.settings.status.disconnected;
+      return dict.device_control.status.disconnected;
     }
     if (status === "connecting") {
-      return dict.settings.status.connecting;
+      return dict.device_control.status.connecting;
     }
     if (status === "fault") {
-      return dict.settings.status.fault;
+      return dict.device_control.status.fault;
     }
     if (status === "connected") {
       if (mode === "normal") {
-        return dict.settings.status.connected_normal;
+        return dict.device_control.status.connected_normal;
       }
       if (mode === "flash") {
-        return dict.settings.status.connected_flash;
+        return dict.device_control.status.connected_flash;
       }
     }
-    return dict.settings.status.disconnected;
+    return dict.device_control.status.disconnected;
   };
 
   // Get status color dot - matching Connection Status Overview colors
@@ -97,7 +97,7 @@ export const MakcuSettings: React.FC<MakcuSettingsProps> = ({ lang, dict }) => {
           {browserSupported && isSettingsDisabled && (
             <div className="p-4 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
               <p className="text-sm text-yellow-600 dark:text-yellow-400">
-                {dict.settings.warnings.flash_mode_detected}
+                {dict.device_control.warnings.flash_mode_detected}
               </p>
             </div>
           )}
