@@ -103,7 +103,7 @@ export function NavMenu({
         const Comp = (
           <LocalizedLink
             key={item.title + item.href}
-            className="flex items-center gap-1 text-foreground/80 hover:text-foreground"
+            className="flex items-center gap-1 text-foreground hover:text-foreground"
             activeClassName={item.href ? "text-foreground font-extrabold" : ""}
             href={item.href ?? ""}
             target={item.target}

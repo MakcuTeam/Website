@@ -82,7 +82,7 @@ export default function HomeSidebar({ lang, dict }: HomeSidebarProps) {
                 <div key={pageKey} className="space-y-2">
                   <Link
                     href={`/${lang}${pageConfig.route}`}
-                    className="font-medium text-foreground/80 transition hover:text-foreground block"
+                    className="font-medium text-foreground transition hover:text-foreground block"
                   >
                     {getPageTitle(pageKey)}
                   </Link>

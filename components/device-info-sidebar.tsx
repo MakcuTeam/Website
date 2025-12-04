@@ -48,7 +48,7 @@ export function DeviceInfoSidebar() {
   return (
     <div className="space-y-2 pt-2 border-t border-border/60">
       <div className="pl-4 border-l border-border/60">
-        <div className="text-xs text-foreground/80 font-medium">
+        <div className="text-xs text-foreground font-medium">
           {vendor}
         </div>
         {model && (

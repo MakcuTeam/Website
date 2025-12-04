@@ -80,7 +80,7 @@ export default async function FirmwarePage({ params }: LangProps) {
                   <div key={item.id} className="space-y-2">
                     <Link
                       href={`/${lang}/firmware#${item.id}`}
-                      className="font-medium text-foreground/80 transition hover:text-foreground"
+                      className="font-medium text-foreground transition hover:text-foreground"
                     >
                       {item.label}
                     </Link>

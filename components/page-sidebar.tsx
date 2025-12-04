@@ -82,7 +82,7 @@ export default function PageSidebar({
           href={href}
           className={`flex items-center gap-1.5 transition hover:text-foreground ${
             level === 0
-              ? "font-medium text-foreground/80 text-sm"
+              ? "font-medium text-foreground text-sm"
               : "text-xs text-muted-foreground"
           }`}
         >
@@ -128,7 +128,7 @@ export default function PageSidebar({
                 <div key={section.id} className="space-y-2">
                   {isDeviceInformation ? (
                     <>
-                      <div className="font-medium text-foreground/80">
+                      <div className="font-medium text-foreground">
                         {getLabel(section.labelKey)}
                       </div>
                       <div className="mt-2 pt-2 border-t border-border/60">
@@ -153,7 +153,7 @@ export default function PageSidebar({
                     <>
                       <Link
                         href={`/${lang}${currentPage}#${section.id}`}
-                        className="font-medium text-foreground/80 transition hover:text-foreground"
+                        className="font-medium text-foreground transition hover:text-foreground"
                       >
                         {getLabel(section.labelKey)}
                       </Link>

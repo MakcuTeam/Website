@@ -338,7 +338,7 @@ export default async function ApiPage({ params }: LangProps) {
                   <div key={item.id} className="space-y-2">
                     <Link
                       href={`/${lang}/api#${item.id}`}
-                      className="font-medium text-foreground/80 transition hover:text-foreground"
+                      className="font-medium text-foreground transition hover:text-foreground"
                     >
                       {item.label}
                     </Link>
