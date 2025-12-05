@@ -59,7 +59,7 @@ function buildBinaryFrame(cmd: number, payload: Uint8Array | null = null): Uint8
 
 // Parse a binary framed response - returns payload or null if invalid
 function parseBinaryFrame(data: Uint8Array): { cmd: number; payload: Uint8Array } | null {
-  // Find start byte (UART0 uses 0x5B)
+  // Find start byte (UART0 uses 0x50)
   let startIdx = -1;
   for (let i = 0; i < data.length; i++) {
     if (data[i] === UART0_START_BYTE) {
@@ -518,7 +518,7 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
       writerRef.current = writer;
 
       // Send binary framed website command (0xB0)
-      // Frame format: [0x5A] [0xB0] [0x00] [0x00] [CRC_LO] [CRC_HI]
+      // Frame format: [0x50] [0xB0] [0x00] [0x00] [CRC_LO] [CRC_HI]
       const binaryCommand = buildBinaryFrame(UART0_CMD_WEBSITE, null);
       console.log("[TRY NORMAL MODE] Sending binary website command:", Array.from(binaryCommand).map(b => b.toString(16).padStart(2, '0')).join(' '));
       await writer.write(binaryCommand);
@@ -556,7 +556,7 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
               offset += chunk.length;
             }
             
-            // Look for binary frame start byte (0x5B for UART0)
+            // Look for binary frame start byte (0x50 for UART0)
             let frameStart = -1;
             for (let i = 0; i < combined.length; i++) {
               if (combined[i] === UART0_START_BYTE) {
