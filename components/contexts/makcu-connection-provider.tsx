@@ -561,8 +561,8 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
             for (let i = 0; i < combined.length; i++) {
               if (combined[i] === UART0_START_BYTE) {
                 frameStart = i;
-                break;
-              }
+                  break;
+                }
             }
             
             // If we found a frame start, try to parse it
@@ -576,9 +576,9 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
                 const parsed = parseBinaryFrame(combined.slice(frameStart));
                 if (parsed && parsed.cmd === UART0_CMD_WEBSITE) {
                   console.log(`[TRY NORMAL MODE] Received valid binary response, payload size: ${parsed.payload.length}`);
-                  if (timeoutId) {
-                    clearTimeout(timeoutId);
-                  }
+              if (timeoutId) {
+                clearTimeout(timeoutId);
+              }
                   return parsed.payload;
                 }
               }
@@ -610,8 +610,8 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
         for (let i = 0; i < combined.length; i++) {
           if (combined[i] === UART0_START_BYTE) {
             frameStart = i;
-            break;
-          }
+              break;
+            }
         }
         
         if (frameStart >= 0 && combined.length >= frameStart + 6) {
@@ -622,7 +622,7 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
             const parsed = parseBinaryFrame(combined.slice(frameStart));
             if (parsed && parsed.cmd === UART0_CMD_WEBSITE) {
               return parsed.payload;
-            }
+        }
           }
         }
         
