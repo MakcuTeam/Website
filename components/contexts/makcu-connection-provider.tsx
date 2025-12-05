@@ -597,20 +597,45 @@ export interface MakcuStatus {
 
 // Parse status response (17 bytes from MCU)
 function parseStatusResponse(data: Uint8Array): MakcuStatus | null {
-  if (data.length < 17) return null;
+  if (data.length < 17) {
+    console.warn(`[PARSE STATUS] Invalid length: ${data.length} bytes (expected 17)`);
+    return null;
+  }
   
   const view = new DataView(data.buffer, data.byteOffset, 17);
   
-  return {
-    mcuAlive: data[0] === 0x01,
-    deviceAttached: data[1] === 0x01,
-    uptime: view.getUint32(2, true),        // little-endian
-    sofCount: view.getUint32(6, true),
-    freeRamKb: view.getUint16(10, true),
-    hasFault: data[12] === 0x01,
-    temp: view.getFloat32(13, true),        // little-endian float, -1.0 if unavailable
+  const mcuAlive = data[0] === 0x01;
+  const deviceAttached = data[1] === 0x01;
+  const uptime = view.getUint32(2, true);        // little-endian
+  const sofCount = view.getUint32(6, true);
+  const freeRamKb = view.getUint16(10, true);
+  const hasFault = data[12] === 0x01;
+  const temp = view.getFloat32(13, true);        // little-endian float, -1.0 if unavailable
+  
+  const status: MakcuStatus = {
+    mcuAlive,
+    deviceAttached,
+    uptime,
+    sofCount,
+    freeRamKb,
+    hasFault,
+    temp,
     lastPollTime: Date.now(),
   };
+  
+  // Detailed logging of parsed values
+  console.log(`[PARSE STATUS] Parsed STATUS response (${data.length} bytes):`, {
+    mcuAlive,
+    deviceAttached,
+    uptime: `${uptime}s (${Math.floor(uptime / 3600)}h ${Math.floor((uptime % 3600) / 60)}m ${uptime % 60}s)`,
+    sofCount,
+    freeRamKb: `${freeRamKb}kb`,
+    hasFault,
+    temp: temp >= 0 ? `${temp.toFixed(1)}°C` : "unavailable",
+    rawBytes: Array.from(data.slice(0, 17)).map(b => `0x${b.toString(16).padStart(2, '0').toUpperCase()}`).join(' ')
+  });
+  
+  return status;
 }
 
 interface MakcuConnectionState {
@@ -878,11 +903,12 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
           reader = null;
         }
         
-        // STATUS response: 15 bytes, first byte is MCU_STATUS (0x01 = alive)
-        if (response && response.length >= 15 && response[0] === 0x01) {
+        // STATUS response: 17 bytes, first byte is MCU_STATUS (0x01 = alive)
+        if (response && response.length >= 17 && response[0] === 0x01) {
           // MCU is alive! Parse initial status
           const status = parseStatusResponse(response);
           if (status) {
+            console.log(`[CONNECTION CHECK] STATUS parsed: RAM=${status.freeRamKb}kb, UPTIME=${status.uptime}s, TEMP=${status.temp >= 0 ? status.temp.toFixed(1) + '°C' : 'N/A'}, Device=${status.deviceAttached ? 'attached' : 'detached'}`);
             setMcuStatus(status);
             lastDeviceAttachedRef.current = status.deviceAttached;
             // Don't fetch full device info here - let the status poll handle it
@@ -1671,9 +1697,10 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
         // Wait for response from continuous reader (via subscription)
         const response = await responsePromise;
 
-        if (response && response.length >= 15) {
+        if (response && response.length >= 17) {
           const status = parseStatusResponse(response);
           if (status) {
+            console.log(`[STATUS POLL] Received STATUS: RAM=${status.freeRamKb}kb, UPTIME=${status.uptime}s, TEMP=${status.temp >= 0 ? status.temp.toFixed(1) + '°C' : 'N/A'}, Device=${status.deviceAttached ? 'attached' : 'detached'}, Fault=${status.hasFault}`);
             setMcuStatus(status);
             consecutiveFailures = 0;  // Reset on success
 
@@ -1701,7 +1728,7 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
           } else {
             // Invalid response - count as failure
             consecutiveFailures++;
-            console.warn(`[STATUS POLL] Invalid response (${consecutiveFailures}/${MAX_FAILURES})`);
+            console.warn(`[STATUS POLL] Invalid response (${consecutiveFailures}/${MAX_FAILURES}):`, response ? `length=${response.length}, firstByte=0x${response[0]?.toString(16)}` : 'null response');
           }
         } else {
           // No response - timeout
