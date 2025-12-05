@@ -513,7 +513,8 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
   // 
   // For frame transmission: max frame size + silence detection
   // For silence detection: 10-20 symbol periods (firmware uses 20 = 2 bytes)
-  const calculateTimeout = (baudRate: number, maxFrameBytes: number = 2566, silenceSymbols: number = 10): number => {
+  // For fast detection (connection phase): use shorter timeout to fail fast
+  const calculateTimeout = (baudRate: number, maxFrameBytes: number = 2566, silenceSymbols: number = 10, fastMode: boolean = false): number => {
     const bitsPerSymbol = 10; // 8N1: 1 start + 8 data + 1 stop
     
     // Frame transmission time
@@ -521,14 +522,19 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
     
     // Silence detection time (10 symbol periods = 100 bits = end of frame indicator)
     // This mimics ESP32 UART hardware timeout behavior
-    const silenceTimeMs = (silenceSymbols * bitsPerSymbol * 1000) / baudRate;
+    // In fast mode, use fewer symbol periods for quicker failure detection
+    const silenceSymbolsToUse = fastMode ? 5 : silenceSymbols;
+    const silenceTimeMs = (silenceSymbolsToUse * bitsPerSymbol * 1000) / baudRate;
     
     // Total: frame time + silence detection + small overhead for Windows/WebSerial
-    const overheadMs = 20; // Small overhead for WebSerial API delays
+    // In fast mode, reduce overhead for quicker detection
+    const overheadMs = fastMode ? 10 : 20;
     const calculatedTimeout = Math.ceil(frameTimeMs + silenceTimeMs + overheadMs);
     
     // Minimum 50ms (for very fast baud rates), maximum 3000ms (safety limit)
-    return Math.max(50, Math.min(3000, calculatedTimeout));
+    // In fast mode, cap at 500ms for quick failure
+    const maxTimeout = fastMode ? 500 : 3000;
+    return Math.max(50, Math.min(maxTimeout, calculatedTimeout));
   };
 
   // Calculate optimal retry count based on baud rate
@@ -734,7 +740,7 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
       let normalModeSuccess = false;
 
       // Step 1: Try 4M (4000000) first - fastest, timeout ~100ms
-      // Most modern devices support this, so try it first to minimize delay
+      // Use minimal retries (1 attempt) for fast detection - if it fails, likely flash mode
       try {
         await selectedPort.open({
           baudRate: 4000000,
@@ -743,7 +749,9 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
           parity: "none",
           flowControl: "none",
         });
-        normalModeSuccess = await tryNormalMode(selectedPort, 4000000);
+        // Single attempt with fast timeout for quick detection
+        const fastTimeout = calculateTimeout(4000000, 2566, 10, true);
+        normalModeSuccess = await tryNormalMode(selectedPort, 4000000, fastTimeout, 1);
         if (normalModeSuccess) {
           detectedBaudRate = 4000000;
         } else {
@@ -757,7 +765,8 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
         }
       }
 
-      // Step 2: If 4M failed, try 115200 - slower but more compatible, timeout ~400ms
+      // Step 2: If 4M failed, try 115200 - slower but more compatible
+      // Use minimal retries (1 attempt) for fast detection
       if (!normalModeSuccess) {
         try {
           await selectedPort.open({
@@ -767,7 +776,9 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
             parity: "none",
             flowControl: "none",
           });
-          normalModeSuccess = await tryNormalMode(selectedPort, 115200);
+          // Single attempt with fast timeout for quick detection
+          const fastTimeout = calculateTimeout(115200, 2566, 10, true);
+          normalModeSuccess = await tryNormalMode(selectedPort, 115200, fastTimeout, 1);
           if (normalModeSuccess) {
             detectedBaudRate = 115200;
           } else {
