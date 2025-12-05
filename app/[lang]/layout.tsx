@@ -50,7 +50,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 } & LangProps>) {
-  const { lang } = await params;
+  const { lang } = await params.params;
   const dict = await getDictionary(lang);
   return (
     <html lang={lang} suppressHydrationWarning style={{ overflowX: "hidden" }}>

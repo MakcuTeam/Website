@@ -4,11 +4,12 @@ import { page_routes } from "@/lib/routes-config";
 import { notFound } from "next/navigation";
 import { getDocsForSlug } from "@/lib/markdown";
 import { Typography } from "@/components/typography";
-import { getDictionary, LangProps } from "@/lib/dictionaries";
+import { getDictionary } from "@/lib/dictionaries";
+import { Locale } from "@/lib/locale";
 
 type PageProps = {
-  params: Promise<{ slug: string[] }>;
-} & LangProps;
+  params: Promise<{ lang: Locale; slug: string[] }>;
+};
 
 export default async function DocsPage(props: PageProps) {
   const params = await props.params;
