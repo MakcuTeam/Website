@@ -371,11 +371,22 @@ function buildAndStoreDeviceInfo(commandResponses: Map<number, Uint8Array>): voi
     }
   }
 
-  // Store in cookie as JSON (only if we have vendor or model)
-  if (deviceInfo.VENDOR || deviceInfo.MODEL) {
+  // Store in cookie as JSON if we have any device information
+  // Store if we have at least one meaningful field (not just empty values)
+  const hasValidData = Object.keys(deviceInfo).some(key => {
+    const value = deviceInfo[key];
+    if (value === undefined || value === null) return false;
+    if (typeof value === 'string' && value.trim() === '') return false;
+    if (typeof value === 'number' && value === 0 && (key === 'VID' || key === 'PID')) return false;
+    return true;
+  });
+
+  if (hasValidData) {
     const jsonStr = JSON.stringify(deviceInfo);
     setCookie(DEVICE_INFO_COOKIE, jsonStr, DEVICE_INFO_EXPIRY_HOURS);
+    console.log(`[DEVICE INFO] Stored device info cookie with ${Object.keys(deviceInfo).length} fields`);
   } else {
+    console.warn("[DEVICE INFO] No valid device data to store in cookie");
     setCookie(DEVICE_INFO_COOKIE, "", 0);
   }
 }

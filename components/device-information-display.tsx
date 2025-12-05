@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { getDeviceInfo } from "./contexts/makcu-connection-provider";
+import { getCombinedDeviceInfo } from "./contexts/makcu-connection-provider";
 import { useMakcuConnection } from "./contexts/makcu-connection-provider";
 import type { Locale } from "@/lib/locale";
 
@@ -13,22 +13,22 @@ type DeviceInformationDisplayProps = {
 
 /**
  * Device Information display component for Device Control page.
- * Shows all parsed cookie information in a formatted card.
+ * Shows all parsed cookie information combined with live STATUS data in a formatted card.
  */
 export function DeviceInformationDisplay({ lang, variant = "card" }: DeviceInformationDisplayProps) {
-  const { status } = useMakcuConnection();
+  const { status, mcuStatus } = useMakcuConnection();
   const [deviceInfo, setDeviceInfo] = useState<Record<string, string | boolean> | null>(null);
   const isCn = lang === "cn";
 
   useEffect(() => {
     // Only check for device info if connected
     if (status === "connected") {
-      const info = getDeviceInfo();
+      const info = getCombinedDeviceInfo(mcuStatus);
       setDeviceInfo(info);
       
-      // Check for updates periodically
+      // Check for updates periodically (includes live RAM/uptime from STATUS poll)
       const interval = setInterval(() => {
-        const updatedInfo = getDeviceInfo();
+        const updatedInfo = getCombinedDeviceInfo(mcuStatus);
         setDeviceInfo(updatedInfo);
       }, 500);
 
@@ -37,7 +37,7 @@ export function DeviceInformationDisplay({ lang, variant = "card" }: DeviceInfor
       // Clear device info when disconnected
       setDeviceInfo(null);
     }
-  }, [status]);
+  }, [status, mcuStatus]);
 
   // Only show if connected and we have valid device info
   if (status !== "connected" || !deviceInfo) {
