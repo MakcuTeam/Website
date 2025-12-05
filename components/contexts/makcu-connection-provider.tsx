@@ -1234,11 +1234,40 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
       const result = await Promise.race([readPromise, timeoutPromise]);
       if (timeoutId) clearTimeout(timeoutId);
       
+      // If command failed (no response), log warning but don't trigger fault
+      // Serial terminal commands have unknown frame sizes and no CRC - failures are expected
+      // Fault is only triggered by:
+      // 1. CRC-protected binary commands (sendBinaryCommand) after all retries fail
+      // 2. Connection attempts (4M/115200 normal mode + flash mode) all failing
+      // 3. Actual port/connection errors (not simple command timeouts)
+      if (!result) {
+        console.warn(`[SEND COMMAND] Command failed (timeout/no response): "${command.trim()}"`);
+      }
+      
       return result;
     } catch (error) {
+      console.error(`[SEND COMMAND] Error:`, error);
+      // Only trigger fault on actual connection problems, not command failures
+      // Connection errors indicate port is broken/disconnected
+      const errorMsg = error instanceof Error ? error.message : String(error);
+      if (errorMsg.includes("port") || errorMsg.includes("disconnect") || errorMsg.includes("locked") || 
+          errorMsg.includes("closed") || errorMsg.includes("not open")) {
+        console.error(`[SEND COMMAND] Connection error detected - setting fault`);
+        await cleanup();
+        setState((prev) => ({ 
+          ...prev, 
+          status: "fault",
+          mode: null,
+          transport: null,
+          loader: null,
+          detectedBaudRate: null
+        }));
+        toast.error("Connection error - please reconnect.");
+      }
+      // Simple command errors (timeout, parse errors, etc.) don't trigger fault
       return null;
     }
-  }, []);
+  }, [cleanup]);
 
   // Send binary API command and wait for binary response
   // 
@@ -1384,8 +1413,22 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
       }
     }
     
+    // All retries exhausted - command failed completely
+    // This indicates a serious communication problem - set status to fault
+    console.error(`[BINARY API] All ${calculatedRetries} retries failed - setting connection to fault`);
+    await cleanup();
+    setState((prev) => ({ 
+      ...prev, 
+      status: "fault",
+      mode: null,
+      transport: null,
+      loader: null,
+      detectedBaudRate: null
+    }));
+    toast.error("Command failed after all retries - connection fault. Please reconnect.");
+    
     return null;
-  }, []);
+  }, [cleanup]);
 
   // Subscribe to serial data
   const subscribeToSerialData = useCallback((callback: SerialDataCallback) => {
