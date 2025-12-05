@@ -506,35 +506,66 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
     }
   }, []);
 
+  // Calculate optimal timeout based on baud rate and expected frame size
+  // Frame: 6 bytes (request) + 2560 bytes (max response) = 2566 bytes total
+  // 8N1 format: 10 bits per byte (1 start + 8 data + 1 stop)
+  // Formula: (bytes * 10 bits) / baud_rate * 1000ms + processing overhead
+  const calculateTimeout = (baudRate: number, maxFrameBytes: number = 2566): number => {
+    const bitsPerByte = 10; // 8N1: 1 start + 8 data + 1 stop
+    const transmissionTimeMs = (maxFrameBytes * bitsPerByte * 1000) / baudRate;
+    // Add processing overhead: firmware processing + USB latency + buffer delays
+    const overheadMs = baudRate >= 2000000 ? 50 : 150; // Less overhead at high baud rates
+    const calculatedTimeout = Math.ceil(transmissionTimeMs + overheadMs);
+    // Minimum 200ms, maximum 2000ms
+    return Math.max(200, Math.min(2000, calculatedTimeout));
+  };
+
+  // Calculate optimal retry count based on baud rate
+  // Faster baud rates need fewer retries (less likely to have errors)
+  const calculateMaxRetries = (baudRate: number): number => {
+    if (baudRate >= 2000000) return 3; // 4M baud: 3 retries
+    if (baudRate >= 1000000) return 4; // 1M+ baud: 4 retries
+    return 5; // 115200 baud: 5 retries (more prone to errors)
+  };
+
   // Try to connect in normal mode with specific baud rate and timeout
-  const tryNormalMode = async (port: SerialPort, baudRate: number, timeout: number): Promise<boolean> => {
+  // Timeout and retries are automatically calculated based on baud rate
+  const tryNormalMode = async (port: SerialPort, baudRate: number, timeout?: number, maxRetries?: number): Promise<boolean> => {
+    // Auto-calculate timeout and retries if not provided
+    const calculatedTimeout = timeout ?? calculateTimeout(baudRate);
+    const calculatedRetries = maxRetries ?? calculateMaxRetries(baudRate);
+    
+    console.log(`[TRY NORMAL MODE] Baud: ${baudRate}, Timeout: ${calculatedTimeout}ms, Max Retries: ${calculatedRetries}`);
     try {
       if (!port.writable || !port.readable) {
         return false;
       }
 
-      // Get writer
-      const writer = port.writable.getWriter();
-      writerRef.current = writer;
+      // Retry loop: attempt up to maxRetries times
+      for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        try {
+          // Get writer
+          const writer = port.writable.getWriter();
+          writerRef.current = writer;
 
-      // Send binary framed website command (0xB0)
-      // Frame format: [0x50] [0xB0] [0x00] [0x00] [CRC_LO] [CRC_HI]
-      const binaryCommand = buildBinaryFrame(UART0_CMD_WEBSITE, null);
-      console.log("[TRY NORMAL MODE] Sending binary website command:", Array.from(binaryCommand).map(b => b.toString(16).padStart(2, '0')).join(' '));
-      await writer.write(binaryCommand);
+          // Send binary framed website command (0xB0)
+          // Frame format: [0x50] [0xB0] [0x00] [0x00] [CRC_LO] [CRC_HI]
+          const binaryCommand = buildBinaryFrame(UART0_CMD_WEBSITE, null);
+          console.log(`[TRY NORMAL MODE] Sending binary website command (attempt ${attempt}/${maxRetries}):`, Array.from(binaryCommand).map(b => b.toString(16).padStart(2, '0')).join(' '));
+          await writer.write(binaryCommand);
 
       // Get reader (keep it for continuous reading after connection)
       const reader = port.readable.getReader();
       readerRef.current = reader;
       console.log("[TRY NORMAL MODE] Reader obtained and stored in readerRef");
 
-      // Read response with timeout (configurable)
+      // Read response with timeout (calculated based on baud rate)
       let timeoutId: NodeJS.Timeout | null = null;
       const timeoutPromise = new Promise<Uint8Array>((_, reject) => {
         timeoutId = setTimeout(() => {
           reader.cancel().catch(() => {});
-          reject(new Error("Timeout waiting for response"));
-        }, timeout);
+          reject(new Error(`Timeout waiting for response (${calculatedTimeout}ms)`));
+        }, calculatedTimeout);
       });
 
       const readPromise = (async () => {
@@ -575,11 +606,14 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
                 // We have a complete frame - verify CRC and extract payload
                 const parsed = parseBinaryFrame(combined.slice(frameStart));
                 if (parsed && parsed.cmd === UART0_CMD_WEBSITE) {
-                  console.log(`[TRY NORMAL MODE] Received valid binary response, payload size: ${parsed.payload.length}`);
-              if (timeoutId) {
-                clearTimeout(timeoutId);
-              }
+                  console.log(`[TRY NORMAL MODE] Received valid binary response (attempt ${attempt}/${maxRetries}), payload size: ${parsed.payload.length}`);
+                  if (timeoutId) {
+                    clearTimeout(timeoutId);
+                  }
                   return parsed.payload;
+                } else if (parsed === null) {
+                  // CRC mismatch or invalid frame - will retry
+                  console.warn(`[TRY NORMAL MODE] CRC mismatch or invalid frame (attempt ${attempt}/${maxRetries}) - will retry`);
                 }
               }
             }
@@ -622,7 +656,10 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
             const parsed = parseBinaryFrame(combined.slice(frameStart));
             if (parsed && parsed.cmd === UART0_CMD_WEBSITE) {
               return parsed.payload;
-        }
+            } else if (parsed === null) {
+              // CRC mismatch or invalid frame - will retry
+              console.warn(`[TRY NORMAL MODE] CRC mismatch or invalid frame in final parse (attempt ${attempt}/${maxRetries}) - will retry`);
+            }
           }
         }
         
@@ -647,6 +684,46 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
           }
           // Note: Reader is kept in readerRef.current for continuous reading
           return true;
+        }
+        
+        // If this wasn't the last attempt, wait a bit before retrying
+        // Retry delay scales with baud rate (faster baud = shorter delay)
+        const retryDelay = baudRate >= 2000000 ? 50 : 100; // 50ms for 4M, 100ms for 115200
+        if (attempt < calculatedRetries) {
+          console.log(`[TRY NORMAL MODE] Retrying in ${retryDelay}ms... (attempt ${attempt}/${calculatedRetries} failed)`);
+          // Release writer before retry
+          if (writerRef.current) {
+            writerRef.current.releaseLock();
+            writerRef.current = null;
+          }
+          await new Promise(resolve => setTimeout(resolve, retryDelay));
+          continue; // Retry the loop
+        }
+        
+        // Last attempt failed
+        if (writerRef.current) {
+          writerRef.current.releaseLock();
+          writerRef.current = null;
+        }
+        return false;
+      } catch (error) {
+        console.error(`[TRY NORMAL MODE] Error on attempt ${attempt}/${calculatedRetries}:`, error);
+        if (writerRef.current) {
+          writerRef.current.releaseLock();
+          writerRef.current = null;
+        }
+        const retryDelay = baudRate >= 2000000 ? 50 : 100;
+        if (attempt < calculatedRetries) {
+          await new Promise(resolve => setTimeout(resolve, retryDelay));
+          continue; // Retry the loop
+        }
+        return false;
+      }
+    }
+    
+    // All retries exhausted
+    console.error(`[TRY NORMAL MODE] Failed after ${calculatedRetries} attempts`);
+    return false;
         }
       } catch (error) {
         if (timeoutId) {
@@ -732,22 +809,24 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
       // Request port
       const selectedPort = await Navigator.serial.requestPort();
       
-      // Auto-detect baud rate: Try 115200 first, then 4M, then flash mode
+      // Auto-detect baud rate: Try 4M first (faster), then 115200, then flash mode
+      // This minimizes connection time for devices that support 4M baud
       let detectedBaudRate: number | null = null;
       let normalModeSuccess = false;
 
-      // Step 1: Try 115200 with 1000ms timeout (1 second)
+      // Step 1: Try 4M (4000000) first - fastest, timeout ~100ms
+      // Most modern devices support this, so try it first to minimize delay
       try {
         await selectedPort.open({
-          baudRate: 115200,
+          baudRate: 4000000,
           dataBits: 8,
           stopBits: 1,
           parity: "none",
           flowControl: "none",
         });
-        normalModeSuccess = await tryNormalMode(selectedPort, 115200, 1000);
+        normalModeSuccess = await tryNormalMode(selectedPort, 4000000);
         if (normalModeSuccess) {
-          detectedBaudRate = 115200;
+          detectedBaudRate = 4000000;
         } else {
           await selectedPort.close();
         }
@@ -759,19 +838,19 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
         }
       }
 
-      // Step 2: If 115200 failed, try 4M (4000000) with 500ms timeout
+      // Step 2: If 4M failed, try 115200 - slower but more compatible, timeout ~400ms
       if (!normalModeSuccess) {
         try {
           await selectedPort.open({
-            baudRate: 4000000,
+            baudRate: 115200,
             dataBits: 8,
             stopBits: 1,
             parity: "none",
             flowControl: "none",
           });
-          normalModeSuccess = await tryNormalMode(selectedPort, 4000000, 500);
+          normalModeSuccess = await tryNormalMode(selectedPort, 115200);
           if (normalModeSuccess) {
-            detectedBaudRate = 4000000;
+            detectedBaudRate = 115200;
           } else {
             await selectedPort.close();
           }
@@ -1246,7 +1325,8 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
   const sendBinaryCommand = useCallback(async (
     cmd: number, 
     payload?: Uint8Array, 
-    timeoutMs: number = 5000
+    timeoutMs?: number,
+    maxRetries?: number
   ): Promise<Uint8Array | null> => {
     const currentState = stateRef.current;
     if (currentState.status !== "connected" || !currentState.port) {
@@ -1254,88 +1334,123 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
       return null;
     }
 
-    try {
-      // Build binary frame
-      const frame = buildBinaryFrame(cmd, payload || null);
-      const hexBytes = Array.from(frame)
-        .map((b) => b.toString(16).padStart(2, "0").toUpperCase())
-        .join(" ");
-      console.log(`[BINARY API] TX (${frame.length} bytes):`, hexBytes);
+    // Auto-calculate timeout and retries based on detected baud rate
+    const baudRate = currentState.detectedBaudRate ?? 115200; // Default to 115200 if unknown
+    const calculatedTimeout = timeoutMs ?? calculateTimeout(baudRate);
+    const calculatedRetries = maxRetries ?? calculateMaxRetries(baudRate);
 
-      // Get writer
-      const writer = currentState.port.writable?.getWriter();
-      if (!writer) {
-        console.log(`[BINARY API] Port not writable`);
-        return null;
-      }
+    // Retry loop: attempt up to calculatedRetries times
+    for (let attempt = 1; attempt <= calculatedRetries; attempt++) {
+      try {
+        // Build binary frame
+        const frame = buildBinaryFrame(cmd, payload || null);
+        const hexBytes = Array.from(frame)
+          .map((b) => b.toString(16).padStart(2, "0").toUpperCase())
+          .join(" ");
+        console.log(`[BINARY API] TX (attempt ${attempt}/${calculatedRetries}, ${frame.length} bytes):`, hexBytes);
 
-      // Send binary frame
-      await writer.write(frame);
-      console.log(`[BINARY API] Successfully sent binary command 0x${cmd.toString(16)}`);
-      writer.releaseLock();
-
-      // Use existing reader if available
-      const reader = readerRef.current;
-      if (!reader) {
-        console.log(`[BINARY API] No reader available`);
-        return null;
-      }
-
-      // Read binary response with timeout
-      const chunks: Uint8Array[] = [];
-      let responseReceived = false;
-      let timeoutId: NodeJS.Timeout | null = null;
-
-      const timeoutPromise = new Promise<Uint8Array | null>((resolve) => {
-        timeoutId = setTimeout(() => {
-          console.log(`[BINARY API] Timeout waiting for response`);
-          resolve(null);
-        }, timeoutMs);
-      });
-
-      const readPromise = (async (): Promise<Uint8Array | null> => {
-        try {
-          let readCount = 0;
-          const maxReads = 200; // Safety limit
-          
-          while (readCount < maxReads && !responseReceived) {
-            const { value, done } = await reader.read();
-            if (done) break;
-            
-            if (value) {
-              chunks.push(value);
-              
-              // Combine chunks and look for binary frame
-              const totalLength = chunks.reduce((sum, chunk) => sum + chunk.length, 0);
-              const combined = new Uint8Array(totalLength);
-              let offset = 0;
-              for (const chunk of chunks) {
-                combined.set(chunk, offset);
-                offset += chunk.length;
-              }
-
-              // Look for binary frame (starts with 0x50)
-              const parsed = parseBinaryFrame(combined);
-              if (parsed && parsed.cmd === cmd) {
-                console.log(`[BINARY API] Received valid binary response, payload size: ${parsed.payload.length}`);
-                responseReceived = true;
-                if (timeoutId) clearTimeout(timeoutId);
-                return parsed.payload;
-              }
-            }
-            
-            readCount++;
-          }
-
-          return null;
-        } catch (error) {
-          console.error(`[BINARY API] Read error:`, error);
+        // Get writer
+        const writer = currentState.port.writable?.getWriter();
+        if (!writer) {
+          console.log(`[BINARY API] Port not writable`);
           return null;
         }
-      })();
 
-      const result = await Promise.race([readPromise, timeoutPromise]);
-      if (timeoutId) clearTimeout(timeoutId);
+        // Send binary frame
+        await writer.write(frame);
+        console.log(`[BINARY API] Successfully sent binary command 0x${cmd.toString(16)}`);
+        writer.releaseLock();
+
+        // Use existing reader if available
+        const reader = readerRef.current;
+        if (!reader) {
+          console.log(`[BINARY API] No reader available`);
+          return null;
+        }
+
+        // Read binary response with timeout
+        const chunks: Uint8Array[] = [];
+        let responseReceived = false;
+        let timeoutId: NodeJS.Timeout | null = null;
+
+        const timeoutPromise = new Promise<Uint8Array | null>((resolve) => {
+          timeoutId = setTimeout(() => {
+            console.log(`[BINARY API] Timeout waiting for response (${calculatedTimeout}ms, attempt ${attempt}/${calculatedRetries})`);
+            resolve(null);
+          }, calculatedTimeout);
+        });
+
+        const readPromise = (async (): Promise<Uint8Array | null> => {
+          try {
+            let readCount = 0;
+            const maxReads = 200; // Safety limit
+            
+            while (readCount < maxReads && !responseReceived) {
+              const { value, done } = await reader.read();
+              if (done) break;
+              
+              if (value) {
+                chunks.push(value);
+                
+                // Combine chunks and look for binary frame
+                const totalLength = chunks.reduce((sum, chunk) => sum + chunk.length, 0);
+                const combined = new Uint8Array(totalLength);
+                let offset = 0;
+                for (const chunk of chunks) {
+                  combined.set(chunk, offset);
+                  offset += chunk.length;
+                }
+
+                // Look for binary frame (starts with 0x50)
+                const parsed = parseBinaryFrame(combined);
+                if (parsed && parsed.cmd === cmd) {
+                  console.log(`[BINARY API] Received valid binary response (attempt ${attempt}/${maxRetries}), payload size: ${parsed.payload.length}`);
+                  responseReceived = true;
+                  if (timeoutId) clearTimeout(timeoutId);
+                  return parsed.payload;
+                } else if (parsed === null && chunks.length > 0) {
+                  // CRC mismatch or invalid frame - will retry
+                  console.warn(`[BINARY API] CRC mismatch or invalid frame (attempt ${attempt}/${calculatedRetries}) - will retry`);
+                }
+              }
+              
+              readCount++;
+            }
+
+            return null;
+          } catch (error) {
+            console.error(`[BINARY API] Read error (attempt ${attempt}/${calculatedRetries}):`, error);
+            return null;
+          }
+        })();
+
+        const result = await Promise.race([readPromise, timeoutPromise]);
+        if (timeoutId) clearTimeout(timeoutId);
+        
+        // If we got a valid response, return it
+        if (result && result instanceof Uint8Array && result.length > 0) {
+          return result;
+        }
+        
+        // If this wasn't the last attempt, wait a bit before retrying
+        // Retry delay scales with baud rate (faster baud = shorter delay)
+        const retryDelay = baudRate >= 2000000 ? 50 : 100;
+        if (attempt < calculatedRetries) {
+          console.log(`[BINARY API] Retrying in ${retryDelay}ms... (attempt ${attempt}/${calculatedRetries} failed)`);
+          await new Promise(resolve => setTimeout(resolve, retryDelay));
+        }
+      } catch (error) {
+        console.error(`[BINARY API] Error on attempt ${attempt}/${calculatedRetries}:`, error);
+        const retryDelay = baudRate >= 2000000 ? 50 : 100;
+        if (attempt < calculatedRetries) {
+          await new Promise(resolve => setTimeout(resolve, retryDelay));
+        }
+      }
+    }
+    
+    // All retries exhausted
+    console.error(`[BINARY API] Failed after ${calculatedRetries} attempts`);
+    return null;
       
       return result;
     } catch (error) {
