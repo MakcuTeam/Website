@@ -564,36 +564,40 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
     
     console.log(`[TRY NORMAL MODE] Baud: ${baudRate}, Timeout: ${calculatedTimeout}ms, Retries: ${calculatedRetries}`);
     
-      if (!port.writable || !port.readable) {
-        return false;
-      }
+    if (!port.writable || !port.readable) {
+      return false;
+    }
+
+    // Give device a moment to stabilize after port open
+    await new Promise(resolve => setTimeout(resolve, 50));
 
     for (let attempt = 1; attempt <= calculatedRetries; attempt++) {
+      let reader: ReadableStreamDefaultReader<Uint8Array> | null = null;
       try {
         // Send command
-      const writer = port.writable.getWriter();
+        const writer = port.writable.getWriter();
         const binaryCommand = buildBinaryFrame(UART0_CMD_WEBSITE, null);
         console.log(`[TRY NORMAL MODE] Attempt ${attempt}/${calculatedRetries}`);
         await writer.write(binaryCommand);
         writer.releaseLock();
 
-        // Read response
-      const reader = port.readable.getReader();
-      readerRef.current = reader;
+        // Read response - create temporary reader for connection check
+        reader = port.readable.getReader();
+        const currentReader = reader; // Capture for timeout handler
 
-      let timeoutId: NodeJS.Timeout | null = null;
+        let timeoutId: NodeJS.Timeout | null = null;
         const timeoutPromise = new Promise<Uint8Array | null>((resolve) => {
-        timeoutId = setTimeout(() => {
-          reader.cancel().catch(() => {});
+          timeoutId = setTimeout(() => {
+            currentReader.cancel().catch(() => {});
             resolve(null);
           }, calculatedTimeout);
-      });
+        });
 
         const readPromise = (async (): Promise<Uint8Array | null> => {
-        const chunks: Uint8Array[] = [];
-        try {
-          while (true) {
-            const { value, done } = await reader.read();
+          const chunks: Uint8Array[] = [];
+          try {
+            while (true) {
+              const { value, done } = await currentReader.read();
               if (done) break;
             chunks.push(value);
             
@@ -638,31 +642,55 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
         const response = await Promise.race([readPromise, timeoutPromise]);
         if (timeoutId) clearTimeout(timeoutId);
         
+        // Cleanup reader before checking response
+        if (reader) {
+          try {
+            await reader.cancel();
+          } catch (e) {
+            // Ignore cancel errors
+          }
+          try {
+            reader.releaseLock();
+          } catch (e) {
+            // Ignore release errors
+          }
+          reader = null;
+        }
+        
         if (response && response.length >= 1) {
           parseAndStoreDeviceInfoBinary(response);
           return true;
         }
         
-        // Cleanup and retry
-        reader.releaseLock();
-        readerRef.current = null;
-        
+        // Retry if not last attempt
         if (attempt < calculatedRetries) {
           const retryDelay = calculateRetryDelay(baudRate, 5);
+          console.log(`[TRY NORMAL MODE] Retrying in ${retryDelay}ms...`);
           await new Promise(resolve => setTimeout(resolve, retryDelay));
         }
       } catch (error) {
         console.error(`[TRY NORMAL MODE] Error:`, error);
-        if (readerRef.current) {
-          try { readerRef.current.releaseLock(); } catch (e) {}
-          readerRef.current = null;
+        // Cleanup reader on error
+        if (reader) {
+          try {
+            await reader.cancel();
+          } catch (e) {
+            // Ignore
+          }
+          try {
+            reader.releaseLock();
+          } catch (e) {
+            // Ignore
+          }
+          reader = null;
         }
+        // Retry if not last attempt
         if (attempt < calculatedRetries) {
           const retryDelay = calculateRetryDelay(baudRate, 5);
           await new Promise(resolve => setTimeout(resolve, retryDelay));
         }
       }
-      }
+    }
 
       return false;
   };
@@ -749,9 +777,10 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
           parity: "none",
           flowControl: "none",
         });
-        // Single attempt with fast timeout for quick detection
-        const fastTimeout = calculateTimeout(4000000, 2566, 10, true);
-        normalModeSuccess = await tryNormalMode(selectedPort, 4000000, fastTimeout, 1);
+        // Single attempt with timeout for connection check (use normal timeout, not fast mode)
+        // Device needs time to process command and respond
+        const connectionTimeout = calculateTimeout(4000000, 2566, 10, false);
+        normalModeSuccess = await tryNormalMode(selectedPort, 4000000, connectionTimeout, 1);
         if (normalModeSuccess) {
           detectedBaudRate = 4000000;
         } else {
@@ -776,9 +805,10 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
             parity: "none",
             flowControl: "none",
           });
-          // Single attempt with fast timeout for quick detection
-          const fastTimeout = calculateTimeout(115200, 2566, 10, true);
-          normalModeSuccess = await tryNormalMode(selectedPort, 115200, fastTimeout, 1);
+          // Single attempt with timeout for connection check (use normal timeout, not fast mode)
+          // Device needs time to process command and respond
+          const connectionTimeout = calculateTimeout(115200, 2566, 10, false);
+          normalModeSuccess = await tryNormalMode(selectedPort, 115200, connectionTimeout, 1);
           if (normalModeSuccess) {
             detectedBaudRate = 115200;
           } else {
