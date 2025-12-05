@@ -564,50 +564,50 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
     
     console.log(`[TRY NORMAL MODE] Baud: ${baudRate}, Timeout: ${calculatedTimeout}ms, Retries: ${calculatedRetries}`);
     
-    if (!port.writable || !port.readable) {
-      return false;
-    }
+      if (!port.writable || !port.readable) {
+        return false;
+      }
 
     for (let attempt = 1; attempt <= calculatedRetries; attempt++) {
       try {
         // Send command
-        const writer = port.writable.getWriter();
+      const writer = port.writable.getWriter();
         const binaryCommand = buildBinaryFrame(UART0_CMD_WEBSITE, null);
         console.log(`[TRY NORMAL MODE] Attempt ${attempt}/${calculatedRetries}`);
         await writer.write(binaryCommand);
         writer.releaseLock();
 
         // Read response
-        const reader = port.readable.getReader();
-        readerRef.current = reader;
+      const reader = port.readable.getReader();
+      readerRef.current = reader;
 
-        let timeoutId: NodeJS.Timeout | null = null;
+      let timeoutId: NodeJS.Timeout | null = null;
         const timeoutPromise = new Promise<Uint8Array | null>((resolve) => {
-          timeoutId = setTimeout(() => {
-            reader.cancel().catch(() => {});
+        timeoutId = setTimeout(() => {
+          reader.cancel().catch(() => {});
             resolve(null);
           }, calculatedTimeout);
-        });
+      });
 
         const readPromise = (async (): Promise<Uint8Array | null> => {
-          const chunks: Uint8Array[] = [];
-          try {
-            while (true) {
-              const { value, done } = await reader.read();
+        const chunks: Uint8Array[] = [];
+        try {
+          while (true) {
+            const { value, done } = await reader.read();
               if (done) break;
-              chunks.push(value);
-              
-              const totalLength = chunks.reduce((sum, chunk) => sum + chunk.length, 0);
-              const combined = new Uint8Array(totalLength);
-              let offset = 0;
-              for (const chunk of chunks) {
-                combined.set(chunk, offset);
-                offset += chunk.length;
-              }
-              
+            chunks.push(value);
+            
+            const totalLength = chunks.reduce((sum, chunk) => sum + chunk.length, 0);
+            const combined = new Uint8Array(totalLength);
+            let offset = 0;
+            for (const chunk of chunks) {
+              combined.set(chunk, offset);
+              offset += chunk.length;
+            }
+            
               // Look for binary frame
               let frameStart = -1;
-              for (let i = 0; i < combined.length; i++) {
+            for (let i = 0; i < combined.length; i++) {
                 if (combined[i] === UART0_START_BYTE) {
                   frameStart = i;
                   break;
@@ -623,17 +623,17 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
                   if (parsed && parsed.cmd === UART0_CMD_WEBSITE) {
                     if (timeoutId) clearTimeout(timeoutId);
                     return parsed.payload;
-                  }
-                }
-              }
-              
+            }
+          }
+        }
+        
               if (totalLength > 3000) break;
             }
           } catch (e) {
             // Read error
           }
           return null;
-        })();
+      })();
 
         const response = await Promise.race([readPromise, timeoutPromise]);
         if (timeoutId) clearTimeout(timeoutId);
@@ -662,9 +662,9 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
           await new Promise(resolve => setTimeout(resolve, retryDelay));
         }
       }
-    }
-    
-    return false;
+      }
+
+      return false;
   };
 
   // Try to connect in flash mode
