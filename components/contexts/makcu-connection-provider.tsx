@@ -2054,8 +2054,8 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
           unsubscribe = null;
         }
         
-        // If we got a valid response, return it
-        if (result && result instanceof Uint8Array && result.length > 0) {
+        // If we got a valid response, return it (0-length payloads are valid - e.g., empty serial number)
+        if (result && result instanceof Uint8Array) {
           return result;
         }
         
@@ -2090,18 +2090,9 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
     }
     
     // All retries exhausted - command failed completely
-    // This indicates a serious communication problem - set status to fault
-    console.error(`[BINARY API] All ${calculatedRetries} retries failed - setting connection to fault`);
-    await cleanup();
-    setState((prev) => ({ 
-      ...prev, 
-      status: "fault",
-      mode: null,
-      transport: null,
-      loader: null,
-      detectedBaudRate: null
-    }));
-    toast.error("Command failed after all retries - connection fault. Please reconnect.");
+    // Don't disconnect - just return null and let the caller handle it
+    // Individual command failures shouldn't kill the connection
+    console.warn(`[BINARY API] Command 0x${cmd.toString(16).toUpperCase()} failed after ${calculatedRetries} retries`);
     
     return null;
   }, [cleanup, subscribeToBinaryFrames]);
