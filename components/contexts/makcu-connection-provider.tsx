@@ -327,10 +327,10 @@ export function registerApiCommandParser(cmd: number, parser: CommandParser): vo
 /* ═══════════════════════════════════════════════════════════════════════════
  * Device Info Storage Strategy
  * ─────────────────────────────────────────────────────────────────────────────
- * STATIC data (cookie):   VID, PID, VENDOR, MODEL, SERIAL, MAC, TEMP, CPU, 
+ * STATIC data (cookie):   VID, PID, VENDOR, MODEL, SERIAL, MAC, CPU, 
  *                         FW, MAKCU, SCREEN_SIZE, MOUSE_BINT, KBD_BINT
  * 
- * LIVE data (mcuStatus):  RAM, UPTIME, DEVICE_ATTACHED, FAULT_FLAG
+ * LIVE data (mcuStatus):  RAM, UPTIME, TEMP, DEVICE_ATTACHED, FAULT_FLAG
  * 
  * Why split?
  * - Cookie: Fetched once when device attaches, doesn't change
@@ -353,6 +353,7 @@ function setCookie(name: string, value: string, hours: number): void {
  * ═══════════════════════════════════════════════════════════════════════════ */
 function buildAndStoreDeviceInfo(commandResponses: Map<number, Uint8Array>): void {
   // Initialize all expected fields with empty/default values - always store all fields
+  // NOTE: TEMP is not stored here - it comes from STATUS (0xB1) live poll
   const deviceInfo: Record<string, any> = {
     VENDOR: "",
     MODEL: "",
@@ -365,7 +366,6 @@ function buildAndStoreDeviceInfo(commandResponses: Map<number, Uint8Array>): voi
     MAC2: "00:00:00:00:00:00",
     VID: 0,
     PID: 0,
-    TEMP: "",
     CPU: 0,
     MOUSE_BINT: 0,
     KBD_BINT: 0,
@@ -392,13 +392,14 @@ function buildAndStoreDeviceInfo(commandResponses: Map<number, Uint8Array>): voi
   // Always store cookie with all fields (even if empty) - fields will always return
   const jsonStr = JSON.stringify(deviceInfo);
   setCookie(DEVICE_INFO_COOKIE, jsonStr, DEVICE_INFO_EXPIRY_HOURS);
-  console.log(`[DEVICE INFO] Stored device info cookie with ${Object.keys(deviceInfo).length} fields (all fields, including empty)`);
+  console.log(`[DEVICE INFO] Stored device info cookie with ${Object.keys(deviceInfo).length} fields (all fields, including empty):`, deviceInfo);
 }
 
 // Get static device info from cookie (VID/PID/vendor/model/serials/etc.)
 // Always returns all fields with defaults (even if cookie missing) - does NOT include live data (RAM, uptime)
 export function getDeviceInfo(): Record<string, any> {
   // Initialize with all expected fields and defaults
+  // NOTE: TEMP is not in static info - it comes from STATUS (0xB1) live poll
   const defaultInfo: Record<string, any> = {
     VENDOR: "",
     MODEL: "",
@@ -411,7 +412,6 @@ export function getDeviceInfo(): Record<string, any> {
     MAC2: "00:00:00:00:00:00",
     VID: 0,
     PID: 0,
-    TEMP: "",
     CPU: 0,
     MOUSE_BINT: 0,
     KBD_BINT: 0,
@@ -441,7 +441,7 @@ export function getDeviceInfo(): Record<string, any> {
 }
 
 // Helper to get combined device info (static + live)
-// Always returns all fields (even if empty/default) - RAM and UPTIME always included from live data
+// Always returns all fields (even if empty/default) - RAM, UPTIME, and TEMP always included from live data
 export function getCombinedDeviceInfo(mcuStatus: MakcuStatus | null): Record<string, string> {
   // Initialize with all fields and defaults (always return all fields)
   const staticInfo = getDeviceInfo() || {};
@@ -459,7 +459,6 @@ export function getCombinedDeviceInfo(mcuStatus: MakcuStatus | null): Record<str
     MAC2: "00:00:00:00:00:00",
     VID: 0,
     PID: 0,
-    TEMP: "",
     CPU: 0,
     MOUSE_BINT: 0,
     KBD_BINT: 0,
@@ -469,9 +468,10 @@ export function getCombinedDeviceInfo(mcuStatus: MakcuStatus | null): Record<str
   // Merge static info with defaults
   const mergedStatic = { ...defaultStaticInfo, ...staticInfo };
   
-  // Always include live data (RAM and UPTIME) - use defaults if no status
+  // Always include live data (RAM, UPTIME, TEMP) - use defaults if no status
   let ram = "0kb";
   let uptime = "00:00:00";
+  let temp = "na";
   
   if (mcuStatus) {
     ram = `${mcuStatus.freeRamKb}kb`;
@@ -480,6 +480,7 @@ export function getCombinedDeviceInfo(mcuStatus: MakcuStatus | null): Record<str
     const minutes = Math.floor((uptimeSeconds % 3600) / 60);
     const seconds = uptimeSeconds % 60;
     uptime = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    temp = mcuStatus.temp >= 0 ? `${mcuStatus.temp.toFixed(1)}c` : "na";
   }
   
   // Combine static and live data - always return all fields
@@ -487,6 +488,7 @@ export function getCombinedDeviceInfo(mcuStatus: MakcuStatus | null): Record<str
     ...mergedStatic,
     RAM: ram,      // Live RAM from STATUS poll (always included)
     UP: uptime,    // Live uptime from STATUS poll (always included)
+    TEMP: temp,    // Live temperature from STATUS poll (always included)
   };
 }
 
@@ -589,14 +591,15 @@ export interface MakcuStatus {
   sofCount: number;        // USB SOF frame count (for sync/debug)
   freeRamKb: number;       // Free RAM in KB (health indicator)
   hasFault: boolean;       // Fault stored on device (parse error, etc.)
+  temp: number;            // MCU temperature in Celsius (-1.0 if unavailable)
   lastPollTime: number;    // Timestamp of last successful poll (ms since epoch)
 }
 
-// Parse status response (15 bytes from MCU)
+// Parse status response (17 bytes from MCU)
 function parseStatusResponse(data: Uint8Array): MakcuStatus | null {
-  if (data.length < 15) return null;
+  if (data.length < 17) return null;
   
-  const view = new DataView(data.buffer, data.byteOffset, 15);
+  const view = new DataView(data.buffer, data.byteOffset, 17);
   
   return {
     mcuAlive: data[0] === 0x01,
@@ -605,6 +608,7 @@ function parseStatusResponse(data: Uint8Array): MakcuStatus | null {
     sofCount: view.getUint32(6, true),
     freeRamKb: view.getUint16(10, true),
     hasFault: data[12] === 0x01,
+    temp: view.getFloat32(13, true),        // little-endian float, -1.0 if unavailable
     lastPollTime: Date.now(),
   };
 }
@@ -1496,10 +1500,10 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
     console.log("[FETCH DEVICE INFO] Fetching full device info using individual commands...");
     
     // List of all commands to fetch - easily extensible for future commands
+    // NOTE: RAM, UPTIME, and TEMP are NOT fetched here - they come from STATUS (0xB1) live poll
     const commandsToFetch: number[] = [
       UART0_CMD_GET_MAC1,
       UART0_CMD_GET_MAC2,
-      UART0_CMD_GET_TEMP,
       UART0_CMD_GET_CPU,
       UART0_CMD_GET_VID,
       UART0_CMD_GET_PID,
@@ -1514,6 +1518,9 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
       UART0_CMD_GET_SPOOF_ACTIVE,
       UART0_CMD_GET_SCREEN_W,
       UART0_CMD_GET_SCREEN_H,
+      // UART0_CMD_GET_RAM - NOT needed (comes from STATUS 0xB1)
+      // UART0_CMD_GET_UPTIME - NOT needed (comes from STATUS 0xB1)
+      // UART0_CMD_GET_TEMP - NOT needed (comes from STATUS 0xB1)
       // UART0_CMD_GET_FAULT - optional, only fetch if needed
     ];
 
@@ -1533,6 +1540,7 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
                  cmd === UART0_CMD_GET_SPOOF_ACTIVE) expectedSize = 1;
         
         const timeout = calculateTimeout(baudRate, expectedSize + 6, 10, false);
+        console.log(`[FETCH DEVICE INFO] Sending command 0x${cmd.toString(16).toUpperCase()} (expected ${expectedSize} bytes, timeout ${timeout}ms)`);
         const response = await sendBinaryCommand(cmd, undefined, timeout);
         
         if (response) {
