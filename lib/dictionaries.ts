@@ -6,15 +6,24 @@ export type LangProps = { params: Promise<{ lang: Locale }> };
 
 // Dynamically create dictionary loaders based on available locales
 function createDictionaryLoaders() {
-  const locales = getLocales();
-  const loaders: Record<string, () => Promise<any>> = {};
+  try {
+    const locales = getLocales();
+    const loaders: Record<string, () => Promise<any>> = {};
 
-  for (const locale of locales) {
-    loaders[locale] = () =>
-      import(`@/langs/${locale}.dict.json`).then((module) => module.default);
+    for (const locale of locales) {
+      loaders[locale] = () =>
+        import(`@/langs/${locale}.dict.json`).then((module) => module.default);
+    }
+
+    return loaders;
+  } catch (error) {
+    console.error("Error creating dictionary loaders:", error);
+    // Fallback to default locales
+    return {
+      en: () => import(`@/langs/en.dict.json`).then((module) => module.default),
+      cn: () => import(`@/langs/cn.dict.json`).then((module) => module.default),
+    };
   }
-
-  return loaders;
 }
 
 // Get dictionary loaders (cached)

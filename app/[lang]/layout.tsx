@@ -34,8 +34,8 @@ const notoSerif = Noto_Serif_SC({
   weight: "400",
 });
 
-export async function generateMetadata(params: LangProps): Promise<Metadata> {
-  const { lang } = await params.params;
+export async function generateMetadata({ params }: LangProps): Promise<Metadata> {
+  const { lang } = await params;
   const dict = await getDictionary(lang);
   return {
     title: dict.metadata.title,
@@ -71,6 +71,17 @@ export default async function RootLayout({
 }
 
 export async function generateStaticParams() {
-  const locales = getLocales();
-  return locales.map((locale) => ({ lang: locale }));
+  // In development, return immediately to avoid blocking
+  if (process.env.NODE_ENV === "development") {
+    return [{ lang: "en" }, { lang: "cn" }];
+  }
+  
+  try {
+    const locales = getLocales();
+    return locales.map((locale) => ({ lang: locale }));
+  } catch (error) {
+    console.error("Error in generateStaticParams:", error);
+    // Fallback to default locales if getLocales fails
+    return [{ lang: "en" }, { lang: "cn" }];
+  }
 }
