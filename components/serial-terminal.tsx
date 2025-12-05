@@ -20,7 +20,7 @@ interface SerialLine {
 }
 
 export function SerialTerminal({ lang }: SerialTerminalProps) {
-  const { status, port, subscribeToSerialData } = useMakcuConnection();
+  const { status, port, subscribeToTextLogs } = useMakcuConnection();
   const [lines, setLines] = useState<SerialLine[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [isSending, setIsSending] = useState(false);
@@ -39,11 +39,14 @@ export function SerialTerminal({ lang }: SerialTerminalProps) {
     }
   }, [lines]);
 
-  // Subscribe to incoming serial data
+  // Subscribe to incoming text/log data (non-0x50 data only)
   useEffect(() => {
-    if (status !== "connected" || !subscribeToSerialData) return;
+    if (status !== "connected" || !subscribeToTextLogs) return;
 
-    const handleSerialData = (value: Uint8Array, isBinary: boolean) => {
+    const handleTextLogData = (value: Uint8Array) => {
+      // This callback only receives non-0x50 data (text/logs)
+      // No filtering needed - the broadcaster already filtered it
+
       // Console log RX bytes
       const hexBytes = Array.from(value)
         .map((b) => b.toString(16).padStart(2, "0").toUpperCase())
@@ -139,13 +142,13 @@ export function SerialTerminal({ lang }: SerialTerminalProps) {
       });
     };
 
-    const unsubscribe = subscribeToSerialData(handleSerialData);
+    const unsubscribe = subscribeToTextLogs(handleTextLogData);
 
     return () => {
       unsubscribe();
       currentLineBufferRef.current = "";
     };
-  }, [status, subscribeToSerialData]);
+  }, [status, subscribeToTextLogs]);
 
   const sendCommand = useCallback(async () => {
     if (!port || status !== "connected" || !inputValue.trim() || isSending) return;

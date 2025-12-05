@@ -494,12 +494,18 @@ interface SerialDataCallback {
   (data: Uint8Array, isBinary: boolean): void;
 }
 
+// Subscriber types - declare what data they want
+type BinaryFrameSubscriber = (data: Uint8Array) => void;  // Only receives 0x50 binary frames
+type TextLogSubscriber = (data: Uint8Array) => void;      // Only receives non-0x50 data (text/logs)
+
 interface MakcuConnectionContextType extends MakcuConnectionState {
   connect: () => Promise<void>;
   disconnect: () => Promise<void>;
   sendCommandAndReadResponse: (command: string, timeoutMs?: number) => Promise<Uint8Array | null>;
   sendBinaryCommand: (cmd: number, payload?: Uint8Array, timeoutMs?: number) => Promise<Uint8Array | null>;
-  subscribeToSerialData: (callback: SerialDataCallback) => () => void;
+  subscribeToSerialData: (callback: SerialDataCallback) => () => void;  // Legacy - receives all data
+  subscribeToBinaryFrames: (callback: BinaryFrameSubscriber) => () => void;  // Only 0x50 frames
+  subscribeToTextLogs: (callback: TextLogSubscriber) => () => void;  // Only non-0x50 data
   fetchFullDeviceInfo: () => Promise<boolean>;  // Manually trigger full device info fetch
   isConnecting: boolean;
   browserSupported: boolean;
@@ -527,7 +533,9 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
   const healthCheckRef = useRef<NodeJS.Timeout | null>(null);
   const statusPollRef = useRef<NodeJS.Timeout | null>(null);
   const stateRef = useRef<MakcuConnectionState>(state);
-  const serialDataSubscribersRef = useRef<Set<SerialDataCallback>>(new Set());
+  const serialDataSubscribersRef = useRef<Set<SerialDataCallback>>(new Set());  // Legacy - all data
+  const binaryFrameSubscribersRef = useRef<Set<BinaryFrameSubscriber>>(new Set());  // Only 0x50 frames
+  const textLogSubscribersRef = useRef<Set<TextLogSubscriber>>(new Set());  // Only non-0x50 data
   const deviceInfoFetchedRef = useRef<boolean>(false);  // Track if we've fetched full device info
   const lastDeviceAttachedRef = useRef<boolean>(false); // Track device attached state for change detection
 
@@ -1155,12 +1163,38 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
                 console.log(`[CONTINUOUS READER] RX: Binary data (not text)`);
               }
 
-              // Broadcast to all subscribers immediately
+              // Check if this is a binary frame (0x50 start byte)
+              const isBinaryFrame = value.length >= 1 && value[0] === UART0_START_BYTE && 
+                                    value.length >= 4 && 
+                                    (value[2] | (value[3] << 8)) <= 65535; // Valid payload length
+
+              // Route to appropriate subscribers based on data type
+              if (isBinaryFrame) {
+                // Binary frame (0x50) - route to binary frame subscribers
+                binaryFrameSubscribersRef.current.forEach((callback: BinaryFrameSubscriber) => {
+                  try {
+                    callback(value);
+                  } catch (e) {
+                    console.error("[CONTINUOUS READER] Binary frame subscriber error:", e);
+                  }
+                });
+              } else {
+                // Text/log data (non-0x50) - route to text log subscribers
+                textLogSubscribersRef.current.forEach((callback: TextLogSubscriber) => {
+                  try {
+                    callback(value);
+                  } catch (e) {
+                    console.error("[CONTINUOUS READER] Text log subscriber error:", e);
+                  }
+                });
+              }
+
+              // Legacy: Broadcast to all subscribers (for backward compatibility)
               serialDataSubscribersRef.current.forEach((callback: SerialDataCallback) => {
                 try {
-                  callback(value, false);
+                  callback(value, isBinaryFrame);
                 } catch (e) {
-                  console.error("[CONTINUOUS READER] Subscriber error:", e);
+                  console.error("[CONTINUOUS READER] Legacy subscriber error:", e);
                 }
               });
             }
@@ -1225,6 +1259,7 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
   }, [state.status, state.port, performDisconnect]);
 
   // Fetch full device info - called when device attaches or manually requested
+  // Uses shared continuous reader (readerRef.current) - no lock conflicts
   const fetchFullDeviceInfo = useCallback(async (): Promise<boolean> => {
     const currentState = stateRef.current;
     if (currentState.status !== "connected" || currentState.mode !== "normal" || !currentState.port) {
@@ -1235,7 +1270,7 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
     console.log("[FETCH DEVICE INFO] Fetching full device info...");
     
     try {
-      // Build and send WEBSITE command
+      // Send WEBSITE command
       const frame = buildBinaryFrame(UART0_CMD_WEBSITE, null);
       const writer = currentState.port.writable?.getWriter();
       if (!writer) {
@@ -1245,8 +1280,8 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
       await writer.write(frame);
       writer.releaseLock();
 
-      // Read response
-      const reader = currentState.port.readable?.getReader();
+      // Use shared continuous reader (same pattern as sendCommandAndReadResponse)
+      const reader = readerRef.current;
       if (!reader) {
         console.log("[FETCH DEVICE INFO] No reader available");
         return false;
@@ -1260,7 +1295,6 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
 
       const timeoutPromise = new Promise<Uint8Array | null>((resolve) => {
         timeoutId = setTimeout(() => {
-          console.log(`[FETCH DEVICE INFO] Timeout (${timeout}ms)`);
           resolve(null);
         }, timeout);
       });
@@ -1293,14 +1327,13 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
           }
           return null;
         } catch (e) {
-          console.error("[FETCH DEVICE INFO] Read error:", e);
           return null;
         }
       })();
 
       const response = await Promise.race([readPromise, timeoutPromise]);
       if (timeoutId) clearTimeout(timeoutId);
-      reader.releaseLock();
+      // DON'T release reader - it's the shared continuous reader
 
       if (response && response.length >= 1) {
         parseAndStoreDeviceInfoBinary(response);
@@ -1318,6 +1351,7 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
   }, []);
 
   // Status polling - runs every 1 second in normal mode
+  // Uses the continuous reader's data stream (same pipeline, no lock conflicts)
   // Detects: MCU disconnect, device attach/detach, provides live uptime
   useEffect(() => {
     // Only poll in normal mode
@@ -1333,6 +1367,41 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
 
     let consecutiveFailures = 0;
     const MAX_FAILURES = 3;  // Go to fault after 3 consecutive failures
+    
+    // Buffer to accumulate data from continuous reader
+    const statusDataBuffer: Uint8Array[] = [];
+    let pendingStatusRequest: { resolve: (data: Uint8Array | null) => void; timeout: NodeJS.Timeout } | null = null;
+
+    // Subscribe to binary frames only (0x50 handler)
+    const statusDataCallback: BinaryFrameSubscriber = (data: Uint8Array) => {
+      if (!pendingStatusRequest) return; // No pending request
+      
+      // Accumulate data
+      statusDataBuffer.push(data);
+      
+      // Combine all buffered data
+      const totalLength = statusDataBuffer.reduce((sum, chunk) => sum + chunk.length, 0);
+      const combined = new Uint8Array(totalLength);
+      let offset = 0;
+      for (const chunk of statusDataBuffer) {
+        combined.set(chunk, offset);
+        offset += chunk.length;
+      }
+      
+      // Look for STATUS response frame (0x50 start byte, 0xB1 command)
+      const parsed = parseBinaryFrame(combined);
+      if (parsed && parsed.cmd === UART0_CMD_STATUS) {
+        // Found STATUS response!
+        if (pendingStatusRequest.timeout) clearTimeout(pendingStatusRequest.timeout);
+        const request = pendingStatusRequest;
+        pendingStatusRequest = null;
+        statusDataBuffer.length = 0; // Clear buffer
+        request.resolve(parsed.payload);
+      }
+    };
+
+    // Subscribe to binary frames only (0x50 handler)
+    const unsubscribe = subscribeToBinaryFrames(statusDataCallback);
 
     const pollStatus = async () => {
       const currentState = stateRef.current;
@@ -1341,7 +1410,10 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
       }
 
       try {
-        // Build and send STATUS command
+        // Clear buffer for new request
+        statusDataBuffer.length = 0;
+        
+        // Send STATUS command (just write, continuous reader will handle response)
         const frame = buildBinaryFrame(UART0_CMD_STATUS, null);
         const writer = currentState.port.writable?.getWriter();
         if (!writer) {
@@ -1351,60 +1423,21 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
         await writer.write(frame);
         writer.releaseLock();
 
-        // Read response
-        const reader = currentState.port.readable?.getReader();
-        if (!reader) {
-          consecutiveFailures++;
-          return;
-        }
-
+        // Wait for response from continuous reader (via subscription)
         const baudRate = currentState.detectedBaudRate ?? 115200;
         const timeout = calculateTimeout(baudRate, 21, 10, false); // 21 bytes for status
         
-        const chunks: Uint8Array[] = [];
-        let timeoutId: NodeJS.Timeout | null = null;
-
-        const timeoutPromise = new Promise<Uint8Array | null>((resolve) => {
-          timeoutId = setTimeout(() => {
+        const response = await new Promise<Uint8Array | null>((resolve) => {
+          const timeoutId = setTimeout(() => {
+            if (pendingStatusRequest) {
+              pendingStatusRequest = null;
+              statusDataBuffer.length = 0;
+            }
             resolve(null);
           }, timeout);
+          
+          pendingStatusRequest = { resolve, timeout: timeoutId };
         });
-
-        const readPromise = (async (): Promise<Uint8Array | null> => {
-          try {
-            let readCount = 0;
-            while (readCount < 50) {
-              const { value, done } = await reader.read();
-              if (done) break;
-              
-              if (value) {
-                chunks.push(value);
-                
-                const totalLength = chunks.reduce((sum, chunk) => sum + chunk.length, 0);
-                const combined = new Uint8Array(totalLength);
-                let offset = 0;
-                for (const chunk of chunks) {
-                  combined.set(chunk, offset);
-                  offset += chunk.length;
-                }
-
-                const parsed = parseBinaryFrame(combined);
-                if (parsed && parsed.cmd === UART0_CMD_STATUS) {
-                  if (timeoutId) clearTimeout(timeoutId);
-                  return parsed.payload;
-                }
-              }
-              readCount++;
-            }
-            return null;
-          } catch (e) {
-            return null;
-          }
-        })();
-
-        const response = await Promise.race([readPromise, timeoutPromise]);
-        if (timeoutId) clearTimeout(timeoutId);
-        reader.releaseLock();
 
         if (response && response.length >= 15) {
           const status = parseStatusResponse(response);
@@ -1433,8 +1466,13 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
             }
 
             lastDeviceAttachedRef.current = isAttached;
+          } else {
+            // Invalid response - count as failure
+            consecutiveFailures++;
+            console.warn(`[STATUS POLL] Invalid response (${consecutiveFailures}/${MAX_FAILURES})`);
           }
         } else {
+          // No response - timeout
           consecutiveFailures++;
           console.warn(`[STATUS POLL] No response (${consecutiveFailures}/${MAX_FAILURES})`);
         }
@@ -1458,7 +1496,7 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
     };
 
     // Start polling every 1 second
-    console.log("[STATUS POLL] Starting 1-second status polling");
+    console.log("[STATUS POLL] Starting 1-second status polling (using continuous reader pipeline)");
     statusPollRef.current = setInterval(pollStatus, 1000);
     
     // Immediate first poll
@@ -1469,9 +1507,17 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
         clearInterval(statusPollRef.current);
         statusPollRef.current = null;
       }
+      // Cleanup pending request
+      if (pendingStatusRequest) {
+        if (pendingStatusRequest.timeout) clearTimeout(pendingStatusRequest.timeout);
+        pendingStatusRequest.resolve(null);
+        pendingStatusRequest = null;
+      }
+      statusDataBuffer.length = 0;
+      unsubscribe(); // Unsubscribe from continuous reader
       console.log("[STATUS POLL] Stopped status polling");
     };
-  }, [state.status, state.mode, state.port, cleanup, fetchFullDeviceInfo]);
+  }, [state.status, state.mode, state.port, cleanup, fetchFullDeviceInfo, subscribeToBinaryFrames]);
 
   // Send command and read response using existing reader
   const sendCommandAndReadResponse = useCallback(async (command: string, timeoutMs: number = 5000): Promise<Uint8Array | null> => {
@@ -1692,8 +1738,8 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
         await writer.write(frame);
         writer.releaseLock();
 
-        // Get reader
-        const reader = currentState.port.readable?.getReader();
+        // Use shared continuous reader (same pattern as sendCommandAndReadResponse)
+        const reader = readerRef.current;
         if (!reader) {
           console.log(`[BINARY API] No reader available`);
           return null;
@@ -1757,9 +1803,7 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
 
         const result = await Promise.race([readPromise, timeoutPromise]);
         if (timeoutId) clearTimeout(timeoutId);
-        
-        // Cleanup reader
-        reader.releaseLock();
+        // DON'T release reader - it's the shared continuous reader
         
         // If we got a valid response, return it
         if (result && result instanceof Uint8Array && result.length > 0) {
@@ -1800,12 +1844,30 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
     return null;
   }, [cleanup]);
 
-  // Subscribe to serial data
+  // Subscribe to serial data (legacy - receives all data)
   const subscribeToSerialData = useCallback((callback: SerialDataCallback) => {
     serialDataSubscribersRef.current.add(callback);
     // Return unsubscribe function
     return () => {
       serialDataSubscribersRef.current.delete(callback);
+    };
+  }, []);
+
+  // Subscribe to binary frames only (0x50 frames)
+  const subscribeToBinaryFrames = useCallback((callback: BinaryFrameSubscriber) => {
+    binaryFrameSubscribersRef.current.add(callback);
+    // Return unsubscribe function
+    return () => {
+      binaryFrameSubscribersRef.current.delete(callback);
+    };
+  }, []);
+
+  // Subscribe to text/logs only (non-0x50 data)
+  const subscribeToTextLogs = useCallback((callback: TextLogSubscriber) => {
+    textLogSubscribersRef.current.add(callback);
+    // Return unsubscribe function
+    return () => {
+      textLogSubscribersRef.current.delete(callback);
     };
   }, []);
 
@@ -1816,6 +1878,8 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
     sendCommandAndReadResponse,
     sendBinaryCommand,
     subscribeToSerialData,
+    subscribeToBinaryFrames,
+    subscribeToTextLogs,
     fetchFullDeviceInfo,
     isConnecting,
     browserSupported,
