@@ -413,7 +413,7 @@
       "how_to_change": "Press the left button on MAKCU 4 times fast to change the baud rate from 115200 to 4mbps. The LED will flash 1 or 4 times and the baud rate will be saved.",
       "led_indicator": "When MAKCU starts, the baud rate indicator LED (left) will show what speed MAKCU is running at.",
       "startup_indicator": "When MAKCU starts, the baud rate indicator LED (left) will flash to indicate the current baud rate: 1 flash = 115200, 4 flashes = 4mbps.",
-      "website_requirement": "The MAKCU website expects to use 115200 baud rate. Ensure if you are trying to use normal mode with the MAKCU website, you set the baud rate to 115200.",
+      "website_requirement": "The MAKCU Website supports any baud rate and will detect your baudrate automatically. The legacy AIO tool will not, expecting 115200 baud rate.",
       "setting_methods": "The baud rate can be set by the user (using the button method), or by the developer in code.",
       "power_requirement": "USB 1 + USB 2 must be connected for MAKCU to take power to change the baud rate. USB 2 does not provide power to MAKCU - this is done to ensure there is no back feeding to the main PC and the 2nd PC from both USB ports."
     },

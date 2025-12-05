@@ -506,26 +506,48 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
     }
   }, []);
 
-  // Calculate optimal timeout based on baud rate and expected frame size
-  // Frame: 6 bytes (request) + 2560 bytes (max response) = 2566 bytes total
-  // 8N1 format: 10 bits per byte (1 start + 8 data + 1 stop)
-  // Formula: (bytes * 10 bits) / baud_rate * 1000ms + processing overhead
-  const calculateTimeout = (baudRate: number, maxFrameBytes: number = 2566): number => {
-    const bitsPerByte = 10; // 8N1: 1 start + 8 data + 1 stop
-    const transmissionTimeMs = (maxFrameBytes * bitsPerByte * 1000) / baudRate;
-    // Add processing overhead: firmware processing + USB latency + buffer delays
-    const overheadMs = baudRate >= 2000000 ? 50 : 150; // Less overhead at high baud rates
-    const calculatedTimeout = Math.ceil(transmissionTimeMs + overheadMs);
-    // Minimum 200ms, maximum 2000ms
-    return Math.max(200, Math.min(2000, calculatedTimeout));
+  // Calculate timeout based on 8N1 symbol periods (like firmware UART hardware timeout)
+  // 8N1 format: 10 bits per symbol (1 start + 8 data + 1 stop)
+  // Uses symbol periods of silence to detect end of frame (same as ESP32 UART hardware)
+  // Formula: (symbol_periods * 10 bits) / baud_rate * 1000ms
+  // 
+  // For frame transmission: max frame size + silence detection
+  // For silence detection: 10-20 symbol periods (firmware uses 20 = 2 bytes)
+  const calculateTimeout = (baudRate: number, maxFrameBytes: number = 2566, silenceSymbols: number = 10): number => {
+    const bitsPerSymbol = 10; // 8N1: 1 start + 8 data + 1 stop
+    
+    // Frame transmission time
+    const frameTimeMs = (maxFrameBytes * bitsPerSymbol * 1000) / baudRate;
+    
+    // Silence detection time (10 symbol periods = 100 bits = end of frame indicator)
+    // This mimics ESP32 UART hardware timeout behavior
+    const silenceTimeMs = (silenceSymbols * bitsPerSymbol * 1000) / baudRate;
+    
+    // Total: frame time + silence detection + small overhead for Windows/WebSerial
+    const overheadMs = 20; // Small overhead for WebSerial API delays
+    const calculatedTimeout = Math.ceil(frameTimeMs + silenceTimeMs + overheadMs);
+    
+    // Minimum 50ms (for very fast baud rates), maximum 3000ms (safety limit)
+    return Math.max(50, Math.min(3000, calculatedTimeout));
   };
 
   // Calculate optimal retry count based on baud rate
   // Faster baud rates need fewer retries (less likely to have errors)
+  // Retry delay also uses 8N1 symbol periods for consistency
   const calculateMaxRetries = (baudRate: number): number => {
     if (baudRate >= 2000000) return 3; // 4M baud: 3 retries
     if (baudRate >= 1000000) return 4; // 1M+ baud: 4 retries
     return 5; // 115200 baud: 5 retries (more prone to errors)
+  };
+
+  // Calculate retry delay based on 8N1 symbol periods
+  // Uses symbol periods to ensure clean separation between retries
+  // 5-10 symbol periods = enough time for line to clear
+  const calculateRetryDelay = (baudRate: number, symbolPeriods: number = 5): number => {
+    const bitsPerSymbol = 10; // 8N1
+    const delayMs = (symbolPeriods * bitsPerSymbol * 1000) / baudRate;
+    // Minimum 10ms, maximum 200ms (safety limits)
+    return Math.max(10, Math.min(200, Math.ceil(delayMs)));
   };
 
   // Try to connect in normal mode with specific baud rate and timeout
@@ -541,23 +563,22 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
         return false;
       }
 
-      // Retry loop: attempt up to maxRetries times
-      for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      // Retry loop: attempt up to calculatedRetries times
+      for (let attempt = 1; attempt <= calculatedRetries; attempt++) {
         try {
           // Get writer
           const writer = port.writable.getWriter();
           writerRef.current = writer;
 
           // Send binary framed website command (0xB0)
-          // Frame format: [0x50] [0xB0] [0x00] [0x00] [CRC_LO] [CRC_HI]
           const binaryCommand = buildBinaryFrame(UART0_CMD_WEBSITE, null);
-          console.log(`[TRY NORMAL MODE] Sending binary website command (attempt ${attempt}/${maxRetries}):`, Array.from(binaryCommand).map(b => b.toString(16).padStart(2, '0')).join(' '));
+          console.log(`[TRY NORMAL MODE] Attempt ${attempt}/${calculatedRetries}: Sending command`);
           await writer.write(binaryCommand);
+          writer.releaseLock();
 
-      // Get reader (keep it for continuous reading after connection)
-      const reader = port.readable.getReader();
-      readerRef.current = reader;
-      console.log("[TRY NORMAL MODE] Reader obtained and stored in readerRef");
+          // Get reader
+          const reader = port.readable.getReader();
+          readerRef.current = reader;
 
       // Read response with timeout (calculated based on baud rate)
       let timeoutId: NodeJS.Timeout | null = null;
@@ -606,14 +627,14 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
                 // We have a complete frame - verify CRC and extract payload
                 const parsed = parseBinaryFrame(combined.slice(frameStart));
                 if (parsed && parsed.cmd === UART0_CMD_WEBSITE) {
-                  console.log(`[TRY NORMAL MODE] Received valid binary response (attempt ${attempt}/${maxRetries}), payload size: ${parsed.payload.length}`);
+                  console.log(`[TRY NORMAL MODE] Received valid binary response (attempt ${attempt}/${calculatedRetries}), payload size: ${parsed.payload.length}`);
                   if (timeoutId) {
                     clearTimeout(timeoutId);
                   }
                   return parsed.payload;
                 } else if (parsed === null) {
-                  // CRC mismatch or invalid frame - will retry
-                  console.warn(`[TRY NORMAL MODE] CRC mismatch or invalid frame (attempt ${attempt}/${maxRetries}) - will retry`);
+                  // CRC mismatch - will retry
+                  console.warn(`[TRY NORMAL MODE] CRC mismatch (attempt ${attempt}/${calculatedRetries})`);
                 }
               }
             }
@@ -658,7 +679,7 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
               return parsed.payload;
             } else if (parsed === null) {
               // CRC mismatch or invalid frame - will retry
-              console.warn(`[TRY NORMAL MODE] CRC mismatch or invalid frame in final parse (attempt ${attempt}/${maxRetries}) - will retry`);
+              console.warn(`[TRY NORMAL MODE] CRC mismatch or invalid frame in final parse (attempt ${attempt}/${calculatedRetries}) - will retry`);
             }
           }
         }
@@ -675,54 +696,41 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
           parseAndStoreDeviceInfoBinary(response);
         }
         
-        // Check if we got a valid response (at least 1 byte)
+        // Check if we got a valid response
         if (response && response instanceof Uint8Array && response.length >= 1) {
-          // Keep reader active - it will be used by continuous reader loop
-          if (writerRef.current) {
-            writerRef.current.releaseLock();
-            writerRef.current = null;
-          }
-          // Note: Reader is kept in readerRef.current for continuous reading
+          // Success - keep reader for continuous reading
           return true;
         }
         
-        // If this wasn't the last attempt, wait a bit before retrying
-        // Retry delay scales with baud rate (faster baud = shorter delay)
-        const retryDelay = baudRate >= 2000000 ? 50 : 100; // 50ms for 4M, 100ms for 115200
+        // Failed - cleanup and retry if not last attempt
+        reader.releaseLock();
+        readerRef.current = null;
+        
         if (attempt < calculatedRetries) {
+          const retryDelay = calculateRetryDelay(baudRate, 5); // 5 symbol periods between retries
           console.log(`[TRY NORMAL MODE] Retrying in ${retryDelay}ms... (attempt ${attempt}/${calculatedRetries} failed)`);
-          // Release writer before retry
-          if (writerRef.current) {
-            writerRef.current.releaseLock();
-            writerRef.current = null;
-          }
           await new Promise(resolve => setTimeout(resolve, retryDelay));
-          continue; // Retry the loop
+          continue;
         }
         
-        // Last attempt failed
-        if (writerRef.current) {
-          writerRef.current.releaseLock();
-          writerRef.current = null;
-        }
         return false;
       } catch (error) {
         console.error(`[TRY NORMAL MODE] Error on attempt ${attempt}/${calculatedRetries}:`, error);
-        if (writerRef.current) {
-          writerRef.current.releaseLock();
-          writerRef.current = null;
+        if (readerRef.current) {
+          try {
+            readerRef.current.releaseLock();
+          } catch (e) {}
+          readerRef.current = null;
         }
-        const retryDelay = baudRate >= 2000000 ? 50 : 100;
         if (attempt < calculatedRetries) {
+          const retryDelay = calculateRetryDelay(baudRate, 5);
           await new Promise(resolve => setTimeout(resolve, retryDelay));
-          continue; // Retry the loop
+          continue;
         }
         return false;
       }
     }
     
-    // All retries exhausted
-    console.error(`[TRY NORMAL MODE] Failed after ${calculatedRetries} attempts`);
     return false;
         }
       } catch (error) {
@@ -1342,27 +1350,21 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
     // Retry loop: attempt up to calculatedRetries times
     for (let attempt = 1; attempt <= calculatedRetries; attempt++) {
       try {
-        // Build binary frame
+        // Build and send binary frame
         const frame = buildBinaryFrame(cmd, payload || null);
-        const hexBytes = Array.from(frame)
-          .map((b) => b.toString(16).padStart(2, "0").toUpperCase())
-          .join(" ");
-        console.log(`[BINARY API] TX (attempt ${attempt}/${calculatedRetries}, ${frame.length} bytes):`, hexBytes);
+        console.log(`[BINARY API] Attempt ${attempt}/${calculatedRetries}: Sending command 0x${cmd.toString(16)}`);
 
-        // Get writer
         const writer = currentState.port.writable?.getWriter();
         if (!writer) {
           console.log(`[BINARY API] Port not writable`);
           return null;
         }
 
-        // Send binary frame
         await writer.write(frame);
-        console.log(`[BINARY API] Successfully sent binary command 0x${cmd.toString(16)}`);
         writer.releaseLock();
 
-        // Use existing reader if available
-        const reader = readerRef.current;
+        // Get reader
+        const reader = currentState.port.readable?.getReader();
         if (!reader) {
           console.log(`[BINARY API] No reader available`);
           return null;
@@ -1404,13 +1406,13 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
                 // Look for binary frame (starts with 0x50)
                 const parsed = parseBinaryFrame(combined);
                 if (parsed && parsed.cmd === cmd) {
-                  console.log(`[BINARY API] Received valid binary response (attempt ${attempt}/${maxRetries}), payload size: ${parsed.payload.length}`);
+                  console.log(`[BINARY API] Received valid binary response (attempt ${attempt}/${calculatedRetries}), payload size: ${parsed.payload.length}`);
                   responseReceived = true;
                   if (timeoutId) clearTimeout(timeoutId);
                   return parsed.payload;
                 } else if (parsed === null && chunks.length > 0) {
-                  // CRC mismatch or invalid frame - will retry
-                  console.warn(`[BINARY API] CRC mismatch or invalid frame (attempt ${attempt}/${calculatedRetries}) - will retry`);
+                  // CRC mismatch - will retry
+                  console.warn(`[BINARY API] CRC mismatch (attempt ${attempt}/${calculatedRetries})`);
                 }
               }
               
@@ -1427,36 +1429,32 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
         const result = await Promise.race([readPromise, timeoutPromise]);
         if (timeoutId) clearTimeout(timeoutId);
         
+        // Cleanup reader
+        reader.releaseLock();
+        
         // If we got a valid response, return it
         if (result && result instanceof Uint8Array && result.length > 0) {
           return result;
         }
         
-        // If this wasn't the last attempt, wait a bit before retrying
-        // Retry delay scales with baud rate (faster baud = shorter delay)
-        const retryDelay = baudRate >= 2000000 ? 50 : 100;
+        // Retry if not last attempt
         if (attempt < calculatedRetries) {
+          const retryDelay = calculateRetryDelay(baudRate, 5);
           console.log(`[BINARY API] Retrying in ${retryDelay}ms... (attempt ${attempt}/${calculatedRetries} failed)`);
           await new Promise(resolve => setTimeout(resolve, retryDelay));
+          continue;
         }
       } catch (error) {
         console.error(`[BINARY API] Error on attempt ${attempt}/${calculatedRetries}:`, error);
-        const retryDelay = baudRate >= 2000000 ? 50 : 100;
         if (attempt < calculatedRetries) {
+          const retryDelay = calculateRetryDelay(baudRate, 5);
           await new Promise(resolve => setTimeout(resolve, retryDelay));
+          continue;
         }
       }
     }
     
-    // All retries exhausted
-    console.error(`[BINARY API] Failed after ${calculatedRetries} attempts`);
     return null;
-      
-      return result;
-    } catch (error) {
-      console.error(`[BINARY API] Error:`, error);
-      return null;
-    }
   }, []);
 
   // Subscribe to serial data
