@@ -732,23 +732,11 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
     }
     
     return false;
-        }
-      } catch (error) {
-        if (timeoutId) {
-          clearTimeout(timeoutId);
-        }
-        throw error;
-      } finally {
-        // Don't release reader - keep it for continuous monitoring
-        // The continuous reader loop will use it
-      }
-
-      return false;
-    } catch (error) {
-      cleanup();
-      return false;
-    }
-  };
+  } catch (error) {
+    console.error(`[TRY NORMAL MODE] Outer error:`, error);
+    return false;
+  }
+};
 
   // Try to connect in flash mode
   // Note: Flash mode uses its own baud rates (921600 for flash, 115200 for ROM)
