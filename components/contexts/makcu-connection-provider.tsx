@@ -352,7 +352,25 @@ function setCookie(name: string, value: string, hours: number): void {
  * Uses the command router to parse each response
  * ═══════════════════════════════════════════════════════════════════════════ */
 function buildAndStoreDeviceInfo(commandResponses: Map<number, Uint8Array>): void {
-  const deviceInfo: Record<string, any> = {};
+  // Initialize all expected fields with empty/default values - always store all fields
+  const deviceInfo: Record<string, any> = {
+    VENDOR: "",
+    MODEL: "",
+    ORIGINAL_SERIAL: "",
+    SPOOFED_SERIAL: "",
+    SPOOF_ACTIVE: false,
+    FW: "",
+    MAKCU: "",
+    MAC1: "00:00:00:00:00:00",
+    MAC2: "00:00:00:00:00:00",
+    VID: 0,
+    PID: 0,
+    TEMP: "",
+    CPU: 0,
+    MOUSE_BINT: 0,
+    KBD_BINT: 0,
+    SCREEN_SIZE: "",
+  };
 
   // Process each command response using the router
   for (const [cmd, payload] of commandResponses.entries()) {
@@ -363,7 +381,7 @@ function buildAndStoreDeviceInfo(commandResponses: Map<number, Uint8Array>): voi
   }
 
   // Handle screen dimensions combination
-  if (deviceInfo.SCREEN_W && deviceInfo.SCREEN_H) {
+  if (deviceInfo.SCREEN_W !== undefined && deviceInfo.SCREEN_H !== undefined) {
     const w = typeof deviceInfo.SCREEN_W === 'number' ? deviceInfo.SCREEN_W : 0;
     const h = typeof deviceInfo.SCREEN_H === 'number' ? deviceInfo.SCREEN_H : 0;
     if (w > 0 && h > 0) {
@@ -371,69 +389,104 @@ function buildAndStoreDeviceInfo(commandResponses: Map<number, Uint8Array>): voi
     }
   }
 
-  // Store in cookie as JSON if we have any device information
-  // Store if we have at least one meaningful field (not just empty values)
-  const hasValidData = Object.keys(deviceInfo).some(key => {
-    const value = deviceInfo[key];
-    if (value === undefined || value === null) return false;
-    if (typeof value === 'string' && value.trim() === '') return false;
-    if (typeof value === 'number' && value === 0 && (key === 'VID' || key === 'PID')) return false;
-    return true;
-  });
-
-  if (hasValidData) {
-    const jsonStr = JSON.stringify(deviceInfo);
-    setCookie(DEVICE_INFO_COOKIE, jsonStr, DEVICE_INFO_EXPIRY_HOURS);
-    console.log(`[DEVICE INFO] Stored device info cookie with ${Object.keys(deviceInfo).length} fields`);
-  } else {
-    console.warn("[DEVICE INFO] No valid device data to store in cookie");
-    setCookie(DEVICE_INFO_COOKIE, "", 0);
-  }
+  // Always store cookie with all fields (even if empty) - fields will always return
+  const jsonStr = JSON.stringify(deviceInfo);
+  setCookie(DEVICE_INFO_COOKIE, jsonStr, DEVICE_INFO_EXPIRY_HOURS);
+  console.log(`[DEVICE INFO] Stored device info cookie with ${Object.keys(deviceInfo).length} fields (all fields, including empty)`);
 }
 
 // Get static device info from cookie (VID/PID/vendor/model/serials/etc.)
-// Does NOT include live data (RAM, uptime) - use mcuStatus for that
-export function getDeviceInfo(): Record<string, string> | null {
-  if (typeof document === "undefined") return null;
+// Always returns all fields with defaults (even if cookie missing) - does NOT include live data (RAM, uptime)
+export function getDeviceInfo(): Record<string, any> {
+  // Initialize with all expected fields and defaults
+  const defaultInfo: Record<string, any> = {
+    VENDOR: "",
+    MODEL: "",
+    ORIGINAL_SERIAL: "",
+    SPOOFED_SERIAL: "",
+    SPOOF_ACTIVE: false,
+    FW: "",
+    MAKCU: "",
+    MAC1: "00:00:00:00:00:00",
+    MAC2: "00:00:00:00:00:00",
+    VID: 0,
+    PID: 0,
+    TEMP: "",
+    CPU: 0,
+    MOUSE_BINT: 0,
+    KBD_BINT: 0,
+    SCREEN_SIZE: "",
+  };
+  
+  if (typeof document === "undefined") return defaultInfo;
+  
   const value = `; ${document.cookie}`;
   const parts = value.split(`; ${DEVICE_INFO_COOKIE}=`);
   if (parts.length === 2) {
     const cookieValue = parts.pop()?.split(";").shift();
     if (cookieValue) {
       try {
-        return JSON.parse(cookieValue);
+        const cookieData = JSON.parse(cookieValue);
+        // Merge cookie data with defaults (cookie data takes precedence)
+        return { ...defaultInfo, ...cookieData };
       } catch (e) {
-        return null;
+        // If cookie parse fails, return defaults
+        return defaultInfo;
       }
     }
   }
-  return null;
+  
+  // Cookie not found - return defaults
+  return defaultInfo;
 }
 
 // Helper to get combined device info (static + live)
-// Returns null if not connected or no device attached
-export function getCombinedDeviceInfo(mcuStatus: MakcuStatus | null): Record<string, string> | null {
-  if (!mcuStatus || !mcuStatus.deviceAttached) {
-    return null;
+// Always returns all fields (even if empty/default) - RAM and UPTIME always included from live data
+export function getCombinedDeviceInfo(mcuStatus: MakcuStatus | null): Record<string, string> {
+  // Initialize with all fields and defaults (always return all fields)
+  const staticInfo = getDeviceInfo() || {};
+  
+  // Initialize defaults for any missing static fields
+  const defaultStaticInfo: Record<string, any> = {
+    VENDOR: "",
+    MODEL: "",
+    ORIGINAL_SERIAL: "",
+    SPOOFED_SERIAL: "",
+    SPOOF_ACTIVE: false,
+    FW: "",
+    MAKCU: "",
+    MAC1: "00:00:00:00:00:00",
+    MAC2: "00:00:00:00:00:00",
+    VID: 0,
+    PID: 0,
+    TEMP: "",
+    CPU: 0,
+    MOUSE_BINT: 0,
+    KBD_BINT: 0,
+    SCREEN_SIZE: "",
+  };
+  
+  // Merge static info with defaults
+  const mergedStatic = { ...defaultStaticInfo, ...staticInfo };
+  
+  // Always include live data (RAM and UPTIME) - use defaults if no status
+  let ram = "0kb";
+  let uptime = "00:00:00";
+  
+  if (mcuStatus) {
+    ram = `${mcuStatus.freeRamKb}kb`;
+    const uptimeSeconds = mcuStatus.uptime;
+    const hours = Math.floor(uptimeSeconds / 3600);
+    const minutes = Math.floor((uptimeSeconds % 3600) / 60);
+    const seconds = uptimeSeconds % 60;
+    uptime = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
   }
   
-  const staticInfo = getDeviceInfo();
-  if (!staticInfo) {
-    return null;
-  }
-  
-  // Format uptime
-  const uptimeSeconds = mcuStatus.uptime;
-  const hours = Math.floor(uptimeSeconds / 3600);
-  const minutes = Math.floor((uptimeSeconds % 3600) / 60);
-  const seconds = uptimeSeconds % 60;
-  const formattedUptime = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-  
-  // Combine static and live data
+  // Combine static and live data - always return all fields
   return {
-    ...staticInfo,
-    RAM: `${mcuStatus.freeRamKb}kb`,  // Live RAM from STATUS poll
-    UP: formattedUptime,               // Live uptime from STATUS poll
+    ...mergedStatic,
+    RAM: ram,      // Live RAM from STATUS poll (always included)
+    UP: uptime,    // Live uptime from STATUS poll (always included)
   };
 }
 

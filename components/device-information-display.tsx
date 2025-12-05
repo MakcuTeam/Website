@@ -21,26 +21,22 @@ export function DeviceInformationDisplay({ lang, variant = "card" }: DeviceInfor
   const isCn = lang === "cn";
 
   useEffect(() => {
-    // Only check for device info if connected
-    if (status === "connected") {
-      const info = getCombinedDeviceInfo(mcuStatus);
-      setDeviceInfo(info);
-      
-      // Check for updates periodically (includes live RAM/uptime from STATUS poll)
-      const interval = setInterval(() => {
-        const updatedInfo = getCombinedDeviceInfo(mcuStatus);
-        setDeviceInfo(updatedInfo);
-      }, 500);
+    // Always get device info (returns all fields with defaults even if not connected)
+    const info = getCombinedDeviceInfo(mcuStatus);
+    setDeviceInfo(info);
+    
+    // Check for updates periodically (includes live RAM/uptime from STATUS poll)
+    const interval = setInterval(() => {
+      const updatedInfo = getCombinedDeviceInfo(mcuStatus);
+      setDeviceInfo(updatedInfo);
+    }, 500);
 
-      return () => clearInterval(interval);
-    } else {
-      // Clear device info when disconnected
-      setDeviceInfo(null);
-    }
+    return () => clearInterval(interval);
   }, [status, mcuStatus]);
 
-  // Only show if connected and we have valid device info
-  if (status !== "connected" || !deviceInfo) {
+  // Always show all fields (even if not connected or empty) - getCombinedDeviceInfo always returns all fields
+  if (!deviceInfo) {
+    // Shouldn't happen, but handle gracefully
     if (variant === "inline") {
       return null;
     }
@@ -48,7 +44,7 @@ export function DeviceInformationDisplay({ lang, variant = "card" }: DeviceInfor
       <Card className="border-border/60 bg-card/90 shadow-lg">
         <CardContent className="p-4">
           <div className="text-sm text-muted-foreground">
-            {isCn ? "设备未连接。连接设备后，设备信息将显示在这里。" : "Device not connected. Device information will appear here once connected."}
+            {isCn ? "加载设备信息中..." : "Loading device information..."}
           </div>
         </CardContent>
       </Card>
