@@ -5,6 +5,99 @@ import { ESPLoader, LoaderOptions, Transport } from "esptool-js";
 import { serial } from "web-serial-polyfill";
 import { toast } from "sonner";
 
+/* ═══════════════════════════════════════════════════════════════════════════
+ * Binary Protocol Constants and Functions
+ * Frame format: [0x50] [CMD] [LEN_LO] [LEN_HI] [PAYLOAD...] [CRC_LO] [CRC_HI]
+ * Note: UART0 uses 0x50, UART1 uses 0x5A (0x50+0xA) to avoid misdirection
+ * ═══════════════════════════════════════════════════════════════════════════ */
+const UART0_START_BYTE = 0x50;  /* UART0=0x50, UART1=0x5A */
+const UART0_CMD_WEBSITE = 0xB0;
+
+// CRC16-CCITT lookup table for faster calculation
+const CRC16_TABLE = (() => {
+  const table = new Uint16Array(256);
+  for (let i = 0; i < 256; i++) {
+    let crc = i << 8;
+    for (let j = 0; j < 8; j++) {
+      crc = (crc & 0x8000) ? ((crc << 1) ^ 0x1021) : (crc << 1);
+    }
+    table[i] = crc & 0xFFFF;
+  }
+  return table;
+})();
+
+function crc16_ccitt(data: Uint8Array): number {
+  let crc = 0xFFFF;
+  for (let i = 0; i < data.length; i++) {
+    crc = ((crc << 8) ^ CRC16_TABLE[((crc >> 8) ^ data[i]) & 0xFF]) & 0xFFFF;
+  }
+  return crc;
+}
+
+// Build a binary framed request
+function buildBinaryFrame(cmd: number, payload: Uint8Array | null = null): Uint8Array {
+  const payloadLen = payload ? payload.length : 0;
+  const frameLen = 6 + payloadLen;  // START(1) + CMD(1) + LEN(2) + PAYLOAD + CRC(2)
+  const frame = new Uint8Array(frameLen);
+  
+  frame[0] = UART0_START_BYTE;
+  frame[1] = cmd;
+  frame[2] = payloadLen & 0xFF;
+  frame[3] = (payloadLen >> 8) & 0xFF;
+  
+  if (payload && payloadLen > 0) {
+    frame.set(payload, 4);
+  }
+  
+  // Calculate CRC over everything except CRC itself
+  const crc = crc16_ccitt(frame.slice(0, 4 + payloadLen));
+  frame[4 + payloadLen] = crc & 0xFF;
+  frame[4 + payloadLen + 1] = (crc >> 8) & 0xFF;
+  
+  return frame;
+}
+
+// Parse a binary framed response - returns payload or null if invalid
+function parseBinaryFrame(data: Uint8Array): { cmd: number; payload: Uint8Array } | null {
+  // Find start byte (UART0 uses 0x5B)
+  let startIdx = -1;
+  for (let i = 0; i < data.length; i++) {
+    if (data[i] === UART0_START_BYTE) {
+      startIdx = i;
+      break;
+    }
+  }
+  
+  if (startIdx < 0 || data.length < startIdx + 6) {
+    return null;  // No start byte or not enough data for minimal frame
+  }
+  
+  const cmd = data[startIdx + 1];
+  const payloadLen = data[startIdx + 2] | (data[startIdx + 3] << 8);
+  const totalFrameLen = 6 + payloadLen;
+  
+  if (data.length < startIdx + totalFrameLen) {
+    return null;  // Not enough data
+  }
+  
+  // Extract frame
+  const frame = data.slice(startIdx, startIdx + totalFrameLen);
+  
+  // Verify CRC
+  const calcCrc = crc16_ccitt(frame.slice(0, 4 + payloadLen));
+  const rxCrc = frame[4 + payloadLen] | (frame[4 + payloadLen + 1] << 8);
+  
+  if (calcCrc !== rxCrc) {
+    console.warn(`Binary frame CRC mismatch: calc=0x${calcCrc.toString(16)} rx=0x${rxCrc.toString(16)}`);
+    return null;
+  }
+  
+  // Extract payload
+  const payload = payloadLen > 0 ? frame.slice(4, 4 + payloadLen) : new Uint8Array(0);
+  
+  return { cmd, payload };
+}
+
 const DEVICE_INFO_COOKIE = "makcu_device_info";
 const DEVICE_INFO_EXPIRY_HOURS = 1;
 
@@ -340,6 +433,7 @@ interface MakcuConnectionContextType extends MakcuConnectionState {
   connect: () => Promise<void>;
   disconnect: () => Promise<void>;
   sendCommandAndReadResponse: (command: string, timeoutMs?: number) => Promise<Uint8Array | null>;
+  sendBinaryCommand: (cmd: number, payload?: Uint8Array, timeoutMs?: number) => Promise<Uint8Array | null>;
   subscribeToSerialData: (callback: SerialDataCallback) => () => void;
   isConnecting: boolean;
   browserSupported: boolean;
@@ -423,9 +517,11 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
       const writer = port.writable.getWriter();
       writerRef.current = writer;
 
-      // Send website command (binary format)
-      const websiteCommand = ".website()\n";
-      await writer.write(new TextEncoder().encode(websiteCommand));
+      // Send binary framed website command (0xB0)
+      // Frame format: [0x5A] [0xB0] [0x00] [0x00] [CRC_LO] [CRC_HI]
+      const binaryCommand = buildBinaryFrame(UART0_CMD_WEBSITE, null);
+      console.log("[TRY NORMAL MODE] Sending binary website command:", Array.from(binaryCommand).map(b => b.toString(16).padStart(2, '0')).join(' '));
+      await writer.write(binaryCommand);
 
       // Get reader (keep it for continuous reading after connection)
       const reader = port.readable.getReader();
@@ -451,10 +547,7 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
             }
             chunks.push(value);
             
-            // Note: Broadcasting to subscribers is now handled by the continuous reader loop
-            // This ensures all incoming data is captured and broadcast, not just during connection
-            
-            // Combine chunks to check for binary data
+            // Combine chunks to check for binary framed response
             const totalLength = chunks.reduce((sum, chunk) => sum + chunk.length, 0);
             const combined = new Uint8Array(totalLength);
             let offset = 0;
@@ -463,34 +556,37 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
               offset += chunk.length;
             }
             
-            // Look for binary header (0x00 or 0x01) - might be preceded by text
-            let binaryStart = -1;
+            // Look for binary frame start byte (0x5B for UART0)
+            let frameStart = -1;
             for (let i = 0; i < combined.length; i++) {
-              if (combined[i] === 0x00 || combined[i] === 0x01) {
-                // Check if this looks like the start of our binary data
-                // Binary data should be at least 360 bytes after header (new format with screen size)
-                if (i + 360 <= combined.length) {
-                  binaryStart = i;
-                  break;
+              if (combined[i] === UART0_START_BYTE) {
+                frameStart = i;
+                break;
+              }
+            }
+            
+            // If we found a frame start, try to parse it
+            if (frameStart >= 0 && combined.length >= frameStart + 6) {
+              // Check if we have enough data for the header
+              const payloadLen = combined[frameStart + 2] | (combined[frameStart + 3] << 8);
+              const totalFrameLen = 6 + payloadLen;
+              
+              if (combined.length >= frameStart + totalFrameLen) {
+                // We have a complete frame - verify CRC and extract payload
+                const parsed = parseBinaryFrame(combined.slice(frameStart));
+                if (parsed && parsed.cmd === UART0_CMD_WEBSITE) {
+                  console.log(`[TRY NORMAL MODE] Received valid binary response, payload size: ${parsed.payload.length}`);
+                  if (timeoutId) {
+                    clearTimeout(timeoutId);
+                  }
+                  return parsed.payload;
                 }
               }
             }
             
-            // If we found binary data and have enough bytes, return it
-            if (binaryStart >= 0 && combined.length >= binaryStart + 360) {
-              // Wait a bit more to ensure we have the complete response
-              await new Promise(resolve => setTimeout(resolve, 200));
-              if (timeoutId) {
-                clearTimeout(timeoutId);
-              }
-              // Return only the binary portion
-              const binaryData = combined.slice(binaryStart);
-              return binaryData;
-            }
-            
-            // If we have data but no binary header yet, keep reading
-            if (totalLength > 500) {
-              // Too much data without finding binary - might be an error
+            // If we have data but no valid frame yet, keep reading
+            if (totalLength > 3000) {
+              // Too much data without finding valid frame - might be an error
               break;
             }
           }
@@ -509,23 +605,29 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
           offset += chunk.length;
         }
         
-        // Try to find binary data in the final combined array
-        let binaryStart = -1;
+        // Try to find binary frame in the final combined array (UART0 uses 0x5B)
+        let frameStart = -1;
         for (let i = 0; i < combined.length; i++) {
-          if (combined[i] === 0x00 || combined[i] === 0x01) {
-            if (i + 360 <= combined.length) {
-              binaryStart = i;
-              break;
+          if (combined[i] === UART0_START_BYTE) {
+            frameStart = i;
+            break;
+          }
+        }
+        
+        if (frameStart >= 0 && combined.length >= frameStart + 6) {
+          const payloadLen = combined[frameStart + 2] | (combined[frameStart + 3] << 8);
+          const totalFrameLen = 6 + payloadLen;
+          
+          if (combined.length >= frameStart + totalFrameLen) {
+            const parsed = parseBinaryFrame(combined.slice(frameStart));
+            if (parsed && parsed.cmd === UART0_CMD_WEBSITE) {
+              return parsed.payload;
             }
           }
         }
         
-        if (binaryStart >= 0) {
-          const binaryData = combined.slice(binaryStart);
-          return binaryData;
-        }
-        
-        return combined;
+        // No valid frame found
+        return new Uint8Array(0);
       })();
 
       try {
@@ -1121,6 +1223,127 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
     }
   }, []);
 
+  // Send binary API command and wait for binary response
+  // 
+  // Protocol Coexistence:
+  // - Text commands (terminal): Send text like ".website()\n" or "km.info()\n"
+  //   → Firmware detects text (starts with '.' or 'k') → parses as text command
+  //   → Returns text response → Terminal displays it
+  // 
+  // - Binary commands (API): Send binary frame [0x50] [CMD] [LEN] [PAYLOAD] [CRC]
+  //   → Firmware detects 0x50 start byte → parses as binary command
+  //   → Returns binary framed response → API extracts payload
+  // 
+  // Both protocols coexist because:
+  // 1. Different start bytes: Binary=0x50, Text='.' or 'k'
+  // 2. Firmware parser checks start byte first, routes accordingly
+  // 3. Terminal and API can operate simultaneously without interference
+  // 4. Continuous reader broadcasts all data, but each consumer filters what it needs
+  //
+  // Usage example:
+  //   const response = await sendBinaryCommand(UART0_CMD_WEBSITE);
+  //   if (response) { /* parse website binary data */ }
+  const sendBinaryCommand = useCallback(async (
+    cmd: number, 
+    payload?: Uint8Array, 
+    timeoutMs: number = 5000
+  ): Promise<Uint8Array | null> => {
+    const currentState = stateRef.current;
+    if (currentState.status !== "connected" || !currentState.port) {
+      console.log(`[BINARY API] Not connected`);
+      return null;
+    }
+
+    try {
+      // Build binary frame
+      const frame = buildBinaryFrame(cmd, payload || null);
+      const hexBytes = Array.from(frame)
+        .map((b) => b.toString(16).padStart(2, "0").toUpperCase())
+        .join(" ");
+      console.log(`[BINARY API] TX (${frame.length} bytes):`, hexBytes);
+
+      // Get writer
+      const writer = currentState.port.writable?.getWriter();
+      if (!writer) {
+        console.log(`[BINARY API] Port not writable`);
+        return null;
+      }
+
+      // Send binary frame
+      await writer.write(frame);
+      console.log(`[BINARY API] Successfully sent binary command 0x${cmd.toString(16)}`);
+      writer.releaseLock();
+
+      // Use existing reader if available
+      const reader = readerRef.current;
+      if (!reader) {
+        console.log(`[BINARY API] No reader available`);
+        return null;
+      }
+
+      // Read binary response with timeout
+      const chunks: Uint8Array[] = [];
+      let responseReceived = false;
+      let timeoutId: NodeJS.Timeout | null = null;
+
+      const timeoutPromise = new Promise<Uint8Array | null>((resolve) => {
+        timeoutId = setTimeout(() => {
+          console.log(`[BINARY API] Timeout waiting for response`);
+          resolve(null);
+        }, timeoutMs);
+      });
+
+      const readPromise = (async (): Promise<Uint8Array | null> => {
+        try {
+          let readCount = 0;
+          const maxReads = 200; // Safety limit
+          
+          while (readCount < maxReads && !responseReceived) {
+            const { value, done } = await reader.read();
+            if (done) break;
+            
+            if (value) {
+              chunks.push(value);
+              
+              // Combine chunks and look for binary frame
+              const totalLength = chunks.reduce((sum, chunk) => sum + chunk.length, 0);
+              const combined = new Uint8Array(totalLength);
+              let offset = 0;
+              for (const chunk of chunks) {
+                combined.set(chunk, offset);
+                offset += chunk.length;
+              }
+
+              // Look for binary frame (starts with 0x50)
+              const parsed = parseBinaryFrame(combined);
+              if (parsed && parsed.cmd === cmd) {
+                console.log(`[BINARY API] Received valid binary response, payload size: ${parsed.payload.length}`);
+                responseReceived = true;
+                if (timeoutId) clearTimeout(timeoutId);
+                return parsed.payload;
+              }
+            }
+            
+            readCount++;
+          }
+
+          return null;
+        } catch (error) {
+          console.error(`[BINARY API] Read error:`, error);
+          return null;
+        }
+      })();
+
+      const result = await Promise.race([readPromise, timeoutPromise]);
+      if (timeoutId) clearTimeout(timeoutId);
+      
+      return result;
+    } catch (error) {
+      console.error(`[BINARY API] Error:`, error);
+      return null;
+    }
+  }, []);
+
   // Subscribe to serial data
   const subscribeToSerialData = useCallback((callback: SerialDataCallback) => {
     serialDataSubscribersRef.current.add(callback);
@@ -1135,6 +1358,7 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
     connect,
     disconnect,
     sendCommandAndReadResponse,
+    sendBinaryCommand,
     subscribeToSerialData,
     isConnecting,
     browserSupported,
