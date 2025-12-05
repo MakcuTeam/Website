@@ -553,190 +553,113 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
   // Try to connect in normal mode with specific baud rate and timeout
   // Timeout and retries are automatically calculated based on baud rate
   const tryNormalMode = async (port: SerialPort, baudRate: number, timeout?: number, maxRetries?: number): Promise<boolean> => {
-    // Auto-calculate timeout and retries if not provided
     const calculatedTimeout = timeout ?? calculateTimeout(baudRate);
     const calculatedRetries = maxRetries ?? calculateMaxRetries(baudRate);
     
-    console.log(`[TRY NORMAL MODE] Baud: ${baudRate}, Timeout: ${calculatedTimeout}ms, Max Retries: ${calculatedRetries}`);
-    try {
-      if (!port.writable || !port.readable) {
-        return false;
-      }
+    console.log(`[TRY NORMAL MODE] Baud: ${baudRate}, Timeout: ${calculatedTimeout}ms, Retries: ${calculatedRetries}`);
+    
+    if (!port.writable || !port.readable) {
+      return false;
+    }
 
-      // Retry loop: attempt up to calculatedRetries times
-      for (let attempt = 1; attempt <= calculatedRetries; attempt++) {
-        try {
-          // Get writer
-          const writer = port.writable.getWriter();
-          writerRef.current = writer;
+    for (let attempt = 1; attempt <= calculatedRetries; attempt++) {
+      try {
+        // Send command
+        const writer = port.writable.getWriter();
+        const binaryCommand = buildBinaryFrame(UART0_CMD_WEBSITE, null);
+        console.log(`[TRY NORMAL MODE] Attempt ${attempt}/${calculatedRetries}`);
+        await writer.write(binaryCommand);
+        writer.releaseLock();
 
-          // Send binary framed website command (0xB0)
-          const binaryCommand = buildBinaryFrame(UART0_CMD_WEBSITE, null);
-          console.log(`[TRY NORMAL MODE] Attempt ${attempt}/${calculatedRetries}: Sending command`);
-          await writer.write(binaryCommand);
-          writer.releaseLock();
+        // Read response
+        const reader = port.readable.getReader();
+        readerRef.current = reader;
 
-          // Get reader
-          const reader = port.readable.getReader();
-          readerRef.current = reader;
+        let timeoutId: NodeJS.Timeout | null = null;
+        const timeoutPromise = new Promise<Uint8Array | null>((resolve) => {
+          timeoutId = setTimeout(() => {
+            reader.cancel().catch(() => {});
+            resolve(null);
+          }, calculatedTimeout);
+        });
 
-          // Read response with timeout (calculated based on baud rate)
-          let timeoutId: NodeJS.Timeout | null = null;
-          const timeoutPromise = new Promise<Uint8Array>((_, reject) => {
-            timeoutId = setTimeout(() => {
-              reader.cancel().catch(() => {});
-              reject(new Error(`Timeout waiting for response (${calculatedTimeout}ms)`));
-            }, calculatedTimeout);
-          });
-
-          const readPromise = (async () => {
-        const chunks: Uint8Array[] = [];
-        try {
-          while (true) {
-            const { value, done } = await reader.read();
-            if (done) {
-              break;
-            }
-            chunks.push(value);
-            
-            // Combine chunks to check for binary framed response
-            const totalLength = chunks.reduce((sum, chunk) => sum + chunk.length, 0);
-            const combined = new Uint8Array(totalLength);
-            let offset = 0;
-            for (const chunk of chunks) {
-              combined.set(chunk, offset);
-              offset += chunk.length;
-            }
-            
-            // Look for binary frame start byte (0x50 for UART0)
-            let frameStart = -1;
-            for (let i = 0; i < combined.length; i++) {
-              if (combined[i] === UART0_START_BYTE) {
-                frameStart = i;
+        const readPromise = (async (): Promise<Uint8Array | null> => {
+          const chunks: Uint8Array[] = [];
+          try {
+            while (true) {
+              const { value, done } = await reader.read();
+              if (done) break;
+              chunks.push(value);
+              
+              const totalLength = chunks.reduce((sum, chunk) => sum + chunk.length, 0);
+              const combined = new Uint8Array(totalLength);
+              let offset = 0;
+              for (const chunk of chunks) {
+                combined.set(chunk, offset);
+                offset += chunk.length;
+              }
+              
+              // Look for binary frame
+              let frameStart = -1;
+              for (let i = 0; i < combined.length; i++) {
+                if (combined[i] === UART0_START_BYTE) {
+                  frameStart = i;
                   break;
                 }
-            }
-            
-            // If we found a frame start, try to parse it
-            if (frameStart >= 0 && combined.length >= frameStart + 6) {
-              // Check if we have enough data for the header
-              const payloadLen = combined[frameStart + 2] | (combined[frameStart + 3] << 8);
-              const totalFrameLen = 6 + payloadLen;
+              }
               
-              if (combined.length >= frameStart + totalFrameLen) {
-                // We have a complete frame - verify CRC and extract payload
-                const parsed = parseBinaryFrame(combined.slice(frameStart));
-                if (parsed && parsed.cmd === UART0_CMD_WEBSITE) {
-                  console.log(`[TRY NORMAL MODE] Received valid binary response (attempt ${attempt}/${calculatedRetries}), payload size: ${parsed.payload.length}`);
-                  if (timeoutId) {
-                    clearTimeout(timeoutId);
+              if (frameStart >= 0 && combined.length >= frameStart + 6) {
+                const payloadLen = combined[frameStart + 2] | (combined[frameStart + 3] << 8);
+                const totalFrameLen = 6 + payloadLen;
+                
+                if (combined.length >= frameStart + totalFrameLen) {
+                  const parsed = parseBinaryFrame(combined.slice(frameStart));
+                  if (parsed && parsed.cmd === UART0_CMD_WEBSITE) {
+                    if (timeoutId) clearTimeout(timeoutId);
+                    return parsed.payload;
                   }
-                  return parsed.payload;
-                } else if (parsed === null) {
-                  // CRC mismatch - will retry
-                  console.warn(`[TRY NORMAL MODE] CRC mismatch (attempt ${attempt}/${calculatedRetries})`);
                 }
               }
+              
+              if (totalLength > 3000) break;
             }
-            
-            // If we have data but no valid frame yet, keep reading
-            if (totalLength > 3000) {
-              // Too much data without finding valid frame - might be an error
-              break;
-            }
+          } catch (e) {
+            // Read error
           }
-        } catch (error) {
-          if (timeoutId) {
-            clearTimeout(timeoutId);
-          }
-          throw error;
-        }
-        // Combine all chunks into single Uint8Array
-        const totalLength = chunks.reduce((sum, chunk) => sum + chunk.length, 0);
-        const combined = new Uint8Array(totalLength);
-        let offset = 0;
-        for (const chunk of chunks) {
-          combined.set(chunk, offset);
-          offset += chunk.length;
-        }
-        
-        // Try to find binary frame in the final combined array (UART0 uses 0x5B)
-        let frameStart = -1;
-        for (let i = 0; i < combined.length; i++) {
-          if (combined[i] === UART0_START_BYTE) {
-            frameStart = i;
-              break;
-            }
-        }
-        
-        if (frameStart >= 0 && combined.length >= frameStart + 6) {
-          const payloadLen = combined[frameStart + 2] | (combined[frameStart + 3] << 8);
-          const totalFrameLen = 6 + payloadLen;
-          
-          if (combined.length >= frameStart + totalFrameLen) {
-            const parsed = parseBinaryFrame(combined.slice(frameStart));
-            if (parsed && parsed.cmd === UART0_CMD_WEBSITE) {
-              return parsed.payload;
-            } else if (parsed === null) {
-              // CRC mismatch or invalid frame - will retry
-              console.warn(`[TRY NORMAL MODE] CRC mismatch or invalid frame in final parse (attempt ${attempt}/${calculatedRetries}) - will retry`);
-            }
-          }
-        }
-        
-            // No valid frame found
-            return new Uint8Array(0);
-          })();
+          return null;
+        })();
 
-          try {
-            const response = await Promise.race([readPromise, timeoutPromise]);
-            
-            // Parse and store device info from binary response
-            if (response && response instanceof Uint8Array) {
-              parseAndStoreDeviceInfoBinary(response);
-            }
-            
-            // Check if we got a valid response
-            if (response && response instanceof Uint8Array && response.length >= 1) {
-              // Success - keep reader for continuous reading
-              return true;
-            }
-            
-            // Failed - cleanup and retry if not last attempt
-            reader.releaseLock();
-            readerRef.current = null;
-            
-            if (attempt < calculatedRetries) {
-              const retryDelay = calculateRetryDelay(baudRate, 5); // 5 symbol periods between retries
-              console.log(`[TRY NORMAL MODE] Retrying in ${retryDelay}ms... (attempt ${attempt}/${calculatedRetries} failed)`);
-              await new Promise(resolve => setTimeout(resolve, retryDelay));
-              continue;
-            }
-            
-            return false;
-          } catch (error) {
-            console.error(`[TRY NORMAL MODE] Error on attempt ${attempt}/${calculatedRetries}:`, error);
-            if (readerRef.current) {
-              try {
-                readerRef.current.releaseLock();
-              } catch (e) {}
-              readerRef.current = null;
-            }
-            if (attempt < calculatedRetries) {
-              const retryDelay = calculateRetryDelay(baudRate, 5);
-              await new Promise(resolve => setTimeout(resolve, retryDelay));
-              continue;
-            }
-            return false;
-          }
+        const response = await Promise.race([readPromise, timeoutPromise]);
+        if (timeoutId) clearTimeout(timeoutId);
+        
+        if (response && response.length >= 1) {
+          parseAndStoreDeviceInfoBinary(response);
+          return true;
+        }
+        
+        // Cleanup and retry
+        reader.releaseLock();
+        readerRef.current = null;
+        
+        if (attempt < calculatedRetries) {
+          const retryDelay = calculateRetryDelay(baudRate, 5);
+          await new Promise(resolve => setTimeout(resolve, retryDelay));
+        }
+      } catch (error) {
+        console.error(`[TRY NORMAL MODE] Error:`, error);
+        if (readerRef.current) {
+          try { readerRef.current.releaseLock(); } catch (e) {}
+          readerRef.current = null;
+        }
+        if (attempt < calculatedRetries) {
+          const retryDelay = calculateRetryDelay(baudRate, 5);
+          await new Promise(resolve => setTimeout(resolve, retryDelay));
+        }
+      }
     }
     
     return false;
-  } catch (error) {
-    console.error(`[TRY NORMAL MODE] Outer error:`, error);
-    return false;
-  }
-};
+  };
 
   // Try to connect in flash mode
   // Note: Flash mode uses its own baud rates (921600 for flash, 115200 for ROM)
