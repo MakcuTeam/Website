@@ -3041,11 +3041,6 @@ export default async function ApiPage({ params }: LangProps) {
               </CardContent>
             </Card>
           </Section>
-
-          <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-border/60 bg-muted/30 px-6 py-4 text-xs uppercase tracking-[0.3em] text-muted-foreground">
-            <span>{t("API version 3.9", "API 版本 3.9")}</span>
-            <span>makcu 2025</span>
-          </div>
         </div>
       </div>
     </div>
