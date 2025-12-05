@@ -580,16 +580,16 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
           const reader = port.readable.getReader();
           readerRef.current = reader;
 
-      // Read response with timeout (calculated based on baud rate)
-      let timeoutId: NodeJS.Timeout | null = null;
-      const timeoutPromise = new Promise<Uint8Array>((_, reject) => {
-        timeoutId = setTimeout(() => {
-          reader.cancel().catch(() => {});
-          reject(new Error(`Timeout waiting for response (${calculatedTimeout}ms)`));
-        }, calculatedTimeout);
-      });
+          // Read response with timeout (calculated based on baud rate)
+          let timeoutId: NodeJS.Timeout | null = null;
+          const timeoutPromise = new Promise<Uint8Array>((_, reject) => {
+            timeoutId = setTimeout(() => {
+              reader.cancel().catch(() => {});
+              reject(new Error(`Timeout waiting for response (${calculatedTimeout}ms)`));
+            }, calculatedTimeout);
+          });
 
-      const readPromise = (async () => {
+          const readPromise = (async () => {
         const chunks: Uint8Array[] = [];
         try {
           while (true) {
@@ -684,51 +684,51 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
           }
         }
         
-        // No valid frame found
-        return new Uint8Array(0);
-      })();
+            // No valid frame found
+            return new Uint8Array(0);
+          })();
 
-      try {
-        const response = await Promise.race([readPromise, timeoutPromise]);
-        
-        // Parse and store device info from binary response
-        if (response && response instanceof Uint8Array) {
-          parseAndStoreDeviceInfoBinary(response);
-        }
-        
-        // Check if we got a valid response
-        if (response && response instanceof Uint8Array && response.length >= 1) {
-          // Success - keep reader for continuous reading
-          return true;
-        }
-        
-        // Failed - cleanup and retry if not last attempt
-        reader.releaseLock();
-        readerRef.current = null;
-        
-        if (attempt < calculatedRetries) {
-          const retryDelay = calculateRetryDelay(baudRate, 5); // 5 symbol periods between retries
-          console.log(`[TRY NORMAL MODE] Retrying in ${retryDelay}ms... (attempt ${attempt}/${calculatedRetries} failed)`);
-          await new Promise(resolve => setTimeout(resolve, retryDelay));
-          continue;
-        }
-        
-        return false;
-      } catch (error) {
-        console.error(`[TRY NORMAL MODE] Error on attempt ${attempt}/${calculatedRetries}:`, error);
-        if (readerRef.current) {
           try {
-            readerRef.current.releaseLock();
-          } catch (e) {}
-          readerRef.current = null;
-        }
-        if (attempt < calculatedRetries) {
-          const retryDelay = calculateRetryDelay(baudRate, 5);
-          await new Promise(resolve => setTimeout(resolve, retryDelay));
-          continue;
-        }
-        return false;
-      }
+            const response = await Promise.race([readPromise, timeoutPromise]);
+            
+            // Parse and store device info from binary response
+            if (response && response instanceof Uint8Array) {
+              parseAndStoreDeviceInfoBinary(response);
+            }
+            
+            // Check if we got a valid response
+            if (response && response instanceof Uint8Array && response.length >= 1) {
+              // Success - keep reader for continuous reading
+              return true;
+            }
+            
+            // Failed - cleanup and retry if not last attempt
+            reader.releaseLock();
+            readerRef.current = null;
+            
+            if (attempt < calculatedRetries) {
+              const retryDelay = calculateRetryDelay(baudRate, 5); // 5 symbol periods between retries
+              console.log(`[TRY NORMAL MODE] Retrying in ${retryDelay}ms... (attempt ${attempt}/${calculatedRetries} failed)`);
+              await new Promise(resolve => setTimeout(resolve, retryDelay));
+              continue;
+            }
+            
+            return false;
+          } catch (error) {
+            console.error(`[TRY NORMAL MODE] Error on attempt ${attempt}/${calculatedRetries}:`, error);
+            if (readerRef.current) {
+              try {
+                readerRef.current.releaseLock();
+              } catch (e) {}
+              readerRef.current = null;
+            }
+            if (attempt < calculatedRetries) {
+              const retryDelay = calculateRetryDelay(baudRate, 5);
+              await new Promise(resolve => setTimeout(resolve, retryDelay));
+              continue;
+            }
+            return false;
+          }
     }
     
     return false;
