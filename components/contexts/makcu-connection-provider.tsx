@@ -1350,6 +1350,24 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
     }
   }, []);
 
+  // Subscribe to binary frames only (0x50 frames)
+  const subscribeToBinaryFrames = useCallback((callback: BinaryFrameSubscriber) => {
+    binaryFrameSubscribersRef.current.add(callback);
+    // Return unsubscribe function
+    return () => {
+      binaryFrameSubscribersRef.current.delete(callback);
+    };
+  }, []);
+
+  // Subscribe to text/logs only (non-0x50 data)
+  const subscribeToTextLogs = useCallback((callback: TextLogSubscriber) => {
+    textLogSubscribersRef.current.add(callback);
+    // Return unsubscribe function
+    return () => {
+      textLogSubscribersRef.current.delete(callback);
+    };
+  }, []);
+
   // Status polling - runs every 1 second in normal mode
   // Uses the continuous reader's data stream (same pipeline, no lock conflicts)
   // Detects: MCU disconnect, device attach/detach, provides live uptime
@@ -1850,24 +1868,6 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
     // Return unsubscribe function
     return () => {
       serialDataSubscribersRef.current.delete(callback);
-    };
-  }, []);
-
-  // Subscribe to binary frames only (0x50 frames)
-  const subscribeToBinaryFrames = useCallback((callback: BinaryFrameSubscriber) => {
-    binaryFrameSubscribersRef.current.add(callback);
-    // Return unsubscribe function
-    return () => {
-      binaryFrameSubscribersRef.current.delete(callback);
-    };
-  }, []);
-
-  // Subscribe to text/logs only (non-0x50 data)
-  const subscribeToTextLogs = useCallback((callback: TextLogSubscriber) => {
-    textLogSubscribersRef.current.add(callback);
-    // Return unsubscribe function
-    return () => {
-      textLogSubscribersRef.current.delete(callback);
     };
   }, []);
 
