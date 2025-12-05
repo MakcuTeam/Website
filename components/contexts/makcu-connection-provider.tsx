@@ -1367,80 +1367,79 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
     console.log("[FETCH DEVICE INFO] Fetching full device info...");
     
     try {
-      // Send WEBSITE command
-      const frame = buildBinaryFrame(UART0_CMD_WEBSITE, null);
-      const writer = currentState.port.writable?.getWriter();
-      if (!writer) {
-        console.log("[FETCH DEVICE INFO] Port not writable");
-        return false;
-      }
-      await writer.write(frame);
-      writer.releaseLock();
-
-      // Use shared continuous reader (same pattern as sendCommandAndReadResponse)
-      const reader = readerRef.current;
-      if (!reader) {
-        console.log("[FETCH DEVICE INFO] No reader available");
-        return false;
-      }
-
       const baudRate = currentState.detectedBaudRate ?? 115200;
       const timeout = calculateTimeout(baudRate, 2566, 10, false); // Full website response
       
-      const chunks: Uint8Array[] = [];
-      let timeoutId: NodeJS.Timeout | null = null;
+      let pendingRequest: { resolve: (data: Uint8Array | null) => void; timeout: NodeJS.Timeout | null } | null = null;
 
-      const timeoutPromise = new Promise<Uint8Array | null>((resolve) => {
-        timeoutId = setTimeout(() => {
-          resolve(null);
-        }, timeout);
-      });
-
-      const readPromise = (async (): Promise<Uint8Array | null> => {
-        try {
-          let readCount = 0;
-          while (readCount < 200) {
-            const { value, done } = await reader.read();
-            if (done) break;
-            
-            if (value) {
-              chunks.push(value);
-              
-              const totalLength = chunks.reduce((sum, chunk) => sum + chunk.length, 0);
-              const combined = new Uint8Array(totalLength);
-              let offset = 0;
-              for (const chunk of chunks) {
-                combined.set(chunk, offset);
-                offset += chunk.length;
-              }
-
-              const parsed = parseBinaryFrame(combined);
-              if (parsed && parsed.cmd === UART0_CMD_WEBSITE) {
-                if (timeoutId) clearTimeout(timeoutId);
-                return parsed.payload;
-              }
-            }
-            readCount++;
-          }
-          return null;
-        } catch (e) {
-          return null;
+      // Subscribe to binary frames - wait for WEBSITE response
+      const deviceInfoCallback: BinaryFrameSubscriber = (frameData: Uint8Array) => {
+        if (!pendingRequest) return;
+        
+        const parsed = parseBinaryFrame(frameData);
+        console.log(`[FETCH DEVICE INFO CB] Received frame: cmd=0x${parsed?.cmd?.toString(16).toUpperCase() ?? 'null'}`);
+        
+        if (parsed && parsed.cmd === UART0_CMD_WEBSITE) {
+          console.log(`[FETCH DEVICE INFO CB] ✓ WEBSITE response received (${parsed.payload.length} bytes)`);
+          if (pendingRequest.timeout) clearTimeout(pendingRequest.timeout);
+          const request = pendingRequest;
+          pendingRequest = null;
+          request.resolve(parsed.payload);
         }
-      })();
+      };
 
-      const response = await Promise.race([readPromise, timeoutPromise]);
-      if (timeoutId) clearTimeout(timeoutId);
-      // DON'T release reader - it's the shared continuous reader
+      // Subscribe BEFORE sending command (timing matters!)
+      binaryFrameSubscribersRef.current.add(deviceInfoCallback);
+      
+      const cleanup = () => {
+        if (pendingRequest?.timeout) clearTimeout(pendingRequest.timeout);
+        pendingRequest = null;
+        binaryFrameSubscribersRef.current.delete(deviceInfoCallback);
+      };
 
-      if (response && response.length >= 1) {
-        parseAndStoreDeviceInfoBinary(response);
-        deviceInfoFetchedRef.current = true;
-        console.log("[FETCH DEVICE INFO] Successfully fetched and stored device info");
-        return true;
+      try {
+        // Set up pending request and timeout
+        const responsePromise = new Promise<Uint8Array | null>((resolve) => {
+          const timeoutId = setTimeout(() => {
+            if (pendingRequest) {
+              pendingRequest = null;
+            }
+            resolve(null);
+          }, timeout);
+
+          pendingRequest = { resolve, timeout: timeoutId };
+        });
+
+        // NOW send the command (after subscription is active)
+        const frame = buildBinaryFrame(UART0_CMD_WEBSITE, null);
+        const writer = currentState.port.writable?.getWriter();
+        if (!writer) {
+          console.log("[FETCH DEVICE INFO] Port not writable");
+          cleanup();
+          return false;
+        }
+        await writer.write(frame);
+        writer.releaseLock();
+
+        // Wait for response
+        const response = await responsePromise;
+
+        if (response && response.length >= 1) {
+          parseAndStoreDeviceInfoBinary(response);
+          deviceInfoFetchedRef.current = true;
+          console.log("[FETCH DEVICE INFO] Successfully fetched and stored device info");
+          cleanup();
+          return true;
+        }
+
+        console.warn("[FETCH DEVICE INFO] No valid response received");
+        cleanup();
+        return false;
+      } catch (e) {
+        console.error("[FETCH DEVICE INFO] Error waiting for response:", e);
+        cleanup();
+        return false;
       }
-
-      console.warn("[FETCH DEVICE INFO] No valid response received");
-      return false;
     } catch (error) {
       console.error("[FETCH DEVICE INFO] Error:", error);
       return false;
