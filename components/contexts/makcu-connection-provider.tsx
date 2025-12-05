@@ -11,7 +11,8 @@ import { toast } from "sonner";
  * Note: UART0 uses 0x50, UART1 uses 0x5A (0x50+0xA) to avoid misdirection
  * ═══════════════════════════════════════════════════════════════════════════ */
 const UART0_START_BYTE = 0x50;  /* UART0=0x50, UART1=0x5A */
-const UART0_CMD_WEBSITE = 0xB0;
+const UART0_CMD_WEBSITE = 0xB0;  /* Full device info (360+ bytes) */
+const UART0_CMD_STATUS = 0xB1;   /* Lightweight status poll (15 bytes) */
 
 // CRC16-CCITT lookup table for faster calculation
 const CRC16_TABLE = (() => {
@@ -415,6 +416,37 @@ export function parseDeviceTestResponse(data: Uint8Array): DeviceTestResult | nu
 export type ConnectionMode = "normal" | "flash" | null;
 export type ConnectionStatus = "disconnected" | "connecting" | "connected" | "fault";
 
+/* ═══════════════════════════════════════════════════════════════════════════
+ * MCU Status - Lightweight polling response (15 bytes from UART0_CMD_STATUS)
+ * Used for: connection verification, live uptime, device attach detection
+ * ═══════════════════════════════════════════════════════════════════════════ */
+export interface MakcuStatus {
+  mcuAlive: boolean;       // MCU responded (always true if we got response)
+  deviceAttached: boolean; // USB device connected to MCU's USB host port
+  uptime: number;          // MCU uptime in seconds
+  sofCount: number;        // USB SOF frame count (for sync/debug)
+  freeRamKb: number;       // Free RAM in KB (health indicator)
+  hasFault: boolean;       // Fault stored on device (parse error, etc.)
+  lastPollTime: number;    // Timestamp of last successful poll (ms since epoch)
+}
+
+// Parse status response (15 bytes from MCU)
+function parseStatusResponse(data: Uint8Array): MakcuStatus | null {
+  if (data.length < 15) return null;
+  
+  const view = new DataView(data.buffer, data.byteOffset, 15);
+  
+  return {
+    mcuAlive: data[0] === 0x01,
+    deviceAttached: data[1] === 0x01,
+    uptime: view.getUint32(2, true),        // little-endian
+    sofCount: view.getUint32(6, true),
+    freeRamKb: view.getUint16(10, true),
+    hasFault: data[12] === 0x01,
+    lastPollTime: Date.now(),
+  };
+}
+
 interface MakcuConnectionState {
   status: ConnectionStatus;
   mode: ConnectionMode;
@@ -435,8 +467,10 @@ interface MakcuConnectionContextType extends MakcuConnectionState {
   sendCommandAndReadResponse: (command: string, timeoutMs?: number) => Promise<Uint8Array | null>;
   sendBinaryCommand: (cmd: number, payload?: Uint8Array, timeoutMs?: number) => Promise<Uint8Array | null>;
   subscribeToSerialData: (callback: SerialDataCallback) => () => void;
+  fetchFullDeviceInfo: () => Promise<boolean>;  // Manually trigger full device info fetch
   isConnecting: boolean;
   browserSupported: boolean;
+  mcuStatus: MakcuStatus | null;  // Live status from 1-second polling
 }
 
 const MakcuConnectionContext = createContext<MakcuConnectionContextType | undefined>(undefined);
@@ -453,12 +487,16 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
   });
   const [isConnecting, setIsConnecting] = useState(false);
   const [browserSupported, setBrowserSupported] = useState(true);
+  const [mcuStatus, setMcuStatus] = useState<MakcuStatus | null>(null);
   const readerRef = useRef<ReadableStreamDefaultReader<Uint8Array> | null>(null);
   const writerRef = useRef<WritableStreamDefaultWriter<Uint8Array> | null>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const healthCheckRef = useRef<NodeJS.Timeout | null>(null);
+  const statusPollRef = useRef<NodeJS.Timeout | null>(null);
   const stateRef = useRef<MakcuConnectionState>(state);
   const serialDataSubscribersRef = useRef<Set<SerialDataCallback>>(new Set());
+  const deviceInfoFetchedRef = useRef<boolean>(false);  // Track if we've fetched full device info
+  const lastDeviceAttachedRef = useRef<boolean>(false); // Track device attached state for change detection
 
   // Keep stateRef in sync with state
   useEffect(() => {
@@ -482,6 +520,10 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
     if (healthCheckRef.current) {
       clearInterval(healthCheckRef.current);
       healthCheckRef.current = null;
+    }
+    if (statusPollRef.current) {
+      clearInterval(statusPollRef.current);
+      statusPollRef.current = null;
     }
     if (readerRef.current) {
       try {
@@ -557,9 +599,11 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
   };
 
   // Try to connect in normal mode with specific baud rate and timeout
-  // Timeout and retries are automatically calculated based on baud rate
+  // Uses lightweight STATUS command (15 bytes) instead of full WEBSITE (360+ bytes)
+  // This makes connection ~24x faster!
   const tryNormalMode = async (port: SerialPort, baudRate: number, timeout?: number, maxRetries?: number): Promise<boolean> => {
-    const calculatedTimeout = timeout ?? calculateTimeout(baudRate);
+    // Use shorter timeout for STATUS (only 15 bytes response)
+    const calculatedTimeout = timeout ?? calculateTimeout(baudRate, 21, 10, false); // 21 = 6 overhead + 15 payload
     const calculatedRetries = maxRetries ?? calculateMaxRetries(baudRate);
     
     console.log(`[TRY NORMAL MODE] Baud: ${baudRate}, Timeout: ${calculatedTimeout}ms, Retries: ${calculatedRetries}`);
@@ -574,10 +618,10 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
     for (let attempt = 1; attempt <= calculatedRetries; attempt++) {
       let reader: ReadableStreamDefaultReader<Uint8Array> | null = null;
       try {
-        // Send command
+        // Send lightweight STATUS command (not full WEBSITE)
         const writer = port.writable.getWriter();
-        const binaryCommand = buildBinaryFrame(UART0_CMD_WEBSITE, null);
-        console.log(`[TRY NORMAL MODE] Attempt ${attempt}/${calculatedRetries}`);
+        const binaryCommand = buildBinaryFrame(UART0_CMD_STATUS, null);
+        console.log(`[TRY NORMAL MODE] Attempt ${attempt}/${calculatedRetries} (using STATUS command)`);
         await writer.write(binaryCommand);
         writer.releaseLock();
 
@@ -599,19 +643,19 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
             while (true) {
               const { value, done } = await currentReader.read();
               if (done) break;
-            chunks.push(value);
-            
-            const totalLength = chunks.reduce((sum, chunk) => sum + chunk.length, 0);
-            const combined = new Uint8Array(totalLength);
-            let offset = 0;
-            for (const chunk of chunks) {
-              combined.set(chunk, offset);
-              offset += chunk.length;
-            }
-            
+              chunks.push(value);
+              
+              const totalLength = chunks.reduce((sum, chunk) => sum + chunk.length, 0);
+              const combined = new Uint8Array(totalLength);
+              let offset = 0;
+              for (const chunk of chunks) {
+                combined.set(chunk, offset);
+                offset += chunk.length;
+              }
+              
               // Look for binary frame
               let frameStart = -1;
-            for (let i = 0; i < combined.length; i++) {
+              for (let i = 0; i < combined.length; i++) {
                 if (combined[i] === UART0_START_BYTE) {
                   frameStart = i;
                   break;
@@ -624,20 +668,21 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
                 
                 if (combined.length >= frameStart + totalFrameLen) {
                   const parsed = parseBinaryFrame(combined.slice(frameStart));
-                  if (parsed && parsed.cmd === UART0_CMD_WEBSITE) {
+                  if (parsed && parsed.cmd === UART0_CMD_STATUS) {
                     if (timeoutId) clearTimeout(timeoutId);
                     return parsed.payload;
-            }
-          }
-        }
-        
-              if (totalLength > 3000) break;
+                  }
+                }
+              }
+              
+              // STATUS response is only 15 bytes + 6 overhead = 21 bytes
+              if (totalLength > 100) break;
             }
           } catch (e) {
             // Read error
           }
           return null;
-      })();
+        })();
 
         const response = await Promise.race([readPromise, timeoutPromise]);
         if (timeoutId) clearTimeout(timeoutId);
@@ -657,8 +702,16 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
           reader = null;
         }
         
-        if (response && response.length >= 1) {
-          parseAndStoreDeviceInfoBinary(response);
+        // STATUS response: 15 bytes, first byte is MCU_STATUS (0x01 = alive)
+        if (response && response.length >= 15 && response[0] === 0x01) {
+          // MCU is alive! Parse initial status
+          const status = parseStatusResponse(response);
+          if (status) {
+            setMcuStatus(status);
+            lastDeviceAttachedRef.current = status.deviceAttached;
+            // Don't fetch full device info here - let the status poll handle it
+            // This keeps connection fast
+          }
           return true;
         }
         
@@ -692,7 +745,7 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
       }
     }
 
-      return false;
+    return false;
   };
 
   // Try to connect in flash mode
@@ -944,16 +997,21 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
     // Clear device info cookie when disconnecting
     setCookie(DEVICE_INFO_COOKIE, "", 0);
     
+    // Reset tracking refs
+    deviceInfoFetchedRef.current = false;
+    lastDeviceAttachedRef.current = false;
+    setMcuStatus(null);
+    
     // Reset state
-      setState({
-        status: "disconnected",
-        mode: null,
-        port: null,
-        transport: null,
-        loader: null,
-        comPort: null,
-        detectedBaudRate: null,
-      });
+    setState({
+      status: "disconnected",
+      mode: null,
+      port: null,
+      transport: null,
+      loader: null,
+      comPort: null,
+      detectedBaudRate: null,
+    });
     
     toast.info("Disconnected");
   }, [cleanup]);
@@ -1132,6 +1190,255 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
       }
     };
   }, [state.status, state.port, performDisconnect]);
+
+  // Fetch full device info - called when device attaches or manually requested
+  const fetchFullDeviceInfo = useCallback(async (): Promise<boolean> => {
+    const currentState = stateRef.current;
+    if (currentState.status !== "connected" || currentState.mode !== "normal" || !currentState.port) {
+      console.log("[FETCH DEVICE INFO] Not in normal mode or not connected");
+      return false;
+    }
+
+    console.log("[FETCH DEVICE INFO] Fetching full device info...");
+    
+    try {
+      // Build and send WEBSITE command
+      const frame = buildBinaryFrame(UART0_CMD_WEBSITE, null);
+      const writer = currentState.port.writable?.getWriter();
+      if (!writer) {
+        console.log("[FETCH DEVICE INFO] Port not writable");
+        return false;
+      }
+      await writer.write(frame);
+      writer.releaseLock();
+
+      // Read response
+      const reader = currentState.port.readable?.getReader();
+      if (!reader) {
+        console.log("[FETCH DEVICE INFO] No reader available");
+        return false;
+      }
+
+      const baudRate = currentState.detectedBaudRate ?? 115200;
+      const timeout = calculateTimeout(baudRate, 2566, 10, false); // Full website response
+      
+      const chunks: Uint8Array[] = [];
+      let timeoutId: NodeJS.Timeout | null = null;
+
+      const timeoutPromise = new Promise<Uint8Array | null>((resolve) => {
+        timeoutId = setTimeout(() => {
+          console.log(`[FETCH DEVICE INFO] Timeout (${timeout}ms)`);
+          resolve(null);
+        }, timeout);
+      });
+
+      const readPromise = (async (): Promise<Uint8Array | null> => {
+        try {
+          let readCount = 0;
+          while (readCount < 200) {
+            const { value, done } = await reader.read();
+            if (done) break;
+            
+            if (value) {
+              chunks.push(value);
+              
+              const totalLength = chunks.reduce((sum, chunk) => sum + chunk.length, 0);
+              const combined = new Uint8Array(totalLength);
+              let offset = 0;
+              for (const chunk of chunks) {
+                combined.set(chunk, offset);
+                offset += chunk.length;
+              }
+
+              const parsed = parseBinaryFrame(combined);
+              if (parsed && parsed.cmd === UART0_CMD_WEBSITE) {
+                if (timeoutId) clearTimeout(timeoutId);
+                return parsed.payload;
+              }
+            }
+            readCount++;
+          }
+          return null;
+        } catch (e) {
+          console.error("[FETCH DEVICE INFO] Read error:", e);
+          return null;
+        }
+      })();
+
+      const response = await Promise.race([readPromise, timeoutPromise]);
+      if (timeoutId) clearTimeout(timeoutId);
+      reader.releaseLock();
+
+      if (response && response.length >= 1) {
+        parseAndStoreDeviceInfoBinary(response);
+        deviceInfoFetchedRef.current = true;
+        console.log("[FETCH DEVICE INFO] Successfully fetched and stored device info");
+        return true;
+      }
+
+      console.warn("[FETCH DEVICE INFO] No valid response received");
+      return false;
+    } catch (error) {
+      console.error("[FETCH DEVICE INFO] Error:", error);
+      return false;
+    }
+  }, []);
+
+  // Status polling - runs every 1 second in normal mode
+  // Detects: MCU disconnect, device attach/detach, provides live uptime
+  useEffect(() => {
+    // Only poll in normal mode
+    if (state.status !== "connected" || state.mode !== "normal" || !state.port) {
+      // Clear status and refs when not connected
+      if (state.status !== "connected") {
+        setMcuStatus(null);
+        deviceInfoFetchedRef.current = false;
+        lastDeviceAttachedRef.current = false;
+      }
+      return;
+    }
+
+    let consecutiveFailures = 0;
+    const MAX_FAILURES = 3;  // Go to fault after 3 consecutive failures
+
+    const pollStatus = async () => {
+      const currentState = stateRef.current;
+      if (currentState.status !== "connected" || currentState.mode !== "normal" || !currentState.port) {
+        return;
+      }
+
+      try {
+        // Build and send STATUS command
+        const frame = buildBinaryFrame(UART0_CMD_STATUS, null);
+        const writer = currentState.port.writable?.getWriter();
+        if (!writer) {
+          consecutiveFailures++;
+          return;
+        }
+        await writer.write(frame);
+        writer.releaseLock();
+
+        // Read response
+        const reader = currentState.port.readable?.getReader();
+        if (!reader) {
+          consecutiveFailures++;
+          return;
+        }
+
+        const baudRate = currentState.detectedBaudRate ?? 115200;
+        const timeout = calculateTimeout(baudRate, 21, 10, false); // 21 bytes for status
+        
+        const chunks: Uint8Array[] = [];
+        let timeoutId: NodeJS.Timeout | null = null;
+
+        const timeoutPromise = new Promise<Uint8Array | null>((resolve) => {
+          timeoutId = setTimeout(() => {
+            resolve(null);
+          }, timeout);
+        });
+
+        const readPromise = (async (): Promise<Uint8Array | null> => {
+          try {
+            let readCount = 0;
+            while (readCount < 50) {
+              const { value, done } = await reader.read();
+              if (done) break;
+              
+              if (value) {
+                chunks.push(value);
+                
+                const totalLength = chunks.reduce((sum, chunk) => sum + chunk.length, 0);
+                const combined = new Uint8Array(totalLength);
+                let offset = 0;
+                for (const chunk of chunks) {
+                  combined.set(chunk, offset);
+                  offset += chunk.length;
+                }
+
+                const parsed = parseBinaryFrame(combined);
+                if (parsed && parsed.cmd === UART0_CMD_STATUS) {
+                  if (timeoutId) clearTimeout(timeoutId);
+                  return parsed.payload;
+                }
+              }
+              readCount++;
+            }
+            return null;
+          } catch (e) {
+            return null;
+          }
+        })();
+
+        const response = await Promise.race([readPromise, timeoutPromise]);
+        if (timeoutId) clearTimeout(timeoutId);
+        reader.releaseLock();
+
+        if (response && response.length >= 15) {
+          const status = parseStatusResponse(response);
+          if (status) {
+            setMcuStatus(status);
+            consecutiveFailures = 0;  // Reset on success
+
+            // Check for device attach/detach
+            const wasAttached = lastDeviceAttachedRef.current;
+            const isAttached = status.deviceAttached;
+
+            if (isAttached && !wasAttached) {
+              // Device just attached - fetch full info
+              console.log("[STATUS POLL] Device attached - fetching full device info");
+              // Small delay to let device enumerate
+              setTimeout(() => fetchFullDeviceInfo(), 500);
+            } else if (!isAttached && wasAttached) {
+              // Device just detached - clear cached info
+              console.log("[STATUS POLL] Device detached - clearing device info");
+              setCookie(DEVICE_INFO_COOKIE, "", 0);
+              deviceInfoFetchedRef.current = false;
+            } else if (isAttached && !deviceInfoFetchedRef.current) {
+              // Device is attached but we don't have info yet (e.g., first poll after connect)
+              console.log("[STATUS POLL] Device attached, fetching initial device info");
+              fetchFullDeviceInfo();
+            }
+
+            lastDeviceAttachedRef.current = isAttached;
+          }
+        } else {
+          consecutiveFailures++;
+          console.warn(`[STATUS POLL] No response (${consecutiveFailures}/${MAX_FAILURES})`);
+        }
+      } catch (error) {
+        consecutiveFailures++;
+        console.error(`[STATUS POLL] Error (${consecutiveFailures}/${MAX_FAILURES}):`, error);
+      }
+
+      // Go to fault if too many consecutive failures
+      if (consecutiveFailures >= MAX_FAILURES) {
+        console.error(`[STATUS POLL] ${MAX_FAILURES} consecutive failures - connection fault`);
+        await cleanup();
+        setState((prev) => ({ 
+          ...prev, 
+          status: "fault",
+          mode: null,
+          detectedBaudRate: null
+        }));
+        toast.error("MCU not responding - connection fault");
+      }
+    };
+
+    // Start polling every 1 second
+    console.log("[STATUS POLL] Starting 1-second status polling");
+    statusPollRef.current = setInterval(pollStatus, 1000);
+    
+    // Immediate first poll
+    pollStatus();
+
+    return () => {
+      if (statusPollRef.current) {
+        clearInterval(statusPollRef.current);
+        statusPollRef.current = null;
+      }
+      console.log("[STATUS POLL] Stopped status polling");
+    };
+  }, [state.status, state.mode, state.port, cleanup, fetchFullDeviceInfo]);
 
   // Send command and read response using existing reader
   const sendCommandAndReadResponse = useCallback(async (command: string, timeoutMs: number = 5000): Promise<Uint8Array | null> => {
@@ -1476,8 +1783,10 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
     sendCommandAndReadResponse,
     sendBinaryCommand,
     subscribeToSerialData,
+    fetchFullDeviceInfo,
     isConnecting,
     browserSupported,
+    mcuStatus,
   };
 
   return (
