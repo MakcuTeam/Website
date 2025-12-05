@@ -11,8 +11,29 @@ import { toast } from "sonner";
  * Note: UART0 uses 0x50, UART1 uses 0x5A (0x50+0xA) to avoid misdirection
  * ═══════════════════════════════════════════════════════════════════════════ */
 const UART0_START_BYTE = 0x50;  /* UART0=0x50, UART1=0x5A */
-const UART0_CMD_WEBSITE = 0xB0;  /* Full device info (360+ bytes) */
+
+/* UART0 Binary API Commands - Individual data field commands */
 const UART0_CMD_STATUS = 0xB1;   /* Lightweight status poll (15 bytes) */
+const UART0_CMD_GET_MAC1 = 0xB2;  /* MAC1 - device side (6 bytes) */
+const UART0_CMD_GET_MAC2 = 0xB3;  /* MAC2 - USB host side (6 bytes) */
+const UART0_CMD_GET_TEMP = 0xB4;  /* Temperature (4 bytes float) */
+const UART0_CMD_GET_RAM = 0xB5;   /* Free RAM (4 bytes uint32, KB) */
+const UART0_CMD_GET_CPU = 0xB6;   /* CPU frequency (4 bytes uint32, MHz) */
+const UART0_CMD_GET_UPTIME = 0xB7; /* Uptime (4 bytes uint32, seconds) */
+const UART0_CMD_GET_VID = 0xB8;    /* VID (2 bytes uint16) */
+const UART0_CMD_GET_PID = 0xB9;    /* PID (2 bytes uint16) */
+const UART0_CMD_GET_MOUSE_BINT = 0xBA; /* Mouse bInterval (1 byte) */
+const UART0_CMD_GET_KBD_BINT = 0xBB;   /* Keyboard bInterval (1 byte) */
+const UART0_CMD_GET_FW_VERSION = 0xBC;  /* FW version string (variable length) */
+const UART0_CMD_GET_MAKCU_VERSION = 0xBD; /* MAKCU version string (variable length) */
+const UART0_CMD_GET_VENDOR = 0xBE;       /* Vendor string (variable length) */
+const UART0_CMD_GET_MODEL = 0xBF;        /* Model string (variable length) */
+const UART0_CMD_GET_ORIG_SERIAL = 0xC0;  /* Original serial (variable length) */
+const UART0_CMD_GET_SPOOF_SERIAL = 0xC1; /* Spoofed serial (variable length) */
+const UART0_CMD_GET_SPOOF_ACTIVE = 0xC2; /* Spoof active flag (1 byte) */
+const UART0_CMD_GET_SCREEN_W = 0xC3;     /* Screen width (2 bytes int16) */
+const UART0_CMD_GET_SCREEN_H = 0xC4;     /* Screen height (2 bytes int16) */
+const UART0_CMD_GET_FAULT = 0xC5;        /* Fault data (parse_fault_t structure) */
 
 // CRC16-CCITT lookup table for faster calculation
 const CRC16_TABLE = (() => {
@@ -100,6 +121,210 @@ function parseBinaryFrame(data: Uint8Array): { cmd: number; payload: Uint8Array 
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
+ * API Command Parser Registry - Extensible System
+ * ─────────────────────────────────────────────────────────────────────────────
+ * This system allows routing any API command to its parser function.
+ * To add new commands:
+ * 1. Add command constant (e.g., UART0_CMD_GET_XXX = 0xXX)
+ * 2. Create parser function: parseCmdXXX(payload: Uint8Array): any
+ * 3. Register in commandParserRegistry below
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+type CommandParser = (payload: Uint8Array) => any;
+
+const commandParserRegistry: Map<number, CommandParser> = new Map();
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * Individual Command Parsers
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+function parseCmdMAC1(payload: Uint8Array): { MAC1: string } | null {
+  if (payload.length !== 6) return null;
+  const mac = Array.from(payload)
+    .map(b => b.toString(16).padStart(2, '0').toUpperCase())
+    .join(':');
+  return { MAC1: mac };
+}
+
+function parseCmdMAC2(payload: Uint8Array): { MAC2: string } | null {
+  if (payload.length !== 6) return null;
+  const mac = Array.from(payload)
+    .map(b => b.toString(16).padStart(2, '0').toUpperCase())
+    .join(':');
+  return { MAC2: mac };
+}
+
+function parseCmdTemp(payload: Uint8Array): { TEMP: string } | null {
+  if (payload.length !== 4) return null;
+  const view = new DataView(payload.buffer, payload.byteOffset, 4);
+  const temp = view.getFloat32(0, true); // little-endian
+  return { TEMP: temp >= 0 ? `${temp.toFixed(1)}c` : "na" };
+}
+
+function parseCmdRAM(payload: Uint8Array): { RAM: number } | null {
+  if (payload.length !== 4) return null;
+  const view = new DataView(payload.buffer, payload.byteOffset, 4);
+  const ram = view.getUint32(0, true); // little-endian
+  return { RAM: ram };
+}
+
+function parseCmdCPU(payload: Uint8Array): { CPU: string } | null {
+  if (payload.length !== 4) return null;
+  const view = new DataView(payload.buffer, payload.byteOffset, 4);
+  const cpu = view.getUint32(0, true); // little-endian
+  return { CPU: `${cpu}mhz` };
+}
+
+function parseCmdUptime(payload: Uint8Array): { UPTIME: number } | null {
+  if (payload.length !== 4) return null;
+  const view = new DataView(payload.buffer, payload.byteOffset, 4);
+  const uptime = view.getUint32(0, true); // little-endian
+  return { UPTIME: uptime };
+}
+
+function parseCmdVID(payload: Uint8Array): { VID: string } | null {
+  if (payload.length !== 2) return null;
+  const view = new DataView(payload.buffer, payload.byteOffset, 2);
+  const vid = view.getUint16(0, true); // little-endian
+  return { VID: vid.toString(16).toUpperCase().padStart(4, '0') };
+}
+
+function parseCmdPID(payload: Uint8Array): { PID: string } | null {
+  if (payload.length !== 2) return null;
+  const view = new DataView(payload.buffer, payload.byteOffset, 2);
+  const pid = view.getUint16(0, true); // little-endian
+  return { PID: pid.toString(16).toUpperCase().padStart(4, '0') };
+}
+
+function parseCmdMouseBint(payload: Uint8Array): { MOUSE_BINT: string } | null {
+  if (payload.length !== 1) return null;
+  return { MOUSE_BINT: payload[0].toString() };
+}
+
+function parseCmdKbdBint(payload: Uint8Array): { KBD_BINT: string } | null {
+  if (payload.length !== 1) return null;
+  return { KBD_BINT: payload[0].toString() };
+}
+
+function parseCmdString(payload: Uint8Array): string {
+  if (payload.length === 0) return "";
+  const decoder = new TextDecoder();
+  return decoder.decode(payload);
+}
+
+function parseCmdFWVersion(payload: Uint8Array): { FW: string } | null {
+  const str = parseCmdString(payload);
+  return str ? { FW: str } : null;
+}
+
+function parseCmdMakcuVersion(payload: Uint8Array): { MAKCU: string } | null {
+  const str = parseCmdString(payload);
+  return str ? { MAKCU: str } : null;
+}
+
+function parseCmdVendor(payload: Uint8Array): { VENDOR?: string } | null {
+  const str = parseCmdString(payload);
+  return str ? { VENDOR: str } : {};
+}
+
+function parseCmdModel(payload: Uint8Array): { MODEL?: string } | null {
+  const str = parseCmdString(payload);
+  return str ? { MODEL: str } : {};
+}
+
+function parseCmdOrigSerial(payload: Uint8Array): { ORIGINAL_SERIAL?: string } | null {
+  const str = parseCmdString(payload);
+  return str ? { ORIGINAL_SERIAL: str } : {};
+}
+
+function parseCmdSpoofSerial(payload: Uint8Array): { SPOOFED_SERIAL?: string } | null {
+  const str = parseCmdString(payload);
+  return str ? { SPOOFED_SERIAL: str } : {};
+}
+
+function parseCmdSpoofActive(payload: Uint8Array): { SPOOF_ACTIVE: boolean } | null {
+  if (payload.length !== 1) return null;
+  return { SPOOF_ACTIVE: payload[0] === 1 };
+}
+
+function parseCmdScreenW(payload: Uint8Array): { SCREEN_W: number } | null {
+  if (payload.length !== 2) return null;
+  const view = new DataView(payload.buffer, payload.byteOffset, 2);
+  const w = view.getInt16(0, true); // little-endian
+  return { SCREEN_W: w };
+}
+
+function parseCmdScreenH(payload: Uint8Array): { SCREEN_H: number } | null {
+  if (payload.length !== 2) return null;
+  const view = new DataView(payload.buffer, payload.byteOffset, 2);
+  const h = view.getInt16(0, true); // little-endian
+  return { SCREEN_H: h };
+}
+
+function parseCmdFault(payload: Uint8Array): { FAULT?: any } | null {
+  // Fault structure parsing - can be extended later
+  return payload.length > 0 ? { FAULT: payload } : {};
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * Register All Command Parsers
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+function registerCommandParsers(): void {
+  commandParserRegistry.set(UART0_CMD_GET_MAC1, parseCmdMAC1);
+  commandParserRegistry.set(UART0_CMD_GET_MAC2, parseCmdMAC2);
+  commandParserRegistry.set(UART0_CMD_GET_TEMP, parseCmdTemp);
+  commandParserRegistry.set(UART0_CMD_GET_RAM, parseCmdRAM);
+  commandParserRegistry.set(UART0_CMD_GET_CPU, parseCmdCPU);
+  commandParserRegistry.set(UART0_CMD_GET_UPTIME, parseCmdUptime);
+  commandParserRegistry.set(UART0_CMD_GET_VID, parseCmdVID);
+  commandParserRegistry.set(UART0_CMD_GET_PID, parseCmdPID);
+  commandParserRegistry.set(UART0_CMD_GET_MOUSE_BINT, parseCmdMouseBint);
+  commandParserRegistry.set(UART0_CMD_GET_KBD_BINT, parseCmdKbdBint);
+  commandParserRegistry.set(UART0_CMD_GET_FW_VERSION, parseCmdFWVersion);
+  commandParserRegistry.set(UART0_CMD_GET_MAKCU_VERSION, parseCmdMakcuVersion);
+  commandParserRegistry.set(UART0_CMD_GET_VENDOR, parseCmdVendor);
+  commandParserRegistry.set(UART0_CMD_GET_MODEL, parseCmdModel);
+  commandParserRegistry.set(UART0_CMD_GET_ORIG_SERIAL, parseCmdOrigSerial);
+  commandParserRegistry.set(UART0_CMD_GET_SPOOF_SERIAL, parseCmdSpoofSerial);
+  commandParserRegistry.set(UART0_CMD_GET_SPOOF_ACTIVE, parseCmdSpoofActive);
+  commandParserRegistry.set(UART0_CMD_GET_SCREEN_W, parseCmdScreenW);
+  commandParserRegistry.set(UART0_CMD_GET_SCREEN_H, parseCmdScreenH);
+  commandParserRegistry.set(UART0_CMD_GET_FAULT, parseCmdFault);
+}
+
+// Initialize parser registry on module load
+registerCommandParsers();
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * API Command Router - Routes commands to their parsers
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+function routeApiCommand(cmd: number, payload: Uint8Array): any | null {
+  const parser = commandParserRegistry.get(cmd);
+  if (!parser) {
+    console.warn(`[API ROUTER] No parser registered for command 0x${cmd.toString(16).toUpperCase()}`);
+    return null;
+  }
+  
+  try {
+    return parser(payload);
+  } catch (error) {
+    console.error(`[API ROUTER] Error parsing command 0x${cmd.toString(16).toUpperCase()}:`, error);
+    return null;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * Register New Command Parser - Extensibility API
+ * Call this to add support for new API commands
+ * ═══════════════════════════════════════════════════════════════════════════ */
+export function registerApiCommandParser(cmd: number, parser: CommandParser): void {
+  commandParserRegistry.set(cmd, parser);
+  console.log(`[API ROUTER] Registered parser for command 0x${cmd.toString(16).toUpperCase()}`);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
  * Device Info Storage Strategy
  * ─────────────────────────────────────────────────────────────────────────────
  * STATIC data (cookie):   VID, PID, VENDOR, MODEL, SERIAL, MAC, TEMP, CPU, 
@@ -122,188 +347,28 @@ function setCookie(name: string, value: string, hours: number): void {
   document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/`;
 }
 
-function parseAndStoreDeviceInfoBinary(data: Uint8Array): void {
-  // Try to decode readable strings from the data
-  const decoder = new TextDecoder();
-  let searchPos = 0;
-  const foundStrings: string[] = [];
-  while (searchPos < data.length - 1) {
-    // Look for null-terminated strings (printable ASCII)
-    if (data[searchPos] >= 0x20 && data[searchPos] < 0x7F) {
-      let strStart = searchPos;
-      let strEnd = searchPos;
-      while (strEnd < data.length && data[strEnd] >= 0x20 && data[strEnd] < 0x7F) {
-        strEnd++;
-      }
-      if (strEnd < data.length && data[strEnd] === 0x00 && strEnd - strStart >= 2) {
-        const str = decoder.decode(data.slice(strStart, strEnd));
-        foundStrings.push(`[${strStart}-${strEnd}]: "${str}"`);
-        searchPos = strEnd + 1;
-      } else {
-        searchPos++;
-      }
-    } else {
-      searchPos++;
-    }
-  }
-  
-  if (data.length < 1) {
-    setCookie(DEVICE_INFO_COOKIE, "", 0);
-    return;
-  }
-
-  let pos = 0;
-  const header = data[pos++];
-  
-  // Header: 0x00 = no device, 0x01 = has device
-  if (header === 0x00) {
-    setCookie(DEVICE_INFO_COOKIE, "", 0);
-    return;
-  }
-
-  // New format: 360 bytes (1 header + 6 MAC1 + 6 MAC2 + 4 TEMP + 4 RAM + 4 CPU + 4 UP + 2 VID + 2 PID + 1 MOUSE_BINT + 1 KBD_BINT + 32 FW + 32 MAKCU + 64 VENDOR + 64 MODEL + 64 ORIGINAL_SERIAL + 64 SPOOFED_SERIAL + 1 SPOOF_ACTIVE + 2 SCREEN_W + 2 SCREEN_H)
-  const NEW_FORMAT_SIZE = 360;
-  
-  if (header !== 0x01 || data.length < NEW_FORMAT_SIZE) {
-    // Invalid or incomplete response
-    setCookie(DEVICE_INFO_COOKIE, "", 0);
-    return;
-  }
+/* ═══════════════════════════════════════════════════════════════════════════
+ * Build Device Info from Individual Command Responses
+ * Uses the command router to parse each response
+ * ═══════════════════════════════════════════════════════════════════════════ */
+function buildAndStoreDeviceInfo(commandResponses: Map<number, Uint8Array>): void {
   const deviceInfo: Record<string, any> = {};
 
-  // MAC1 (6 bytes)
-  const mac1Bytes = data.slice(pos, pos + 6);
-  const mac1 = Array.from(mac1Bytes)
-    .map(b => b.toString(16).padStart(2, '0').toUpperCase())
-    .join(':');
-  deviceInfo.MAC1 = mac1;
-  pos += 6;
-
-  // MAC2 (6 bytes)
-  const mac2Bytes = data.slice(pos, pos + 6);
-  const mac2 = Array.from(mac2Bytes)
-    .map(b => b.toString(16).padStart(2, '0').toUpperCase())
-    .join(':');
-  deviceInfo.MAC2 = mac2;
-  pos += 6;
-
-  // TEMP (float, 4 bytes)
-  const tempView = new DataView(data.buffer, data.byteOffset + pos, 4);
-  const temp = tempView.getFloat32(0, true); // little-endian
-  if (temp >= 0) {
-    deviceInfo.TEMP = `${temp.toFixed(1)}c`;
-  } else {
-    deviceInfo.TEMP = "na";
-  }
-  pos += 4;
-
-  // RAM (uint32_t, 4 bytes) - SKIP: Use mcuStatus.freeRamKb from STATUS poll instead
-  pos += 4;
-
-  // CPU (uint32_t, 4 bytes)
-  const cpuView = new DataView(data.buffer, data.byteOffset + pos, 4);
-  const cpu = cpuView.getUint32(0, true); // little-endian
-  deviceInfo.CPU = `${cpu}mhz`;
-  pos += 4;
-
-  // Uptime (uint32_t, 4 bytes) - SKIP: Use mcuStatus.uptime from STATUS poll instead
-  pos += 4;
-
-  // VID (uint16_t, 2 bytes)
-  const vidView = new DataView(data.buffer, data.byteOffset + pos, 2);
-  const vid = vidView.getUint16(0, true); // little-endian
-  deviceInfo.VID = vid.toString(16).toUpperCase().padStart(4, '0');
-  pos += 2;
-
-  // PID (uint16_t, 2 bytes)
-  const pidView = new DataView(data.buffer, data.byteOffset + pos, 2);
-  const pid = pidView.getUint16(0, true); // little-endian
-  deviceInfo.PID = pid.toString(16).toUpperCase().padStart(4, '0');
-  pos += 2;
-
-  // MOUSE_BINT (uint8_t, 1 byte)
-  deviceInfo.MOUSE_BINT = data[pos++].toString();
-
-  // KBD_BINT (uint8_t, 1 byte)
-  deviceInfo.KBD_BINT = data[pos++].toString();
-
-  // FW version string (null-terminated, max 32 bytes)
-  const fwEnd = data.indexOf(0, pos);
-  if (fwEnd >= pos) {
-    deviceInfo.FW = new TextDecoder().decode(data.slice(pos, fwEnd));
-  }
-  pos += 32;
-
-  // MAKCU version string (null-terminated, max 32 bytes)
-  const makcuEnd = data.indexOf(0, pos);
-  if (makcuEnd >= pos) {
-    deviceInfo.MAKCU = new TextDecoder().decode(data.slice(pos, makcuEnd));
-  }
-  pos += 32;
-
-  // VENDOR string (null-terminated, max 64 bytes)
-  const vendorEnd = data.indexOf(0, pos);
-  if (vendorEnd >= pos) {
-    const vendor = new TextDecoder().decode(data.slice(pos, vendorEnd));
-    if (vendor) deviceInfo.VENDOR = vendor;
-  }
-  pos += 64;
-
-  // MODEL string (null-terminated, max 64 bytes)
-  const modelEnd = data.indexOf(0, pos);
-  if (modelEnd >= pos) {
-    const model = new TextDecoder().decode(data.slice(pos, modelEnd));
-    if (model) deviceInfo.MODEL = model;
-  }
-  pos += 64;
-
-  // ORIGINAL_SERIAL string (null-terminated, max 64 bytes)
-  const origSerialEnd = data.indexOf(0, pos);
-  if (origSerialEnd >= pos) {
-    const origSerial = new TextDecoder().decode(data.slice(pos, origSerialEnd));
-    if (origSerial) deviceInfo.ORIGINAL_SERIAL = origSerial;
-  }
-  pos += 64;
-
-  // SPOOFED_SERIAL string (null-terminated, max 64 bytes)
-  const spoofSerialEnd = data.indexOf(0, pos);
-  if (spoofSerialEnd >= pos) {
-    const spoofSerial = new TextDecoder().decode(data.slice(pos, spoofSerialEnd));
-    if (spoofSerial) deviceInfo.SPOOFED_SERIAL = spoofSerial;
-  }
-  pos += 64;
-
-  // SPOOF_ACTIVE flag (1 byte: 0=not spoofed, 1=spoofed)
-  if (pos < data.length) {
-    const spoofActive = data[pos++];
-    deviceInfo.SPOOF_ACTIVE = spoofActive === 1;
-  } else {
-    deviceInfo.SPOOF_ACTIVE = false;
+  // Process each command response using the router
+  for (const [cmd, payload] of commandResponses.entries()) {
+    const parsed = routeApiCommand(cmd, payload);
+    if (parsed) {
+      Object.assign(deviceInfo, parsed);
+    }
   }
 
-  // SCREEN_W (int16_t, 2 bytes, little-endian)
-  let screenW = 0;
-  if (pos + 1 < data.length) {
-    const screenWView = new DataView(data.buffer, data.byteOffset + pos, 2);
-    screenW = screenWView.getInt16(0, true); // little-endian
-    pos += 2;
-  } else {
-    pos += 2;
-  }
-
-  // SCREEN_H (int16_t, 2 bytes, little-endian)
-  let screenH = 0;
-  if (pos + 1 < data.length) {
-    const screenHView = new DataView(data.buffer, data.byteOffset + pos, 2);
-    screenH = screenHView.getInt16(0, true); // little-endian
-    pos += 2;
-  } else {
-    pos += 2;
-  }
-
-  // Combine screen dimensions into a single field
-  if (screenW > 0 && screenH > 0) {
-    deviceInfo.SCREEN_SIZE = `${screenW}x${screenH}`;
+  // Handle screen dimensions combination
+  if (deviceInfo.SCREEN_W && deviceInfo.SCREEN_H) {
+    const w = typeof deviceInfo.SCREEN_W === 'number' ? deviceInfo.SCREEN_W : 0;
+    const h = typeof deviceInfo.SCREEN_H === 'number' ? deviceInfo.SCREEN_H : 0;
+    if (w > 0 && h > 0) {
+      deviceInfo.SCREEN_SIZE = `${w}x${h}`;
+    }
   }
 
   // Store in cookie as JSON (only if we have vendor or model)
@@ -1355,8 +1420,8 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
     };
   }, [state.status, state.port, performDisconnect]);
 
-  // Fetch full device info - called when device attaches or manually requested
-  // Uses shared continuous reader (readerRef.current) - no lock conflicts
+  // Fetch full device info - fetches each field individually using new API commands
+  // Routes all commands through the extensible command router system
   const fetchFullDeviceInfo = useCallback(async (): Promise<boolean> => {
     const currentState = stateRef.current;
     if (currentState.status !== "connected" || currentState.mode !== "normal" || !currentState.port) {
@@ -1364,87 +1429,70 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
       return false;
     }
 
-    console.log("[FETCH DEVICE INFO] Fetching full device info...");
+    console.log("[FETCH DEVICE INFO] Fetching full device info using individual commands...");
     
-    try {
-      const baudRate = currentState.detectedBaudRate ?? 115200;
-      const timeout = calculateTimeout(baudRate, 2566, 10, false); // Full website response
-      
-      let pendingRequest: { resolve: (data: Uint8Array | null) => void; timeout: NodeJS.Timeout | null } | null = null;
+    // List of all commands to fetch - easily extensible for future commands
+    const commandsToFetch: number[] = [
+      UART0_CMD_GET_MAC1,
+      UART0_CMD_GET_MAC2,
+      UART0_CMD_GET_TEMP,
+      UART0_CMD_GET_CPU,
+      UART0_CMD_GET_VID,
+      UART0_CMD_GET_PID,
+      UART0_CMD_GET_MOUSE_BINT,
+      UART0_CMD_GET_KBD_BINT,
+      UART0_CMD_GET_FW_VERSION,
+      UART0_CMD_GET_MAKCU_VERSION,
+      UART0_CMD_GET_VENDOR,
+      UART0_CMD_GET_MODEL,
+      UART0_CMD_GET_ORIG_SERIAL,
+      UART0_CMD_GET_SPOOF_SERIAL,
+      UART0_CMD_GET_SPOOF_ACTIVE,
+      UART0_CMD_GET_SCREEN_W,
+      UART0_CMD_GET_SCREEN_H,
+      // UART0_CMD_GET_FAULT - optional, only fetch if needed
+    ];
 
-      // Subscribe to binary frames - wait for WEBSITE response
-      const deviceInfoCallback: BinaryFrameSubscriber = (frameData: Uint8Array) => {
-        if (!pendingRequest) return;
-        
-        const parsed = parseBinaryFrame(frameData);
-        console.log(`[FETCH DEVICE INFO CB] Received frame: cmd=0x${parsed?.cmd?.toString(16).toUpperCase() ?? 'null'}`);
-        
-        if (parsed && parsed.cmd === UART0_CMD_WEBSITE) {
-          console.log(`[FETCH DEVICE INFO CB] ✓ WEBSITE response received (${parsed.payload.length} bytes)`);
-          if (pendingRequest.timeout) clearTimeout(pendingRequest.timeout);
-          const request = pendingRequest;
-          pendingRequest = null;
-          request.resolve(parsed.payload);
-        }
-      };
+    const commandResponses = new Map<number, Uint8Array>();
+    const baudRate = currentState.detectedBaudRate ?? 115200;
 
-      // Subscribe BEFORE sending command (timing matters!)
-      binaryFrameSubscribersRef.current.add(deviceInfoCallback);
-      
-      const cleanup = () => {
-        if (pendingRequest?.timeout) clearTimeout(pendingRequest.timeout);
-        pendingRequest = null;
-        binaryFrameSubscribersRef.current.delete(deviceInfoCallback);
-      };
-
+    // Fetch each command sequentially (can be parallelized later if needed)
+    for (const cmd of commandsToFetch) {
       try {
-        // Set up pending request and timeout
-        const responsePromise = new Promise<Uint8Array | null>((resolve) => {
-          const timeoutId = setTimeout(() => {
-            if (pendingRequest) {
-              pendingRequest = null;
-            }
-            resolve(null);
-          }, timeout);
-
-          pendingRequest = { resolve, timeout: timeoutId };
-        });
-
-        // NOW send the command (after subscription is active)
-        const frame = buildBinaryFrame(UART0_CMD_WEBSITE, null);
-        const writer = currentState.port.writable?.getWriter();
-        if (!writer) {
-          console.log("[FETCH DEVICE INFO] Port not writable");
-          cleanup();
-          return false;
+        // Calculate timeout based on expected payload size
+        let expectedSize = 64; // Default for variable-length strings
+        if (cmd === UART0_CMD_GET_MAC1 || cmd === UART0_CMD_GET_MAC2) expectedSize = 6;
+        else if (cmd === UART0_CMD_GET_TEMP || cmd === UART0_CMD_GET_CPU) expectedSize = 4;
+        else if (cmd === UART0_CMD_GET_VID || cmd === UART0_CMD_GET_PID || 
+                 cmd === UART0_CMD_GET_SCREEN_W || cmd === UART0_CMD_GET_SCREEN_H) expectedSize = 2;
+        else if (cmd === UART0_CMD_GET_MOUSE_BINT || cmd === UART0_CMD_GET_KBD_BINT ||
+                 cmd === UART0_CMD_GET_SPOOF_ACTIVE) expectedSize = 1;
+        
+        const timeout = calculateTimeout(baudRate, expectedSize + 6, 10, false);
+        const response = await sendBinaryCommand(cmd, undefined, timeout);
+        
+        if (response) {
+          commandResponses.set(cmd, response);
+          console.log(`[FETCH DEVICE INFO] ✓ Command 0x${cmd.toString(16).toUpperCase()} received (${response.length} bytes)`);
+        } else {
+          console.warn(`[FETCH DEVICE INFO] ✗ Command 0x${cmd.toString(16).toUpperCase()} failed or timed out`);
         }
-        await writer.write(frame);
-        writer.releaseLock();
-
-        // Wait for response
-        const response = await responsePromise;
-
-        if (response && response.length >= 1) {
-          parseAndStoreDeviceInfoBinary(response);
-          deviceInfoFetchedRef.current = true;
-          console.log("[FETCH DEVICE INFO] Successfully fetched and stored device info");
-          cleanup();
-          return true;
-        }
-
-        console.warn("[FETCH DEVICE INFO] No valid response received");
-        cleanup();
-        return false;
-      } catch (e) {
-        console.error("[FETCH DEVICE INFO] Error waiting for response:", e);
-        cleanup();
-        return false;
+      } catch (error) {
+        console.error(`[FETCH DEVICE INFO] Error fetching command 0x${cmd.toString(16).toUpperCase()}:`, error);
       }
-    } catch (error) {
-      console.error("[FETCH DEVICE INFO] Error:", error);
-      return false;
     }
-  }, []);
+
+    // Build device info from all collected responses using the router
+    if (commandResponses.size > 0) {
+      buildAndStoreDeviceInfo(commandResponses);
+      deviceInfoFetchedRef.current = true;
+      console.log(`[FETCH DEVICE INFO] Successfully fetched ${commandResponses.size}/${commandsToFetch.length} commands and stored device info`);
+      return true;
+    }
+
+    console.warn("[FETCH DEVICE INFO] No valid responses received");
+    return false;
+  }, [sendBinaryCommand]);
 
   // Subscribe to binary frames only (0x50 frames)
   const subscribeToBinaryFrames = useCallback((callback: BinaryFrameSubscriber) => {
@@ -1814,8 +1862,8 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
   // 4. Continuous reader broadcasts all data, but each consumer filters what it needs
   //
   // Usage example:
-  //   const response = await sendBinaryCommand(UART0_CMD_WEBSITE);
-  //   if (response) { /* parse website binary data */ }
+  //   const response = await sendBinaryCommand(UART0_CMD_GET_MAC1);
+  //   if (response) { /* parse response using routeApiCommand() */ }
   const sendBinaryCommand = useCallback(async (
     cmd: number, 
     payload?: Uint8Array, 
