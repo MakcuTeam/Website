@@ -538,6 +538,7 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
   const textLogSubscribersRef = useRef<Set<TextLogSubscriber>>(new Set());  // Only non-0x50 data
   const deviceInfoFetchedRef = useRef<boolean>(false);  // Track if we've fetched full device info
   const lastDeviceAttachedRef = useRef<boolean>(false); // Track device attached state for change detection
+  const binaryFrameBufferRef = useRef<Uint8Array>(new Uint8Array(0)); // Buffer for reconstructing split binary frames
 
   // Keep stateRef in sync with state
   useEffect(() => {
@@ -587,6 +588,7 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
       }
       writerRef.current = null;
     }
+    binaryFrameBufferRef.current = new Uint8Array(0); // Clear frame buffer on cleanup
   }, []);
 
   // Calculate timeout based on 8N1 symbol periods (like firmware UART hardware timeout)
@@ -1163,40 +1165,132 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
                 console.log(`[CONTINUOUS READER] RX: Binary data (not text)`);
               }
 
-              // Check if this is a binary frame (0x50 start byte)
-              const isBinaryFrame = value.length >= 1 && value[0] === UART0_START_BYTE && 
-                                    value.length >= 4 && 
-                                    (value[2] | (value[3] << 8)) <= 65535; // Valid payload length
-
-              // Route to appropriate subscribers based on data type
-              if (isBinaryFrame) {
-                // Binary frame (0x50) - route to binary frame subscribers
-                binaryFrameSubscribersRef.current.forEach((callback: BinaryFrameSubscriber) => {
-                  try {
-                    callback(value);
-                  } catch (e) {
-                    console.error("[CONTINUOUS READER] Binary frame subscriber error:", e);
+              // Combine with buffer to handle split frames
+              const combined = new Uint8Array(binaryFrameBufferRef.current.length + value.length);
+              combined.set(binaryFrameBufferRef.current, 0);
+              combined.set(value, binaryFrameBufferRef.current.length);
+              
+              let processedPos = 0;
+              
+              // Process data sequentially from start (don't search randomly for 0x50)
+              while (processedPos < combined.length) {
+                // Check if current position starts with 0x50 (binary frame start)
+                if (combined[processedPos] === UART0_START_BYTE) {
+                  // Might be a binary frame - need at least 6 bytes (START + CMD + LEN(2) + CRC(2))
+                  if (processedPos + 6 > combined.length) {
+                    // Not enough data for header - buffer and wait
+                    binaryFrameBufferRef.current = combined.slice(processedPos);
+                    processedPos = combined.length;
+                    break;
                   }
-                });
-              } else {
-                // Text/log data (non-0x50) - route to text log subscribers
-                textLogSubscribersRef.current.forEach((callback: TextLogSubscriber) => {
-                  try {
-                    callback(value);
-                  } catch (e) {
-                    console.error("[CONTINUOUS READER] Text log subscriber error:", e);
+                  
+                  // Read frame length from header
+                  const payloadLen = combined[processedPos + 2] | (combined[processedPos + 3] << 8);
+                  const totalFrameLen = 6 + payloadLen;
+                  
+                  // Sanity check payload length (max 64KB)
+                  if (payloadLen > 65535) {
+                    // Invalid length - this isn't a binary frame, treat as text
+                    // Find next 0x50 or end of buffer
+                    let nextFramePos = processedPos + 1;
+                    while (nextFramePos < combined.length && combined[nextFramePos] !== UART0_START_BYTE) {
+                      nextFramePos++;
+                    }
+                    
+                    // Send this chunk as text
+                    const textData = combined.slice(processedPos, nextFramePos);
+                    textLogSubscribersRef.current.forEach((callback: TextLogSubscriber) => {
+                      try {
+                        callback(textData);
+                      } catch (e) {
+                        console.error("[CONTINUOUS READER] Text log subscriber error:", e);
+                      }
+                    });
+                    // Legacy
+                    serialDataSubscribersRef.current.forEach((callback: SerialDataCallback) => {
+                      try {
+                        callback(textData, false);
+                      } catch (e) {
+                        console.error("[CONTINUOUS READER] Legacy subscriber error:", e);
+                      }
+                    });
+                    
+                    processedPos = nextFramePos;
+                    continue;
                   }
-                });
-              }
-
-              // Legacy: Broadcast to all subscribers (for backward compatibility)
-              serialDataSubscribersRef.current.forEach((callback: SerialDataCallback) => {
-                try {
-                  callback(value, isBinaryFrame);
-                } catch (e) {
-                  console.error("[CONTINUOUS READER] Legacy subscriber error:", e);
+                  
+                  // Check if we have complete frame
+                  if (processedPos + totalFrameLen > combined.length) {
+                    // Incomplete frame - buffer and wait for more data
+                    binaryFrameBufferRef.current = combined.slice(processedPos);
+                    processedPos = combined.length;
+                    break;
+                  }
+                  
+                  // We have complete frame - extract and verify CRC
+                  const frame = combined.slice(processedPos, processedPos + totalFrameLen);
+                  const parsed = parseBinaryFrame(frame);
+                  
+                  if (parsed) {
+                    // Valid binary frame (CRC good) - send to binary subscribers
+                    binaryFrameSubscribersRef.current.forEach((callback: BinaryFrameSubscriber) => {
+                      try {
+                        callback(frame);
+                      } catch (e) {
+                        console.error("[CONTINUOUS READER] Binary frame subscriber error:", e);
+                      }
+                    });
+                    // Legacy
+                    serialDataSubscribersRef.current.forEach((callback: SerialDataCallback) => {
+                      try {
+                        callback(frame, true);
+                      } catch (e) {
+                        console.error("[CONTINUOUS READER] Legacy subscriber error:", e);
+                      }
+                    });
+                    
+                    processedPos += totalFrameLen;
+                  } else {
+                    // CRC mismatch - invalid frame, flush it (skip entire frame)
+                    // This could be corruption, wrong baud rate, or false 0x50 detection
+                    console.warn(`[CONTINUOUS READER] CRC mismatch - flushing invalid frame (${totalFrameLen} bytes)`);
+                    processedPos += totalFrameLen; // Skip entire invalid frame
+                    // Don't send to subscribers - just discard and continue
+                  }
+                } else {
+                  // Not a binary frame start (not 0x50) - this is text/log data
+                  // Find next 0x50 or end of buffer
+                  let nextFramePos = processedPos + 1;
+                  while (nextFramePos < combined.length && combined[nextFramePos] !== UART0_START_BYTE) {
+                    nextFramePos++;
+                  }
+                  
+                  // Send this chunk as text
+                  const textData = combined.slice(processedPos, nextFramePos);
+                  textLogSubscribersRef.current.forEach((callback: TextLogSubscriber) => {
+                    try {
+                      callback(textData);
+                    } catch (e) {
+                      console.error("[CONTINUOUS READER] Text log subscriber error:", e);
+                    }
+                  });
+                  // Legacy
+                  serialDataSubscribersRef.current.forEach((callback: SerialDataCallback) => {
+                    try {
+                      callback(textData, false);
+                    } catch (e) {
+                      console.error("[CONTINUOUS READER] Legacy subscriber error:", e);
+                    }
+                  });
+                  
+                  processedPos = nextFramePos;
                 }
-              });
+              }
+              
+              // Clear buffer if we processed everything
+              if (processedPos >= combined.length) {
+                binaryFrameBufferRef.current = new Uint8Array(0);
+              }
             }
           } catch (error) {
             console.error("[CONTINUOUS READER] Read error:", error);
