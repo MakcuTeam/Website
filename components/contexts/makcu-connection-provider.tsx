@@ -1,5 +1,8 @@
 "use client";
 
+// FORCE ERROR FOR VERCEL DEBUG - REMOVE THIS LINE
+const FORCE_ERROR = this.will.cause.a.build.error;
+
 import React, { createContext, useContext, useState, useRef, useEffect, useCallback } from "react";
 import { ESPLoader, LoaderOptions, Transport } from "esptool-js";
 import { serial } from "web-serial-polyfill";
