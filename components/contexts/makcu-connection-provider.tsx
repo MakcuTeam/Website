@@ -829,15 +829,23 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
         return;
       }
 
-      // Both normal mode (500ms timeout) and flash mode failed
-      // Set status to fault
+      // Both normal mode and flash mode failed - set status to fault
+      await cleanup();
       try {
         await selectedPort.close();
       } catch (e) {
         // Ignore close errors
       }
-      setState((prev) => ({ ...prev, status: "fault", mode: null, port: null, detectedBaudRate: null }));
-      toast.error("Connection failed - device not responding");
+      setState((prev) => ({ 
+        ...prev, 
+        status: "fault", 
+        mode: null, 
+        port: null, 
+        transport: null,
+        loader: null,
+        detectedBaudRate: null 
+      }));
+      toast.error("Connection failed - device not responding. Check USB connections and try again.");
 
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
