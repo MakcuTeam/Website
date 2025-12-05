@@ -1166,11 +1166,16 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
               }
 
               // Combine with buffer to handle split frames
-              const combined = new Uint8Array(binaryFrameBufferRef.current.length + value.length);
-              combined.set(binaryFrameBufferRef.current, 0);
-              combined.set(value, binaryFrameBufferRef.current.length);
+              const currentBuffer = binaryFrameBufferRef.current;
+              const combined = new Uint8Array(currentBuffer.length + value.length);
+              combined.set(currentBuffer, 0);
+              combined.set(value, currentBuffer.length);
+              
+              // Clear buffer at start - we'll re-add incomplete frames at the end
+              binaryFrameBufferRef.current = new Uint8Array(0);
               
               let processedPos = 0;
+              let hasIncompleteFrame = false;
               
               // Process data sequentially from start (don't search randomly for 0x50)
               while (processedPos < combined.length) {
@@ -1180,7 +1185,7 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
                   if (processedPos + 6 > combined.length) {
                     // Not enough data for header - buffer and wait
                     binaryFrameBufferRef.current = combined.slice(processedPos);
-                    processedPos = combined.length;
+                    hasIncompleteFrame = true;
                     break;
                   }
                   
@@ -1223,7 +1228,7 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
                   if (processedPos + totalFrameLen > combined.length) {
                     // Incomplete frame - buffer and wait for more data
                     binaryFrameBufferRef.current = combined.slice(processedPos);
-                    processedPos = combined.length;
+                    hasIncompleteFrame = true;
                     break;
                   }
                   
@@ -1253,7 +1258,7 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
                   } else {
                     // CRC mismatch - invalid frame, flush it (skip entire frame)
                     // This could be corruption, wrong baud rate, or false 0x50 detection
-                    console.warn(`[CONTINUOUS READER] CRC mismatch - flushing invalid frame (${totalFrameLen} bytes)`);
+                    console.warn(`[CONTINUOUS READER] CRC mismatch - flushing invalid frame (${totalFrameLen} bytes) at pos ${processedPos}`);
                     processedPos += totalFrameLen; // Skip entire invalid frame
                     // Don't send to subscribers - just discard and continue
                   }
@@ -1287,10 +1292,7 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
                 }
               }
               
-              // Clear buffer if we processed everything
-              if (processedPos >= combined.length) {
-                binaryFrameBufferRef.current = new Uint8Array(0);
-              }
+              // Buffer is already set if we have incomplete frame, or cleared if we processed everything
             }
           } catch (error) {
             console.error("[CONTINUOUS READER] Read error:", error);
@@ -1480,34 +1482,20 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
     let consecutiveFailures = 0;
     const MAX_FAILURES = 3;  // Go to fault after 3 consecutive failures
     
-    // Buffer to accumulate data from continuous reader
-    const statusDataBuffer: Uint8Array[] = [];
     let pendingStatusRequest: { resolve: (data: Uint8Array | null) => void; timeout: NodeJS.Timeout } | null = null;
 
     // Subscribe to binary frames only (0x50 handler)
-    const statusDataCallback: BinaryFrameSubscriber = (data: Uint8Array) => {
+    // The continuous reader already sends complete, validated frames, so we can parse directly
+    const statusDataCallback: BinaryFrameSubscriber = (frame: Uint8Array) => {
       if (!pendingStatusRequest) return; // No pending request
       
-      // Accumulate data
-      statusDataBuffer.push(data);
-      
-      // Combine all buffered data
-      const totalLength = statusDataBuffer.reduce((sum, chunk) => sum + chunk.length, 0);
-      const combined = new Uint8Array(totalLength);
-      let offset = 0;
-      for (const chunk of statusDataBuffer) {
-        combined.set(chunk, offset);
-        offset += chunk.length;
-      }
-      
-      // Look for STATUS response frame (0x50 start byte, 0xB1 command)
-      const parsed = parseBinaryFrame(combined);
+      // Parse the complete frame (already validated by continuous reader)
+      const parsed = parseBinaryFrame(frame);
       if (parsed && parsed.cmd === UART0_CMD_STATUS) {
         // Found STATUS response!
         if (pendingStatusRequest.timeout) clearTimeout(pendingStatusRequest.timeout);
         const request = pendingStatusRequest;
         pendingStatusRequest = null;
-        statusDataBuffer.length = 0; // Clear buffer
         request.resolve(parsed.payload);
       }
     };
@@ -1522,9 +1510,6 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
       }
 
       try {
-        // Clear buffer for new request
-        statusDataBuffer.length = 0;
-        
         // Send STATUS command (just write, continuous reader will handle response)
         const frame = buildBinaryFrame(UART0_CMD_STATUS, null);
         const writer = currentState.port.writable?.getWriter();
@@ -1543,7 +1528,6 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
           const timeoutId = setTimeout(() => {
             if (pendingStatusRequest) {
               pendingStatusRequest = null;
-              statusDataBuffer.length = 0;
             }
             resolve(null);
           }, timeout);
@@ -1625,7 +1609,6 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
         pendingStatusRequest.resolve(null);
         pendingStatusRequest = null;
       }
-      statusDataBuffer.length = 0;
       unsubscribe(); // Unsubscribe from continuous reader
       console.log("[STATUS POLL] Stopped status polling");
     };
