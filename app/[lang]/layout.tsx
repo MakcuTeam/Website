@@ -57,12 +57,12 @@ export default async function RootLayout({
       <body
         className={`${sansFont.variable} ${notoSerif.variable} ${monoFont.variable} ${roadRage.variable} font-basic antialiased tracking-wide relative`}
         suppressHydrationWarning
-        style={{ position: "relative", overflowX: "hidden", minHeight: "100vh" }}
+        style={{ position: "relative", overflowX: "hidden" }}
       >
         {/* Background video - fixed to viewport, does NOT scroll, behind all content (z-index: -1) */}
         <BackgroundVideo />
         {/* All scrollable content - scrolls normally while video stays fixed */}
-        <div style={{ transform: 'scale(0.9)', transformOrigin: 'top left', width: '111.11%', position: "relative", zIndex: 1 }}>
+        <div style={{ position: "relative", zIndex: 1 }}>
           <RootLayoutProvider dict={dict}>{children}</RootLayoutProvider>
         </div>
       </body>
