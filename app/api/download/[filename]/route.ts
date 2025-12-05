@@ -39,7 +39,7 @@ export async function GET(
             headers,
         });
     } catch (error) {
-        console.error(` File download error:$ {error}`);
+        console.error(`File download error: ${error}`);
         if ((error as NodeJS.ErrnoException).code === "ENOENT") {
             return new NextResponse("File does not exist ", { status: 404 });
         }
