@@ -319,7 +319,7 @@ export default async function ApiPage({ params }: LangProps) {
   const t = <T,>(en: T, cn: T): T => (isCn ? cn : en);
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col pb-0">
       <header className="flex flex-col gap-3 pt-8">
         <h1 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl text-black dark:text-white">MAKCU API</h1>
         <p className="max-w-2xl text-sm text-muted-foreground sm:text-base">
@@ -363,7 +363,7 @@ export default async function ApiPage({ params }: LangProps) {
           </Card>
         </aside>
 
-        <div className="space-y-20">
+        <div className="space-y-20 [&>*:last-child]:mb-0">
           {/* Transport */}
           <Section
             id="transport"

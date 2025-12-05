@@ -39,7 +39,7 @@ export default async function InformationPage({ params }: LangProps) {
   const t = <T,>(en: T, cn: T): T => (isCn ? cn : en);
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col pb-0">
       <header className="flex flex-col gap-3 pt-8">
         <h1 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl text-black dark:text-white">
           {dict.information.title}
@@ -57,7 +57,7 @@ export default async function InformationPage({ params }: LangProps) {
           dict={dict}
         />
 
-        <div className="space-y-20">
+        <div className="space-y-20 [&>*:last-child]:mb-0">
           {/* What is MAKCU */}
           <Section
             id="what-is-makcu"
