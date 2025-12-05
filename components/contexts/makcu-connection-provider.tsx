@@ -1989,86 +1989,68 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
 
     // Retry loop: attempt up to calculatedRetries times
     for (let attempt = 1; attempt <= calculatedRetries; attempt++) {
+      let pendingRequest: { resolve: (data: Uint8Array | null) => void; timeout: NodeJS.Timeout } | null = null;
+      let unsubscribe: (() => void) | null = null;
+
       try {
+        // Set up response listener BEFORE sending command (MCU responds fast!)
+        const responsePromise = new Promise<Uint8Array | null>((resolve) => {
+          const timeoutId = setTimeout(() => {
+            if (pendingRequest) {
+              pendingRequest = null;
+            }
+            resolve(null);
+          }, calculatedTimeout);
+          
+          pendingRequest = { resolve, timeout: timeoutId };
+        });
+
+        // Subscribe to binary frames - use same pattern as STATUS polling
+        const binaryFrameCallback: BinaryFrameSubscriber = (frame: Uint8Array) => {
+          // Parse the complete frame (already validated by continuous reader)
+          const parsed = parseBinaryFrame(frame);
+          
+          if (!pendingRequest) {
+            return; // No pending request
+          }
+          
+          if (parsed && parsed.cmd === cmd) {
+            // Found matching command response!
+            console.log(`[BINARY API CB] ✓ Command 0x${cmd.toString(16).toUpperCase()} response received (attempt ${attempt}/${calculatedRetries}), payload size: ${parsed.payload.length}`);
+            if (pendingRequest.timeout) clearTimeout(pendingRequest.timeout);
+            const request = pendingRequest;
+            pendingRequest = null;
+            request.resolve(parsed.payload);
+          }
+        };
+
+        // Subscribe BEFORE sending command
+        unsubscribe = subscribeToBinaryFrames(binaryFrameCallback);
+
         // Build and send binary frame
         const frame = buildBinaryFrame(cmd, payload || null);
-        console.log(`[BINARY API] Attempt ${attempt}/${calculatedRetries}: Sending command 0x${cmd.toString(16)}`);
+        console.log(`[BINARY API] Attempt ${attempt}/${calculatedRetries}: Sending command 0x${cmd.toString(16).toUpperCase()}`);
 
         const writer = currentState.port.writable?.getWriter();
         if (!writer) {
           console.log(`[BINARY API] Port not writable`);
+          if (pendingRequest && pendingRequest.timeout) clearTimeout(pendingRequest.timeout);
+          pendingRequest = null;
+          if (unsubscribe) unsubscribe();
           return null;
         }
 
         await writer.write(frame);
         writer.releaseLock();
 
-        // Use shared continuous reader (same pattern as sendCommandAndReadResponse)
-        const reader = readerRef.current;
-        if (!reader) {
-          console.log(`[BINARY API] No reader available`);
-          return null;
+        // Wait for response from continuous reader (via subscription)
+        const result = await responsePromise;
+        
+        // Cleanup subscription
+        if (unsubscribe) {
+          unsubscribe();
+          unsubscribe = null;
         }
-
-        // Read binary response with timeout
-        const chunks: Uint8Array[] = [];
-        let responseReceived = false;
-        let timeoutId: NodeJS.Timeout | null = null;
-
-        const timeoutPromise = new Promise<Uint8Array | null>((resolve) => {
-          timeoutId = setTimeout(() => {
-            console.log(`[BINARY API] Timeout waiting for response (${calculatedTimeout}ms, attempt ${attempt}/${calculatedRetries})`);
-            resolve(null);
-          }, calculatedTimeout);
-        });
-
-        const readPromise = (async (): Promise<Uint8Array | null> => {
-          try {
-            let readCount = 0;
-            const maxReads = 200; // Safety limit
-            
-            while (readCount < maxReads && !responseReceived) {
-              const { value, done } = await reader.read();
-              if (done) break;
-              
-              if (value) {
-                chunks.push(value);
-                
-                // Combine chunks and look for binary frame
-                const totalLength = chunks.reduce((sum, chunk) => sum + chunk.length, 0);
-                const combined = new Uint8Array(totalLength);
-                let offset = 0;
-                for (const chunk of chunks) {
-                  combined.set(chunk, offset);
-                  offset += chunk.length;
-                }
-
-                // Look for binary frame (starts with 0x50)
-                const parsed = parseBinaryFrame(combined);
-                if (parsed && parsed.cmd === cmd) {
-                  console.log(`[BINARY API] Received valid binary response (attempt ${attempt}/${calculatedRetries}), payload size: ${parsed.payload.length}`);
-                  responseReceived = true;
-                  if (timeoutId) clearTimeout(timeoutId);
-                  return parsed.payload;
-                } else if (parsed === null && chunks.length > 0) {
-                  // CRC mismatch - will retry
-                  console.warn(`[BINARY API] CRC mismatch (attempt ${attempt}/${calculatedRetries})`);
-                }
-              }
-              
-              readCount++;
-            }
-
-            return null;
-          } catch (error) {
-            console.error(`[BINARY API] Read error (attempt ${attempt}/${calculatedRetries}):`, error);
-            return null;
-          }
-        })();
-
-        const result = await Promise.race([readPromise, timeoutPromise]);
-        if (timeoutId) clearTimeout(timeoutId);
-        // DON'T release reader - it's the shared continuous reader
         
         // If we got a valid response, return it
         if (result && result instanceof Uint8Array && result.length > 0) {
@@ -2084,11 +2066,24 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
         }
       } catch (error) {
         console.error(`[BINARY API] Error on attempt ${attempt}/${calculatedRetries}:`, error);
+        
+        // Cleanup on error
+        if (pendingRequest && pendingRequest.timeout) clearTimeout(pendingRequest.timeout);
+        pendingRequest = null;
+        if (unsubscribe) {
+          unsubscribe();
+          unsubscribe = null;
+        }
+        
         if (attempt < calculatedRetries) {
           const retryDelay = calculateRetryDelay(baudRate, 5);
           await new Promise(resolve => setTimeout(resolve, retryDelay));
           continue;
         }
+      } finally {
+        // Ensure cleanup in all cases
+        if (pendingRequest && pendingRequest.timeout) clearTimeout(pendingRequest.timeout);
+        if (unsubscribe) unsubscribe();
       }
     }
     
@@ -2107,7 +2102,7 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
     toast.error("Command failed after all retries - connection fault. Please reconnect.");
     
     return null;
-  }, [cleanup]);
+  }, [cleanup, subscribeToBinaryFrames]);
 
   // Store sendBinaryCommand in ref so fetchFullDeviceInfo can access it
   useEffect(() => {
