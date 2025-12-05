@@ -694,6 +694,7 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
   const serialDataSubscribersRef = useRef<Set<SerialDataCallback>>(new Set());  // Legacy - all data
   const binaryFrameSubscribersRef = useRef<Set<BinaryFrameSubscriber>>(new Set());  // Only 0x50 frames
   const textLogSubscribersRef = useRef<Set<TextLogSubscriber>>(new Set());  // Only non-0x50 data
+  const sendBinaryCommandRef = useRef<((cmd: number, payload?: Uint8Array, timeoutMs?: number, maxRetries?: number) => Promise<Uint8Array | null>) | null>(null);
   const deviceInfoFetchedRef = useRef<boolean>(false);  // Track if we've fetched full device info
   const lastDeviceAttachedRef = useRef<boolean>(false); // Track device attached state for change detection
   const binaryFrameBufferRef = useRef<Uint8Array>(new Uint8Array(0)); // Buffer for reconstructing split binary frames
@@ -1567,7 +1568,12 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
         
         const timeout = calculateTimeout(baudRate, expectedSize + 6, 10, false);
         console.log(`[FETCH DEVICE INFO] Sending command 0x${cmd.toString(16).toUpperCase()} (expected ${expectedSize} bytes, timeout ${timeout}ms)`);
-        const response = await sendBinaryCommand(cmd, undefined, timeout);
+        const sendBinaryCmd = sendBinaryCommandRef.current;
+        if (!sendBinaryCmd) {
+          console.error("[FETCH DEVICE INFO] sendBinaryCommand not available");
+          continue;
+        }
+        const response = await sendBinaryCmd(cmd, undefined, timeout);
         
         if (response) {
           commandResponses.set(cmd, response);
@@ -1590,7 +1596,8 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
 
     console.warn("[FETCH DEVICE INFO] No valid responses received");
     return false;
-  }, [sendBinaryCommand]);
+    // sendBinaryCommand accessed via ref, no need in dependency array
+  }, []);
 
   // Subscribe to binary frames only (0x50 frames)
   const subscribeToBinaryFrames = useCallback((callback: BinaryFrameSubscriber) => {
@@ -2101,6 +2108,11 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
     
     return null;
   }, [cleanup]);
+
+  // Store sendBinaryCommand in ref so fetchFullDeviceInfo can access it
+  useEffect(() => {
+    sendBinaryCommandRef.current = sendBinaryCommand;
+  }, [sendBinaryCommand]);
 
   // Subscribe to serial data (legacy - receives all data)
   const subscribeToSerialData = useCallback((callback: SerialDataCallback) => {

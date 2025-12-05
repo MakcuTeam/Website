@@ -23,15 +23,15 @@ export function DeviceInformationDisplay({ lang, variant = "card" }: DeviceInfor
   useEffect(() => {
     // Always get device info (returns all fields with defaults even if not connected)
     const info = getCombinedDeviceInfo(mcuStatus);
-    setDeviceInfo(info);
-    
+      setDeviceInfo(info);
+      
     // Check for updates periodically (includes live RAM/uptime from STATUS poll)
-    const interval = setInterval(() => {
+      const interval = setInterval(() => {
       const updatedInfo = getCombinedDeviceInfo(mcuStatus);
-      setDeviceInfo(updatedInfo);
-    }, 500);
+        setDeviceInfo(updatedInfo);
+      }, 500);
 
-    return () => clearInterval(interval);
+      return () => clearInterval(interval);
   }, [status, mcuStatus]);
 
   // Always show all fields (even if not connected or empty) - getCombinedDeviceInfo always returns all fields
