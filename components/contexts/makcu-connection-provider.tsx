@@ -99,6 +99,19 @@ function parseBinaryFrame(data: Uint8Array): { cmd: number; payload: Uint8Array 
   return { cmd, payload };
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+ * Device Info Storage Strategy
+ * ─────────────────────────────────────────────────────────────────────────────
+ * STATIC data (cookie):   VID, PID, VENDOR, MODEL, SERIAL, MAC, TEMP, CPU, 
+ *                         FW, MAKCU, SCREEN_SIZE, MOUSE_BINT, KBD_BINT
+ * 
+ * LIVE data (mcuStatus):  RAM, UPTIME, DEVICE_ATTACHED, FAULT_FLAG
+ * 
+ * Why split?
+ * - Cookie: Fetched once when device attaches, doesn't change
+ * - mcuStatus: Updates every 1 second via STATUS poll
+ * - Components auto-update and disable correctly when using mcuStatus
+ * ═══════════════════════════════════════════════════════════════════════════ */
 const DEVICE_INFO_COOKIE = "makcu_device_info";
 const DEVICE_INFO_EXPIRY_HOURS = 1;
 
@@ -184,10 +197,7 @@ function parseAndStoreDeviceInfoBinary(data: Uint8Array): void {
   }
   pos += 4;
 
-  // RAM (uint32_t, 4 bytes)
-  const ramView = new DataView(data.buffer, data.byteOffset + pos, 4);
-  const ram = ramView.getUint32(0, true); // little-endian
-  deviceInfo.RAM = `${ram}kb`;
+  // RAM (uint32_t, 4 bytes) - SKIP: Use mcuStatus.freeRamKb from STATUS poll instead
   pos += 4;
 
   // CPU (uint32_t, 4 bytes)
@@ -196,13 +206,7 @@ function parseAndStoreDeviceInfoBinary(data: Uint8Array): void {
   deviceInfo.CPU = `${cpu}mhz`;
   pos += 4;
 
-  // Uptime (uint32_t, 4 bytes, seconds)
-  const uptimeView = new DataView(data.buffer, data.byteOffset + pos, 4);
-  const uptimeSeconds = uptimeView.getUint32(0, true); // little-endian
-  const hours = Math.floor(uptimeSeconds / 3600);
-  const minutes = Math.floor((uptimeSeconds % 3600) / 60);
-  const seconds = uptimeSeconds % 60;
-  deviceInfo.UP = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  // Uptime (uint32_t, 4 bytes) - SKIP: Use mcuStatus.uptime from STATUS poll instead
   pos += 4;
 
   // VID (uint16_t, 2 bytes)
@@ -311,6 +315,8 @@ function parseAndStoreDeviceInfoBinary(data: Uint8Array): void {
   }
 }
 
+// Get static device info from cookie (VID/PID/vendor/model/serials/etc.)
+// Does NOT include live data (RAM, uptime) - use mcuStatus for that
 export function getDeviceInfo(): Record<string, string> | null {
   if (typeof document === "undefined") return null;
   const value = `; ${document.cookie}`;
@@ -326,6 +332,33 @@ export function getDeviceInfo(): Record<string, string> | null {
     }
   }
   return null;
+}
+
+// Helper to get combined device info (static + live)
+// Returns null if not connected or no device attached
+export function getCombinedDeviceInfo(mcuStatus: MakcuStatus | null): Record<string, string> | null {
+  if (!mcuStatus || !mcuStatus.deviceAttached) {
+    return null;
+  }
+  
+  const staticInfo = getDeviceInfo();
+  if (!staticInfo) {
+    return null;
+  }
+  
+  // Format uptime
+  const uptimeSeconds = mcuStatus.uptime;
+  const hours = Math.floor(uptimeSeconds / 3600);
+  const minutes = Math.floor((uptimeSeconds % 3600) / 60);
+  const seconds = uptimeSeconds % 60;
+  const formattedUptime = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  
+  // Combine static and live data
+  return {
+    ...staticInfo,
+    RAM: `${mcuStatus.freeRamKb}kb`,  // Live RAM from STATUS poll
+    UP: formattedUptime,               // Live uptime from STATUS poll
+  };
 }
 
 /* ═══ Device Test Types ═══ */
@@ -643,19 +676,19 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
             while (true) {
               const { value, done } = await currentReader.read();
               if (done) break;
-              chunks.push(value);
-              
-              const totalLength = chunks.reduce((sum, chunk) => sum + chunk.length, 0);
-              const combined = new Uint8Array(totalLength);
-              let offset = 0;
-              for (const chunk of chunks) {
-                combined.set(chunk, offset);
-                offset += chunk.length;
-              }
-              
+            chunks.push(value);
+            
+            const totalLength = chunks.reduce((sum, chunk) => sum + chunk.length, 0);
+            const combined = new Uint8Array(totalLength);
+            let offset = 0;
+            for (const chunk of chunks) {
+              combined.set(chunk, offset);
+              offset += chunk.length;
+            }
+            
               // Look for binary frame
               let frameStart = -1;
-              for (let i = 0; i < combined.length; i++) {
+            for (let i = 0; i < combined.length; i++) {
                 if (combined[i] === UART0_START_BYTE) {
                   frameStart = i;
                   break;
@@ -671,10 +704,10 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
                   if (parsed && parsed.cmd === UART0_CMD_STATUS) {
                     if (timeoutId) clearTimeout(timeoutId);
                     return parsed.payload;
-                  }
-                }
-              }
-              
+            }
+          }
+        }
+        
               // STATUS response is only 15 bytes + 6 overhead = 21 bytes
               if (totalLength > 100) break;
             }
@@ -682,7 +715,7 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
             // Read error
           }
           return null;
-        })();
+      })();
 
         const response = await Promise.race([readPromise, timeoutPromise]);
         if (timeoutId) clearTimeout(timeoutId);
@@ -745,7 +778,7 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
       }
     }
 
-    return false;
+      return false;
   };
 
   // Try to connect in flash mode
@@ -1003,15 +1036,15 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
     setMcuStatus(null);
     
     // Reset state
-    setState({
-      status: "disconnected",
-      mode: null,
-      port: null,
-      transport: null,
-      loader: null,
-      comPort: null,
-      detectedBaudRate: null,
-    });
+      setState({
+        status: "disconnected",
+        mode: null,
+        port: null,
+        transport: null,
+        loader: null,
+        comPort: null,
+        detectedBaudRate: null,
+      });
     
     toast.info("Disconnected");
   }, [cleanup]);
