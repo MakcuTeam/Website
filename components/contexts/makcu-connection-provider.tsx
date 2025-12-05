@@ -1212,10 +1212,10 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
                       }
                     });
                     // Legacy
-                    serialDataSubscribersRef.current.forEach((callback: SerialDataCallback) => {
-                      try {
+              serialDataSubscribersRef.current.forEach((callback: SerialDataCallback) => {
+                try {
                         callback(textData, false);
-                      } catch (e) {
+                } catch (e) {
                         console.error("[CONTINUOUS READER] Legacy subscriber error:", e);
                       }
                     });
@@ -1238,6 +1238,7 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
                   
                   if (parsed) {
                     // Valid binary frame (CRC good) - send to binary subscribers
+                    console.log(`[CONTINUOUS READER] ✓ Valid binary frame: cmd=0x${parsed.cmd.toString(16).toUpperCase()}, payload=${parsed.payload.length} bytes, dispatching to ${binaryFrameSubscribersRef.current.size} subscribers`);
                     binaryFrameSubscribersRef.current.forEach((callback: BinaryFrameSubscriber) => {
                       try {
                         callback(frame);
@@ -1487,16 +1488,25 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
     // Subscribe to binary frames only (0x50 handler)
     // The continuous reader already sends complete, validated frames, so we can parse directly
     const statusDataCallback: BinaryFrameSubscriber = (frame: Uint8Array) => {
-      if (!pendingStatusRequest) return; // No pending request
-      
       // Parse the complete frame (already validated by continuous reader)
       const parsed = parseBinaryFrame(frame);
+      
+      console.log(`[STATUS POLL CB] Received frame: cmd=0x${parsed?.cmd?.toString(16).toUpperCase() ?? 'null'}, pending=${!!pendingStatusRequest}`);
+      
+      if (!pendingStatusRequest) {
+        console.log(`[STATUS POLL CB] No pending request, ignoring frame`);
+        return; // No pending request
+      }
+      
       if (parsed && parsed.cmd === UART0_CMD_STATUS) {
         // Found STATUS response!
+        console.log(`[STATUS POLL CB] ✓ STATUS response received, resolving promise`);
         if (pendingStatusRequest.timeout) clearTimeout(pendingStatusRequest.timeout);
         const request = pendingStatusRequest;
         pendingStatusRequest = null;
         request.resolve(parsed.payload);
+      } else {
+        console.log(`[STATUS POLL CB] Frame is not STATUS (cmd=0x${parsed?.cmd?.toString(16).toUpperCase() ?? 'null'}), waiting...`);
       }
     };
 
@@ -1510,21 +1520,12 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
       }
 
       try {
-        // Send STATUS command (just write, continuous reader will handle response)
-        const frame = buildBinaryFrame(UART0_CMD_STATUS, null);
-        const writer = currentState.port.writable?.getWriter();
-        if (!writer) {
-          consecutiveFailures++;
-          return;
-        }
-        await writer.write(frame);
-        writer.releaseLock();
-
-        // Wait for response from continuous reader (via subscription)
+        // Calculate timeout first
         const baudRate = currentState.detectedBaudRate ?? 115200;
         const timeout = calculateTimeout(baudRate, 21, 10, false); // 21 bytes for status
         
-        const response = await new Promise<Uint8Array | null>((resolve) => {
+        // Set up response listener BEFORE sending command (MCU responds fast!)
+        const responsePromise = new Promise<Uint8Array | null>((resolve) => {
           const timeoutId = setTimeout(() => {
             if (pendingStatusRequest) {
               pendingStatusRequest = null;
@@ -1534,6 +1535,22 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
           
           pendingStatusRequest = { resolve, timeout: timeoutId };
         });
+
+        // NOW send STATUS command
+        const frame = buildBinaryFrame(UART0_CMD_STATUS, null);
+        const writer = currentState.port.writable?.getWriter();
+        if (!writer) {
+          // Clear the pending request we just set up
+          if (pendingStatusRequest?.timeout) clearTimeout(pendingStatusRequest.timeout);
+          pendingStatusRequest = null;
+          consecutiveFailures++;
+          return;
+        }
+        await writer.write(frame);
+        writer.releaseLock();
+
+        // Wait for response from continuous reader (via subscription)
+        const response = await responsePromise;
 
         if (response && response.length >= 15) {
           const status = parseStatusResponse(response);
