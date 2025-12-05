@@ -9,6 +9,7 @@ import PageSidebar from "@/components/page-sidebar";
 import { getSectionsForPage } from "@/lib/sections-config";
 import { DeviceTestDisplay } from "@/components/device-test-display";
 import { SerialTerminal } from "@/components/serial-terminal";
+import { DeviceInformationDisplay } from "@/components/device-information-display";
 
 type TocItem = {
   id: string;
@@ -135,6 +136,11 @@ export default async function DeviceControlPage({ params }: LangProps) {
                 </div>
               </CardContent>
             </Card>
+          </Section>
+
+          {/* Device Information Section */}
+          <Section id="device-information" title={dict.device_control.sections.device_information}>
+            <DeviceInformationDisplay lang={lang} variant="card" />
           </Section>
 
           {/* Device Test Section */}

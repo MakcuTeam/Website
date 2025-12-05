@@ -82,20 +82,12 @@ export default function HomeSidebar({ lang, dict }: HomeSidebarProps) {
                 <div key={pageKey} className="space-y-2">
                   <Link
                     href={`/${lang}${pageConfig.route}`}
-                    className="font-medium text-black dark:text-white transition block"
+                    className="font-medium text-black dark:text-white transition hover:underline cursor-pointer block"
                   >
                     {getPageTitle(pageKey)}
                   </Link>
                   <div className="space-y-2 pl-4 border-l border-border/60">
-                    {pageConfig.sections
-                      .filter((section) => {
-                        // Filter out device-information from device-control page on main page sidebar
-                        if (pageKey === "device-control" && section.id === "device-information") {
-                          return false;
-                        }
-                        return true;
-                      })
-                      .map((section) => (
+                    {pageConfig.sections.map((section) => (
                       <Link
                         key={section.id}
                         href={`/${lang}${pageConfig.route}#${section.id}`}
