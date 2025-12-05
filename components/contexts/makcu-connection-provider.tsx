@@ -1990,12 +1990,13 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
     // Retry loop: attempt up to calculatedRetries times
     for (let attempt = 1; attempt <= calculatedRetries; attempt++) {
       let pendingRequest: { resolve: (data: Uint8Array | null) => void; timeout: NodeJS.Timeout } | null = null;
+      let timeoutId: NodeJS.Timeout | null = null;
       let unsubscribe: (() => void) | null = null;
 
       try {
         // Set up response listener BEFORE sending command (MCU responds fast!)
         const responsePromise = new Promise<Uint8Array | null>((resolve) => {
-          const timeoutId = setTimeout(() => {
+          timeoutId = setTimeout(() => {
             if (pendingRequest) {
               pendingRequest = null;
             }
@@ -2017,10 +2018,11 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
           if (parsed && parsed.cmd === cmd) {
             // Found matching command response!
             console.log(`[BINARY API CB] ✓ Command 0x${cmd.toString(16).toUpperCase()} response received (attempt ${attempt}/${calculatedRetries}), payload size: ${parsed.payload.length}`);
-            if (pendingRequest.timeout) clearTimeout(pendingRequest.timeout);
+            if (timeoutId) clearTimeout(timeoutId);
             const request = pendingRequest;
             pendingRequest = null;
-            request.resolve(parsed.payload);
+            timeoutId = null;
+            if (request) request.resolve(parsed.payload);
           }
         };
 
@@ -2034,7 +2036,7 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
         const writer = currentState.port.writable?.getWriter();
         if (!writer) {
           console.log(`[BINARY API] Port not writable`);
-          if (pendingRequest && pendingRequest.timeout) clearTimeout(pendingRequest.timeout);
+          if (timeoutId) clearTimeout(timeoutId);
           pendingRequest = null;
           if (unsubscribe) unsubscribe();
           return null;
@@ -2068,7 +2070,7 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
         console.error(`[BINARY API] Error on attempt ${attempt}/${calculatedRetries}:`, error);
         
         // Cleanup on error
-        if (pendingRequest && pendingRequest.timeout) clearTimeout(pendingRequest.timeout);
+        if (timeoutId) clearTimeout(timeoutId);
         pendingRequest = null;
         if (unsubscribe) {
           unsubscribe();
@@ -2082,7 +2084,7 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
         }
       } finally {
         // Ensure cleanup in all cases
-        if (pendingRequest && pendingRequest.timeout) clearTimeout(pendingRequest.timeout);
+        if (timeoutId) clearTimeout(timeoutId);
         if (unsubscribe) unsubscribe();
       }
     }
