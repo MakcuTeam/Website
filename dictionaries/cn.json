@@ -469,6 +469,9 @@
   },
   "api": {
     "sections": {
+      "legacy": "传统",
+      "binary": "二进制",
+      "legacy_api_ascii": "传统 API (ASCII)",
       "transport": "传输与封装",
       "mouse_buttons": {
         "title": "鼠标按键",
@@ -540,6 +543,14 @@
         "hs": "hs() (GET/SET)",
         "release": "release() (GET/SET)"
       },
+      "v2_api_binary": "V2 API (二进制)",
+      "binary_keyboard": "键盘",
+      "binary_misc": "其他",
+      "binary_mouse": "鼠标",
+      "binary_streaming": "流式",
+      "baud_rate_legacy": "波特率（传统）",
+      "misc": "其他",
+      "mouse": "鼠标",
       "baud_binary": "波特率（二进制）",
       "no_usb": "无需 USB 设备的函数",
       "limits": "限制与解析"

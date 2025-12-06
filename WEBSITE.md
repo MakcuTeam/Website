@@ -249,15 +249,9 @@ Website/
   - Numpad Keys (HID 84-99)
   - Modifier Keys (HID 224-231)
 - Organized sections:
-  - Transport & Framing
-  - Mouse Buttons
-  - Mouse Movement
-  - Mouse Advanced
-  - Mouse Remap
-  - Keyboard
-  - Streaming
-  - Position & Screen
-  - System Commands
+  - Legacy API (ASCII): Keyboard, Misc, Mouse, Streaming
+  - V2 API (Binary): Keyboard, Misc, Mouse, Streaming
+  - Baud Rate (Legacy)
 - Interactive code examples
 - Copy-to-clipboard functionality
 - Table of contents navigation

@@ -92,7 +92,6 @@ const tocByLang: Record<Locale, TocItem[]> = {
         { id: "mouse-stream", label: "mouse" },
       ],
     },
-    { id: "baud-binary", label: "Baud Rate (Legacy)" },
     { id: "binary-protocol-format", label: "V2 API (Binary)" },
     {
       id: "binary-keyboard-basic",
@@ -133,12 +132,17 @@ const tocByLang: Record<Locale, TocItem[]> = {
         { id: "binary-click", label: "Click Scheduling" },
         { id: "binary-getpos", label: "getpos" },
         { id: "binary-individual-buttons", label: "Individual Buttons" },
+        { id: "binary-invert-x", label: "invert_x" },
+        { id: "binary-invert-y", label: "invert_y" },
+        { id: "binary-lock", label: "lock" },
         { id: "binary-mo", label: "mo" },
         { id: "binary-move", label: "move" },
         { id: "binary-moveto", label: "moveto" },
         { id: "binary-pan", label: "pan" },
+        { id: "binary-remap-axis", label: "remap_axis" },
         { id: "binary-remap-button", label: "remap_button" },
         { id: "binary-silent", label: "silent" },
+        { id: "binary-swap-xy", label: "swap_xy" },
         { id: "binary-tilt", label: "tilt" },
         { id: "binary-turbo", label: "turbo" },
         { id: "binary-wheel", label: "wheel" },
@@ -154,6 +158,7 @@ const tocByLang: Record<Locale, TocItem[]> = {
         { id: "binary-mouse-stream", label: "mouse" },
       ],
     },
+    { id: "baud-binary", label: "Baud Rate (Legacy)" },
   ],
   cn: [
     { id: "transport", label: "传统 API (ASCII)" },
@@ -228,7 +233,6 @@ const tocByLang: Record<Locale, TocItem[]> = {
         { id: "mouse-stream", label: "mouse" },
       ],
     },
-    { id: "baud-binary", label: "波特率（传统）" },
     { id: "binary-protocol-format", label: "V2 API (二进制)" },
     {
       id: "binary-keyboard-basic",
@@ -269,12 +273,17 @@ const tocByLang: Record<Locale, TocItem[]> = {
         { id: "binary-click", label: "点击调度" },
         { id: "binary-getpos", label: "getpos" },
         { id: "binary-individual-buttons", label: "单个按键" },
+        { id: "binary-invert-x", label: "invert_x" },
+        { id: "binary-invert-y", label: "invert_y" },
+        { id: "binary-lock", label: "lock" },
         { id: "binary-mo", label: "mo" },
         { id: "binary-move", label: "move" },
         { id: "binary-moveto", label: "moveto" },
         { id: "binary-pan", label: "pan" },
+        { id: "binary-remap-axis", label: "remap_axis" },
         { id: "binary-remap-button", label: "remap_button" },
         { id: "binary-silent", label: "silent" },
+        { id: "binary-swap-xy", label: "swap_xy" },
         { id: "binary-tilt", label: "tilt" },
         { id: "binary-turbo", label: "turbo" },
         { id: "binary-wheel", label: "wheel" },
@@ -290,6 +299,7 @@ const tocByLang: Record<Locale, TocItem[]> = {
         { id: "binary-mouse-stream", label: "mouse" },
       ],
     },
+    { id: "baud-binary", label: "波特率（传统）" },
   ],
 };
 
@@ -297,12 +307,12 @@ const metadataCopy: Record<Locale, { title: string; description: string }> = {
   en: {
     title: "MAKCU API — KM Host Protocol",
     description:
-      "Protocol reference for MAKCU KM Host API v3.9, covering transport, mouse, keyboard, streaming, and system commands.",
+      "Protocol reference for MAKCU KM Host API v3.9, covering Legacy API (ASCII) and V2 API (Binary) with mouse, keyboard, streaming, and system commands.",
   },
   cn: {
     title: "MAKCU API — KM 主机协议",
     description:
-      "MAKCU KM 主机 API v3.9 协议参考，涵盖传输、鼠标、键盘、流式以及系统指令。",
+      "MAKCU KM 主机 API v3.9 协议参考，涵盖传统 API (ASCII) 和 V2 API (二进制)，包括鼠标、键盘、流式以及系统指令。",
   },
 };
 
@@ -3129,7 +3139,7 @@ export default async function ApiPage({ params }: LangProps) {
             />
           </Section>
 
-          {/* Binary API - Mouse */}
+          {/* Binary Mouse */}
           <Section
             id="binary-mouse"
             title={t("Mouse", "鼠标")}
@@ -3426,6 +3436,54 @@ export default async function ApiPage({ params }: LangProps) {
                 />
               </SubSection>
 
+              <SubSection id="binary-swap-xy" title="swap_xy([enable]) — GET/SET (0x15)">
+                <SpecCard
+                  entries={[
+                    {
+                      label: t("Command", "命令"),
+                      content: <span className="font-mono">[0x15]</span>,
+                    },
+                    {
+                      label: t("Description", "描述"),
+                      content: t(
+                        "Swap X and Y axes (physical only) - 0=disable, 1=enable",
+                        "交换 X 和 Y 轴（仅物理） - 0=禁用，1=启用"
+                      ),
+                    },
+                    {
+                      label: t("Params", "参数"),
+                      content: isCn ? (
+                        <span>() 查询; (enable) 设置。enable: 0=禁用，1=启用</span>
+                      ) : (
+                        <span>() to query; (enable) set. enable: 0=disable, 1=enable</span>
+                      ),
+                    },
+                    {
+                      label: t("Response (GET)", "响应 (GET)"),
+                      content: (
+                        <div className="space-y-2">
+                          <CodeBlock code={`[0x15]\nResponse: [0x15] [enabled:u8]`} />
+                          <p className="text-sm text-muted-foreground">
+                            {t("Returns 0=disabled, 1=enabled.", "返回 0=禁用，1=启用。")}
+                          </p>
+                        </div>
+                      ),
+                    },
+                    {
+                      label: t("Response (SET)", "响应 (SET)"),
+                      content: (
+                        <div className="space-y-2">
+                          <CodeBlock code={`[0x15] [enable:u8]\nResponse: [0x15] [status:u8]`} />
+                          <p className="text-sm text-muted-foreground">
+                            {t("Returns 0x00 (OK) on success, 0x01 (ERR) on error.", "成功返回 0x00 (OK)，错误返回 0x01 (ERR)。")}
+                          </p>
+                        </div>
+                      ),
+                    },
+                  ]}
+                />
+              </SubSection>
+
               <SubSection id="binary-tilt" title="tilt([steps]) — GET/SET (0x16)">
                 <SpecCard
                   entries={[
@@ -3593,6 +3651,158 @@ export default async function ApiPage({ params }: LangProps) {
                 />
               </SubSection>
 
+              <SubSection id="binary-invert-x" title="invert_x([enable]) — GET/SET (0x06)">
+                <SpecCard
+                  entries={[
+                    {
+                      label: t("Command", "命令"),
+                      content: <span className="font-mono">[0x06]</span>,
+                    },
+                    {
+                      label: t("Description", "描述"),
+                      content: t(
+                        "Invert X axis (physical only) - 0=disable, 1=enable",
+                        "反转 X 轴（仅物理） - 0=禁用，1=启用"
+                      ),
+                    },
+                    {
+                      label: t("Params", "参数"),
+                      content: isCn ? (
+                        <span>() 查询; (enable) 设置。enable: 0=禁用，1=启用</span>
+                      ) : (
+                        <span>() to query; (enable) set. enable: 0=disable, 1=enable</span>
+                      ),
+                    },
+                    {
+                      label: t("Response (GET)", "响应 (GET)"),
+                      content: (
+                        <div className="space-y-2">
+                          <CodeBlock code={`[0x06]\nResponse: [0x06] [enabled:u8]`} />
+                          <p className="text-sm text-muted-foreground">
+                            {t("Returns 0=disabled, 1=enabled.", "返回 0=禁用，1=启用。")}
+                          </p>
+                        </div>
+                      ),
+                    },
+                    {
+                      label: t("Response (SET)", "响应 (SET)"),
+                      content: (
+                        <div className="space-y-2">
+                          <CodeBlock code={`[0x06] [enable:u8]\nResponse: [0x06] [status:u8]`} />
+                          <p className="text-sm text-muted-foreground">
+                            {t("Returns 0x00 (OK) on success, 0x01 (ERR) on error.", "成功返回 0x00 (OK)，错误返回 0x01 (ERR)。")}
+                          </p>
+                        </div>
+                      ),
+                    },
+                  ]}
+                />
+              </SubSection>
+
+              <SubSection id="binary-invert-y" title="invert_y([enable]) — GET/SET (0x07)">
+                <SpecCard
+                  entries={[
+                    {
+                      label: t("Command", "命令"),
+                      content: <span className="font-mono">[0x07]</span>,
+                    },
+                    {
+                      label: t("Description", "描述"),
+                      content: t(
+                        "Invert Y axis (physical only) - 0=disable, 1=enable",
+                        "反转 Y 轴（仅物理） - 0=禁用，1=启用"
+                      ),
+                    },
+                    {
+                      label: t("Params", "参数"),
+                      content: isCn ? (
+                        <span>() 查询; (enable) 设置。enable: 0=禁用，1=启用</span>
+                      ) : (
+                        <span>() to query; (enable) set. enable: 0=disable, 1=enable</span>
+                      ),
+                    },
+                    {
+                      label: t("Response (GET)", "响应 (GET)"),
+                      content: (
+                        <div className="space-y-2">
+                          <CodeBlock code={`[0x07]\nResponse: [0x07] [enabled:u8]`} />
+                          <p className="text-sm text-muted-foreground">
+                            {t("Returns 0=disabled, 1=enabled.", "返回 0=禁用，1=启用。")}
+                          </p>
+                        </div>
+                      ),
+                    },
+                    {
+                      label: t("Response (SET)", "响应 (SET)"),
+                      content: (
+                        <div className="space-y-2">
+                          <CodeBlock code={`[0x07] [enable:u8]\nResponse: [0x07] [status:u8]`} />
+                          <p className="text-sm text-muted-foreground">
+                            {t("Returns 0x00 (OK) on success, 0x01 (ERR) on error.", "成功返回 0x00 (OK)，错误返回 0x01 (ERR)。")}
+                          </p>
+                        </div>
+                      ),
+                    },
+                  ]}
+                />
+              </SubSection>
+
+              <SubSection id="binary-lock" title="lock_<target>([state]) — GET/SET (0x09)">
+                <SpecCard
+                  entries={[
+                    {
+                      label: t("Command", "命令"),
+                      content: <span className="font-mono">[0x09]</span>,
+                    },
+                    {
+                      label: t("Description", "描述"),
+                      content: t(
+                        "Lock button or axis - state: 1=lock, 0=unlock; target is part of command (mx, my, mw, mx+, mx-, my+, my-, mw+, mw-, ml, mm, mr, ms1, ms2)",
+                        "锁定按钮或轴 - state: 1=锁定，0=解锁；target 是命令的一部分（mx, my, mw, mx+, mx-, my+, my-, mw+, mw-, ml, mm, mr, ms1, ms2）"
+                      ),
+                    },
+                    {
+                      label: t("Params", "参数"),
+                      content: isCn ? (
+                        <span>() 查询; (state) 设置状态。state: 1=锁定，0=解锁</span>
+                      ) : (
+                        <span>() to query; (state) set state. state: 1=lock, 0=unlock</span>
+                      ),
+                    },
+                    {
+                      label: t("Targets", "目标"),
+                      content: isCn ? (
+                        <span>轴：mx, my, mw（全部）；mx+, mx-, my+, my-, mw+, mw-（方向）；按钮：ml, mm, mr, ms1, ms2</span>
+                      ) : (
+                        <span>Axes: mx, my, mw (all); mx+, mx-, my+, my-, mw+, mw- (directional); Buttons: ml, mm, mr, ms1, ms2</span>
+                      ),
+                    },
+                    {
+                      label: t("Response (GET)", "响应 (GET)"),
+                      content: (
+                        <div className="space-y-2">
+                          <CodeBlock code={`[0x09]\nResponse: [0x09] [locked:u8]`} />
+                          <p className="text-sm text-muted-foreground">
+                            {t("Returns 1=locked, 0=unlocked.", "返回 1=锁定，0=解锁。")}
+                          </p>
+                        </div>
+                      ),
+                    },
+                    {
+                      label: t("Response (SET)", "响应 (SET)"),
+                      content: (
+                        <div className="space-y-2">
+                          <CodeBlock code={`[0x09] [state:u8]\nResponse: [0x09] [status:u8]`} />
+                          <p className="text-sm text-muted-foreground">
+                            {t("Returns 0x00 (OK) on success, 0x01 (ERR) on error.", "成功返回 0x00 (OK)，错误返回 0x01 (ERR)。")}
+                          </p>
+                        </div>
+                      ),
+                    },
+                  ]}
+                />
+              </SubSection>
+
               <SubSection id="binary-mo" title="mo(buttons,x,y,wheel,pan,tilt) — SET (0x0B)">
                 <SpecCard
                   entries={[
@@ -3677,9 +3887,69 @@ export default async function ApiPage({ params }: LangProps) {
                   ]}
                 />
               </SubSection>
+
+              <SubSection id="binary-remap-axis" title="remap_axis([inv_x,inv_y,swap]) — GET/SET (0x19)">
+                <SpecCard
+                  entries={[
+                    {
+                      label: t("Command", "命令"),
+                      content: <span className="font-mono">[0x19]</span>,
+                    },
+                    {
+                      label: t("Description", "描述"),
+                      content: t(
+                        "Remap mouse axes (physical only) - Set all three flags atomically: inv_x, inv_y, swap (each 0=disable, 1=enable)",
+                        "重映射鼠标轴（仅物理） - 原子性设置所有三个标志：inv_x, inv_y, swap（每个 0=禁用，1=启用）"
+                      ),
+                    },
+                    {
+                      label: t("Params", "参数"),
+                      content: isCn ? (
+                        <ul className="list-disc space-y-1 pl-5">
+                          <li><span className="font-mono">()</span> - 查询当前设置</li>
+                          <li><span className="font-mono">(0)</span> - 重置所有轴映射</li>
+                          <li><span className="font-mono">(inv_x,inv_y,swap)</span> - 设置所有三个标志（每个 0 或 1）</li>
+                        </ul>
+                      ) : (
+                        <ul className="list-disc space-y-1 pl-5">
+                          <li><span className="font-mono">()</span> - Query current settings</li>
+                          <li><span className="font-mono">(0)</span> - Reset all axis remaps</li>
+                          <li><span className="font-mono">(inv_x,inv_y,swap)</span> - Set all three flags (each 0 or 1)</li>
+                        </ul>
+                      ),
+                    },
+                    {
+                      label: t("Response (GET)", "响应 (GET)"),
+                      content: (
+                        <div className="space-y-2">
+                          <CodeBlock code={`[0x19]\nResponse: [0x19] [inv_x:u8] [inv_y:u8] [swap:u8]`} />
+                          <p className="text-sm text-muted-foreground">
+                            {t("Returns 3 bytes: inv_x, inv_y, swap (each 0=disabled, 1=enabled).", "返回 3 字节：inv_x, inv_y, swap（每个 0=禁用，1=启用）。")}
+                          </p>
+                        </div>
+                      ),
+                    },
+                    {
+                      label: t("Response (SET)", "响应 (SET)"),
+                      content: (
+                        <div className="space-y-2">
+                          <CodeBlock code={`[0x19] [inv_x:u8] [inv_y:u8] [swap:u8]\nResponse: [0x19] [status:u8]`} />
+                          <p className="text-sm text-muted-foreground">
+                            {t("Returns 0x00 (OK) on success, 0x01 (ERR) on error. Sets all three flags atomically.", "成功返回 0x00 (OK)，错误返回 0x01 (ERR)。原子性设置所有三个标志。")}
+                          </p>
+                          <CodeBlock code={`[0x19] [0x00]\nResponse: [0x19] [status:u8]`} />
+                          <p className="text-sm text-muted-foreground">
+                            {t("Reset all axis remaps (sets all flags to 0).", "重置所有轴映射（将所有标志设为 0）。")}
+                          </p>
+                        </div>
+                      ),
+                    },
+                  ]}
+                />
+              </SubSection>
           </Section>
 
-          {/* Binary API - Keyboard */}
+          {/* Binary Keyboard */}
           <Section
             id="binary-keyboard-basic"
             title={t("Keyboard", "键盘")}

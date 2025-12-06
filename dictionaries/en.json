@@ -478,6 +478,9 @@
   },
   "api": {
     "sections": {
+      "legacy": "Legacy",
+      "binary": "Binary",
+      "legacy_api_ascii": "Legacy API (ASCII)",
       "transport": "Transport & Framing",
       "mouse_buttons": {
         "title": "Mouse Buttons",
@@ -549,6 +552,14 @@
         "hs": "hs() (GET/SET)",
         "release": "release() (GET/SET)"
       },
+      "v2_api_binary": "V2 API (Binary)",
+      "binary_keyboard": "Keyboard",
+      "binary_misc": "Misc",
+      "binary_mouse": "Mouse",
+      "binary_streaming": "Streaming",
+      "baud_rate_legacy": "Baud Rate (Legacy)",
+      "misc": "Misc",
+      "mouse": "Mouse",
       "baud_binary": "Baud Rate (Binary)",
       "no_usb": "Functions Without USB Device",
       "limits": "Limits & Parsing"
