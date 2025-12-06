@@ -4426,9 +4426,9 @@ export default async function ApiPage({ params }: LangProps) {
                     {
                       label: t("Params", "参数"),
                       content: isCn ? (
-                        <span>() 查询; (mode) 设置模式。mode: 0=关闭，1=鼠标，2=键盘；需要波特率 >= 1M</span>
+                        <span>() 查询; (mode) 设置模式。mode: 0=关闭，1=鼠标，2=键盘；需要波特率 &gt;= 1M</span>
                       ) : (
-                        <span>() to query; (mode) set mode. mode: 0=off, 1=mouse, 2=keyboard; requires baud >= 1M</span>
+                        <span>() to query; (mode) set mode. mode: 0=off, 1=mouse, 2=keyboard; requires baud &gt;= 1M</span>
                       ),
                     },
                     {
