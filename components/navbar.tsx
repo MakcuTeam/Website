@@ -73,10 +73,6 @@ export function NavMenu({
       target: "_blank",
     },
     {
-      title: "makcu_tools",
-      href: "/firmware",
-    },
-    {
       title: "information",
       href: "/information",
     },

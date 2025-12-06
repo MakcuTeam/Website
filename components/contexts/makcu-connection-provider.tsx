@@ -5,347 +5,73 @@ import { ESPLoader, LoaderOptions, Transport } from "esptool-js";
 import { serial } from "web-serial-polyfill";
 import { toast } from "sonner";
 
-/* ═══════════════════════════════════════════════════════════════════════════
- * Binary Protocol Constants and Functions
- * Frame format: [0x50] [CMD] [LEN_LO] [LEN_HI] [PAYLOAD...] [CRC_LO] [CRC_HI]
- * Note: UART0 uses 0x50, UART1 uses 0x5A (0x50+0xA) to avoid misdirection
- * ═══════════════════════════════════════════════════════════════════════════ */
-const UART0_START_BYTE = 0x50;  /* UART0=0x50, UART1=0x5A */
+// Import all modular functions and types
+import {
+  // Types
+  type MakcuConnectionState,
+  type MakcuStatus,
+  type SerialDataCallback,
+  type BinaryFrameSubscriber,
+  type TextLogSubscriber,
+  type MakcuConnectionContextType,
+  type ConnectionMode,
+  type ConnectionStatus,
+  type TestStatus,
+  type MouseTestResults,
+  type KeyboardTestResults,
+  type DeviceTestResult,
+  // Constants
+  UART0_START_BYTE,
+  UART0_CMD_STATUS,
+  UART0_CMD_GET_MAC1,
+  UART0_CMD_GET_MAC2,
+  UART0_CMD_GET_TEMP,
+  UART0_CMD_GET_RAM,
+  UART0_CMD_GET_CPU,
+  UART0_CMD_GET_UPTIME,
+  UART0_CMD_GET_VID,
+  UART0_CMD_GET_PID,
+  UART0_CMD_GET_MOUSE_BINT,
+  UART0_CMD_GET_KBD_BINT,
+  UART0_CMD_GET_FW_VERSION,
+  UART0_CMD_GET_MAKCU_VERSION,
+  UART0_CMD_GET_VENDOR,
+  UART0_CMD_GET_MODEL,
+  UART0_CMD_GET_ORIG_SERIAL,
+  UART0_CMD_GET_SPOOF_SERIAL,
+  UART0_CMD_GET_SPOOF_ACTIVE,
+  UART0_CMD_GET_SCREEN_W,
+  UART0_CMD_GET_SCREEN_H,
+  UART0_CMD_GET_FAULT,
+  BAUD_RATES,
+  SERIAL_PORT_CONFIG,
+  CONNECTION_DELAYS,
+  CONNECTION_TIMEOUTS,
+  DEVICE_INFO_COOKIE,
+  DEVICE_INFO_EXPIRY_HOURS,
+  // Protocol
+  buildBinaryFrame,
+  parseBinaryFrame,
+  // Parsers
+  parseStatusResponse,
+  parseDeviceTestResponse,
+  routeApiCommand,
+  registerApiCommandParser,
+  // Utils
+  calculateTimeout,
+  calculateMaxRetries,
+  calculateRetryDelay,
+  openPortWithBaudRate,
+  safeClosePort,
+  getComPort,
+  setCookie,
+  getCookie,
+  deleteCookie,
+} from "./makcu";
 
-/* UART0 Binary API Commands - Individual data field commands */
-const UART0_CMD_STATUS = 0xB1;   /* Lightweight status poll (15 bytes) */
-const UART0_CMD_GET_MAC1 = 0xB2;  /* MAC1 - device side (6 bytes) */
-const UART0_CMD_GET_MAC2 = 0xB3;  /* MAC2 - USB host side (6 bytes) */
-const UART0_CMD_GET_TEMP = 0xB4;  /* Temperature (4 bytes float) */
-const UART0_CMD_GET_RAM = 0xB5;   /* Free RAM (4 bytes uint32, KB) */
-const UART0_CMD_GET_CPU = 0xB6;   /* CPU frequency (4 bytes uint32, MHz) */
-const UART0_CMD_GET_UPTIME = 0xB7; /* Uptime (4 bytes uint32, seconds) */
-const UART0_CMD_GET_VID = 0xB8;    /* VID (2 bytes uint16) */
-const UART0_CMD_GET_PID = 0xB9;    /* PID (2 bytes uint16) */
-const UART0_CMD_GET_MOUSE_BINT = 0xBA; /* Mouse bInterval (1 byte) */
-const UART0_CMD_GET_KBD_BINT = 0xBB;   /* Keyboard bInterval (1 byte) */
-const UART0_CMD_GET_FW_VERSION = 0xBC;  /* FW version string (variable length) */
-const UART0_CMD_GET_MAKCU_VERSION = 0xBD; /* MAKCU version string (variable length) */
-const UART0_CMD_GET_VENDOR = 0xBE;       /* Vendor string (variable length) */
-const UART0_CMD_GET_MODEL = 0xBF;        /* Model string (variable length) */
-const UART0_CMD_GET_ORIG_SERIAL = 0xC0;  /* Original serial (variable length) */
-const UART0_CMD_GET_SPOOF_SERIAL = 0xC1; /* Spoofed serial (variable length) */
-const UART0_CMD_GET_SPOOF_ACTIVE = 0xC2; /* Spoof active flag (1 byte) */
-const UART0_CMD_GET_SCREEN_W = 0xC3;     /* Screen width (2 bytes int16) */
-const UART0_CMD_GET_SCREEN_H = 0xC4;     /* Screen height (2 bytes int16) */
-const UART0_CMD_GET_FAULT = 0xC5;        /* Fault data (parse_fault_t structure) */
+// Protocol functions (CRC, frame building/parsing) now in makcu/protocol.ts
 
-// CRC16-CCITT lookup table for faster calculation
-const CRC16_TABLE = (() => {
-  const table = new Uint16Array(256);
-  for (let i = 0; i < 256; i++) {
-    let crc = i << 8;
-    for (let j = 0; j < 8; j++) {
-      crc = (crc & 0x8000) ? ((crc << 1) ^ 0x1021) : (crc << 1);
-    }
-    table[i] = crc & 0xFFFF;
-  }
-  return table;
-})();
-
-function crc16_ccitt(data: Uint8Array): number {
-  let crc = 0xFFFF;
-  for (let i = 0; i < data.length; i++) {
-    crc = ((crc << 8) ^ CRC16_TABLE[((crc >> 8) ^ data[i]) & 0xFF]) & 0xFFFF;
-  }
-  return crc;
-}
-
-// Build a binary framed request
-function buildBinaryFrame(cmd: number, payload: Uint8Array | null = null): Uint8Array {
-  const payloadLen = payload ? payload.length : 0;
-  const frameLen = 6 + payloadLen;  // START(1) + CMD(1) + LEN(2) + PAYLOAD + CRC(2)
-  const frame = new Uint8Array(frameLen);
-  
-  frame[0] = UART0_START_BYTE;
-  frame[1] = cmd;
-  frame[2] = payloadLen & 0xFF;
-  frame[3] = (payloadLen >> 8) & 0xFF;
-  
-  if (payload && payloadLen > 0) {
-    frame.set(payload, 4);
-  }
-  
-  // Calculate CRC over everything except CRC itself
-  const crc = crc16_ccitt(frame.slice(0, 4 + payloadLen));
-  frame[4 + payloadLen] = crc & 0xFF;
-  frame[4 + payloadLen + 1] = (crc >> 8) & 0xFF;
-  
-  return frame;
-}
-
-// Parse a binary framed response - returns payload or null if invalid
-function parseBinaryFrame(data: Uint8Array): { cmd: number; payload: Uint8Array } | null {
-  // Find start byte (UART0 uses 0x50)
-  let startIdx = -1;
-  for (let i = 0; i < data.length; i++) {
-    if (data[i] === UART0_START_BYTE) {
-      startIdx = i;
-      break;
-    }
-  }
-  
-  if (startIdx < 0 || data.length < startIdx + 6) {
-    return null;  // No start byte or not enough data for minimal frame
-  }
-  
-  const cmd = data[startIdx + 1];
-  const payloadLen = data[startIdx + 2] | (data[startIdx + 3] << 8);
-  const totalFrameLen = 6 + payloadLen;
-  
-  if (data.length < startIdx + totalFrameLen) {
-    return null;  // Not enough data
-  }
-  
-  // Extract frame
-  const frame = data.slice(startIdx, startIdx + totalFrameLen);
-  
-  // Verify CRC
-  const calcCrc = crc16_ccitt(frame.slice(0, 4 + payloadLen));
-  const rxCrc = frame[4 + payloadLen] | (frame[4 + payloadLen + 1] << 8);
-  
-  if (calcCrc !== rxCrc) {
-    console.warn(`Binary frame CRC mismatch: calc=0x${calcCrc.toString(16)} rx=0x${rxCrc.toString(16)}`);
-    return null;
-  }
-  
-  // Extract payload
-  const payload = payloadLen > 0 ? frame.slice(4, 4 + payloadLen) : new Uint8Array(0);
-  
-  return { cmd, payload };
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
- * API Command Parser Registry - Extensible System
- * ─────────────────────────────────────────────────────────────────────────────
- * This system allows routing any API command to its parser function.
- * To add new commands:
- * 1. Add command constant (e.g., UART0_CMD_GET_XXX = 0xXX)
- * 2. Create parser function: parseCmdXXX(payload: Uint8Array): any
- * 3. Register in commandParserRegistry below
- * ═══════════════════════════════════════════════════════════════════════════ */
-
-type CommandParser = (payload: Uint8Array) => any;
-
-const commandParserRegistry: Map<number, CommandParser> = new Map();
-
-/* ═══════════════════════════════════════════════════════════════════════════
- * Individual Command Parsers
- * ═══════════════════════════════════════════════════════════════════════════ */
-
-function parseCmdMAC1(payload: Uint8Array): { MAC1: string } | null {
-  if (payload.length !== 6) return null;
-  const mac = Array.from(payload)
-    .map(b => b.toString(16).padStart(2, '0').toUpperCase())
-    .join(':');
-  return { MAC1: mac };
-}
-
-function parseCmdMAC2(payload: Uint8Array): { MAC2: string } | null {
-  if (payload.length !== 6) return null;
-  const mac = Array.from(payload)
-    .map(b => b.toString(16).padStart(2, '0').toUpperCase())
-    .join(':');
-  return { MAC2: mac };
-}
-
-function parseCmdTemp(payload: Uint8Array): { TEMP: string } | null {
-  if (payload.length !== 4) return null;
-  const view = new DataView(payload.buffer, payload.byteOffset, 4);
-  const temp = view.getFloat32(0, true); // little-endian
-  return { TEMP: temp >= 0 ? `${temp.toFixed(1)}c` : "na" };
-}
-
-function parseCmdRAM(payload: Uint8Array): { RAM: number } | null {
-  if (payload.length !== 4) return null;
-  const view = new DataView(payload.buffer, payload.byteOffset, 4);
-  const ram = view.getUint32(0, true); // little-endian
-  return { RAM: ram };
-}
-
-function parseCmdCPU(payload: Uint8Array): { CPU: string } | null {
-  if (payload.length !== 4) return null;
-  const view = new DataView(payload.buffer, payload.byteOffset, 4);
-  const cpu = view.getUint32(0, true); // little-endian
-  return { CPU: `${cpu}mhz` };
-}
-
-function parseCmdUptime(payload: Uint8Array): { UPTIME: number } | null {
-  if (payload.length !== 4) return null;
-  const view = new DataView(payload.buffer, payload.byteOffset, 4);
-  const uptime = view.getUint32(0, true); // little-endian
-  return { UPTIME: uptime };
-}
-
-function parseCmdVID(payload: Uint8Array): { VID: string } | null {
-  if (payload.length !== 2) return null;
-  const view = new DataView(payload.buffer, payload.byteOffset, 2);
-  const vid = view.getUint16(0, true); // little-endian
-  return { VID: vid.toString(16).toUpperCase().padStart(4, '0') };
-}
-
-function parseCmdPID(payload: Uint8Array): { PID: string } | null {
-  if (payload.length !== 2) return null;
-  const view = new DataView(payload.buffer, payload.byteOffset, 2);
-  const pid = view.getUint16(0, true); // little-endian
-  return { PID: pid.toString(16).toUpperCase().padStart(4, '0') };
-}
-
-function parseCmdMouseBint(payload: Uint8Array): { MOUSE_BINT: string } | null {
-  if (payload.length !== 1) return null;
-  return { MOUSE_BINT: payload[0].toString() };
-}
-
-function parseCmdKbdBint(payload: Uint8Array): { KBD_BINT: string } | null {
-  if (payload.length !== 1) return null;
-  return { KBD_BINT: payload[0].toString() };
-}
-
-function parseCmdString(payload: Uint8Array): string {
-  if (payload.length === 0) return "";
-  const decoder = new TextDecoder();
-  return decoder.decode(payload);
-}
-
-function parseCmdFWVersion(payload: Uint8Array): { FW: string } | null {
-  const str = parseCmdString(payload);
-  return str ? { FW: str } : null;
-}
-
-function parseCmdMakcuVersion(payload: Uint8Array): { MAKCU: string } | null {
-  const str = parseCmdString(payload);
-  return str ? { MAKCU: str } : null;
-}
-
-function parseCmdVendor(payload: Uint8Array): { VENDOR?: string } | null {
-  const str = parseCmdString(payload);
-  return str ? { VENDOR: str } : {};
-}
-
-function parseCmdModel(payload: Uint8Array): { MODEL?: string } | null {
-  const str = parseCmdString(payload);
-  return str ? { MODEL: str } : {};
-}
-
-function parseCmdOrigSerial(payload: Uint8Array): { ORIGINAL_SERIAL?: string } | null {
-  const str = parseCmdString(payload);
-  return str ? { ORIGINAL_SERIAL: str } : {};
-}
-
-function parseCmdSpoofSerial(payload: Uint8Array): { SPOOFED_SERIAL?: string } | null {
-  const str = parseCmdString(payload);
-  return str ? { SPOOFED_SERIAL: str } : {};
-}
-
-function parseCmdSpoofActive(payload: Uint8Array): { SPOOF_ACTIVE: boolean } | null {
-  if (payload.length !== 1) return null;
-  return { SPOOF_ACTIVE: payload[0] === 1 };
-}
-
-function parseCmdScreenW(payload: Uint8Array): { SCREEN_W: number } | null {
-  if (payload.length !== 2) return null;
-  const view = new DataView(payload.buffer, payload.byteOffset, 2);
-  const w = view.getInt16(0, true); // little-endian
-  return { SCREEN_W: w };
-}
-
-function parseCmdScreenH(payload: Uint8Array): { SCREEN_H: number } | null {
-  if (payload.length !== 2) return null;
-  const view = new DataView(payload.buffer, payload.byteOffset, 2);
-  const h = view.getInt16(0, true); // little-endian
-  return { SCREEN_H: h };
-}
-
-function parseCmdFault(payload: Uint8Array): { FAULT?: any } | null {
-  // Fault structure parsing - can be extended later
-  return payload.length > 0 ? { FAULT: payload } : {};
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
- * Register All Command Parsers
- * ═══════════════════════════════════════════════════════════════════════════ */
-
-function registerCommandParsers(): void {
-  commandParserRegistry.set(UART0_CMD_GET_MAC1, parseCmdMAC1);
-  commandParserRegistry.set(UART0_CMD_GET_MAC2, parseCmdMAC2);
-  commandParserRegistry.set(UART0_CMD_GET_TEMP, parseCmdTemp);
-  commandParserRegistry.set(UART0_CMD_GET_RAM, parseCmdRAM);
-  commandParserRegistry.set(UART0_CMD_GET_CPU, parseCmdCPU);
-  commandParserRegistry.set(UART0_CMD_GET_UPTIME, parseCmdUptime);
-  commandParserRegistry.set(UART0_CMD_GET_VID, parseCmdVID);
-  commandParserRegistry.set(UART0_CMD_GET_PID, parseCmdPID);
-  commandParserRegistry.set(UART0_CMD_GET_MOUSE_BINT, parseCmdMouseBint);
-  commandParserRegistry.set(UART0_CMD_GET_KBD_BINT, parseCmdKbdBint);
-  commandParserRegistry.set(UART0_CMD_GET_FW_VERSION, parseCmdFWVersion);
-  commandParserRegistry.set(UART0_CMD_GET_MAKCU_VERSION, parseCmdMakcuVersion);
-  commandParserRegistry.set(UART0_CMD_GET_VENDOR, parseCmdVendor);
-  commandParserRegistry.set(UART0_CMD_GET_MODEL, parseCmdModel);
-  commandParserRegistry.set(UART0_CMD_GET_ORIG_SERIAL, parseCmdOrigSerial);
-  commandParserRegistry.set(UART0_CMD_GET_SPOOF_SERIAL, parseCmdSpoofSerial);
-  commandParserRegistry.set(UART0_CMD_GET_SPOOF_ACTIVE, parseCmdSpoofActive);
-  commandParserRegistry.set(UART0_CMD_GET_SCREEN_W, parseCmdScreenW);
-  commandParserRegistry.set(UART0_CMD_GET_SCREEN_H, parseCmdScreenH);
-  commandParserRegistry.set(UART0_CMD_GET_FAULT, parseCmdFault);
-}
-
-// Initialize parser registry on module load
-registerCommandParsers();
-
-/* ═══════════════════════════════════════════════════════════════════════════
- * API Command Router - Routes commands to their parsers
- * ═══════════════════════════════════════════════════════════════════════════ */
-
-function routeApiCommand(cmd: number, payload: Uint8Array): any | null {
-  const parser = commandParserRegistry.get(cmd);
-  if (!parser) {
-    console.warn(`[API ROUTER] No parser registered for command 0x${cmd.toString(16).toUpperCase()}`);
-    return null;
-  }
-  
-  try {
-    return parser(payload);
-  } catch (error) {
-    console.error(`[API ROUTER] Error parsing command 0x${cmd.toString(16).toUpperCase()}:`, error);
-    return null;
-  }
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
- * Register New Command Parser - Extensibility API
- * Call this to add support for new API commands
- * ═══════════════════════════════════════════════════════════════════════════ */
-export function registerApiCommandParser(cmd: number, parser: CommandParser): void {
-  commandParserRegistry.set(cmd, parser);
-  console.log(`[API ROUTER] Registered parser for command 0x${cmd.toString(16).toUpperCase()}`);
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
- * Device Info Storage Strategy
- * ─────────────────────────────────────────────────────────────────────────────
- * STATIC data (cookie):   VID, PID, VENDOR, MODEL, SERIAL, MAC, CPU, 
- *                         FW, MAKCU, SCREEN_SIZE, MOUSE_BINT, KBD_BINT
- * 
- * LIVE data (mcuStatus):  RAM, UPTIME, TEMP, DEVICE_ATTACHED, FAULT_FLAG
- * 
- * Why split?
- * - Cookie: Fetched once when device attaches, doesn't change
- * - mcuStatus: Updates every 1 second via STATUS poll
- * - Components auto-update and disable correctly when using mcuStatus
- * ═══════════════════════════════════════════════════════════════════════════ */
-const DEVICE_INFO_COOKIE = "makcu_device_info";
-const DEVICE_INFO_EXPIRY_HOURS = 1;
-
-function setCookie(name: string, value: string, hours: number): void {
-  if (typeof document === "undefined") return;
-  const expires = new Date();
-  expires.setTime(expires.getTime() + hours * 60 * 60 * 1000);
-  document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/`;
-}
+// Parser functions, command registry, and cookie utilities are now in makcu/parsers.ts and makcu/utils.ts
 
 /* ═══════════════════════════════════════════════════════════════════════════
  * Build Device Info from Individual Command Responses
@@ -376,6 +102,10 @@ function buildAndStoreDeviceInfo(commandResponses: Map<number, Uint8Array>): voi
   for (const [cmd, payload] of commandResponses.entries()) {
     const parsed = routeApiCommand(cmd, payload);
     if (parsed) {
+      // Debug log for bInterval commands
+      if (cmd === UART0_CMD_GET_MOUSE_BINT || cmd === UART0_CMD_GET_KBD_BINT) {
+        console.log(`[BUILD DEVICE INFO] ✓ Parsed command 0x${cmd.toString(16).toUpperCase()}:`, parsed);
+      }
       Object.assign(deviceInfo, parsed);
     }
   }
@@ -393,6 +123,8 @@ function buildAndStoreDeviceInfo(commandResponses: Map<number, Uint8Array>): voi
   const jsonStr = JSON.stringify(deviceInfo);
   setCookie(DEVICE_INFO_COOKIE, jsonStr, DEVICE_INFO_EXPIRY_HOURS);
   console.log(`[DEVICE INFO] Stored device info cookie with ${Object.keys(deviceInfo).length} fields (all fields, including empty):`, deviceInfo);
+  console.log(`[DEVICE INFO] 🖱️ Mouse bInterval: ${deviceInfo.MOUSE_BINT} (${deviceInfo.MOUSE_BINT > 0 ? Math.round(1000 / deviceInfo.MOUSE_BINT) + 'Hz' : 'N/A'})`);
+  console.log(`[DEVICE INFO] ⌨️ Keyboard bInterval: ${deviceInfo.KBD_BINT} (${deviceInfo.KBD_BINT > 0 ? Math.round(1000 / deviceInfo.KBD_BINT) + 'Hz' : 'N/A'})`);
 }
 
 // Get static device info from cookie (VID/PID/vendor/model/serials/etc.)
@@ -492,185 +224,19 @@ export function getCombinedDeviceInfo(mcuStatus: MakcuStatus | null): Record<str
   };
 }
 
-/* ═══ Device Test Types ═══ */
-export type TestStatus = "pass" | "fail" | "not_supported" | "not_tested";
+// Device test types (TestStatus, MouseTestResults, KeyboardTestResults, DeviceTestResult) 
+// are now imported from makcu/types.ts
 
-export interface MouseTestResults {
-  button1: TestStatus;
-  button2: TestStatus;
-  button3: TestStatus;
-  button4: TestStatus;
-  button5: TestStatus;
-  xAxis: TestStatus;
-  yAxis: TestStatus;
-  wheel: TestStatus;
-  pan: TestStatus;
-  tilt: TestStatus;
-}
+// parseDeviceTestResponse is now imported from makcu/parsers.ts
 
-export interface KeyboardTestResults {
-  keyPress: TestStatus;
-  keyRelease: TestStatus;
-  modifiers: TestStatus;
-}
+// Types are now imported from makcu/types.ts
 
-export interface DeviceTestResult {
-  success: boolean;
-  testMode: number;
-  mousePresent: boolean;
-  keyboardPresent: boolean;
-  mouse?: MouseTestResults;
-  keyboard?: KeyboardTestResults;
-}
-
-function parseTestByte(value: number): TestStatus {
-  if (value === 1) return "pass";
-  if (value === 2) return "not_supported";
-  return "fail";
-}
-
-export function parseDeviceTestResponse(data: Uint8Array): DeviceTestResult | null {
-  if (data.length < 4) return null;
-  
-  const header = data[0];
-  if (header !== 0x01) {
-    return { success: false, testMode: 0, mousePresent: false, keyboardPresent: false };
-  }
-  
-  const testMode = data[1];
-  const mousePresent = data[2] === 1;
-  const keyboardPresent = data[3] === 1;
-  
-  let pos = 4;
-  const result: DeviceTestResult = {
-    success: true,
-    testMode,
-    mousePresent,
-    keyboardPresent,
-  };
-  
-  // Parse mouse results (10 bytes)
-  if (mousePresent && (testMode & 0x01) && pos + 10 <= data.length) {
-    result.mouse = {
-      button1: parseTestByte(data[pos++]),
-      button2: parseTestByte(data[pos++]),
-      button3: parseTestByte(data[pos++]),
-      button4: parseTestByte(data[pos++]),
-      button5: parseTestByte(data[pos++]),
-      xAxis: parseTestByte(data[pos++]),
-      yAxis: parseTestByte(data[pos++]),
-      wheel: parseTestByte(data[pos++]),
-      pan: parseTestByte(data[pos++]),
-      tilt: parseTestByte(data[pos++]),
-    };
-  }
-  
-  // Parse keyboard results (3 bytes)
-  if (keyboardPresent && (testMode & 0x02) && pos + 3 <= data.length) {
-    result.keyboard = {
-      keyPress: parseTestByte(data[pos++]),
-      keyRelease: parseTestByte(data[pos++]),
-      modifiers: parseTestByte(data[pos++]),
-    };
-  }
-  
-  return result;
-}
-
-export type ConnectionMode = "normal" | "flash" | null;
-export type ConnectionStatus = "disconnected" | "connecting" | "connected" | "fault";
-
-/* ═══════════════════════════════════════════════════════════════════════════
- * MCU Status - Lightweight polling response (15 bytes from UART0_CMD_STATUS)
- * Used for: connection verification, live uptime, device attach detection
- * ═══════════════════════════════════════════════════════════════════════════ */
-export interface MakcuStatus {
-  mcuAlive: boolean;       // MCU responded (always true if we got response)
-  deviceAttached: boolean; // USB device connected to MCU's USB host port
-  uptime: number;          // MCU uptime in seconds
-  sofCount: number;        // USB SOF frame count (for sync/debug)
-  freeRamKb: number;       // Free RAM in KB (health indicator)
-  hasFault: boolean;       // Fault stored on device (parse error, etc.)
-  temp: number;            // MCU temperature in Celsius (-1.0 if unavailable)
-  lastPollTime: number;    // Timestamp of last successful poll (ms since epoch)
-}
-
-// Parse status response (17 bytes from MCU)
-function parseStatusResponse(data: Uint8Array): MakcuStatus | null {
-  if (data.length < 17) {
-    console.warn(`[PARSE STATUS] Invalid length: ${data.length} bytes (expected 17)`);
-    return null;
-  }
-  
-  const view = new DataView(data.buffer, data.byteOffset, 17);
-  
-  const mcuAlive = data[0] === 0x01;
-  const deviceAttached = data[1] === 0x01;
-  const uptime = view.getUint32(2, true);        // little-endian
-  const sofCount = view.getUint32(6, true);
-  const freeRamKb = view.getUint16(10, true);
-  const hasFault = data[12] === 0x01;
-  const temp = view.getFloat32(13, true);        // little-endian float, -1.0 if unavailable
-  
-  const status: MakcuStatus = {
-    mcuAlive,
-    deviceAttached,
-    uptime,
-    sofCount,
-    freeRamKb,
-    hasFault,
-    temp,
-    lastPollTime: Date.now(),
-  };
-  
-  // Detailed logging of parsed values
-  console.log(`[PARSE STATUS] Parsed STATUS response (${data.length} bytes):`, {
-    mcuAlive,
-    deviceAttached,
-    uptime: `${uptime}s (${Math.floor(uptime / 3600)}h ${Math.floor((uptime % 3600) / 60)}m ${uptime % 60}s)`,
-    sofCount,
-    freeRamKb: `${freeRamKb}kb`,
-    hasFault,
-    temp: temp >= 0 ? `${temp.toFixed(1)}°C` : "unavailable",
-    rawBytes: Array.from(data.slice(0, 17)).map(b => `0x${b.toString(16).padStart(2, '0').toUpperCase()}`).join(' ')
-  });
-  
-  return status;
-}
-
-interface MakcuConnectionState {
-  status: ConnectionStatus;
-  mode: ConnectionMode;
-  port: SerialPort | null;
-  transport: Transport | null;
-  loader: ESPLoader | null;
-  comPort: string | null;
-  detectedBaudRate: number | null;
-}
-
-interface SerialDataCallback {
-  (data: Uint8Array, isBinary: boolean): void;
-}
-
-// Subscriber types - declare what data they want
-type BinaryFrameSubscriber = (data: Uint8Array) => void;  // Only receives 0x50 binary frames
-type TextLogSubscriber = (data: Uint8Array) => void;      // Only receives non-0x50 data (text/logs)
-
-interface MakcuConnectionContextType extends MakcuConnectionState {
-  connect: () => Promise<void>;
-  disconnect: () => Promise<void>;
-  sendCommandAndReadResponse: (command: string, timeoutMs?: number) => Promise<Uint8Array | null>;
-  sendBinaryCommand: (cmd: number, payload?: Uint8Array, timeoutMs?: number) => Promise<Uint8Array | null>;
-  subscribeToSerialData: (callback: SerialDataCallback) => () => void;  // Legacy - receives all data
-  subscribeToBinaryFrames: (callback: BinaryFrameSubscriber) => () => void;  // Only 0x50 frames
-  subscribeToTextLogs: (callback: TextLogSubscriber) => () => void;  // Only non-0x50 data
-  fetchFullDeviceInfo: () => Promise<boolean>;  // Manually trigger full device info fetch
-  isConnecting: boolean;
-  browserSupported: boolean;
-  mcuStatus: MakcuStatus | null;  // Live status from 1-second polling
-}
+// MakcuConnectionContextType is now imported from makcu/types.ts
 
 const MakcuConnectionContext = createContext<MakcuConnectionContextType | undefined>(undefined);
+
+// Utility functions (calculateTimeout, calculateMaxRetries, calculateRetryDelay, 
+// openPortWithBaudRate, safeClosePort, getComPort) are now imported from makcu/utils.ts
 
 export function MakcuConnectionProvider({ children }: { children: React.ReactNode }) {
   const [state, setState] = useState<MakcuConnectionState>({
@@ -750,62 +316,13 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
     binaryFrameBufferRef.current = new Uint8Array(0); // Clear frame buffer on cleanup
   }, []);
 
-  // Calculate timeout based on 8N1 symbol periods (like firmware UART hardware timeout)
-  // 8N1 format: 10 bits per symbol (1 start + 8 data + 1 stop)
-  // Uses symbol periods of silence to detect end of frame (same as ESP32 UART hardware)
-  // Formula: (symbol_periods * 10 bits) / baud_rate * 1000ms
-  // 
-  // For frame transmission: max frame size + silence detection
-  // For silence detection: 10-20 symbol periods (firmware uses 20 = 2 bytes)
-  // For fast detection (connection phase): use shorter timeout to fail fast
-  const calculateTimeout = (baudRate: number, maxFrameBytes: number = 2566, silenceSymbols: number = 10, fastMode: boolean = false): number => {
-    const bitsPerSymbol = 10; // 8N1: 1 start + 8 data + 1 stop
-    
-    // Frame transmission time
-    const frameTimeMs = (maxFrameBytes * bitsPerSymbol * 1000) / baudRate;
-    
-    // Silence detection time (10 symbol periods = 100 bits = end of frame indicator)
-    // This mimics ESP32 UART hardware timeout behavior
-    // In fast mode, use fewer symbol periods for quicker failure detection
-    const silenceSymbolsToUse = fastMode ? 5 : silenceSymbols;
-    const silenceTimeMs = (silenceSymbolsToUse * bitsPerSymbol * 1000) / baudRate;
-    
-    // Total: frame time + silence detection + small overhead for Windows/WebSerial
-    // In fast mode, reduce overhead for quicker detection
-    const overheadMs = fastMode ? 10 : 20;
-    const calculatedTimeout = Math.ceil(frameTimeMs + silenceTimeMs + overheadMs);
-    
-    // Minimum 50ms (for very fast baud rates), maximum 3000ms (safety limit)
-    // In fast mode, cap at 500ms for quick failure
-    const maxTimeout = fastMode ? 500 : 3000;
-    return Math.max(50, Math.min(maxTimeout, calculatedTimeout));
-  };
-
-  // Calculate optimal retry count based on baud rate
-  // Faster baud rates need fewer retries (less likely to have errors)
-  // Retry delay also uses 8N1 symbol periods for consistency
-  const calculateMaxRetries = (baudRate: number): number => {
-    if (baudRate >= 2000000) return 3; // 4M baud: 3 retries
-    if (baudRate >= 1000000) return 4; // 1M+ baud: 4 retries
-    return 5; // 115200 baud: 5 retries (more prone to errors)
-  };
-
-  // Calculate retry delay based on 8N1 symbol periods
-  // Uses symbol periods to ensure clean separation between retries
-  // 5-10 symbol periods = enough time for line to clear
-  const calculateRetryDelay = (baudRate: number, symbolPeriods: number = 5): number => {
-    const bitsPerSymbol = 10; // 8N1
-    const delayMs = (symbolPeriods * bitsPerSymbol * 1000) / baudRate;
-    // Minimum 10ms, maximum 200ms (safety limits)
-    return Math.max(10, Math.min(200, Math.ceil(delayMs)));
-  };
 
   // Try to connect in normal mode with specific baud rate and timeout
   // Uses lightweight STATUS command (15 bytes) instead of full WEBSITE (360+ bytes)
   // This makes connection ~24x faster!
   const tryNormalMode = async (port: SerialPort, baudRate: number, timeout?: number, maxRetries?: number): Promise<boolean> => {
     // Use shorter timeout for STATUS (only 15 bytes response)
-    const calculatedTimeout = timeout ?? calculateTimeout(baudRate, 21, 10, false); // 21 = 6 overhead + 15 payload
+    const calculatedTimeout = timeout ?? calculateTimeout(baudRate, CONNECTION_TIMEOUTS.STATUS_FRAME_BYTES, CONNECTION_TIMEOUTS.SILENCE_SYMBOLS, false);
     const calculatedRetries = maxRetries ?? calculateMaxRetries(baudRate);
     
     console.log(`[TRY NORMAL MODE] Baud: ${baudRate}, Timeout: ${calculatedTimeout}ms, Retries: ${calculatedRetries}`);
@@ -815,7 +332,7 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
     }
 
     // Give device a moment to stabilize after port open
-    await new Promise(resolve => setTimeout(resolve, 50));
+    await new Promise(resolve => setTimeout(resolve, CONNECTION_DELAYS.PORT_STABILIZATION));
 
     for (let attempt = 1; attempt <= calculatedRetries; attempt++) {
       let reader: ReadableStreamDefaultReader<Uint8Array> | null = null;
@@ -952,176 +469,183 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
   };
 
   // Try to connect in flash mode
-  // Note: Flash mode uses its own baud rates (921600 for flash, 115200 for ROM)
+      // Note: Flash mode uses its own baud rates (FLASH_MODE for flash, ROM_BOOTLOADER for ROM)
   // The website baud rate setting is ignored - ESPLoader handles its own baud rates
   // After flashing, users reconnect anyway, so baud rate returns to website value
   const tryFlashMode = async (port: SerialPort): Promise<{ transport: Transport; loader: ESPLoader } | null> => {
     try {
       // Close the port first if it's open (required before reopening for flash mode)
-      try {
-        await port.close();
-      } catch (e) {
-        // Port might not be open
-      }
+      await safeClosePort(port);
 
       // Reopen for flash mode - Transport/ESPLoader will use its own baud rates
-      // This ignores the website baud rate setting (115200 or 4M)
+      // This ignores the website baud rate setting (uses FLASH_MODE baud rate)
       const transport = new Transport(port as any, false, false);
+      
+      // Temporarily suppress expected timeout errors during flash mode connection
+      // ESPLoader may timeout on sync attempts before successfully connecting - this is normal
+      const originalConsoleError = console.error;
+      const suppressedErrors: Error[] = [];
+      console.error = (...args: any[]) => {
+        const errorMsg = args[0]?.toString() || "";
+        // Suppress expected timeout errors during flash mode connection
+        if (errorMsg.includes("Read timeout exceeded") || 
+            errorMsg.includes("Error reading from serial port")) {
+          // These are expected during ESPLoader sync attempts - suppress them
+          suppressedErrors.push(new Error(errorMsg));
+          return;
+        }
+        // Log other errors normally
+        originalConsoleError.apply(console, args);
+      };
+      
+      try {
+        // Route flash terminal output to serial terminal subscribers
       const flashOptions: LoaderOptions = {
         transport,
-        baudrate: 921600,  // Flash mode baud rate (independent of website setting)
-        romBaudrate: 115200,  // ROM bootloader baud rate
+          baudrate: BAUD_RATES.FLASH_MODE,  // Flash mode baud rate (independent of website setting)
+          romBaudrate: BAUD_RATES.ROM_BOOTLOADER,  // ROM bootloader baud rate
         terminal: {
-          clean() {},
-          writeLine() {},
-          write() {},
+            clean() {
+              // Clear terminal - can be used if needed
+            },
+            writeLine(message: string) {
+              // Send flash log line to serial terminal
+              const messageBytes = new TextEncoder().encode(message + "\n");
+              textLogSubscribersRef.current.forEach((callback: TextLogSubscriber) => {
+                try {
+                  callback(messageBytes);
+                } catch (e) {
+                  originalConsoleError("[FLASH MODE] Text log subscriber error:", e);
+                }
+              });
+            },
+            write(message: string) {
+              // Send flash log message to serial terminal
+              const messageBytes = new TextEncoder().encode(message);
+              textLogSubscribersRef.current.forEach((callback: TextLogSubscriber) => {
+                try {
+                  callback(messageBytes);
+                } catch (e) {
+                  originalConsoleError("[FLASH MODE] Text log subscriber error:", e);
+                }
+              });
+            },
         },
         debugLogging: false,
       };
 
       const loader = new ESPLoader(flashOptions);
       await loader.main();
+        
+        // Restore console.error
+        console.error = originalConsoleError;
+        
+        // Log summary if there were suppressed errors (but connection succeeded)
+        if (suppressedErrors.length > 0) {
+          console.log(`[FLASH MODE] Connection successful after ${suppressedErrors.length} expected timeout(s) during sync`);
+        }
       
       return { transport, loader };
     } catch (error) {
+        // Restore console.error before rethrowing
+        console.error = originalConsoleError;
+        throw error;
+      }
+    } catch (error) {
+      // Connection failed - log the error
+      console.warn("[FLASH MODE] Connection attempt failed:", error);
       return null;
     }
   };
 
-  // Get COM port name (if available)
-  // Note: WebSerial API doesn't expose COM port numbers for security/privacy reasons
-  // This function returns null as COM port information is not available via WebSerial
-  const getComPort = (_port: SerialPort): string | null => {
-    // WebSerial API specification doesn't provide COM port information
-    // The port selection dialog shows the device name, but not the COM port number
-    // This is by design for security and privacy reasons
-    return null;
+  /* ═══════════════════════════════════════════════════════════════════════════
+   * Connection Strategy Functions - Modular helpers for connection flow
+   * ═══════════════════════════════════════════════════════════════════════════ */
+
+  /**
+   * Try connecting with a specific baud rate
+   * Returns success status and baud rate if successful
+   */
+  const tryBaudRate = async (
+    port: SerialPort,
+    baudRate: number
+  ): Promise<{ success: boolean; baudRate?: number }> => {
+      try {
+      await openPortWithBaudRate(port, baudRate);
+      const connectionTimeout = calculateTimeout(baudRate, CONNECTION_TIMEOUTS.MAX_FRAME_BYTES, CONNECTION_TIMEOUTS.SILENCE_SYMBOLS, false);
+      const success = await tryNormalMode(port, baudRate, connectionTimeout, 1);
+      
+      if (success) {
+        return { success: true, baudRate };
+      }
+      
+      await safeClosePort(port);
+      return { success: false };
+      } catch (error) {
+      await safeClosePort(port);
+      return { success: false };
+        }
   };
 
-  const connect = useCallback(async () => {
-    if (isConnecting) {
-      return;
+  /**
+   * Attempt normal mode connection with multiple baud rates
+   * Tries high-speed first, then standard
+   */
+  const attemptNormalModeConnection = async (
+    port: SerialPort
+  ): Promise<{ success: boolean; baudRate?: number }> => {
+    // Try 4M first (fastest)
+    const highSpeedResult = await tryBaudRate(port, BAUD_RATES.HIGH_SPEED);
+    if (highSpeedResult.success) {
+      return highSpeedResult;
     }
-    if (state.status === "connected") {
-      return;
-    }
 
-    setIsConnecting(true);
-    setState((prev) => ({ ...prev, status: "connecting" }));
-
-    try {
-      const Navigator = navigator as Navigator & { serial?: Serial };
-      if (!Navigator.serial) {
-        throw new Error("WebSerial API not supported");
-      }
-
-      // Request port
-      const selectedPort = await Navigator.serial.requestPort();
-      
-      // Auto-detect baud rate: Try 4M first (faster), then 115200, then flash mode
-      // This minimizes connection time for devices that support 4M baud
-      let detectedBaudRate: number | null = null;
-      let normalModeSuccess = false;
-
-      // Step 1: Try 4M (4000000) first - fastest, timeout ~100ms
-      // Use minimal retries (1 attempt) for fast detection - if it fails, likely flash mode
-      try {
-        await selectedPort.open({
-          baudRate: 4000000,
-          dataBits: 8,
-          stopBits: 1,
-          parity: "none",
-          flowControl: "none",
-        });
-        // Single attempt with timeout for connection check (use normal timeout, not fast mode)
-        // Device needs time to process command and respond
-        const connectionTimeout = calculateTimeout(4000000, 2566, 10, false);
-        normalModeSuccess = await tryNormalMode(selectedPort, 4000000, connectionTimeout, 1);
-        if (normalModeSuccess) {
-          detectedBaudRate = 4000000;
-        } else {
-          await selectedPort.close();
-        }
-      } catch (error) {
-        try {
-          await selectedPort.close();
-        } catch (e) {
-          // Ignore close errors
-        }
-      }
-
-      // Step 2: If 4M failed, try 115200 - slower but more compatible
-      // Use minimal retries (1 attempt) for fast detection
-      if (!normalModeSuccess) {
-        try {
-          await selectedPort.open({
-            baudRate: 115200,
-            dataBits: 8,
-            stopBits: 1,
-            parity: "none",
-            flowControl: "none",
-          });
-          // Single attempt with timeout for connection check (use normal timeout, not fast mode)
-          // Device needs time to process command and respond
-          const connectionTimeout = calculateTimeout(115200, 2566, 10, false);
-          normalModeSuccess = await tryNormalMode(selectedPort, 115200, connectionTimeout, 1);
-          if (normalModeSuccess) {
-            detectedBaudRate = 115200;
-          } else {
-            await selectedPort.close();
+    // Try standard baud rate (more compatible)
+    const standardResult = await tryBaudRate(port, BAUD_RATES.STANDARD);
+    if (standardResult.success) {
+      return standardResult;
           }
-        } catch (error) {
-          try {
-            await selectedPort.close();
-          } catch (e) {
-            // Ignore close errors
-          }
-        }
-      }
 
-      // Step 3: If normal mode succeeded, set state
-      if (normalModeSuccess && detectedBaudRate) {
-        const comPort = getComPort(selectedPort);
+    return { success: false };
+  };
+
+  /**
+   * Attempt flash mode connection
+   */
+  const attemptFlashModeConnection = async (
+    port: SerialPort
+  ): Promise<{ transport: Transport; loader: ESPLoader } | null> => {
+      await cleanup();
+    return await tryFlashMode(port);
+  };
+
+  /**
+   * Set connected state after successful connection
+   */
+  const setConnectedState = (
+    port: SerialPort,
+    mode: "normal" | "flash",
+    baudRate: number | null,
+    flashResult?: { transport: Transport; loader: ESPLoader }
+  ): void => {
+    const comPort = getComPort(port);
         setState({
           status: "connected",
-          mode: "normal",
-          port: selectedPort,
-          transport: null,
-          loader: null,
+      mode,
+      port,
+      transport: flashResult?.transport || null,
+      loader: flashResult?.loader || null,
           comPort,
-          detectedBaudRate,
+      detectedBaudRate: baudRate,
         });
-        toast.success(`Connected in Normal mode (${detectedBaudRate === 115200 ? "115200" : "4M"})`);
-        return;
-      }
+  };
 
-      // Step 4: If both normal mode attempts failed, try flash mode
+  /**
+   * Handle connection failure - cleanup and set fault state
+   */
+  const handleConnectionFailure = async (port: SerialPort): Promise<void> => {
       await cleanup();
-      const flashResult = await tryFlashMode(selectedPort);
-
-      if (flashResult) {
-        // Flash mode connected successfully
-        const comPort = getComPort(selectedPort);
-        setState({
-          status: "connected",
-          mode: "flash",
-          port: selectedPort,
-          transport: flashResult.transport,
-          loader: flashResult.loader,
-          comPort,
-          detectedBaudRate: null, // Flash mode doesn't use website baud rates
-        });
-        toast.success("Connected in Flash mode");
-        return;
-      }
-
-      // Both normal mode and flash mode failed - set status to fault
-      await cleanup();
-      try {
-        await selectedPort.close();
-      } catch (e) {
-        // Ignore close errors
-      }
+    await safeClosePort(port);
       setState((prev) => ({ 
         ...prev, 
         status: "fault", 
@@ -1132,8 +656,12 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
         detectedBaudRate: null 
       }));
       toast.error("Connection failed - device not responding. Check USB connections and try again.");
+  };
 
-    } catch (error) {
+  /**
+   * Handle connection errors with appropriate user feedback
+   */
+  const handleConnectionError = (error: unknown): void => {
       const message = error instanceof Error ? error.message : String(error);
       if (!message.includes("Must be handling a user gesture")) {
         setState((prev) => ({ ...prev, status: "fault" }));
@@ -1141,6 +669,52 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
       } else {
         setState((prev) => ({ ...prev, status: "disconnected" }));
       }
+  };
+
+
+  const connect = useCallback(async () => {
+    // Early returns for invalid states
+    if (isConnecting || state.status === "connected") {
+      return;
+    }
+
+    setIsConnecting(true);
+    setState((prev) => ({ ...prev, status: "connecting" }));
+
+    try {
+      // Check browser support
+      const Navigator = navigator as Navigator & { serial?: Serial };
+      if (!Navigator.serial) {
+        throw new Error("WebSerial API not supported");
+      }
+
+      // Request port from user
+      const selectedPort = await Navigator.serial.requestPort();
+      
+      // Step 1: Try normal mode with multiple baud rates
+      const normalModeResult = await attemptNormalModeConnection(selectedPort);
+      
+      if (normalModeResult.success && normalModeResult.baudRate) {
+        setConnectedState(selectedPort, "normal", normalModeResult.baudRate);
+        const baudDisplay = normalModeResult.baudRate === BAUD_RATES.STANDARD ? "115200" : "4M";
+        toast.success(`Connected in Normal mode (${baudDisplay})`);
+        return;
+      }
+
+      // Step 2: If normal mode failed, try flash mode
+      const flashResult = await attemptFlashModeConnection(selectedPort);
+      
+      if (flashResult) {
+        setConnectedState(selectedPort, "flash", null, flashResult);
+        toast.success("Connected in Flash mode");
+        return;
+      }
+
+      // Step 3: All connection attempts failed
+      await handleConnectionFailure(selectedPort);
+
+    } catch (error) {
+      handleConnectionError(error);
     } finally {
       setIsConnecting(false);
     }
@@ -1256,7 +830,8 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
   // Continuous serial data reading and broadcasting for subscribers (serial terminal)
   // This loop continuously reads from the port and broadcasts to all subscribers
   useEffect(() => {
-    if (state.status !== "connected" || !state.port || !state.port.readable) {
+    // Only start continuous reader in normal mode - flash mode uses ESPLoader which locks the stream
+    if (state.status !== "connected" || !state.port || !state.port.readable || state.mode !== "normal") {
       return;
     }
 
@@ -1272,7 +847,9 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
       // Wait a bit for connection to stabilize and readerRef to be set
       await new Promise(resolve => setTimeout(resolve, 500));
       
-      if (shouldStop || stateRef.current.status !== "connected") {
+      // Check again after delay - mode might have changed
+      if (shouldStop || stateRef.current.status !== "connected" || stateRef.current.mode !== "normal") {
+        console.log("[CONTINUOUS READER] Aborted - not in normal mode or disconnected");
         return;
       }
 
@@ -1283,6 +860,12 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
       if (!reader) {
         try {
           console.log("[CONTINUOUS READER] Creating new reader");
+          // Double-check the stream is not locked (shouldn't be in normal mode)
+          if (stateRef.current.port!.readable!.locked) {
+            console.warn("[CONTINUOUS READER] Readable stream is locked, cannot create reader");
+            isReading = false;
+            return;
+          }
           reader = stateRef.current.port!.readable!.getReader();
           readerRef.current = reader;
         } catch (e) {
@@ -1302,7 +885,8 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
       // this promise only when data arrives - it's event-driven, not polling.
 
       try {
-        while (!shouldStop && stateRef.current.status === "connected" && stateRef.current.port) {
+        // Only read in normal mode - flash mode uses ESPLoader which locks the stream
+        while (!shouldStop && stateRef.current.status === "connected" && stateRef.current.mode === "normal" && stateRef.current.port) {
           try {
             // This await suspends the function until data arrives - NO CPU USED while waiting
             const { value, done } = await reader.read();
@@ -1477,7 +1061,7 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
       isReading = false;
       console.log("[CONTINUOUS READER] Cleanup - stopping reader loop");
     };
-  }, [state.status, state.port]);
+  }, [state.status, state.mode, state.port]);
 
   // Health check for connection - detects when port becomes inaccessible
   // Uses performDisconnect to ensure all components are updated
@@ -1552,7 +1136,7 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
     ];
 
     const commandResponses = new Map<number, Uint8Array>();
-    const baudRate = currentState.detectedBaudRate ?? 115200;
+    const baudRate = currentState.detectedBaudRate ?? BAUD_RATES.STANDARD;
 
     // Fetch each command sequentially (can be parallelized later if needed)
     for (const cmd of commandsToFetch) {
@@ -1567,7 +1151,8 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
                  cmd === UART0_CMD_GET_SPOOF_ACTIVE) expectedSize = 1;
         
         const timeout = calculateTimeout(baudRate, expectedSize + 6, 10, false);
-        console.log(`[FETCH DEVICE INFO] Sending command 0x${cmd.toString(16).toUpperCase()} (expected ${expectedSize} bytes, timeout ${timeout}ms)`);
+        const cmdName = cmd === UART0_CMD_GET_MOUSE_BINT ? "MOUSE_BINT" : cmd === UART0_CMD_GET_KBD_BINT ? "KBD_BINT" : "";
+        console.log(`[FETCH DEVICE INFO] Sending command 0x${cmd.toString(16).toUpperCase()}${cmdName ? ` (${cmdName})` : ""} (expected ${expectedSize} bytes, timeout ${timeout}ms)`);
         const sendBinaryCmd = sendBinaryCommandRef.current;
         if (!sendBinaryCmd) {
           console.error("[FETCH DEVICE INFO] sendBinaryCommand not available");
@@ -1577,9 +1162,12 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
         
         if (response) {
           commandResponses.set(cmd, response);
-          console.log(`[FETCH DEVICE INFO] ✓ Command 0x${cmd.toString(16).toUpperCase()} received (${response.length} bytes)`);
+          const cmdName = cmd === UART0_CMD_GET_MOUSE_BINT ? "MOUSE_BINT" : cmd === UART0_CMD_GET_KBD_BINT ? "KBD_BINT" : "";
+          const details = cmdName && response.length === 1 ? ` - value=${response[0]}` : "";
+          console.log(`[FETCH DEVICE INFO] ✓ Command 0x${cmd.toString(16).toUpperCase()}${cmdName ? ` (${cmdName})` : ""} received (${response.length} bytes)${details}`);
         } else {
-          console.warn(`[FETCH DEVICE INFO] ✗ Command 0x${cmd.toString(16).toUpperCase()} failed or timed out`);
+          const cmdName = cmd === UART0_CMD_GET_MOUSE_BINT ? "MOUSE_BINT" : cmd === UART0_CMD_GET_KBD_BINT ? "KBD_BINT" : "";
+          console.warn(`[FETCH DEVICE INFO] ✗ Command 0x${cmd.toString(16).toUpperCase()}${cmdName ? ` (${cmdName})` : ""} failed or timed out`);
         }
       } catch (error) {
         console.error(`[FETCH DEVICE INFO] Error fetching command 0x${cmd.toString(16).toUpperCase()}:`, error);
@@ -1673,8 +1261,8 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
 
       try {
         // Calculate timeout first
-        const baudRate = currentState.detectedBaudRate ?? 115200;
-        const timeout = calculateTimeout(baudRate, 21, 10, false); // 21 bytes for status
+        const baudRate = currentState.detectedBaudRate ?? BAUD_RATES.STANDARD;
+        const timeout = calculateTimeout(baudRate, CONNECTION_TIMEOUTS.STATUS_FRAME_BYTES, CONNECTION_TIMEOUTS.SILENCE_SYMBOLS, false);
         
         // Set up response listener BEFORE sending command (MCU responds fast!)
         const responsePromise = new Promise<Uint8Array | null>((resolve) => {
@@ -1919,7 +1507,7 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
       // Serial terminal commands have unknown frame sizes and no CRC - failures are expected
       // Fault is only triggered by:
       // 1. CRC-protected binary commands (sendBinaryCommand) after all retries fail
-      // 2. Connection attempts (4M/115200 normal mode + flash mode) all failing
+      // 2. Connection attempts (high-speed/standard normal mode + flash mode) all failing
       // 3. Actual port/connection errors (not simple command timeouts)
       if (!result) {
         console.warn(`[SEND COMMAND] Command failed (timeout/no response): "${command.trim()}"`);
@@ -1983,7 +1571,7 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
     }
 
     // Auto-calculate timeout and retries based on detected baud rate
-    const baudRate = currentState.detectedBaudRate ?? 115200; // Default to 115200 if unknown
+    const baudRate = currentState.detectedBaudRate ?? BAUD_RATES.STANDARD; // Default to 115200 if unknown
     const calculatedTimeout = timeoutMs ?? calculateTimeout(baudRate);
     const calculatedRetries = maxRetries ?? calculateMaxRetries(baudRate);
 

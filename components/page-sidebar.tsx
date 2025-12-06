@@ -8,6 +8,7 @@ import type { SectionItem } from "@/lib/sections-config";
 import { Dictionary } from "@/lib/dictionaries";
 import { ChevronRight } from "lucide-react";
 import { DeviceInformationDisplay } from "./device-information-display";
+import { useMakcuConnection } from "./contexts/makcu-connection-provider";
 
 type PageSidebarProps = {
   sections: SectionItem[];
@@ -26,6 +27,25 @@ export default function PageSidebar({
   lang,
   dict,
 }: PageSidebarProps) {
+  const { status, mode } = useMakcuConnection();
+  
+  // Filter sections based on connection mode
+  const filteredSections = sections.filter((section) => {
+    // Hide firmware-selection unless in flash mode
+    if (section.id === "firmware-selection") {
+      return status === "connected" && mode === "flash";
+    }
+    // Hide device-test unless in normal mode
+    if (section.id === "device-test") {
+      return status === "connected" && mode === "normal";
+    }
+    // Device information shows when connected in normal mode
+    if (section.id === "device-information") {
+      return status === "connected" && mode === "normal";
+    }
+    return true;
+  });
+  
   const getLabel = (labelKey: string): string => {
     // Navigate through the dictionary using the key path
     const keys = labelKey.split(".");
@@ -120,7 +140,7 @@ export default function PageSidebar({
       <Card className="border-border/60 bg-card/90 shadow-lg">
         <CardContent className="p-5">
           <nav className="space-y-3 text-sm">
-            {sections.map((section) => {
+            {filteredSections.map((section) => {
               const isDeviceInformation = section.id === "device-information" && currentPage === "/device-control";
               const hasChildren = section.children && section.children.length > 0;
               

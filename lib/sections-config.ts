@@ -23,12 +23,11 @@ export type PageSections = {
 const sortPagesAlphabetically = (pages: PageSections[]): PageSections[] => {
   const pageOrder: Record<string, number> = {
     api: 0,
-    firmware: 1,
-    information: 2,
-    setup: 3,
-    "device-control": 4,
-    troubleshooting: 5,
-    xim: 6,
+    information: 1,
+    setup: 2,
+    "device-control": 3,
+    troubleshooting: 4,
+    xim: 5,
   };
   return pages.sort((a, b) => {
     const aOrder = pageOrder[a.page] ?? 999;
@@ -154,24 +153,6 @@ export const SECTIONS_CONFIG: PageSections[] = sortPagesAlphabetically([
       {
         id: "limits",
         labelKey: "api.sections.limits",
-      },
-    ],
-  },
-  {
-    page: "firmware",
-    route: "/firmware",
-    sections: [
-      {
-        id: "steps",
-        labelKey: "tools.sections.steps.title",
-      },
-      {
-        id: "flashing-tool",
-        labelKey: "tools.sections.flashing_tool.title",
-      },
-      {
-        id: "firmware-selection",
-        labelKey: "tools.sections.firmware_selection.title",
       },
     ],
   },
@@ -368,16 +349,16 @@ export const SECTIONS_CONFIG: PageSections[] = sortPagesAlphabetically([
     route: "/device-control",
     sections: [
       {
-        id: "prerequisites",
-        labelKey: "device_control.prerequisites.title",
-      },
-      {
         id: "device-information",
         labelKey: "device_control.sections.device_information",
       },
       {
         id: "device-test",
         labelKey: "device_control.sections.device_test",
+      },
+      {
+        id: "firmware-selection",
+        labelKey: "tools.sections.firmware_selection.title",
       },
       {
         id: "serial-terminal",

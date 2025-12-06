@@ -5,9 +5,9 @@ import { Button } from "@/components/ui/button";
 import { useMakcuConnection } from "./contexts/makcu-connection-provider";
 import {
   parseDeviceTestResponse,
-  DeviceTestResult,
-  TestStatus,
-} from "./contexts/makcu-connection-provider";
+  type DeviceTestResult,
+  type TestStatus,
+} from "./contexts/makcu";
 import type { Locale } from "@/lib/locale";
 import { CheckCircle2, XCircle, MinusCircle, Loader2, MousePointer2, Keyboard } from "lucide-react";
 

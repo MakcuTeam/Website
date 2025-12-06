@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { useMakcuConnection } from "./contexts/makcu-connection-provider";
 import type { Locale } from "@/lib/locale";
 import { Send, Trash2 } from "lucide-react";
+import Link from "next/link";
 
 type SerialTerminalProps = {
   lang: Locale;
@@ -20,7 +21,7 @@ interface SerialLine {
 }
 
 export function SerialTerminal({ lang }: SerialTerminalProps) {
-  const { status, port, subscribeToTextLogs } = useMakcuConnection();
+  const { status, mode, port, subscribeToTextLogs } = useMakcuConnection();
   const [lines, setLines] = useState<SerialLine[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [isSending, setIsSending] = useState(false);
@@ -31,6 +32,9 @@ export function SerialTerminal({ lang }: SerialTerminalProps) {
   const lineIdRef = useRef(0);
   const currentLineBufferRef = useRef("");
   const isCn = lang === "cn";
+  
+  // Serial terminal is only available in normal mode
+  const isNormalMode = status === "connected" && mode === "normal";
 
   // Auto-scroll to bottom when new lines are added
   useEffect(() => {
@@ -40,6 +44,7 @@ export function SerialTerminal({ lang }: SerialTerminalProps) {
   }, [lines]);
 
   // Subscribe to incoming text/log data (non-0x50 data only)
+  // Subscribe in both normal and flash mode - flash logs come through textLogSubscribers
   useEffect(() => {
     if (status !== "connected" || !subscribeToTextLogs) return;
 
@@ -63,6 +68,13 @@ export function SerialTerminal({ lang }: SerialTerminalProps) {
         console.log(`[SERIAL TERMINAL] RX: Failed to decode as text, treating as binary`);
       }
 
+      // Filter out ESPLoader warnings that are harmless
+      // These warnings appear even though we're providing correct flash settings
+      const filteredWarnings = [
+        "image file at 0x0 doesn't look like an image file",
+        "so not changing any flash settings",
+      ];
+      
       // Process text data line by line
       setLines((prev) => {
         const newLines: SerialLine[] = [];
@@ -75,8 +87,11 @@ export function SerialTerminal({ lang }: SerialTerminalProps) {
 
           // Check for line terminators
           if (char === "\r" && nextChar === "\n") {
-            // CRLF
-            if (buffer.length > 0 || prev.length === 0 || prev[prev.length - 1]?.data.length > 0) {
+            // CRLF - check if this line should be filtered
+            const lineToCheck = (buffer + currentLineBufferRef.current).toLowerCase();
+            const shouldFilter = filteredWarnings.some(warning => lineToCheck.includes(warning));
+            
+            if (!shouldFilter && (buffer.length > 0 || prev.length === 0 || prev[prev.length - 1]?.data.length > 0)) {
               newLines.push({
                 id: lineIdRef.current++,
                 timestamp: Date.now(),
@@ -88,8 +103,11 @@ export function SerialTerminal({ lang }: SerialTerminalProps) {
             buffer = "";
             i++; // Skip the LF
           } else if (char === "\n") {
-            // LF
-            if (buffer.length > 0 || prev.length === 0 || prev[prev.length - 1]?.data.length > 0) {
+            // LF - check if this line should be filtered
+            const lineToCheck = (buffer + currentLineBufferRef.current).toLowerCase();
+            const shouldFilter = filteredWarnings.some(warning => lineToCheck.includes(warning));
+            
+            if (!shouldFilter && (buffer.length > 0 || prev.length === 0 || prev[prev.length - 1]?.data.length > 0)) {
               newLines.push({
                 id: lineIdRef.current++,
                 timestamp: Date.now(),
@@ -100,8 +118,11 @@ export function SerialTerminal({ lang }: SerialTerminalProps) {
             }
             buffer = "";
           } else if (char === "\r") {
-            // CR alone
-            if (buffer.length > 0 || prev.length === 0 || prev[prev.length - 1]?.data.length > 0) {
+            // CR alone - check if this line should be filtered
+            const lineToCheck = (buffer + currentLineBufferRef.current).toLowerCase();
+            const shouldFilter = filteredWarnings.some(warning => lineToCheck.includes(warning));
+            
+            if (!shouldFilter && (buffer.length > 0 || prev.length === 0 || prev[prev.length - 1]?.data.length > 0)) {
               newLines.push({
                 id: lineIdRef.current++,
                 timestamp: Date.now(),
@@ -151,7 +172,7 @@ export function SerialTerminal({ lang }: SerialTerminalProps) {
   }, [status, subscribeToTextLogs]);
 
   const sendCommand = useCallback(async () => {
-    if (!port || status !== "connected" || !inputValue.trim() || isSending) return;
+    if (!port || !isNormalMode || !inputValue.trim() || isSending) return;
 
     const command = inputValue.trim();
     const commandWithNewline = command.endsWith("\n") ? command : command + "\n";
@@ -217,7 +238,7 @@ export function SerialTerminal({ lang }: SerialTerminalProps) {
         inputRef.current?.focus();
       }, 0);
     }
-  }, [port, status, inputValue, isSending]);
+  }, [port, isNormalMode, inputValue, isSending]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "ArrowUp") {
@@ -277,13 +298,6 @@ export function SerialTerminal({ lang }: SerialTerminalProps) {
           {isCn ? "清空" : "Clear"}
         </Button>
       </div>
-        {/* Description */}
-        <p className="text-sm text-muted-foreground">
-          {isCn
-            ? "实时查看串口输出并发送命令。按 Enter 发送，Shift+Enter 换行。"
-            : "View serial port output in real-time and send commands. Press Enter to send, Shift+Enter for new line."}
-        </p>
-
         {/* Terminal Output */}
         <div
           ref={scrollContainerRef}
@@ -292,7 +306,17 @@ export function SerialTerminal({ lang }: SerialTerminalProps) {
         >
           {status !== "connected" ? (
             <div className="text-muted-foreground">
-              {isCn ? "设备未连接。连接设备后，串口数据将显示在这里。" : "Device not connected. Serial data will appear here once connected."}
+              {isCn ? (
+                <>设备未连接，请查看<Link href={`/${lang}/setup`} className="text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 underline">设置页面</Link>。</>
+              ) : (
+                <>Device not connected, please see the <Link href={`/${lang}/setup`} className="text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 underline">setup page</Link>.</>
+              )}
+            </div>
+          ) : mode === "flash" && lines.length === 0 ? (
+            <div className="text-muted-foreground">
+              {isCn 
+                ? "刷写模式下，刷写日志将显示在这里。串口命令输入已禁用。" 
+                : "In flash mode, flash logs will appear here. Serial command input is disabled."}
             </div>
           ) : lines.length === 0 ? (
             <div className="text-muted-foreground">
@@ -344,7 +368,7 @@ export function SerialTerminal({ lang }: SerialTerminalProps) {
             }}
             onKeyDown={handleKeyDown}
             placeholder={isCn ? "输入命令并按 Enter 发送..." : "Enter command and press Enter to send..."}
-            disabled={status !== "connected" || isSending}
+            disabled={!isNormalMode || isSending}
             className="font-mono"
           />
           <Button
@@ -352,7 +376,7 @@ export function SerialTerminal({ lang }: SerialTerminalProps) {
               e.preventDefault();
               sendCommand();
             }}
-            disabled={status !== "connected" || !inputValue.trim() || isSending}
+            disabled={!isNormalMode || !inputValue.trim() || isSending}
             size="default"
             type="button"
             onMouseDown={(e) => {
