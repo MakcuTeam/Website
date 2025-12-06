@@ -39,6 +39,10 @@ export default function PageSidebar({
     if (section.id === "device-test") {
       return status === "connected" && mode === "normal";
     }
+    // Hide serial-terminal unless in normal or flash mode
+    if (section.id === "serial-terminal") {
+      return status === "connected" && (mode === "normal" || mode === "flash");
+    }
     // Device information shows when connected in normal mode
     if (section.id === "device-information") {
       return status === "connected" && mode === "normal";

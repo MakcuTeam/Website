@@ -186,6 +186,25 @@ export default async function SetupPage({ params }: LangProps) {
                         </p>
                       </div>
                       <div>
+                        <h4 className="font-semibold text-black dark:text-white mb-2">{t("Device Control", "设备控制")}</h4>
+                        <p className="text-sm leading-relaxed text-muted-foreground">
+                          {t(
+                            "To flash MAKCU firmware, you need to navigate to the ",
+                            "要刷写 MAKCU 固件，您需要导航到"
+                          )}
+                          <Link
+                            href={`/${lang}/device-control`}
+                            className="text-blue-600 dark:text-blue-400 hover:underline"
+                          >
+                            {t("Device control section", "设备控制部分")}
+                          </Link>
+                          {t(
+                            " in the website. This is where you can select and flash the firmware to your device.",
+                            "。这是您可以选择并刷写固件到设备的地方。"
+                          )}
+                        </p>
+                      </div>
+                      <div>
                         <h4 className="font-semibold text-black dark:text-white mb-2">{t("Selecting Firmware", "选择固件")}</h4>
                         <p className="text-sm leading-relaxed text-muted-foreground">
                           {dict.setup.sections.flash_makcu.flashing_process.selecting_firmware}

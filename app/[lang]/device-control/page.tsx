@@ -1,15 +1,13 @@
-import { Card, CardContent } from "@/components/ui/card";
 import type { LangProps } from "@/lib/dictionaries";
 import type { Locale } from "@/lib/locale";
 import type { Metadata } from "next";
 import { getDictionary } from "@/lib/dictionaries";
-import { Section, SubSection } from "@/components/section";
-import PageSidebar from "@/components/page-sidebar";
+import { ConditionalSidebar } from "@/components/conditional-sidebar";
 import { getSectionsForPage } from "@/lib/sections-config";
-import { SerialTerminal } from "@/components/serial-terminal";
-import { FlashControls } from "@/components/flash-controls";
+import { SerialTerminalSection } from "@/components/serial-terminal-section";
 import { FirmwareSelectionSection } from "@/components/firmware-selection-section";
 import { DeviceTestSection } from "@/components/device-test-section";
+import { DeviceControlNote } from "@/components/device-control-note";
 
 type TocItem = {
   id: string;
@@ -69,10 +67,11 @@ export default async function DeviceControlPage({ params }: LangProps) {
         <p className="max-w-2xl text-sm text-muted-foreground sm:text-base">
           {dict.device_control.description}
         </p>
+        <DeviceControlNote lang={lang} />
       </header>
 
       <div className="mt-10 grid gap-8 lg:grid-cols-[280px_minmax(0,1fr)] xl:grid-cols-[300px_minmax(0,1fr)]">
-        <PageSidebar
+        <ConditionalSidebar
           sections={getSectionsForPage("device-control")}
           currentPage="/device-control"
           lang={lang}
@@ -86,20 +85,8 @@ export default async function DeviceControlPage({ params }: LangProps) {
           {/* Firmware Selection Section - Only visible in flash mode */}
           <FirmwareSelectionSection lang={lang} dict={dict} />
 
-          {/* Serial Terminal Section with Flash Controls */}
-          <Section id="serial-terminal" title={dict.device_control.sections.serial_terminal}>
-            <Card className="border-border/60 bg-card/90 shadow-lg">
-              <CardContent className="p-6">
-                <div className="space-y-6">
-                  {/* Flash Controls - Above Serial Terminal */}
-                  <FlashControls lang={lang} dict={dict} />
-                  
-                  {/* Serial Terminal */}
-                  <SerialTerminal lang={lang} />
-                </div>
-              </CardContent>
-            </Card>
-          </Section>
+          {/* Serial Terminal Section with Flash Controls - Only visible in normal or flash mode */}
+          <SerialTerminalSection lang={lang} dict={dict} />
         </div>
       </div>
     </div>
