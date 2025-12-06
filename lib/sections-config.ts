@@ -154,6 +154,122 @@ export const SECTIONS_CONFIG: PageSections[] = sortPagesAlphabetically([
         id: "limits",
         labelKey: "api.sections.limits",
       },
+      {
+        id: "binary-protocol-format",
+        labelKey: "api.sections.binary_protocol_format",
+      },
+      {
+        id: "binary-api-mouse",
+        labelKey: "api.sections.binary_api_mouse",
+        children: [
+          {
+            id: "binary-mouse-buttons",
+            labelKey: "api.sections.binary_mouse_buttons",
+            children: [
+              { id: "binary-buttons-stream", labelKey: "api.sections.binary_buttons_stream" },
+              { id: "binary-click", labelKey: "api.sections.binary_click" },
+              { id: "binary-individual-buttons", labelKey: "api.sections.binary_individual_buttons" },
+            ],
+          },
+          {
+            id: "binary-mouse-movement",
+            labelKey: "api.sections.binary_mouse_movement",
+            children: [
+              { id: "binary-move", labelKey: "api.sections.binary_move" },
+              { id: "binary-moveto", labelKey: "api.sections.binary_moveto" },
+              { id: "binary-wheel", labelKey: "api.sections.binary_wheel" },
+              { id: "binary-pan", labelKey: "api.sections.binary_pan" },
+              { id: "binary-tilt", labelKey: "api.sections.binary_tilt" },
+              { id: "binary-silent", labelKey: "api.sections.binary_silent" },
+            ],
+          },
+          {
+            id: "binary-mouse-streaming",
+            labelKey: "api.sections.binary_mouse_streaming",
+            children: [
+              { id: "binary-axis-stream", labelKey: "api.sections.binary_axis_stream" },
+              { id: "binary-mouse-stream", labelKey: "api.sections.binary_mouse_stream" },
+            ],
+          },
+          {
+            id: "binary-mouse-advanced",
+            labelKey: "api.sections.binary_mouse_advanced",
+            children: [
+              { id: "binary-catch", labelKey: "api.sections.binary_catch" },
+              { id: "binary-getpos", labelKey: "api.sections.binary_getpos" },
+              { id: "binary-mo", labelKey: "api.sections.binary_mo" },
+              { id: "binary-remap-button", labelKey: "api.sections.binary_remap_button" },
+              { id: "binary-turbo", labelKey: "api.sections.binary_turbo" },
+            ],
+          },
+        ],
+      },
+      {
+        id: "binary-api-keyboard",
+        labelKey: "api.sections.binary_api_keyboard",
+        children: [
+          {
+            id: "binary-keyboard-basic",
+            labelKey: "api.sections.binary_keyboard_basic",
+            children: [
+              { id: "binary-down", labelKey: "api.sections.binary_down" },
+              { id: "binary-up", labelKey: "api.sections.binary_up" },
+              { id: "binary-press", labelKey: "api.sections.binary_press" },
+              { id: "binary-string", labelKey: "api.sections.binary_string" },
+              { id: "binary-init", labelKey: "api.sections.binary_init" },
+              { id: "binary-isdown", labelKey: "api.sections.binary_isdown" },
+            ],
+          },
+          {
+            id: "binary-keyboard-streaming",
+            labelKey: "api.sections.binary_keyboard_streaming",
+            children: [
+              { id: "binary-keyboard-stream", labelKey: "api.sections.binary_keyboard_stream" },
+            ],
+          },
+          {
+            id: "binary-keyboard-config",
+            labelKey: "api.sections.binary_keyboard_config",
+            children: [
+              { id: "binary-disable", labelKey: "api.sections.binary_disable" },
+              { id: "binary-mask", labelKey: "api.sections.binary_mask" },
+              { id: "binary-remap", labelKey: "api.sections.binary_remap" },
+            ],
+          },
+        ],
+      },
+      {
+        id: "binary-api-general",
+        labelKey: "api.sections.binary_api_general",
+        children: [
+          {
+            id: "binary-general-config",
+            labelKey: "api.sections.binary_general_config",
+            children: [
+              { id: "binary-baud", labelKey: "api.sections.binary_baud" },
+              { id: "binary-bypass", labelKey: "api.sections.binary_bypass" },
+              { id: "binary-echo", labelKey: "api.sections.binary_echo" },
+              { id: "binary-hs", labelKey: "api.sections.binary_hs" },
+              { id: "binary-led", labelKey: "api.sections.binary_led" },
+              { id: "binary-log", labelKey: "api.sections.binary_log" },
+              { id: "binary-release", labelKey: "api.sections.binary_release" },
+              { id: "binary-screen", labelKey: "api.sections.binary_screen" },
+              { id: "binary-serial", labelKey: "api.sections.binary_serial" },
+            ],
+          },
+          {
+            id: "binary-general-system",
+            labelKey: "api.sections.binary_general_system",
+            children: [
+              { id: "binary-device", labelKey: "api.sections.binary_device" },
+              { id: "binary-fault", labelKey: "api.sections.binary_fault" },
+              { id: "binary-info", labelKey: "api.sections.binary_info" },
+              { id: "binary-reboot", labelKey: "api.sections.binary_reboot" },
+              { id: "binary-version", labelKey: "api.sections.binary_version" },
+            ],
+          },
+        ],
+      },
     ],
   },
   {
