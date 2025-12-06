@@ -120,9 +120,37 @@ const tocByLang: Record<Locale, TocItem[]> = {
           { id: "release", label: "release() (GET/SET)" },
         ],
       },
-    { id: "baud-binary", label: "Baud Rate (Binary)" },
     { id: "no-usb", label: "Functions Without USB Device" },
+    { id: "baud-binary", label: "Baud Rate (Binary)" },
     { id: "limits", label: "Limits & Parsing" },
+    { id: "binary-protocol-format", label: "Binary Protocol Format" },
+    {
+      id: "binary-api-mouse",
+      label: "Binary API - Mouse",
+      children: [
+        { id: "binary-mouse-buttons", label: "Buttons & Clicks" },
+        { id: "binary-mouse-movement", label: "Movement" },
+        { id: "binary-mouse-streaming", label: "Streaming" },
+        { id: "binary-mouse-advanced", label: "Advanced" },
+      ],
+    },
+    {
+      id: "binary-api-keyboard",
+      label: "Binary API - Keyboard",
+      children: [
+        { id: "binary-keyboard-basic", label: "Basic Operations" },
+        { id: "binary-keyboard-streaming", label: "Streaming" },
+        { id: "binary-keyboard-config", label: "Configuration" },
+      ],
+    },
+    {
+      id: "binary-api-general",
+      label: "Binary API - General",
+      children: [
+        { id: "binary-general-config", label: "Configuration" },
+        { id: "binary-general-system", label: "System" },
+      ],
+    },
   ],
   cn: [
     { id: "transport", label: "传输与封装" },
@@ -225,9 +253,37 @@ const tocByLang: Record<Locale, TocItem[]> = {
           { id: "release", label: "release() (GET/SET)" },
         ],
       },
-    { id: "baud-binary", label: "波特率（二进制）" },
     { id: "no-usb", label: "无需 USB 设备的函数" },
+    { id: "baud-binary", label: "波特率（二进制）" },
     { id: "limits", label: "限制与解析" },
+    { id: "binary-protocol-format", label: "二进制协议格式" },
+    {
+      id: "binary-api-mouse",
+      label: "二进制 API - 鼠标",
+      children: [
+        { id: "binary-mouse-buttons", label: "按键与点击" },
+        { id: "binary-mouse-movement", label: "移动" },
+        { id: "binary-mouse-streaming", label: "流式" },
+        { id: "binary-mouse-advanced", label: "高级" },
+      ],
+    },
+    {
+      id: "binary-api-keyboard",
+      label: "二进制 API - 键盘",
+      children: [
+        { id: "binary-keyboard-basic", label: "基本操作" },
+        { id: "binary-keyboard-streaming", label: "流式" },
+        { id: "binary-keyboard-config", label: "配置" },
+      ],
+    },
+    {
+      id: "binary-api-general",
+      label: "二进制 API - 通用",
+      children: [
+        { id: "binary-general-config", label: "配置" },
+        { id: "binary-general-system", label: "系统" },
+      ],
+    },
   ],
 };
 
@@ -2635,11 +2691,11 @@ export default async function ApiPage({ params }: LangProps) {
                     label: t("Description", "描述"),
                     content: isCn ? (
                       <p>
-                        禁用 USB 写入并将原始帧流式传输到 COM2。可在未连接 USB 设备的情况下工作。
+                        阻止鼠标端点发送到 USB 1，所有其他端点将正常通过。可在未连接 USB 设备的情况下工作。
                       </p>
                     ) : (
                       <p>
-                        Disable USB write and stream raw frames to COM2. Works without USB device attached.
+                        Blocks the mouse endpoint from being sent to USB 1, all other endpoints will pass without issues. Works without USB device attached.
                       </p>
                     ),
                   },
@@ -3040,6 +3096,1886 @@ export default async function ApiPage({ params }: LangProps) {
                 </ul>
               </CardContent>
             </Card>
+          </Section>
+
+          {/* Binary Protocol Format */}
+          <Section
+            id="binary-protocol-format"
+            title={t("Binary Protocol Format", "二进制协议格式")}
+            lead={
+              isCn ? (
+                <span>
+                  所有二进制命令使用相同的帧结构。帧格式在下方说明，后续命令示例仅显示命令字节和负载数据。
+                </span>
+              ) : (
+                <span>
+                  All binary commands use the same frame structure. The frame format is explained below, and subsequent command examples show only the command byte and payload data.
+                </span>
+              )
+            }
+          >
+            <SpecCard
+              entries={[
+                {
+                  label: t("Frame Structure", "帧结构"),
+                  content: (
+                    <div className="space-y-3">
+                      <CodeBlock code={`[0x50] [CMD] [LEN_LO] [LEN_HI] [PAYLOAD...] [CRC_LO] [CRC_HI]`} />
+                      <ul className="list-disc space-y-2 pl-5 text-sm text-muted-foreground">
+                        <li>
+                          <span className="font-mono">0x50</span> - Frame start byte (fixed)
+                        </li>
+                        <li>
+                          <span className="font-mono">CMD</span> - Command byte (0x01-0xFF)
+                        </li>
+                        <li>
+                          <span className="font-mono">LEN_LO / LEN_HI</span> - Payload length in bytes (little-endian, 16-bit)
+                        </li>
+                        <li>
+                          <span className="font-mono">PAYLOAD</span> - Command-specific data (variable length)
+                        </li>
+                        <li>
+                          <span className="font-mono">CRC_LO / CRC_HI</span> - CRC-16-CCITT checksum (little-endian, covers START through PAYLOAD)
+                        </li>
+                      </ul>
+                    </div>
+                  ),
+                },
+                {
+                  label: t("Response Conventions", "响应约定"),
+                  content: (
+                    <ul className="list-disc space-y-2 pl-5 text-sm text-muted-foreground">
+                      <li>
+                        {isCn ? (
+                          <span><strong>设置命令 (SET)</strong>：返回 <span className="font-mono">[status:u8]</span>，其中 <span className="font-mono">0x00</span> 表示成功 (OK)，<span className="font-mono">0x01</span> 表示错误 (ERR)</span>
+                        ) : (
+                          <span><strong>Setters</strong>: Return <span className="font-mono">[status:u8]</span> where <span className="font-mono">0x00</span> = OK (success) and <span className="font-mono">0x01</span> = ERR (error)</span>
+                        )}
+                      </li>
+                      <li>
+                        {isCn ? (
+                          <span><strong>查询命令 (GET)</strong>：返回原始值字节或结构化数据</span>
+                        ) : (
+                          <span><strong>Getters</strong>: Return raw value bytes or structured data</span>
+                        )}
+                      </li>
+                      <li>
+                        {isCn ? (
+                          <span><strong>流式命令</strong>：返回原始 HID 帧字节（无文本格式）</span>
+                        ) : (
+                          <span><strong>Streaming</strong>: Return raw HID frame bytes (no text formatting)</span>
+                        )}
+                      </li>
+                      <li>
+                        {isCn ? (
+                          <span><strong>数据格式</strong>：多字节值使用小端序（little-endian）</span>
+                        ) : (
+                          <span><strong>Data Types</strong>: Multi-byte values use little-endian byte order</span>
+                        )}
+                      </li>
+                    </ul>
+                  ),
+                },
+                {
+                  label: t("Example", "示例"),
+                  content: (
+                    <div className="space-y-2">
+                      <p className="text-sm text-muted-foreground">
+                        {isCn ? (
+                          <span>查询波特率（命令 0xB1，无负载）：</span>
+                        ) : (
+                          <span>Query baud rate (command 0xB1, no payload):</span>
+                        )}
+                      </p>
+                      <CodeBlock code={`Request:  [0x50] [0xB1] [0x00] [0x00] [CRC_LO] [CRC_HI]\nResponse: [0x50] [0xB1] [0x04] [0x00] [0x00] [0xC2] [0x01] [0x00] [CRC_LO] [CRC_HI]\n         └─ 0x00C20100 = 115200 (little-endian)`} />
+                      <p className="text-sm text-muted-foreground mt-3">
+                        {isCn ? (
+                          <span>在后续命令示例中，我们仅显示：<span className="font-mono">[CMD] [PAYLOAD...]</span></span>
+                        ) : (
+                          <span>In subsequent command examples, we show only: <span className="font-mono">[CMD] [PAYLOAD...]</span></span>
+                        )}
+                      </p>
+                    </div>
+                  ),
+                },
+              ]}
+            />
+          </Section>
+
+          {/* Binary API - Mouse */}
+          <Section
+            id="binary-api-mouse"
+            title={t("Binary API - Mouse Commands", "二进制 API - 鼠标命令")}
+          >
+            <SubSection id="binary-mouse-buttons" title={t("Buttons & Clicks", "按键与点击")}>
+              <SubSection id="binary-buttons-stream" title="buttons([mode[,period_ms]]) — GET/SET (0x02)">
+                <SpecCard
+                  entries={[
+                    {
+                      label: t("Command", "命令"),
+                      content: <span className="font-mono">[0x02]</span>,
+                    },
+                    {
+                      label: t("Description", "描述"),
+                      content: t(
+                        "Stream button states - mode: 1=raw 2=mut; period: 1-1000ms (rounded to bInterval); requires baud >= 1M; only emits on new frames",
+                        "流式输出按键状态 - 模式：1=原始 2=修改；周期：1-1000ms（四舍五入到 bInterval）；需要波特率 >= 1M；仅在帧变化时输出"
+                      ),
+                    },
+                    {
+                      label: t("Params", "参数"),
+                      content: isCn ? (
+                        <span>() 查询; (mode) 设置模式; (mode,period_ms) 设置模式和周期。mode: 1=原始 2=修改；period: 1-1000ms</span>
+                      ) : (
+                        <span>() to query; (mode) set mode; (mode,period_ms) set mode and period. mode: 1=raw 2=mut; period: 1-1000ms</span>
+                      ),
+                    },
+                    {
+                      label: t("Response (GET)", "响应 (GET)"),
+                      content: (
+                        <div className="space-y-2">
+                          <CodeBlock code={`[0x02]\nResponse: [0x02] [mode:u8] [period:u8]`} />
+                          <p className="text-sm text-muted-foreground">
+                            {t("Returns current streaming mode and period.", "返回当前流式模式和周期。")}
+                          </p>
+                        </div>
+                      ),
+                    },
+                    {
+                      label: t("Response (SET)", "响应 (SET)"),
+                      content: (
+                        <div className="space-y-2">
+                          <CodeBlock code={`[0x02] [mode:u8] [period:u8]\nResponse: [0x02] [status:u8]`} />
+                          <p className="text-sm text-muted-foreground">
+                            {t("Returns 0x00 (OK) on success, 0x01 (ERR) on error.", "成功返回 0x00 (OK)，错误返回 0x01 (ERR)。")}
+                          </p>
+                        </div>
+                      ),
+                    },
+                    {
+                      label: t("Streaming format", "流格式"),
+                      content: (
+                        <div className="space-y-2">
+                          <p className="text-sm">
+                            {t("Device emits 2-byte binary frame when buttons change:", "设备在按键变化时发送 2 字节二进制帧：")}
+                          </p>
+                          <CodeBlock code={`[0x02] [buttons_lo:u8] [buttons_hi:u8]`} />
+                          <p className="text-sm text-muted-foreground">
+                            {t("Buttons mask: bit 0=left, 1=right, 2=middle, 3=side1, 4=side2", "按键掩码：位 0=左键，1=右键，2=中键，3=侧键1，4=侧键2")}
+                          </p>
+                        </div>
+                      ),
+                    },
+                  ]}
+                />
+              </SubSection>
+
+              <SubSection id="binary-click" title="click(button,count,delay_ms) — SET (0x04)">
+                <SpecCard
+                  entries={[
+                    {
+                      label: t("Command", "命令"),
+                      content: <span className="font-mono">[0x04]</span>,
+                    },
+                    {
+                      label: t("Description", "描述"),
+                      content: t(
+                        "Schedule clicks - button 1-5, count 1-255, delay_ms (0=random 35-75ms)",
+                        "调度点击 - 按钮 1-5，次数 1-255，延迟 ms（0=随机 35-75ms）"
+                      ),
+                    },
+                    {
+                      label: t("Params", "参数"),
+                      content: isCn ? (
+                        <span>button: 1-5（左、右、中、侧1、侧2）；count: 1-255；delay_ms: 延迟毫秒，0=随机 35-75ms</span>
+                      ) : (
+                        <span>button: 1-5 (left, right, middle, side1, side2); count: 1-255; delay_ms: delay in ms, 0=random 35-75ms</span>
+                      ),
+                    },
+                    {
+                      label: t("Response (SET)", "响应 (SET)"),
+                      content: (
+                        <div className="space-y-2">
+                          <CodeBlock code={`[0x04] [button:u8] [count:u8] [delay_ms:u8]\nResponse: [0x04] [status:u8]`} />
+                          <p className="text-sm text-muted-foreground">
+                            {t("Returns 0x00 (OK) on success, 0x01 (ERR) on error.", "成功返回 0x00 (OK)，错误返回 0x01 (ERR)。")}
+                          </p>
+                        </div>
+                      ),
+                    },
+                  ]}
+                />
+              </SubSection>
+
+              <SubSection id="binary-individual-buttons" title="left/right/middle/side1/side2([state]) — GET/SET (0x08-0x13)">
+                <SpecCard
+                  entries={[
+                    {
+                      label: t("Command", "命令"),
+                      content: <span className="font-mono">left(0x08) | right(0x11) | middle(0x0A) | side1(0x12) | side2(0x13)</span>,
+                    },
+                    {
+                      label: t("Description", "描述"),
+                      content: t(
+                        "Control individual mouse buttons - state: 0=release 1=down 2=silent_release; get returns: 0=none 1=raw 2=injected 3=both",
+                        "控制单个鼠标按键 - 状态：0=释放 1=按下 2=静默释放；查询返回：0=无 1=原始 2=注入 3=两者"
+                      ),
+                    },
+                    {
+                      label: t("Params", "参数"),
+                      content: isCn ? (
+                        <span>() 查询; (state) 设置状态。state: 0=释放（发送帧），1=按下，2=静默释放（设为0但不发送帧）</span>
+                      ) : (
+                        <span>() to query; (state) set state. state: 0=release (sends frame), 1=down, 2=silent_release (sets to 0 but doesn't send frame)</span>
+                      ),
+                    },
+                    {
+                      label: t("Response (GET)", "响应 (GET)"),
+                      content: (
+                        <div className="space-y-2">
+                          <CodeBlock code={`[0x08]\nResponse: [0x08] [state:u8]`} />
+                          <p className="text-sm text-muted-foreground">
+                            {t("Returns lock state: 0=none, 1=raw, 2=injected, 3=both.", "返回锁定状态：0=无，1=原始，2=注入，3=两者。")}
+                          </p>
+                        </div>
+                      ),
+                    },
+                    {
+                      label: t("Response (SET)", "响应 (SET)"),
+                      content: (
+                        <div className="space-y-2">
+                          <CodeBlock code={`[0x08] [state:u8]\nResponse: [0x08] [status:u8]`} />
+                          <p className="text-sm text-muted-foreground">
+                            {t("Returns 0x00 (OK) on success, 0x01 (ERR) on error.", "成功返回 0x00 (OK)，错误返回 0x01 (ERR)。")}
+                          </p>
+                        </div>
+                      ),
+                    },
+                  ]}
+                />
+              </SubSection>
+            </SubSection>
+
+            <SubSection id="binary-mouse-movement" title={t("Movement", "移动")}>
+              <SubSection id="binary-move" title="move(dx,dy[,segments[,cx1,cy1]]) — SET (0x0D)">
+                <SpecCard
+                  entries={[
+                    {
+                      label: t("Command", "命令"),
+                      content: <span className="font-mono">[0x0D]</span>,
+                    },
+                    {
+                      label: t("Description", "描述"),
+                      content: t(
+                        "Move relative with bezier curve",
+                        "相对移动并带贝塞尔曲线"
+                      ),
+                    },
+                    {
+                      label: t("Params", "参数"),
+                      content: isCn ? (
+                        <span>dx,dy: 相对移动距离（int16）；segments: 贝塞尔分段数；cx1,cy1: 控制点1（int8）</span>
+                      ) : (
+                        <span>dx,dy: relative movement (int16); segments: bezier segments; cx1,cy1: control point 1 (int8)</span>
+                      ),
+                    },
+                    {
+                      label: t("Response (SET)", "响应 (SET)"),
+                      content: (
+                        <div className="space-y-2">
+                          <CodeBlock code={`[0x0D] [x:i16] [y:i16] [segments:u8] [cx1:i8] [cy1:i8]\nResponse: [0x0D] [status:u8]`} />
+                          <p className="text-sm text-muted-foreground">
+                            {t("Returns 0x00 (OK) on success, 0x01 (ERR) on error.", "成功返回 0x00 (OK)，错误返回 0x01 (ERR)。")}
+                          </p>
+                        </div>
+                      ),
+                    },
+                  ]}
+                />
+              </SubSection>
+
+              <SubSection id="binary-moveto" title="moveto(x,y[,segments[,cx1,cy1[,cx2,cy2]]]) — SET (0x0E)">
+                <SpecCard
+                  entries={[
+                    {
+                      label: t("Command", "命令"),
+                      content: <span className="font-mono">[0x0E]</span>,
+                    },
+                    {
+                      label: t("Description", "描述"),
+                      content: t(
+                        "Move absolute with bezier curve",
+                        "绝对移动并带贝塞尔曲线"
+                      ),
+                    },
+                    {
+                      label: t("Params", "参数"),
+                      content: isCn ? (
+                        <span>x,y: 绝对位置（int16）；segments: 贝塞尔分段数；cx1,cy1,cx2,cy2: 控制点（int16）</span>
+                      ) : (
+                        <span>x,y: absolute position (int16); segments: bezier segments; cx1,cy1,cx2,cy2: control points (int16)</span>
+                      ),
+                    },
+                    {
+                      label: t("Response (SET)", "响应 (SET)"),
+                      content: (
+                        <div className="space-y-2">
+                          <CodeBlock code={`[0x0E] [x:i16] [y:i16] [segments:u8] [cx1:i16] [cy1:i16] [cx2:i16] [cy2:i16]\nResponse: [0x0E] [status:u8]`} />
+                          <p className="text-sm text-muted-foreground">
+                            {t("Returns 0x00 (OK) on success, 0x01 (ERR) on error.", "成功返回 0x00 (OK)，错误返回 0x01 (ERR)。")}
+                          </p>
+                        </div>
+                      ),
+                    },
+                  ]}
+                />
+              </SubSection>
+
+              <SubSection id="binary-wheel" title="wheel(delta) — SET (0x18)">
+                <SpecCard
+                  entries={[
+                    {
+                      label: t("Command", "命令"),
+                      content: <span className="font-mono">[0x18]</span>,
+                    },
+                    {
+                      label: t("Description", "描述"),
+                      content: t(
+                        "Scroll wheel steps",
+                        "滚轮步数"
+                      ),
+                    },
+                    {
+                      label: t("Params", "参数"),
+                      content: isCn ? (
+                        <span>delta: 滚轮增量（int8，正值向上，负值向下）</span>
+                      ) : (
+                        <span>delta: wheel steps (int8, positive=up, negative=down)</span>
+                      ),
+                    },
+                    {
+                      label: t("Response (SET)", "响应 (SET)"),
+                      content: (
+                        <div className="space-y-2">
+                          <CodeBlock code={`[0x18] [delta:i8]\nResponse: [0x18] [status:u8]`} />
+                          <p className="text-sm text-muted-foreground">
+                            {t("Returns 0x00 (OK) on success, 0x01 (ERR) on error.", "成功返回 0x00 (OK)，错误返回 0x01 (ERR)。")}
+                          </p>
+                        </div>
+                      ),
+                    },
+                  ]}
+                />
+              </SubSection>
+
+              <SubSection id="binary-pan" title="pan([steps]) — GET/SET (0x0F)">
+                <SpecCard
+                  entries={[
+                    {
+                      label: t("Command", "命令"),
+                      content: <span className="font-mono">[0x0F]</span>,
+                    },
+                    {
+                      label: t("Description", "描述"),
+                      content: t(
+                        "Horizontal scroll/pan steps",
+                        "水平滚动/平移步数"
+                      ),
+                    },
+                    {
+                      label: t("Params", "参数"),
+                      content: isCn ? (
+                        <span>() 查询待处理的平移；(steps) 设置平移步数（int8）</span>
+                      ) : (
+                        <span>() to query pending pan; (steps) set pan steps (int8)</span>
+                      ),
+                    },
+                    {
+                      label: t("Response (GET)", "响应 (GET)"),
+                      content: (
+                        <div className="space-y-2">
+                          <CodeBlock code={`[0x0F]\nResponse: [0x0F] [pending:i8]`} />
+                        </div>
+                      ),
+                    },
+                    {
+                      label: t("Response (SET)", "响应 (SET)"),
+                      content: (
+                        <div className="space-y-2">
+                          <CodeBlock code={`[0x0F] [steps:i8]\nResponse: [0x0F] [status:u8]`} />
+                          <p className="text-sm text-muted-foreground">
+                            {t("Returns 0x00 (OK) on success, 0x01 (ERR) on error.", "成功返回 0x00 (OK)，错误返回 0x01 (ERR)。")}
+                          </p>
+                        </div>
+                      ),
+                    },
+                  ]}
+                />
+              </SubSection>
+
+              <SubSection id="binary-tilt" title="tilt([steps]) — GET/SET (0x16)">
+                <SpecCard
+                  entries={[
+                    {
+                      label: t("Command", "命令"),
+                      content: <span className="font-mono">[0x16]</span>,
+                    },
+                    {
+                      label: t("Description", "描述"),
+                      content: t(
+                        "Tilt/z-axis steps",
+                        "倾斜/z轴步数"
+                      ),
+                    },
+                    {
+                      label: t("Params", "参数"),
+                      content: isCn ? (
+                        <span>() 查询待处理的倾斜；(steps) 设置倾斜步数（int8）</span>
+                      ) : (
+                        <span>() to query pending tilt; (steps) set tilt steps (int8)</span>
+                      ),
+                    },
+                    {
+                      label: t("Response (GET)", "响应 (GET)"),
+                      content: (
+                        <div className="space-y-2">
+                          <CodeBlock code={`[0x16]\nResponse: [0x16] [pending:i8]`} />
+                        </div>
+                      ),
+                    },
+                    {
+                      label: t("Response (SET)", "响应 (SET)"),
+                      content: (
+                        <div className="space-y-2">
+                          <CodeBlock code={`[0x16] [steps:i8]\nResponse: [0x16] [status:u8]`} />
+                          <p className="text-sm text-muted-foreground">
+                            {t("Returns 0x00 (OK) on success, 0x01 (ERR) on error.", "成功返回 0x00 (OK)，错误返回 0x01 (ERR)。")}
+                          </p>
+                        </div>
+                      ),
+                    },
+                  ]}
+                />
+              </SubSection>
+
+              <SubSection id="binary-silent" title="silent(x,y) — SET (0x14)">
+                <SpecCard
+                  entries={[
+                    {
+                      label: t("Command", "命令"),
+                      content: <span className="font-mono">[0x14]</span>,
+                    },
+                    {
+                      label: t("Description", "描述"),
+                      content: t(
+                        "Move then silent left click",
+                        "移动然后静默左键点击"
+                      ),
+                    },
+                    {
+                      label: t("Params", "参数"),
+                      content: isCn ? (
+                        <span>x,y: 移动到的位置（int16）</span>
+                      ) : (
+                        <span>x,y: position to move to (int16)</span>
+                      ),
+                    },
+                    {
+                      label: t("Response (SET)", "响应 (SET)"),
+                      content: (
+                        <div className="space-y-2">
+                          <CodeBlock code={`[0x14] [x:i16] [y:i16]\nResponse: [0x14] [status:u8]`} />
+                          <p className="text-sm text-muted-foreground">
+                            {t("Returns 0x00 (OK) on success, 0x01 (ERR) on error.", "成功返回 0x00 (OK)，错误返回 0x01 (ERR)。")}
+                          </p>
+                        </div>
+                      ),
+                    },
+                  ]}
+                />
+              </SubSection>
+            </SubSection>
+
+            <SubSection id="binary-mouse-streaming" title={t("Streaming", "流式")}>
+              <SubSection id="binary-axis-stream" title="axis([mode[,period_ms]]) — GET/SET (0x01)">
+                <SpecCard
+                  entries={[
+                    {
+                      label: t("Command", "命令"),
+                      content: <span className="font-mono">[0x01]</span>,
+                    },
+                    {
+                      label: t("Description", "描述"),
+                      content: t(
+                        "Stream x/y/wheel axis deltas - mode: 1=raw 2=mut; period: 1-1000ms (rounded to bInterval); requires baud >= 1M; only emits on new frames",
+                        "流式输出 x/y/滚轮轴增量 - 模式：1=原始 2=修改；周期：1-1000ms（四舍五入到 bInterval）；需要波特率 >= 1M；仅在帧变化时输出"
+                      ),
+                    },
+                    {
+                      label: t("Params", "参数"),
+                      content: isCn ? (
+                        <span>() 查询; (mode) 设置模式; (mode,period_ms) 设置模式和周期。mode: 1=原始 2=修改；period: 1-1000ms</span>
+                      ) : (
+                        <span>() to query; (mode) set mode; (mode,period_ms) set mode and period. mode: 1=raw 2=mut; period: 1-1000ms</span>
+                      ),
+                    },
+                    {
+                      label: t("Response (GET)", "响应 (GET)"),
+                      content: (
+                        <div className="space-y-2">
+                          <CodeBlock code={`[0x01]\nResponse: [0x01] [mode:u8] [period:u8]`} />
+                        </div>
+                      ),
+                    },
+                    {
+                      label: t("Response (SET)", "响应 (SET)"),
+                      content: (
+                        <div className="space-y-2">
+                          <CodeBlock code={`[0x01] [mode:u8] [period:u8]\nResponse: [0x01] [status:u8]`} />
+                          <p className="text-sm text-muted-foreground">
+                            {t("Returns 0x00 (OK) on success, 0x01 (ERR) on error.", "成功返回 0x00 (OK)，错误返回 0x01 (ERR)。")}
+                          </p>
+                        </div>
+                      ),
+                    },
+                    {
+                      label: t("Streaming format", "流格式"),
+                      content: (
+                        <div className="space-y-2">
+                          <p className="text-sm">
+                            {t("Device emits 6-byte binary frame when axes change:", "设备在轴变化时发送 6 字节二进制帧：")}
+                          </p>
+                          <CodeBlock code={`[0x01] [dx:i16] [dy:i16] [wheel:i8]`} />
+                        </div>
+                      ),
+                    },
+                  ]}
+                />
+              </SubSection>
+
+              <SubSection id="binary-mouse-stream" title="mouse([mode[,period_ms]]) — GET/SET (0x0C)">
+                <SpecCard
+                  entries={[
+                    {
+                      label: t("Command", "命令"),
+                      content: <span className="font-mono">[0x0C]</span>,
+                    },
+                    {
+                      label: t("Description", "描述"),
+                      content: t(
+                        "Stream full mouse data - mode: 1=raw 2=mut; period: 1-1000ms (rounded to bInterval); requires baud >= 1M; only emits on new frames",
+                        "流式输出完整鼠标数据 - 模式：1=原始 2=修改；周期：1-1000ms（四舍五入到 bInterval）；需要波特率 >= 1M；仅在帧变化时输出"
+                      ),
+                    },
+                    {
+                      label: t("Params", "参数"),
+                      content: isCn ? (
+                        <span>() 查询; (mode) 设置模式; (mode,period_ms) 设置模式和周期。mode: 1=原始 2=修改；period: 1-1000ms</span>
+                      ) : (
+                        <span>() to query; (mode) set mode; (mode,period_ms) set mode and period. mode: 1=raw 2=mut; period: 1-1000ms</span>
+                      ),
+                    },
+                    {
+                      label: t("Response (GET)", "响应 (GET)"),
+                      content: (
+                        <div className="space-y-2">
+                          <CodeBlock code={`[0x0C]\nResponse: [0x0C] [mode:u8] [period:u8]`} />
+                        </div>
+                      ),
+                    },
+                    {
+                      label: t("Response (SET)", "响应 (SET)"),
+                      content: (
+                        <div className="space-y-2">
+                          <CodeBlock code={`[0x0C] [mode:u8] [period:u8]\nResponse: [0x0C] [status:u8]`} />
+                          <p className="text-sm text-muted-foreground">
+                            {t("Returns 0x00 (OK) on success, 0x01 (ERR) on error.", "成功返回 0x00 (OK)，错误返回 0x01 (ERR)。")}
+                          </p>
+                        </div>
+                      ),
+                    },
+                    {
+                      label: t("Streaming format", "流格式"),
+                      content: (
+                        <div className="space-y-2">
+                          <p className="text-sm">
+                            {t("Device emits 8-byte binary frame when mouse data changes:", "设备在鼠标数据变化时发送 8 字节二进制帧：")}
+                          </p>
+                          <CodeBlock code={`[0x0C] [buttons:u8] [dx:i16] [dy:i16] [wheel:i8] [pan:i8] [tilt:i8]`} />
+                        </div>
+                      ),
+                    },
+                  ]}
+                />
+              </SubSection>
+            </SubSection>
+
+            <SubSection id="binary-mouse-advanced" title={t("Advanced", "高级")}>
+              <SubSection id="binary-catch" title="catch_<target>([mode]) — GET/SET (0x03)">
+                <SpecCard
+                  entries={[
+                    {
+                      label: t("Command", "命令"),
+                      content: <span className="font-mono">[0x03]</span>,
+                    },
+                    {
+                      label: t("Description", "描述"),
+                      content: t(
+                        "Catch mode - 0=off, 1=inject, 2=lock",
+                        "捕获模式 - 0=关闭，1=注入，2=锁定"
+                      ),
+                    },
+                    {
+                      label: t("Params", "参数"),
+                      content: isCn ? (
+                        <span>() 查询; (mode) 设置模式。mode: 0=关闭，1=注入，2=锁定</span>
+                      ) : (
+                        <span>() to query; (mode) set mode. mode: 0=off, 1=inject, 2=lock</span>
+                      ),
+                    },
+                    {
+                      label: t("Response (GET)", "响应 (GET)"),
+                      content: (
+                        <div className="space-y-2">
+                          <CodeBlock code={`[0x03]\nResponse: [0x03] [mode:u8]`} />
+                        </div>
+                      ),
+                    },
+                    {
+                      label: t("Response (SET)", "响应 (SET)"),
+                      content: (
+                        <div className="space-y-2">
+                          <CodeBlock code={`[0x03] [mode:u8]\nResponse: [0x03] [status:u8]`} />
+                          <p className="text-sm text-muted-foreground">
+                            {t("Returns 0x00 (OK) on success, 0x01 (ERR) on error.", "成功返回 0x00 (OK)，错误返回 0x01 (ERR)。")}
+                          </p>
+                        </div>
+                      ),
+                    },
+                  ]}
+                />
+              </SubSection>
+
+              <SubSection id="binary-getpos" title="getpos() — GET (0x05)">
+                <SpecCard
+                  entries={[
+                    {
+                      label: t("Command", "命令"),
+                      content: <span className="font-mono">[0x05]</span>,
+                    },
+                    {
+                      label: t("Description", "描述"),
+                      content: t(
+                        "Get current mouse position",
+                        "获取当前鼠标位置"
+                      ),
+                    },
+                    {
+                      label: t("Params", "参数"),
+                      content: isCn ? (
+                        <span>无参数</span>
+                      ) : (
+                        <span>No parameters</span>
+                      ),
+                    },
+                    {
+                      label: t("Response (GET)", "响应 (GET)"),
+                      content: (
+                        <div className="space-y-2">
+                          <CodeBlock code={`[0x05]\nResponse: [0x05] [x:i16] [y:i16]`} />
+                          <p className="text-sm text-muted-foreground">
+                            {t("Returns current pointer position as int16 coordinates.", "返回当前指针位置（int16 坐标）。")}
+                          </p>
+                        </div>
+                      ),
+                    },
+                  ]}
+                />
+              </SubSection>
+
+              <SubSection id="binary-mo" title="mo(buttons,x,y,wheel,pan,tilt) — SET (0x0B)">
+                <SpecCard
+                  entries={[
+                    {
+                      label: t("Command", "命令"),
+                      content: <span className="font-mono">[0x0B]</span>,
+                    },
+                    {
+                      label: t("Description", "描述"),
+                      content: t(
+                        "Send raw mouse frame - button mask mirrors states, axes are one-shot",
+                        "发送原始鼠标帧 - 按键掩码镜像状态，轴为一次性"
+                      ),
+                    },
+                    {
+                      label: t("Params", "参数"),
+                      content: isCn ? (
+                        <span>buttons: 按键掩码（u8）；x,y: 位置（i16）；wheel,pan,tilt: 轴值（i8）</span>
+                      ) : (
+                        <span>buttons: button mask (u8); x,y: position (i16); wheel,pan,tilt: axis values (i8)</span>
+                      ),
+                    },
+                    {
+                      label: t("Response (SET)", "响应 (SET)"),
+                      content: (
+                        <div className="space-y-2">
+                          <CodeBlock code={`[0x0B] [buttons:u8] [x:i16] [y:i16] [wheel:i8] [pan:i8] [tilt:i8]\nResponse: [0x0B] [status:u8]`} />
+                          <p className="text-sm text-muted-foreground">
+                            {t("Returns 0x00 (OK) on success, 0x01 (ERR) on error.", "成功返回 0x00 (OK)，错误返回 0x01 (ERR)。")}
+                          </p>
+                        </div>
+                      ),
+                    },
+                  ]}
+                />
+              </SubSection>
+
+              <SubSection id="binary-remap-button" title="remap_button([src,dst]) — GET/SET (0x10)">
+                <SpecCard
+                  entries={[
+                    {
+                      label: t("Command", "命令"),
+                      content: <span className="font-mono">[0x10]</span>,
+                    },
+                    {
+                      label: t("Description", "描述"),
+                      content: t(
+                        "Remap mouse buttons (1-5: left,right,middle,side1,side2); dst=0 clears src",
+                        "重映射鼠标按键（1-5：左、右、中、侧1、侧2）；dst=0 清除 src"
+                      ),
+                    },
+                    {
+                      label: t("Params", "参数"),
+                      content: isCn ? (
+                        <span>() 显示映射; (0) 重置所有; (src,dst) 映射按键 src→dst; (src,0) 清除 src</span>
+                      ) : (
+                        <span>() show mappings; (0) reset all; (src,dst) map button src→dst; (src,0) clear src</span>
+                      ),
+                    },
+                    {
+                      label: t("Response (GET)", "响应 (GET)"),
+                      content: (
+                        <div className="space-y-2">
+                          <CodeBlock code={`[0x10]\nResponse: [0x10] [map1-5:u8×2×5]`} />
+                          <p className="text-sm text-muted-foreground">
+                            {t("Returns 10 bytes: 5 mappings, each 2 bytes (src,dst).", "返回 10 字节：5 个映射，每个 2 字节（src,dst）。")}
+                          </p>
+                        </div>
+                      ),
+                    },
+                    {
+                      label: t("Response (SET)", "响应 (SET)"),
+                      content: (
+                        <div className="space-y-2">
+                          <CodeBlock code={`[0x10] [src:u8] [dst:u8]\nResponse: [0x10] [status:u8]`} />
+                          <p className="text-sm text-muted-foreground">
+                            {t("Returns 0x00 (OK) on success, 0x01 (ERR) on error.", "成功返回 0x00 (OK)，错误返回 0x01 (ERR)。")}
+                          </p>
+                        </div>
+                      ),
+                    },
+                  ]}
+                />
+              </SubSection>
+
+              <SubSection id="binary-turbo" title="turbo([button[,delay_ms]]) — GET/SET (0x17)">
+                <SpecCard
+                  entries={[
+                    {
+                      label: t("Command", "命令"),
+                      content: <span className="font-mono">[0x17]</span>,
+                    },
+                    {
+                      label: t("Description", "描述"),
+                      content: t(
+                        "Rapid-fire for mouse buttons 1-5 - delay: 1-5000ms or (button) for random 35-75ms - (0) disables all",
+                        "鼠标按键 1-5 的连发 - 延迟：1-5000ms 或 (button) 随机 35-75ms - (0) 禁用所有"
+                      ),
+                    },
+                    {
+                      label: t("Params", "参数"),
+                      content: isCn ? (
+                        <span>() 返回活动设置; (button) 随机延迟; (button,delay_ms) 设置延迟；(0) 禁用所有</span>
+                      ) : (
+                        <span>() returns active settings; (button) random delay; (button,delay_ms) set delay; (0) disables all</span>
+                      ),
+                    },
+                    {
+                      label: t("Response (GET)", "响应 (GET)"),
+                      content: (
+                        <div className="space-y-2">
+                          <CodeBlock code={`[0x17]\nResponse: [0x17] [btn1-5_delay:u16×5]`} />
+                          <p className="text-sm text-muted-foreground">
+                            {t("Returns 10 bytes: 5 delays (u16 each) for buttons 1-5.", "返回 10 字节：按键 1-5 的 5 个延迟（每个 u16）。")}
+                          </p>
+                        </div>
+                      ),
+                    },
+                    {
+                      label: t("Response (SET)", "响应 (SET)"),
+                      content: (
+                        <div className="space-y-2">
+                          <CodeBlock code={`[0x17] [button:u8] [delay_ms:u16]\nResponse: [0x17] [status:u8]`} />
+                          <p className="text-sm text-muted-foreground">
+                            {t("Returns 0x00 (OK) on success, 0x01 (ERR) on error.", "成功返回 0x00 (OK)，错误返回 0x01 (ERR)。")}
+                          </p>
+                        </div>
+                      ),
+                    },
+                  ]}
+                />
+              </SubSection>
+            </SubSection>
+          </Section>
+
+          {/* Binary API - Keyboard */}
+          <Section
+            id="binary-api-keyboard"
+            title={t("Binary API - Keyboard Commands", "二进制 API - 键盘命令")}
+          >
+            <Tip>
+              {isCn ? (
+                <span>
+                  键盘命令使用<strong>数字 HID 码</strong>（u8）。支持的 HID 码范围：0x00-0xFF。详见完整按键参考。
+                </span>
+              ) : (
+                <span>
+                  Keyboard commands use <strong>numeric HID codes</strong> (u8). Supported HID codes: 0x00-0xFF. See complete key reference for details.
+                </span>
+              )}
+            </Tip>
+
+            <SubSection id="binary-keyboard-basic" title={t("Basic Operations", "基本操作")}>
+              <SubSection id="binary-down" title="down(key) — SET (0xA2)">
+                <SpecCard
+                  entries={[
+                    {
+                      label: t("Command", "命令"),
+                      content: <span className="font-mono">[0xA2]</span>,
+                    },
+                    {
+                      label: t("Description", "描述"),
+                      content: t(
+                        "Press key down",
+                        "按下按键"
+                      ),
+                    },
+                    {
+                      label: t("Params", "参数"),
+                      content: isCn ? (
+                        <span>key: HID 码（u8）</span>
+                      ) : (
+                        <span>key: HID code (u8)</span>
+                      ),
+                    },
+                    {
+                      label: t("Response (SET)", "响应 (SET)"),
+                      content: (
+                        <div className="space-y-2">
+                          <CodeBlock code={`[0xA2] [key:u8]\nResponse: [0xA2] [status:u8]`} />
+                          <p className="text-sm text-muted-foreground">
+                            {t("Returns 0x00 (OK) on success, 0x01 (ERR) on error.", "成功返回 0x00 (OK)，错误返回 0x01 (ERR)。")}
+                          </p>
+                        </div>
+                      ),
+                    },
+                  ]}
+                />
+              </SubSection>
+
+              <SubSection id="binary-up" title="up(key) — SET (0xAA)">
+                <SpecCard
+                  entries={[
+                    {
+                      label: t("Command", "命令"),
+                      content: <span className="font-mono">[0xAA]</span>,
+                    },
+                    {
+                      label: t("Description", "描述"),
+                      content: t(
+                        "Release key",
+                        "释放按键"
+                      ),
+                    },
+                    {
+                      label: t("Params", "参数"),
+                      content: isCn ? (
+                        <span>key: HID 码（u8）</span>
+                      ) : (
+                        <span>key: HID code (u8)</span>
+                      ),
+                    },
+                    {
+                      label: t("Response (SET)", "响应 (SET)"),
+                      content: (
+                        <div className="space-y-2">
+                          <CodeBlock code={`[0xAA] [key:u8]\nResponse: [0xAA] [status:u8]`} />
+                          <p className="text-sm text-muted-foreground">
+                            {t("Returns 0x00 (OK) on success, 0x01 (ERR) on error.", "成功返回 0x00 (OK)，错误返回 0x01 (ERR)。")}
+                          </p>
+                        </div>
+                      ),
+                    },
+                  ]}
+                />
+              </SubSection>
+
+              <SubSection id="binary-press" title="press(key[,hold_ms[,rand_ms]]) — SET (0xA7)">
+                <SpecCard
+                  entries={[
+                    {
+                      label: t("Command", "命令"),
+                      content: <span className="font-mono">[0xA7]</span>,
+                    },
+                    {
+                      label: t("Description", "描述"),
+                      content: t(
+                        "Tap key - key: HID code - hold_ms: random 35-85ms if omitted - rand_ms optional",
+                        "点击按键 - key: HID 码 - hold_ms: 省略时随机 35-85ms - rand_ms 可选"
+                      ),
+                    },
+                    {
+                      label: t("Params", "参数"),
+                      content: isCn ? (
+                        <span>key: HID 码（u8）；hold_ms: 按住时间（u8，0=随机 35-85ms）；rand_ms: 随机化（u8，可选）</span>
+                      ) : (
+                        <span>key: HID code (u8); hold_ms: hold time (u8, 0=random 35-85ms); rand_ms: randomization (u8, optional)</span>
+                      ),
+                    },
+                    {
+                      label: t("Response (SET)", "响应 (SET)"),
+                      content: (
+                        <div className="space-y-2">
+                          <CodeBlock code={`[0xA7] [key:u8] [hold_ms:u8] [rand_ms:u8]\nResponse: [0xA7] [status:u8]`} />
+                          <p className="text-sm text-muted-foreground">
+                            {t("Returns 0x00 (OK) on success, 0x01 (ERR) on error.", "成功返回 0x00 (OK)，错误返回 0x01 (ERR)。")}
+                          </p>
+                        </div>
+                      ),
+                    },
+                  ]}
+                />
+              </SubSection>
+
+              <SubSection id="binary-string" title="string(text) — SET (0xA9)">
+                <SpecCard
+                  entries={[
+                    {
+                      label: t("Command", "命令"),
+                      content: <span className="font-mono">[0xA9]</span>,
+                    },
+                    {
+                      label: t("Description", "描述"),
+                      content: t(
+                        "Type ASCII string - max 256 chars",
+                        "输入 ASCII 字符串 - 最大 256 字符"
+                      ),
+                    },
+                    {
+                      label: t("Params", "参数"),
+                      content: isCn ? (
+                        <span>text: ASCII 字节数组（u8×N，最大 256 字节）</span>
+                      ) : (
+                        <span>text: ASCII bytes (u8×N, max 256 bytes)</span>
+                      ),
+                    },
+                    {
+                      label: t("Response (SET)", "响应 (SET)"),
+                      content: (
+                        <div className="space-y-2">
+                          <CodeBlock code={`[0xA9] [text:u8×N]\nResponse: [0xA9] [status:u8]`} />
+                          <p className="text-sm text-muted-foreground">
+                            {t("Returns 0x00 (OK) on success, 0x01 (ERR) on error.", "成功返回 0x00 (OK)，错误返回 0x01 (ERR)。")}
+                          </p>
+                        </div>
+                      ),
+                    },
+                  ]}
+                />
+              </SubSection>
+
+              <SubSection id="binary-init" title="init() — SET (0xA3)">
+                <SpecCard
+                  entries={[
+                    {
+                      label: t("Command", "命令"),
+                      content: <span className="font-mono">[0xA3]</span>,
+                    },
+                    {
+                      label: t("Description", "描述"),
+                      content: t(
+                        "Clear keyboard state",
+                        "清除键盘状态"
+                      ),
+                    },
+                    {
+                      label: t("Params", "参数"),
+                      content: isCn ? (
+                        <span>无参数</span>
+                      ) : (
+                        <span>No parameters</span>
+                      ),
+                    },
+                    {
+                      label: t("Response (SET)", "响应 (SET)"),
+                      content: (
+                        <div className="space-y-2">
+                          <CodeBlock code={`[0xA3]\nResponse: [0xA3] [status:u8]`} />
+                          <p className="text-sm text-muted-foreground">
+                            {t("Returns 0x00 (OK) on success, 0x01 (ERR) on error.", "成功返回 0x00 (OK)，错误返回 0x01 (ERR)。")}
+                          </p>
+                        </div>
+                      ),
+                    },
+                  ]}
+                />
+              </SubSection>
+
+              <SubSection id="binary-isdown" title="isdown(key) — GET (0xA4)">
+                <SpecCard
+                  entries={[
+                    {
+                      label: t("Command", "命令"),
+                      content: <span className="font-mono">[0xA4]</span>,
+                    },
+                    {
+                      label: t("Description", "描述"),
+                      content: t(
+                        "Query if key is down",
+                        "查询按键是否按下"
+                      ),
+                    },
+                    {
+                      label: t("Params", "参数"),
+                      content: isCn ? (
+                        <span>key: HID 码（u8）</span>
+                      ) : (
+                        <span>key: HID code (u8)</span>
+                      ),
+                    },
+                    {
+                      label: t("Response (GET)", "响应 (GET)"),
+                      content: (
+                        <div className="space-y-2">
+                          <CodeBlock code={`[0xA4] [key:u8]\nResponse: [0xA4] [is_down:u8]`} />
+                          <p className="text-sm text-muted-foreground">
+                            {t("Returns 0=up, 1=down.", "返回 0=释放，1=按下。")}
+                          </p>
+                        </div>
+                      ),
+                    },
+                  ]}
+                />
+              </SubSection>
+            </SubSection>
+
+            <SubSection id="binary-keyboard-streaming" title={t("Streaming", "流式")}>
+              <SubSection id="binary-keyboard-stream" title="keyboard([mode[,period_ms]]) — GET/SET (0xA5)">
+                <SpecCard
+                  entries={[
+                    {
+                      label: t("Command", "命令"),
+                      content: <span className="font-mono">[0xA5]</span>,
+                    },
+                    {
+                      label: t("Description", "描述"),
+                      content: t(
+                        "Stream keyboard - mode: 1=raw 2=mut; period: 1-1000ms (rounded to bInterval); requires baud >= 1M; only emits on new frames",
+                        "流式输出键盘 - 模式：1=原始 2=修改；周期：1-1000ms（四舍五入到 bInterval）；需要波特率 >= 1M；仅在帧变化时输出"
+                      ),
+                    },
+                    {
+                      label: t("Params", "参数"),
+                      content: isCn ? (
+                        <span>() 查询; (mode) 设置模式; (mode,period_ms) 设置模式和周期。mode: 1=原始 2=修改；period: 1-1000ms</span>
+                      ) : (
+                        <span>() to query; (mode) set mode; (mode,period_ms) set mode and period. mode: 1=raw 2=mut; period: 1-1000ms</span>
+                      ),
+                    },
+                    {
+                      label: t("Response (GET)", "响应 (GET)"),
+                      content: (
+                        <div className="space-y-2">
+                          <CodeBlock code={`[0xA5]\nResponse: [0xA5] [mode:u8] [period:u8]`} />
+                        </div>
+                      ),
+                    },
+                    {
+                      label: t("Response (SET)", "响应 (SET)"),
+                      content: (
+                        <div className="space-y-2">
+                          <CodeBlock code={`[0xA5] [mode:u8] [period:u8]\nResponse: [0xA5] [status:u8]`} />
+                          <p className="text-sm text-muted-foreground">
+                            {t("Returns 0x00 (OK) on success, 0x01 (ERR) on error.", "成功返回 0x00 (OK)，错误返回 0x01 (ERR)。")}
+                          </p>
+                        </div>
+                      ),
+                    },
+                    {
+                      label: t("Streaming format", "流格式"),
+                      content: (
+                        <div className="space-y-2">
+                          <p className="text-sm">
+                            {t("Device emits 15-byte binary frame when keyboard data changes:", "设备在键盘数据变化时发送 15 字节二进制帧：")}
+                          </p>
+                          <CodeBlock code={`[0xA5] [modifiers:u8] [keys:u8×14]`} />
+                          <p className="text-sm text-muted-foreground">
+                            {t("Modifiers byte: bit flags for ctrl, shift, alt, gui, etc. Keys array: up to 14 HID codes.", "修饰符字节：ctrl、shift、alt、gui 等的位标志。按键数组：最多 14 个 HID 码。")}
+                          </p>
+                        </div>
+                      ),
+                    },
+                  ]}
+                />
+              </SubSection>
+            </SubSection>
+
+            <SubSection id="binary-keyboard-config" title={t("Configuration", "配置")}>
+              <SubSection id="binary-disable" title="disable([key1,key2,...] | [key,mode]) — GET/SET (0xA1)">
+                <SpecCard
+                  entries={[
+                    {
+                      label: t("Command", "命令"),
+                      content: <span className="font-mono">[0xA1]</span>,
+                    },
+                    {
+                      label: t("Description", "描述"),
+                      content: t(
+                        "Disable keys - key: HID code - mode: 0=enable 1=disable - can disable multiple keys",
+                        "禁用按键 - key: HID 码 - mode: 0=启用 1=禁用 - 可禁用多个按键"
+                      ),
+                    },
+                    {
+                      label: t("Params", "参数"),
+                      content: isCn ? (
+                        <span>() 列出禁用的按键; (key1,key2,...) 禁用多个按键; (key,mode) 启用/禁用单个按键</span>
+                      ) : (
+                        <span>() list disabled keys; (key1,key2,...) disable keys; (key,mode) enable/disable single key</span>
+                      ),
+                    },
+                    {
+                      label: t("Response (GET)", "响应 (GET)"),
+                      content: (
+                        <div className="space-y-2">
+                          <CodeBlock code={`[0xA1]\nResponse: [0xA1] [disabled_keys:u8×N]`} />
+                          <p className="text-sm text-muted-foreground">
+                            {t("Returns list of disabled HID codes.", "返回禁用的 HID 码列表。")}
+                          </p>
+                        </div>
+                      ),
+                    },
+                    {
+                      label: t("Response (SET)", "响应 (SET)"),
+                      content: (
+                        <div className="space-y-2">
+                          <CodeBlock code={`[0xA1] [key1:u8]...[keyN:u8]\nResponse: [0xA1] [status:u8]`} />
+                          <p className="text-sm text-muted-foreground">
+                            {t("Returns 0x00 (OK) on success, 0x01 (ERR) on error.", "成功返回 0x00 (OK)，错误返回 0x01 (ERR)。")}
+                          </p>
+                        </div>
+                      ),
+                    },
+                  ]}
+                />
+              </SubSection>
+
+              <SubSection id="binary-mask" title="mask(key[,mode]) — SET (0xA6)">
+                <SpecCard
+                  entries={[
+                    {
+                      label: t("Command", "命令"),
+                      content: <span className="font-mono">[0xA6]</span>,
+                    },
+                    {
+                      label: t("Description", "描述"),
+                      content: t(
+                        "Mask key - key: HID code - mode: 0=off 1=on",
+                        "掩码按键 - key: HID 码 - mode: 0=关闭 1=开启"
+                      ),
+                    },
+                    {
+                      label: t("Params", "参数"),
+                      content: isCn ? (
+                        <span>key: HID 码（u8）；mode: 0=关闭掩码，1=开启掩码</span>
+                      ) : (
+                        <span>key: HID code (u8); mode: 0=off, 1=on</span>
+                      ),
+                    },
+                    {
+                      label: t("Response (SET)", "响应 (SET)"),
+                      content: (
+                        <div className="space-y-2">
+                          <CodeBlock code={`[0xA6] [key:u8] [mode:u8]\nResponse: [0xA6] [status:u8]`} />
+                          <p className="text-sm text-muted-foreground">
+                            {t("Returns 0x00 (OK) on success, 0x01 (ERR) on error.", "成功返回 0x00 (OK)，错误返回 0x01 (ERR)。")}
+                          </p>
+                        </div>
+                      ),
+                    },
+                  ]}
+                />
+              </SubSection>
+
+              <SubSection id="binary-remap" title="remap(source,target) — SET (0xA8)">
+                <SpecCard
+                  entries={[
+                    {
+                      label: t("Command", "命令"),
+                      content: <span className="font-mono">[0xA8]</span>,
+                    },
+                    {
+                      label: t("Description", "描述"),
+                      content: t(
+                        "Remap keycode - both: HID code; target=0 clears remap (passthrough)",
+                        "重映射键码 - 两者：HID 码；target=0 清除重映射（直通）"
+                      ),
+                    },
+                    {
+                      label: t("Params", "参数"),
+                      content: isCn ? (
+                        <span>source: 源 HID 码（u8）；target: 目标 HID 码（u8），0=清除重映射</span>
+                      ) : (
+                        <span>source: source HID code (u8); target: target HID code (u8), 0=clear remap</span>
+                      ),
+                    },
+                    {
+                      label: t("Response (SET)", "响应 (SET)"),
+                      content: (
+                        <div className="space-y-2">
+                          <CodeBlock code={`[0xA8] [source:u8] [target:u8]\nResponse: [0xA8] [status:u8]`} />
+                          <p className="text-sm text-muted-foreground">
+                            {t("Returns 0x00 (OK) on success, 0x01 (ERR) on error.", "成功返回 0x00 (OK)，错误返回 0x01 (ERR)。")}
+                          </p>
+                        </div>
+                      ),
+                    },
+                  ]}
+                />
+              </SubSection>
+            </SubSection>
+          </Section>
+
+          {/* Binary API - General */}
+          <Section
+            id="binary-api-general"
+            title={t("Binary API - General Commands", "二进制 API - 通用命令")}
+          >
+            <SubSection id="binary-general-config" title={t("Configuration", "配置")}>
+              <SubSection id="binary-baud" title="baud([rate]) — GET/SET (0xB1)">
+                <SpecCard
+                  entries={[
+                    {
+                      label: t("Command", "命令"),
+                      content: <span className="font-mono">[0xB1]</span>,
+                    },
+                    {
+                      label: t("Description", "描述"),
+                      content: t(
+                        "Set/get UART0 baud rate - 0=default (115200)",
+                        "设置/获取 UART0 波特率 - 0=默认 (115200)"
+                      ),
+                    },
+                    {
+                      label: t("Params", "参数"),
+                      content: isCn ? (
+                        <span>() 查询; (rate) 设置波特率（u32），0=默认 115200，范围：115200-4000000</span>
+                      ) : (
+                        <span>() to query; (rate) set baud rate (u32), 0=default 115200, range: 115200-4000000</span>
+                      ),
+                    },
+                    {
+                      label: t("Response (GET)", "响应 (GET)"),
+                      content: (
+                        <div className="space-y-2">
+                          <CodeBlock code={`[0xB1]\nResponse: [0xB1] [rate:u32]`} />
+                          <p className="text-sm text-muted-foreground">
+                            {t("Returns current baud rate as uint32 (little-endian).", "返回当前波特率（uint32，小端序）。")}
+                          </p>
+                        </div>
+                      ),
+                    },
+                    {
+                      label: t("Response (SET)", "响应 (SET)"),
+                      content: (
+                        <div className="space-y-2">
+                          <CodeBlock code={`[0xB1] [rate:u32]\nResponse: [0xB1] [status:u8]`} />
+                          <p className="text-sm text-muted-foreground">
+                            {t("Returns 0x00 (OK) on success, 0x01 (ERR) on error. Change is persistent.", "成功返回 0x00 (OK)，错误返回 0x01 (ERR)。更改是持久的。")}
+                          </p>
+                        </div>
+                      ),
+                    },
+                  ]}
+                />
+              </SubSection>
+
+              <SubSection id="binary-bypass" title="bypass([mode]) — GET/SET (0xB2)">
+                <SpecCard
+                  entries={[
+                    {
+                      label: t("Command", "命令"),
+                      content: <span className="font-mono">[0xB2]</span>,
+                    },
+                    {
+                      label: t("Description", "描述"),
+                      content: t(
+                        "Bypass mode - 0=off, 1=mouse, 2=keyboard; disables USB write, streams raw to COM2",
+                        "旁路模式 - 0=关闭，1=鼠标，2=键盘；禁用 USB 写入，将原始数据流式传输到 COM2"
+                      ),
+                    },
+                    {
+                      label: t("Params", "参数"),
+                      content: isCn ? (
+                        <span>() 查询; (mode) 设置模式。mode: 0=关闭，1=鼠标，2=键盘；需要波特率 >= 1M</span>
+                      ) : (
+                        <span>() to query; (mode) set mode. mode: 0=off, 1=mouse, 2=keyboard; requires baud >= 1M</span>
+                      ),
+                    },
+                    {
+                      label: t("Response (GET)", "响应 (GET)"),
+                      content: (
+                        <div className="space-y-2">
+                          <CodeBlock code={`[0xB2]\nResponse: [0xB2] [mode:u8]`} />
+                        </div>
+                      ),
+                    },
+                    {
+                      label: t("Response (SET)", "响应 (SET)"),
+                      content: (
+                        <div className="space-y-2">
+                          <CodeBlock code={`[0xB2] [mode:u8]\nResponse: [0xB2] [status:u8]`} />
+                          <p className="text-sm text-muted-foreground">
+                            {t("Returns 0x00 (OK) on success, 0x01 (ERR) on error.", "成功返回 0x00 (OK)，错误返回 0x01 (ERR)。")}
+                          </p>
+                        </div>
+                      ),
+                    },
+                  ]}
+                />
+              </SubSection>
+
+              <SubSection id="binary-echo" title="echo([enable]) — GET/SET (0xB4)">
+                <SpecCard
+                  entries={[
+                    {
+                      label: t("Command", "命令"),
+                      content: <span className="font-mono">[0xB4]</span>,
+                    },
+                    {
+                      label: t("Description", "描述"),
+                      content: t(
+                        "Toggle UART echo",
+                        "切换 UART 回显"
+                      ),
+                    },
+                    {
+                      label: t("Params", "参数"),
+                      content: isCn ? (
+                        <span>() 查询; (enable) 设置回显。enable: 0=禁用，1=启用</span>
+                      ) : (
+                        <span>() to query; (enable) set echo. enable: 0=disable, 1=enable</span>
+                      ),
+                    },
+                    {
+                      label: t("Response (GET)", "响应 (GET)"),
+                      content: (
+                        <div className="space-y-2">
+                          <CodeBlock code={`[0xB4]\nResponse: [0xB4] [enabled:u8]`} />
+                        </div>
+                      ),
+                    },
+                    {
+                      label: t("Response (SET)", "响应 (SET)"),
+                      content: (
+                        <div className="space-y-2">
+                          <CodeBlock code={`[0xB4] [enable:u8]\nResponse: [0xB4] [status:u8]`} />
+                          <p className="text-sm text-muted-foreground">
+                            {t("Returns 0x00 (OK) on success, 0x01 (ERR) on error. When echo is disabled, most setter commands won't echo their input.", "成功返回 0x00 (OK)，错误返回 0x01 (ERR)。当回显禁用时，大多数设置命令不会回显其输入。")}
+                          </p>
+                        </div>
+                      ),
+                    },
+                  ]}
+                />
+              </SubSection>
+
+              <SubSection id="binary-hs" title="hs([enable]) — GET/SET (0xB7)">
+                <SpecCard
+                  entries={[
+                    {
+                      label: t("Command", "命令"),
+                      content: <span className="font-mono">[0xB7]</span>,
+                    },
+                    {
+                      label: t("Description", "描述"),
+                      content: t(
+                        "USB high-speed compatibility - 0=disable, 1=enable (persistent)",
+                        "USB 高速兼容性 - 0=禁用，1=启用（持久）"
+                      ),
+                    },
+                    {
+                      label: t("Params", "参数"),
+                      content: isCn ? (
+                        <span>() 查询; (enable) 设置高速模式。enable: 0=禁用，1=启用</span>
+                      ) : (
+                        <span>() to query; (enable) set high-speed mode. enable: 0=disable, 1=enable</span>
+                      ),
+                    },
+                    {
+                      label: t("Response (GET)", "响应 (GET)"),
+                      content: (
+                        <div className="space-y-2">
+                          <CodeBlock code={`[0xB7]\nResponse: [0xB7] [enabled:u8]`} />
+                        </div>
+                      ),
+                    },
+                    {
+                      label: t("Response (SET)", "响应 (SET)"),
+                      content: (
+                        <div className="space-y-2">
+                          <CodeBlock code={`[0xB7] [enable:u8]\nResponse: [0xB7] [status:u8]`} />
+                          <p className="text-sm text-muted-foreground">
+                            {t("Returns 0x00 (OK) on success, 0x01 (ERR) on error. Setting is persistent across reboots.", "成功返回 0x00 (OK)，错误返回 0x01 (ERR)。设置在重启后仍然保留。")}
+                          </p>
+                        </div>
+                      ),
+                    },
+                  ]}
+                />
+              </SubSection>
+
+              <SubSection id="binary-led" title="led([...]) — GET/SET (0xB9)">
+                <SpecCard
+                  entries={[
+                    {
+                      label: t("Command", "命令"),
+                      content: <span className="font-mono">[0xB9]</span>,
+                    },
+                    {
+                      label: t("Description", "描述"),
+                      content: t(
+                        "LED control - target: 1=device 2=host; mode: 0=off 1=on; state: 0=off 1=on 2=slow_blink 3=fast_blink",
+                        "LED 控制 - target: 1=设备 2=主机；mode: 0=关闭 1=开启；state: 0=关闭 1=开启 2=慢闪 3=快闪"
+                      ),
+                    },
+                    {
+                      label: t("Params", "参数"),
+                      content: isCn ? (
+                        <span>() 查询设备; (1) 查询设备; (2) 查询主机; (0) 设备关闭; (1) 设备开启; (target,mode) 控制; (target,times,delay_ms) 闪烁</span>
+                      ) : (
+                        <span>() query device; (1) query device; (2) query host; (0) device off; (1) device on; (target,mode) control; (target,times,delay_ms) flash</span>
+                      ),
+                    },
+                    {
+                      label: t("Response (GET)", "响应 (GET)"),
+                      content: (
+                        <div className="space-y-2">
+                          <CodeBlock code={`Query device: [0xB9]\nQuery host:   [0xB9] [0x02]\nResponse:    [0xB9] [target:u8] [state:u8]`} />
+                          <p className="text-sm text-muted-foreground">
+                            {t("State: 0=off, 1=on, 2=slow_blink, 3=fast_blink", "状态：0=关闭，1=开启，2=慢闪，3=快闪")}
+                          </p>
+                        </div>
+                      ),
+                    },
+                    {
+                      label: t("Response (SET)", "响应 (SET)"),
+                      content: (
+                        <div className="space-y-2">
+                          <CodeBlock code={`Set:    [0xB9] [target:u8] [mode:u8]\nResponse: [0xB9] [status:u8]`} />
+                          <p className="text-sm text-muted-foreground">
+                            {t("Returns 0x00 (OK) on success, 0x01 (ERR) on error.", "成功返回 0x00 (OK)，错误返回 0x01 (ERR)。")}
+                          </p>
+                        </div>
+                      ),
+                    },
+                    {
+                      label: t("Flash", "闪烁"),
+                      content: (
+                        <div className="space-y-2">
+                          <CodeBlock code={`Flash:  [0xB9] [target:u8] [times:u32] [delay_ms:u32]\nResponse: [0xB9] [status:u8]`} />
+                          <p className="text-sm text-muted-foreground">
+                            {t("Returns 0x00 (OK) on success, 0x01 (ERR) on error. Controls both LED and RGB. Times: 1-255, delay_ms: 100-5000ms", "成功返回 0x00 (OK)，错误返回 0x01 (ERR)。控制 LED 和 RGB。次数：1-255，延迟：100-5000ms")}
+                          </p>
+                        </div>
+                      ),
+                    },
+                  ]}
+                />
+              </SubSection>
+
+              <SubSection id="binary-log" title="log([level]) — GET/SET (0xBA)">
+                <SpecCard
+                  entries={[
+                    {
+                      label: t("Command", "命令"),
+                      content: <span className="font-mono">[0xBA]</span>,
+                    },
+                    {
+                      label: t("Description", "描述"),
+                      content: t(
+                        "Set/get log level - 0-5",
+                        "设置/获取日志级别 - 0-5"
+                      ),
+                    },
+                    {
+                      label: t("Params", "参数"),
+                      content: isCn ? (
+                        <span>() 查询; (level) 设置日志级别。level: 0-5（0=无，5=调试）</span>
+                      ) : (
+                        <span>() to query; (level) set log level. level: 0-5 (0=none, 5=debug)</span>
+                      ),
+                    },
+                    {
+                      label: t("Response (GET)", "响应 (GET)"),
+                      content: (
+                        <div className="space-y-2">
+                          <CodeBlock code={`[0xBA]\nResponse: [0xBA] [level:u8]`} />
+                        </div>
+                      ),
+                    },
+                    {
+                      label: t("Response (SET)", "响应 (SET)"),
+                      content: (
+                        <div className="space-y-2">
+                          <CodeBlock code={`[0xBA] [level:u8]\nResponse: [0xBA] [status:u8]`} />
+                          <p className="text-sm text-muted-foreground">
+                            {t("Returns 0x00 (OK) on success, 0x01 (ERR) on error.", "成功返回 0x00 (OK)，错误返回 0x01 (ERR)。")}
+                          </p>
+                        </div>
+                      ),
+                    },
+                  ]}
+                />
+              </SubSection>
+
+              <SubSection id="binary-release" title="release([timer_ms]) — GET/SET (0xBC)">
+                <SpecCard
+                  entries={[
+                    {
+                      label: t("Command", "命令"),
+                      content: <span className="font-mono">[0xBC]</span>,
+                    },
+                    {
+                      label: t("Description", "描述"),
+                      content: t(
+                        "Auto-release timer - releases all active locks/buttons/keys when expired",
+                        "自动释放定时器 - 到期时释放所有活动的锁定/按键/键"
+                      ),
+                    },
+                    {
+                      label: t("Params", "参数"),
+                      content: isCn ? (
+                        <span>() 获取状态; (timer_ms) 设置定时器 500-300000ms（5 分钟），(0) 禁用</span>
+                      ) : (
+                        <span>() get status; (timer_ms) set timer 500-300000ms (5 min), (0) disables</span>
+                      ),
+                    },
+                    {
+                      label: t("Response (GET)", "响应 (GET)"),
+                      content: (
+                        <div className="space-y-2">
+                          <CodeBlock code={`[0xBC]\nResponse: [0xBC] [timer_ms:u32]`} />
+                          <p className="text-sm text-muted-foreground">
+                            {t("Returns 0 if disabled, else time in milliseconds.", "如果禁用返回 0，否则返回时间（毫秒）。")}
+                          </p>
+                        </div>
+                      ),
+                    },
+                    {
+                      label: t("Response (SET)", "响应 (SET)"),
+                      content: (
+                        <div className="space-y-2">
+                          <CodeBlock code={`[0xBC] [timer_ms:u32]\nResponse: [0xBC] [status:u8]`} />
+                          <p className="text-sm text-muted-foreground">
+                            {t("Returns 0x00 (OK) on success, 0x01 (ERR) on error.", "成功返回 0x00 (OK)，错误返回 0x01 (ERR)。")}
+                          </p>
+                        </div>
+                      ),
+                    },
+                  ]}
+                />
+              </SubSection>
+
+              <SubSection id="binary-screen" title="screen([W,H]) — GET/SET (0xBD)">
+                <SpecCard
+                  entries={[
+                    {
+                      label: t("Command", "命令"),
+                      content: <span className="font-mono">[0xBD]</span>,
+                    },
+                    {
+                      label: t("Description", "描述"),
+                      content: t(
+                        "Set/get virtual screen dimensions",
+                        "设置/获取虚拟屏幕尺寸"
+                      ),
+                    },
+                    {
+                      label: t("Params", "参数"),
+                      content: isCn ? (
+                        <span>() 查询; (width,height) 设置虚拟屏幕尺寸（int16）</span>
+                      ) : (
+                        <span>() to query; (width,height) set virtual screen size (int16)</span>
+                      ),
+                    },
+                    {
+                      label: t("Response (GET)", "响应 (GET)"),
+                      content: (
+                        <div className="space-y-2">
+                          <CodeBlock code={`[0xBD]\nResponse: [0xBD] [width:i16] [height:i16]`} />
+                        </div>
+                      ),
+                    },
+                    {
+                      label: t("Response (SET)", "响应 (SET)"),
+                      content: (
+                        <div className="space-y-2">
+                          <CodeBlock code={`[0xBD] [width:i16] [height:i16]\nResponse: [0xBD] [status:u8]`} />
+                          <p className="text-sm text-muted-foreground">
+                            {t("Returns 0x00 (OK) on success, 0x01 (ERR) on error.", "成功返回 0x00 (OK)，错误返回 0x01 (ERR)。")}
+                          </p>
+                        </div>
+                      ),
+                    },
+                  ]}
+                />
+              </SubSection>
+
+              <SubSection id="binary-serial" title="serial([text]) — GET/SET (0xBE)">
+                <SpecCard
+                  entries={[
+                    {
+                      label: t("Command", "命令"),
+                      content: <span className="font-mono">[0xBE]</span>,
+                    },
+                    {
+                      label: t("Description", "描述"),
+                      content: t(
+                        "USB serial number operations - ASCII bytes",
+                        "USB 序列号操作 - ASCII 字节"
+                      ),
+                    },
+                    {
+                      label: t("Params", "参数"),
+                      content: isCn ? (
+                        <span>() 查询; (0) 重置; (text) 设置清理后的序列号（ASCII 字节数组）</span>
+                      ) : (
+                        <span>() to query; (0) to reset; (text) to set sanitized serial value (ASCII bytes)</span>
+                      ),
+                    },
+                    {
+                      label: t("Response (GET)", "响应 (GET)"),
+                      content: (
+                        <div className="space-y-2">
+                          <CodeBlock code={`[0xBE]\nResponse: [0xBE] [serial:u8×N]`} />
+                          <p className="text-sm text-muted-foreground">
+                            {t("Returns current serial number as ASCII bytes.", "返回当前序列号（ASCII 字节）。")}
+                          </p>
+                        </div>
+                      ),
+                    },
+                    {
+                      label: t("Response (SET)", "响应 (SET)"),
+                      content: (
+                        <div className="space-y-2">
+                          <CodeBlock code={`[0xBE] [text:u8×N]\nResponse: [0xBE] [status:u8]`} />
+                          <p className="text-sm text-muted-foreground">
+                            {t("Returns 0x00 (OK) on success, 0x01 (ERR) on error. The change is persistent across firmware updates.", "成功返回 0x00 (OK)，错误返回 0x01 (ERR)。更改在固件更新后仍然保留。")}
+                          </p>
+                        </div>
+                      ),
+                    },
+                  ]}
+                />
+              </SubSection>
+            </SubSection>
+
+            <SubSection id="binary-general-system" title={t("System", "系统")}>
+              <SubSection id="binary-device" title="device() — GET (0xB3)">
+                <SpecCard
+                  entries={[
+                    {
+                      label: t("Command", "命令"),
+                      content: <span className="font-mono">[0xB3]</span>,
+                    },
+                    {
+                      label: t("Description", "描述"),
+                      content: t(
+                        "Returns active device type",
+                        "返回活动设备类型"
+                      ),
+                    },
+                    {
+                      label: t("Params", "参数"),
+                      content: isCn ? (
+                        <span>无参数</span>
+                      ) : (
+                        <span>No parameters</span>
+                      ),
+                    },
+                    {
+                      label: t("Response (GET)", "响应 (GET)"),
+                      content: (
+                        <div className="space-y-2">
+                          <CodeBlock code={`[0xB3]\nResponse: [0xB3] [type:u8]`} />
+                          <p className="text-sm text-muted-foreground">
+                            {t("Type: 0=none, 1=keyboard, 2=mouse", "类型：0=无，1=键盘，2=鼠标")}
+                          </p>
+                        </div>
+                      ),
+                    },
+                  ]}
+                />
+              </SubSection>
+
+              <SubSection id="binary-fault" title="fault() — GET (0xB5)">
+                <SpecCard
+                  entries={[
+                    {
+                      label: t("Command", "命令"),
+                      content: <span className="font-mono">[0xB5]</span>,
+                    },
+                    {
+                      label: t("Description", "描述"),
+                      content: t(
+                        "Get stored parse fault info (same as 0xE8)",
+                        "获取存储的解析故障信息（与 0xE8 相同）"
+                      ),
+                    },
+                    {
+                      label: t("Params", "参数"),
+                      content: isCn ? (
+                        <span>无参数</span>
+                      ) : (
+                        <span>No parameters</span>
+                      ),
+                    },
+                    {
+                      label: t("Response (GET)", "响应 (GET)"),
+                      content: (
+                        <div className="space-y-2">
+                          <CodeBlock code={`[0xB5]\nResponse: [0xB5] [parse_fault_t struct]`} />
+                          <p className="text-sm text-muted-foreground">
+                            {t("Returns parse_fault_t structure with MAC, endpoint, reason, and raw descriptor bytes.", "返回包含 MAC、端点、原因和原始描述符字节的 parse_fault_t 结构。")}
+                          </p>
+                        </div>
+                      ),
+                    },
+                  ]}
+                />
+              </SubSection>
+
+              <SubSection id="binary-info" title="info() — GET (0xB8)">
+                <SpecCard
+                  entries={[
+                    {
+                      label: t("Command", "命令"),
+                      content: <span className="font-mono">[0xB8]</span>,
+                    },
+                    {
+                      label: t("Description", "描述"),
+                      content: t(
+                        "System/device info - key=value format: MAC1, MAC2, TEMP, RAM, FW, CPU, UP, VID, PID, VENDOR, MODEL, ORIGINAL_SERIAL, SPOOFED_SERIAL, MOUSE_BINT, KBD_BINT, FAULT",
+                        "系统/设备信息 - 键值格式：MAC1、MAC2、TEMP、RAM、FW、CPU、UP、VID、PID、VENDOR、MODEL、ORIGINAL_SERIAL、SPOOFED_SERIAL、MOUSE_BINT、KBD_BINT、FAULT"
+                      ),
+                    },
+                    {
+                      label: t("Params", "参数"),
+                      content: isCn ? (
+                        <span>无参数</span>
+                      ) : (
+                        <span>No parameters</span>
+                      ),
+                    },
+                    {
+                      label: t("Response (GET)", "响应 (GET)"),
+                      content: (
+                        <div className="space-y-2">
+                          <CodeBlock code={`[0xB8]\nResponse: [0xB8] [field_count:u8] [fields...]`} />
+                          <p className="text-sm text-muted-foreground">
+                            {t("Returns structured binary data with system/device info key-value pairs. Device info cached after first fetch.", "返回包含系统/设备信息键值对的结构化二进制数据。设备信息在首次获取后缓存。")}
+                          </p>
+                        </div>
+                      ),
+                    },
+                  ]}
+                />
+              </SubSection>
+
+              <SubSection id="binary-reboot" title="reboot() — SET (0xBB)">
+                <SpecCard
+                  entries={[
+                    {
+                      label: t("Command", "命令"),
+                      content: <span className="font-mono">[0xBB]</span>,
+                    },
+                    {
+                      label: t("Description", "描述"),
+                      content: t(
+                        "Reboot device after response",
+                        "响应后重启设备"
+                      ),
+                    },
+                    {
+                      label: t("Params", "参数"),
+                      content: isCn ? (
+                        <span>无参数</span>
+                      ) : (
+                        <span>No parameters</span>
+                      ),
+                    },
+                    {
+                      label: t("Response (SET)", "响应 (SET)"),
+                      content: (
+                        <div className="space-y-2">
+                          <CodeBlock code={`[0xBB]\nResponse: [0xBB] [status:u8]`} />
+                          <p className="text-sm text-muted-foreground">
+                            {t("Always returns 0x00 (success). Device reboots after sending response.", "始终返回 0x00（成功）。设备在发送响应后重启。")}
+                          </p>
+                        </div>
+                      ),
+                    },
+                  ]}
+                />
+              </SubSection>
+
+              <SubSection id="binary-version" title="version() — GET (0xBF)">
+                <SpecCard
+                  entries={[
+                    {
+                      label: t("Command", "命令"),
+                      content: <span className="font-mono">[0xBF]</span>,
+                    },
+                    {
+                      label: t("Description", "描述"),
+                      content: t(
+                        "Get firmware version information",
+                        "获取固件版本信息"
+                      ),
+                    },
+                    {
+                      label: t("Params", "参数"),
+                      content: isCn ? (
+                        <span>无参数</span>
+                      ) : (
+                        <span>No parameters</span>
+                      ),
+                    },
+                    {
+                      label: t("Response (GET)", "响应 (GET)"),
+                      content: (
+                        <div className="space-y-2">
+                          <CodeBlock code={`[0xBF]\nResponse: [0xBF] [version:u8×N]`} />
+                          <p className="text-sm text-muted-foreground">
+                            {t("Returns firmware version as ASCII bytes.", "返回固件版本（ASCII 字节）。")}
+                          </p>
+                        </div>
+                      ),
+                    },
+                  ]}
+                />
+              </SubSection>
+            </SubSection>
           </Section>
         </div>
       </div>

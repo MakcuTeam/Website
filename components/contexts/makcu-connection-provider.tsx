@@ -79,7 +79,7 @@ import {
  * ═══════════════════════════════════════════════════════════════════════════ */
 function buildAndStoreDeviceInfo(commandResponses: Map<number, Uint8Array>): void {
   // Initialize all expected fields with empty/default values - always store all fields
-  // NOTE: TEMP is not stored here - it comes from STATUS (0xB1) live poll
+  // NOTE: TEMP is not stored here - it comes from STATUS (0xD4) live poll
   const deviceInfo: Record<string, any> = {
     VENDOR: "",
     MODEL: "",
@@ -131,7 +131,7 @@ function buildAndStoreDeviceInfo(commandResponses: Map<number, Uint8Array>): voi
 // Always returns all fields with defaults (even if cookie missing) - does NOT include live data (RAM, uptime)
 export function getDeviceInfo(): Record<string, any> {
   // Initialize with all expected fields and defaults
-  // NOTE: TEMP is not in static info - it comes from STATUS (0xB1) live poll
+  // NOTE: TEMP is not in static info - it comes from STATUS (0xD4) live poll
   const defaultInfo: Record<string, any> = {
     VENDOR: "",
     MODEL: "",
@@ -1111,7 +1111,7 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
     console.log("[FETCH DEVICE INFO] Fetching full device info using individual commands...");
     
     // List of all commands to fetch - easily extensible for future commands
-    // NOTE: RAM, UPTIME, and TEMP are NOT fetched here - they come from STATUS (0xB1) live poll
+    // NOTE: RAM, UPTIME, and TEMP are NOT fetched here - they come from STATUS (0xD4) live poll
     const commandsToFetch: number[] = [
       UART0_CMD_GET_MAC1,
       UART0_CMD_GET_MAC2,
@@ -1129,9 +1129,9 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
       UART0_CMD_GET_SPOOF_ACTIVE,
       UART0_CMD_GET_SCREEN_W,
       UART0_CMD_GET_SCREEN_H,
-      // UART0_CMD_GET_RAM - NOT needed (comes from STATUS 0xB1)
-      // UART0_CMD_GET_UPTIME - NOT needed (comes from STATUS 0xB1)
-      // UART0_CMD_GET_TEMP - NOT needed (comes from STATUS 0xB1)
+      // UART0_CMD_GET_RAM - NOT needed (comes from STATUS 0xD4)
+      // UART0_CMD_GET_UPTIME - NOT needed (comes from STATUS 0xD4)
+      // UART0_CMD_GET_TEMP - NOT needed (comes from STATUS 0xD4)
       // UART0_CMD_GET_FAULT - optional, only fetch if needed
     ];
 

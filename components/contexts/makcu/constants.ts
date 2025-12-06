@@ -8,27 +8,27 @@ export const UART0_START_BYTE = 0x50;  /* UART0=0x50, UART1=0x5A */
 /**
  * UART0 Binary API Commands - Individual data field commands
  */
-export const UART0_CMD_STATUS = 0xB1;   /* Lightweight status poll (17 bytes) */
-export const UART0_CMD_GET_MAC1 = 0xB2;  /* MAC1 - device side (6 bytes) */
-export const UART0_CMD_GET_MAC2 = 0xB3;  /* MAC2 - USB host side (6 bytes) */
-export const UART0_CMD_GET_TEMP = 0xB4;  /* Temperature (4 bytes float) */
-export const UART0_CMD_GET_RAM = 0xB5;   /* Free RAM (4 bytes uint32, KB) */
-export const UART0_CMD_GET_CPU = 0xB6;   /* CPU frequency (4 bytes uint32, MHz) */
-export const UART0_CMD_GET_UPTIME = 0xB7; /* Uptime (4 bytes uint32, seconds) */
-export const UART0_CMD_GET_VID = 0xB8;    /* VID (2 bytes uint16) */
-export const UART0_CMD_GET_PID = 0xB9;    /* PID (2 bytes uint16) */
-export const UART0_CMD_GET_MOUSE_BINT = 0xBA; /* Mouse bInterval (1 byte) */
-export const UART0_CMD_GET_KBD_BINT = 0xBB;   /* Keyboard bInterval (1 byte) */
-export const UART0_CMD_GET_FW_VERSION = 0xBC;  /* FW version string (variable length) */
-export const UART0_CMD_GET_MAKCU_VERSION = 0xBD; /* MAKCU version string (variable length) */
-export const UART0_CMD_GET_VENDOR = 0xBE;       /* Vendor string (variable length) */
-export const UART0_CMD_GET_MODEL = 0xBF;        /* Model string (variable length) */
-export const UART0_CMD_GET_ORIG_SERIAL = 0xC0;  /* Original serial (variable length) */
-export const UART0_CMD_GET_SPOOF_SERIAL = 0xC1; /* Spoofed serial (variable length) */
-export const UART0_CMD_GET_SPOOF_ACTIVE = 0xC2; /* Spoof active flag (1 byte) */
-export const UART0_CMD_GET_SCREEN_W = 0xC3;     /* Screen width (2 bytes int16) */
-export const UART0_CMD_GET_SCREEN_H = 0xC4;     /* Screen height (2 bytes int16) */
-export const UART0_CMD_GET_FAULT = 0xC5;        /* Fault data (parse_fault_t structure) */
+export const UART0_CMD_STATUS = 0xD4;   /* Lightweight status poll (17 bytes) */
+export const UART0_CMD_GET_MAC1 = 0xD5;  /* MAC1 - device side (6 bytes) */
+export const UART0_CMD_GET_MAC2 = 0xD6;  /* MAC2 - USB host side (6 bytes) */
+export const UART0_CMD_GET_TEMP = 0xD7;  /* Temperature (4 bytes float) */
+export const UART0_CMD_GET_RAM = 0xD8;   /* Free RAM (4 bytes uint32, KB) */
+export const UART0_CMD_GET_CPU = 0xD9;   /* CPU frequency (4 bytes uint32, MHz) */
+export const UART0_CMD_GET_UPTIME = 0xDA; /* Uptime (4 bytes uint32, seconds) */
+export const UART0_CMD_GET_VID = 0xDB;    /* VID (2 bytes uint16) */
+export const UART0_CMD_GET_PID = 0xDC;    /* PID (2 bytes uint16) */
+export const UART0_CMD_GET_MOUSE_BINT = 0xDD; /* Mouse bInterval (1 byte) */
+export const UART0_CMD_GET_KBD_BINT = 0xDE;   /* Keyboard bInterval (1 byte) */
+export const UART0_CMD_GET_FW_VERSION = 0xDF;  /* FW version string (variable length) */
+export const UART0_CMD_GET_MAKCU_VERSION = 0xE0; /* MAKCU version string (variable length) */
+export const UART0_CMD_GET_VENDOR = 0xE1;       /* Vendor string (variable length) */
+export const UART0_CMD_GET_MODEL = 0xE2;        /* Model string (variable length) */
+export const UART0_CMD_GET_ORIG_SERIAL = 0xE3;  /* Original serial (variable length) */
+export const UART0_CMD_GET_SPOOF_SERIAL = 0xE4; /* Spoofed serial (variable length) */
+export const UART0_CMD_GET_SPOOF_ACTIVE = 0xE5; /* Spoof active flag (1 byte) */
+export const UART0_CMD_GET_SCREEN_W = 0xE6;     /* Screen width (2 bytes int16) */
+export const UART0_CMD_GET_SCREEN_H = 0xE7;     /* Screen height (2 bytes int16) */
+export const UART0_CMD_GET_FAULT = 0xE8;        /* Fault data (parse_fault_t structure) */
 
 /**
  * Connection Constants
