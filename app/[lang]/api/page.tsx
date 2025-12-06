@@ -3007,11 +3007,11 @@ export default async function ApiPage({ params }: LangProps) {
                       <li>
                         {isCn ? (
                           <span>
-                            帧格式：<span className="font-mono">[0x50] [CMD] [LEN_LO] [LEN_HI] [PAYLOAD...] [CRC_LO] [CRC_HI]</span>
+                            帧格式：<span className="font-mono">[0x50] [CMD] [LEN_LO] [LEN_HI] [PAYLOAD...]</span>
                           </span>
                         ) : (
                           <span>
-                            Frame format: <span className="font-mono">[0x50] [CMD] [LEN_LO] [LEN_HI] [PAYLOAD...] [CRC_LO] [CRC_HI]</span>
+                            Frame format: <span className="font-mono">[0x50] [CMD] [LEN_LO] [LEN_HI] [PAYLOAD...]</span>
                           </span>
                         )}
                       </li>
@@ -3059,17 +3059,6 @@ export default async function ApiPage({ params }: LangProps) {
                           </span>
                         )}
                       </li>
-                      <li>
-                        {isCn ? (
-                          <span>
-                            <span className="font-mono">CRC_LO / CRC_HI</span> - CRC-16-CCITT 校验和（小端序，覆盖从起始字节到负载）
-                          </span>
-                        ) : (
-                          <span>
-                            <span className="font-mono">CRC_LO / CRC_HI</span> - CRC-16-CCITT checksum (little-endian, covers START through PAYLOAD)
-                          </span>
-                        )}
-                      </li>
                     </ul>
                   ),
                 },
@@ -3080,44 +3069,44 @@ export default async function ApiPage({ params }: LangProps) {
                       <li>
                         {isCn ? (
                           <span>
-                            <strong>设置命令 (SET)</strong>：返回 <span className="font-mono">[0x50] [CMD] [LEN_LO] [LEN_HI] [status:u8] [CRC_LO] [CRC_HI]</span>，其中 <span className="font-mono">0x00</span> 表示成功 (OK)，<span className="font-mono">0x01</span> 表示错误 (ERR)
+                            <strong>设置命令 (SET)</strong>：返回 <span className="font-mono">[0x50] [CMD] [LEN_LO] [LEN_HI] [status:u8]</span>，其中 <span className="font-mono">0x00</span> 表示成功 (OK)，<span className="font-mono">0x01</span> 表示错误 (ERR)
                           </span>
                         ) : (
                           <span>
-                            <strong>Setters</strong>: Return <span className="font-mono">[0x50] [CMD] [LEN_LO] [LEN_HI] [status:u8] [CRC_LO] [CRC_HI]</span> where <span className="font-mono">0x00</span> = OK (success) and <span className="font-mono">0x01</span> = ERR (error)
+                            <strong>Setters</strong>: Return <span className="font-mono">[0x50] [CMD] [LEN_LO] [LEN_HI] [status:u8]</span> where <span className="font-mono">0x00</span> = OK (success) and <span className="font-mono">0x01</span> = ERR (error)
                           </span>
                         )}
                       </li>
                       <li>
                         {isCn ? (
                           <span>
-                            <strong>查询命令 (GET)</strong>：返回 <span className="font-mono">[0x50] [CMD] [LEN_LO] [LEN_HI] [PAYLOAD...] [CRC_LO] [CRC_HI]</span>，包含原始值字节或结构化数据
+                            <strong>查询命令 (GET)</strong>：返回 <span className="font-mono">[0x50] [CMD] [LEN_LO] [LEN_HI] [PAYLOAD...]</span>，包含原始值字节或结构化数据
                           </span>
                         ) : (
                           <span>
-                            <strong>Getters</strong>: Return <span className="font-mono">[0x50] [CMD] [LEN_LO] [LEN_HI] [PAYLOAD...] [CRC_LO] [CRC_HI]</span> with raw value bytes or structured data
+                            <strong>Getters</strong>: Return <span className="font-mono">[0x50] [CMD] [LEN_LO] [LEN_HI] [PAYLOAD...]</span> with raw value bytes or structured data
                           </span>
                         )}
                       </li>
                       <li>
                         {isCn ? (
                           <span>
-                            <strong>流式命令</strong>：返回原始 HID 帧字节（无文本格式），格式为 <span className="font-mono">[0x50] [CMD] [LEN_LO] [LEN_HI] [PAYLOAD...] [CRC_LO] [CRC_HI]</span>
+                            <strong>流式命令</strong>：返回原始 HID 帧字节（无文本格式），格式为 <span className="font-mono">[0x50] [CMD] [LEN_LO] [LEN_HI] [PAYLOAD...]</span>
                           </span>
                         ) : (
                           <span>
-                            <strong>Streaming</strong>: Return raw HID frame bytes (no text formatting) as <span className="font-mono">[0x50] [CMD] [LEN_LO] [LEN_HI] [PAYLOAD...] [CRC_LO] [CRC_HI]</span>
+                            <strong>Streaming</strong>: Return raw HID frame bytes (no text formatting) as <span className="font-mono">[0x50] [CMD] [LEN_LO] [LEN_HI] [PAYLOAD...]</span>
                           </span>
                         )}
                       </li>
                       <li>
                         {isCn ? (
                           <span>
-                            <strong>数据格式</strong>：多字节值使用小端序（little-endian）。示例：查询波特率（命令 0xB1，无负载）返回 <span className="font-mono">[0x50] [0xB1] [0x04] [0x00] [0x00] [0xC2] [0x01] [0x00] [CRC_LO] [CRC_HI]</span>，其中 <span className="font-mono">0x00C20100</span> = 115200（小端序）
+                            <strong>数据格式</strong>：多字节值使用小端序（little-endian）。示例：查询波特率（命令 0xB1，无负载）返回 <span className="font-mono">[0x50] [0xB1] [0x04] [0x00] [0x00] [0xC2] [0x01] [0x00]</span>，其中 <span className="font-mono">0x00C20100</span> = 115200（小端序）
                           </span>
                         ) : (
                           <span>
-                            <strong>Data Types</strong>: Multi-byte values use little-endian byte order. Example: Query baud rate (command 0xB1, no payload) returns <span className="font-mono">[0x50] [0xB1] [0x04] [0x00] [0x00] [0xC2] [0x01] [0x00] [CRC_LO] [CRC_HI]</span> where <span className="font-mono">0x00C20100</span> = 115200 (little-endian)
+                            <strong>Data Types</strong>: Multi-byte values use little-endian byte order. Example: Query baud rate (command 0xB1, no payload) returns <span className="font-mono">[0x50] [0xB1] [0x04] [0x00] [0x00] [0xC2] [0x01] [0x00]</span> where <span className="font-mono">0x00C20100</span> = 115200 (little-endian)
                           </span>
                         )}
                       </li>

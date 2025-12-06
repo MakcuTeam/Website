@@ -88,7 +88,7 @@ export interface MakcuConnectionContextType extends MakcuConnectionState {
   connect: () => Promise<void>;
   disconnect: () => Promise<void>;
   sendCommandAndReadResponse: (command: string, timeoutMs?: number) => Promise<Uint8Array | null>;
-  sendBinaryCommand: (cmd: number, payload?: Uint8Array, timeoutMs?: number) => Promise<Uint8Array | null>;
+  sendBinaryCommand: (cmd: number, payload?: Uint8Array, timeoutMs?: number, maxRetries?: number) => Promise<Uint8Array | null>;
   subscribeToSerialData: (callback: SerialDataCallback) => () => void;  // Legacy - receives all data
   subscribeToBinaryFrames: (callback: BinaryFrameSubscriber) => () => void;  // Only 0x50 frames
   subscribeToTextLogs: (callback: TextLogSubscriber) => () => void;  // Only non-0x50 data

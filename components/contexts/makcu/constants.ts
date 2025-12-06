@@ -1,6 +1,6 @@
 /**
  * Binary Protocol Constants
- * Frame format: [0x50] [CMD] [LEN_LO] [LEN_HI] [PAYLOAD...] [CRC_LO] [CRC_HI]
+ * Frame format: [0x50] [CMD] [LEN_LO] [LEN_HI] [PAYLOAD...] (no CRC)
  * Note: UART0 uses 0x50, UART1 uses 0x5A (0x50+0xA) to avoid misdirection
  */
 export const UART0_START_BYTE = 0x50;  /* UART0=0x50, UART1=0x5A */
@@ -52,7 +52,7 @@ export const CONNECTION_DELAYS = {
 } as const;
 
 export const CONNECTION_TIMEOUTS = {
-  STATUS_FRAME_BYTES: 21, // 6 overhead + 15 payload
+  STATUS_FRAME_BYTES: 21, // 4 overhead + 17 payload (current STATUS size)
   MAX_FRAME_BYTES: 2566,
   SILENCE_SYMBOLS: 10,
 } as const;

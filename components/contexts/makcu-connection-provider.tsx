@@ -59,8 +59,6 @@ import {
   registerApiCommandParser,
   // Utils
   calculateTimeout,
-  calculateMaxRetries,
-  calculateRetryDelay,
   openPortWithBaudRate,
   safeClosePort,
   getComPort,
@@ -69,7 +67,7 @@ import {
   deleteCookie,
 } from "./makcu";
 
-// Protocol functions (CRC, frame building/parsing) now in makcu/protocol.ts
+// Protocol functions (binary framing/parsing) now in makcu/protocol.ts
 
 // Parser functions, command registry, and cookie utilities are now in makcu/parsers.ts and makcu/utils.ts
 
@@ -235,8 +233,7 @@ export function getCombinedDeviceInfo(mcuStatus: MakcuStatus | null): Record<str
 
 const MakcuConnectionContext = createContext<MakcuConnectionContextType | undefined>(undefined);
 
-// Utility functions (calculateTimeout, calculateMaxRetries, calculateRetryDelay, 
-// openPortWithBaudRate, safeClosePort, getComPort) are now imported from makcu/utils.ts
+// Utility functions (calculateTimeout, openPortWithBaudRate, safeClosePort, getComPort) are now imported from makcu/utils.ts
 
 export function MakcuConnectionProvider({ children }: { children: React.ReactNode }) {
   const [state, setState] = useState<MakcuConnectionState>({
@@ -318,154 +315,131 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
 
 
   // Try to connect in normal mode with specific baud rate and timeout
-  // Uses lightweight STATUS command (15 bytes) instead of full WEBSITE (360+ bytes)
-  // This makes connection ~24x faster!
-  const tryNormalMode = async (port: SerialPort, baudRate: number, timeout?: number, maxRetries?: number): Promise<boolean> => {
-    // Use shorter timeout for STATUS (only 15 bytes response)
+  // Uses lightweight STATUS command (17-byte payload) instead of full WEBSITE (360+ bytes)
+  // This keeps connection fast while still confirming link health
+  const tryNormalMode = async (port: SerialPort, baudRate: number, timeout?: number, _maxRetries?: number): Promise<boolean> => {
     const calculatedTimeout = timeout ?? calculateTimeout(baudRate, CONNECTION_TIMEOUTS.STATUS_FRAME_BYTES, CONNECTION_TIMEOUTS.SILENCE_SYMBOLS, false);
-    const calculatedRetries = maxRetries ?? calculateMaxRetries(baudRate);
     
-    console.log(`[TRY NORMAL MODE] Baud: ${baudRate}, Timeout: ${calculatedTimeout}ms, Retries: ${calculatedRetries}`);
+    console.log(`[TRY NORMAL MODE] Baud: ${baudRate}, Timeout: ${calculatedTimeout}ms, Retries: 1 (CRC removed)`);
     
     if (!port.writable || !port.readable) {
       return false;
     }
 
-    // Give device a moment to stabilize after port open
     await new Promise(resolve => setTimeout(resolve, CONNECTION_DELAYS.PORT_STABILIZATION));
 
-    for (let attempt = 1; attempt <= calculatedRetries; attempt++) {
-      let reader: ReadableStreamDefaultReader<Uint8Array> | null = null;
-      try {
-        // Send lightweight STATUS command (not full WEBSITE)
-        const writer = port.writable.getWriter();
-        const binaryCommand = buildBinaryFrame(UART0_CMD_STATUS, null);
-        console.log(`[TRY NORMAL MODE] Attempt ${attempt}/${calculatedRetries} (using STATUS command)`);
-        await writer.write(binaryCommand);
-        writer.releaseLock();
+    let reader: ReadableStreamDefaultReader<Uint8Array> | null = null;
+    try {
+      const writer = port.writable.getWriter();
+      const binaryCommand = buildBinaryFrame(UART0_CMD_STATUS, null);
+      console.log("[TRY NORMAL MODE] Single attempt using STATUS command (no CRC)");
+      await writer.write(binaryCommand);
+      writer.releaseLock();
 
-        // Read response - create temporary reader for connection check
-        reader = port.readable.getReader();
-        const currentReader = reader; // Capture for timeout handler
+      reader = port.readable.getReader();
+      const currentReader = reader;
 
-        let timeoutId: NodeJS.Timeout | null = null;
-        const timeoutPromise = new Promise<Uint8Array | null>((resolve) => {
-          timeoutId = setTimeout(() => {
-            currentReader.cancel().catch(() => {});
-            resolve(null);
-          }, calculatedTimeout);
-        });
+      let timeoutId: NodeJS.Timeout | null = null;
+      const timeoutPromise = new Promise<Uint8Array | null>((resolve) => {
+        timeoutId = setTimeout(() => {
+          currentReader.cancel().catch(() => {});
+          resolve(null);
+        }, calculatedTimeout);
+      });
 
-        const readPromise = (async (): Promise<Uint8Array | null> => {
-          const chunks: Uint8Array[] = [];
-          try {
-            while (true) {
-              const { value, done } = await currentReader.read();
-              if (done) break;
-            chunks.push(value);
-            
-            const totalLength = chunks.reduce((sum, chunk) => sum + chunk.length, 0);
-            const combined = new Uint8Array(totalLength);
-            let offset = 0;
-            for (const chunk of chunks) {
-              combined.set(chunk, offset);
-              offset += chunk.length;
-            }
-            
-              // Look for binary frame
+      const readPromise = (async (): Promise<Uint8Array | null> => {
+        const chunks: Uint8Array[] = [];
+        try {
+          while (true) {
+            const { value, done } = await currentReader.read();
+            if (done) break;
+            if (value) {
+              chunks.push(value);
+
+              const totalLength = chunks.reduce((sum, chunk) => sum + chunk.length, 0);
+              const combined = new Uint8Array(totalLength);
+              let offset = 0;
+              for (const chunk of chunks) {
+                combined.set(chunk, offset);
+                offset += chunk.length;
+              }
+
               let frameStart = -1;
-            for (let i = 0; i < combined.length; i++) {
+              for (let i = 0; i < combined.length; i++) {
                 if (combined[i] === UART0_START_BYTE) {
                   frameStart = i;
                   break;
                 }
               }
-              
-              if (frameStart >= 0 && combined.length >= frameStart + 6) {
+
+              if (frameStart >= 0 && combined.length >= frameStart + 4) {
                 const payloadLen = combined[frameStart + 2] | (combined[frameStart + 3] << 8);
-                const totalFrameLen = 6 + payloadLen;
-                
+                const totalFrameLen = 4 + payloadLen;
+
                 if (combined.length >= frameStart + totalFrameLen) {
-                  const parsed = parseBinaryFrame(combined.slice(frameStart));
+                  const parsed = parseBinaryFrame(combined.slice(frameStart, frameStart + totalFrameLen));
                   if (parsed && parsed.cmd === UART0_CMD_STATUS) {
                     if (timeoutId) clearTimeout(timeoutId);
                     return parsed.payload;
-            }
-          }
-        }
-        
-              // STATUS response is only 15 bytes + 6 overhead = 21 bytes
+                  }
+                }
+              }
+
               if (totalLength > 100) break;
             }
-          } catch (e) {
-            // Read error
           }
-          return null;
+        } catch (e) {
+          // Read error
+        }
+        return null;
       })();
 
-        const response = await Promise.race([readPromise, timeoutPromise]);
-        if (timeoutId) clearTimeout(timeoutId);
-        
-        // Cleanup reader before checking response
-        if (reader) {
-          try {
-            await reader.cancel();
-          } catch (e) {
-            // Ignore cancel errors
-          }
-          try {
-            reader.releaseLock();
-          } catch (e) {
-            // Ignore release errors
-          }
-          reader = null;
+      const response = await Promise.race([readPromise, timeoutPromise]);
+      if (timeoutId) clearTimeout(timeoutId);
+      
+      if (reader) {
+        try {
+          await reader.cancel();
+        } catch (e) {
+          // Ignore cancel errors
         }
-        
-        // STATUS response: 17 bytes, first byte is MCU_STATUS (0x01 = alive)
-        if (response && response.length >= 17 && response[0] === 0x01) {
-          // MCU is alive! Parse initial status
-          const status = parseStatusResponse(response);
-          if (status) {
-            console.log(`[CONNECTION CHECK] STATUS parsed: RAM=${status.freeRamKb}kb, UPTIME=${status.uptime}s, TEMP=${status.temp >= 0 ? status.temp.toFixed(1) + '°C' : 'N/A'}, Device=${status.deviceAttached ? 'attached' : 'detached'}`);
-            setMcuStatus(status);
-            lastDeviceAttachedRef.current = status.deviceAttached;
-            // Don't fetch full device info here - let the status poll handle it
-            // This keeps connection fast
-          }
-          return true;
+        try {
+          reader.releaseLock();
+        } catch (e) {
+          // Ignore release errors
         }
-        
-        // Retry if not last attempt
-        if (attempt < calculatedRetries) {
-          const retryDelay = calculateRetryDelay(baudRate, 5);
-          console.log(`[TRY NORMAL MODE] Retrying in ${retryDelay}ms...`);
-          await new Promise(resolve => setTimeout(resolve, retryDelay));
-        }
-      } catch (error) {
-        console.error(`[TRY NORMAL MODE] Error:`, error);
-        // Cleanup reader on error
-        if (reader) {
-          try {
-            await reader.cancel();
-          } catch (e) {
-            // Ignore
-          }
-          try {
-            reader.releaseLock();
-          } catch (e) {
-            // Ignore
-          }
-          reader = null;
-        }
-        // Retry if not last attempt
-        if (attempt < calculatedRetries) {
-          const retryDelay = calculateRetryDelay(baudRate, 5);
-          await new Promise(resolve => setTimeout(resolve, retryDelay));
-        }
+        reader = null;
       }
-    }
+      
+      if (response && response.length >= 17 && response[0] === 0x01) {
+        const status = parseStatusResponse(response);
+        if (status) {
+          console.log(`[CONNECTION CHECK] STATUS parsed: RAM=${status.freeRamKb}kb, UPTIME=${status.uptime}s, TEMP=${status.temp >= 0 ? status.temp.toFixed(1) + '°C' : 'N/A'}, Device=${status.deviceAttached ? 'attached' : 'detached'}`);
+          setMcuStatus(status);
+          lastDeviceAttachedRef.current = status.deviceAttached;
+        }
+        return true;
+      }
 
+      console.warn("[TRY NORMAL MODE] No valid STATUS response on single attempt");
       return false;
+    } catch (error) {
+      console.error("[TRY NORMAL MODE] Error:", error);
+      if (reader) {
+        try {
+          await reader.cancel();
+        } catch (e) {
+          // Ignore
+        }
+        try {
+          reader.releaseLock();
+        } catch (e) {
+          // Ignore
+        }
+        reader = null;
+      }
+      return false;
+    }
   };
 
   // Try to connect in flash mode
@@ -925,8 +899,8 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
               while (processedPos < combined.length) {
                 // Check if current position starts with 0x50 (binary frame start)
                 if (combined[processedPos] === UART0_START_BYTE) {
-                  // Might be a binary frame - need at least 6 bytes (START + CMD + LEN(2) + CRC(2))
-                  if (processedPos + 6 > combined.length) {
+                  // Might be a binary frame - need at least 4 bytes (START + CMD + LEN(2))
+                  if (processedPos + 4 > combined.length) {
                     // Not enough data for header - buffer and wait
                     binaryFrameBufferRef.current = combined.slice(processedPos);
                     hasIncompleteFrame = true;
@@ -935,7 +909,7 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
                   
                   // Read frame length from header
                   const payloadLen = combined[processedPos + 2] | (combined[processedPos + 3] << 8);
-                  const totalFrameLen = 6 + payloadLen;
+                  const totalFrameLen = 4 + payloadLen;
                   
                   // Sanity check payload length (max 64KB)
                   if (payloadLen > 65535) {
@@ -976,12 +950,12 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
                     break;
                   }
                   
-                  // We have complete frame - extract and verify CRC
+                  // We have complete frame
                   const frame = combined.slice(processedPos, processedPos + totalFrameLen);
                   const parsed = parseBinaryFrame(frame);
                   
                   if (parsed) {
-                    // Valid binary frame (CRC good) - send to binary subscribers
+                    // Valid binary frame - send to binary subscribers
                     console.log(`[CONTINUOUS READER] ✓ Valid binary frame: cmd=0x${parsed.cmd.toString(16).toUpperCase()}, payload=${parsed.payload.length} bytes, dispatching to ${binaryFrameSubscribersRef.current.size} subscribers`);
                     binaryFrameSubscribersRef.current.forEach((callback: BinaryFrameSubscriber) => {
                       try {
@@ -1001,11 +975,9 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
                     
                     processedPos += totalFrameLen;
                   } else {
-                    // CRC mismatch - invalid frame, flush it (skip entire frame)
-                    // This could be corruption, wrong baud rate, or false 0x50 detection
-                    console.warn(`[CONTINUOUS READER] CRC mismatch - flushing invalid frame (${totalFrameLen} bytes) at pos ${processedPos}`);
-                    processedPos += totalFrameLen; // Skip entire invalid frame
-                    // Don't send to subscribers - just discard and continue
+                    // Invalid frame - skip it
+                    console.warn(`[CONTINUOUS READER] Invalid binary frame (${totalFrameLen} bytes) at pos ${processedPos}, skipping`);
+                    processedPos += totalFrameLen;
                   }
                 } else {
                   // Not a binary frame start (not 0x50) - this is text/log data
@@ -1150,7 +1122,7 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
         else if (cmd === UART0_CMD_GET_MOUSE_BINT || cmd === UART0_CMD_GET_KBD_BINT ||
                  cmd === UART0_CMD_GET_SPOOF_ACTIVE) expectedSize = 1;
         
-        const timeout = calculateTimeout(baudRate, expectedSize + 6, 10, false);
+        const timeout = calculateTimeout(baudRate, expectedSize + 4, 10, false);
         const cmdName = cmd === UART0_CMD_GET_MOUSE_BINT ? "MOUSE_BINT" : cmd === UART0_CMD_GET_KBD_BINT ? "KBD_BINT" : "";
         console.log(`[FETCH DEVICE INFO] Sending command 0x${cmd.toString(16).toUpperCase()}${cmdName ? ` (${cmdName})` : ""} (expected ${expectedSize} bytes, timeout ${timeout}ms)`);
         const sendBinaryCmd = sendBinaryCommandRef.current;
@@ -1506,7 +1478,7 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
       // If command failed (no response), log warning but don't trigger fault
       // Serial terminal commands have unknown frame sizes and no CRC - failures are expected
       // Fault is only triggered by:
-      // 1. CRC-protected binary commands (sendBinaryCommand) after all retries fail
+      // 1. Binary commands (sendBinaryCommand) failing after the single attempt
       // 2. Connection attempts (high-speed/standard normal mode + flash mode) all failing
       // 3. Actual port/connection errors (not simple command timeouts)
       if (!result) {
@@ -1545,7 +1517,7 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
   //   → Firmware detects text (starts with '.' or 'k') → parses as text command
   //   → Returns text response → Terminal displays it
   // 
-  // - Binary commands (API): Send binary frame [0x50] [CMD] [LEN] [PAYLOAD] [CRC]
+  // - Binary commands (API): Send binary frame [0x50] [CMD] [LEN] [PAYLOAD]
   //   → Firmware detects 0x50 start byte → parses as binary command
   //   → Returns binary framed response → API extracts payload
   // 
@@ -1562,7 +1534,7 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
     cmd: number, 
     payload?: Uint8Array, 
     timeoutMs?: number,
-    maxRetries?: number
+    _maxRetries?: number
   ): Promise<Uint8Array | null> => {
     const currentState = stateRef.current;
     if (currentState.status !== "connected" || !currentState.port) {
@@ -1570,118 +1542,79 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
       return null;
     }
 
-    // Auto-calculate timeout and retries based on detected baud rate
+    // Auto-calculate timeout based on detected baud rate
     const baudRate = currentState.detectedBaudRate ?? BAUD_RATES.STANDARD; // Default to 115200 if unknown
     const calculatedTimeout = timeoutMs ?? calculateTimeout(baudRate);
-    const calculatedRetries = maxRetries ?? calculateMaxRetries(baudRate);
+    const maxAttempts = 1; // CRC removed - single attempt
 
-    // Retry loop: attempt up to calculatedRetries times
-    for (let attempt = 1; attempt <= calculatedRetries; attempt++) {
-      let pendingRequest: { resolve: (data: Uint8Array | null) => void; timeout: NodeJS.Timeout } | null = null;
-      let timeoutId: NodeJS.Timeout | null = null;
-      let unsubscribe: (() => void) | null = null;
+    let pendingRequest: { resolve: (data: Uint8Array | null) => void; timeout: NodeJS.Timeout } | null = null;
+    let timeoutId: NodeJS.Timeout | null = null;
+    let unsubscribe: (() => void) | null = null;
 
-      try {
-        // Set up response listener BEFORE sending command (MCU responds fast!)
-        const responsePromise = new Promise<Uint8Array | null>((resolve) => {
-          timeoutId = setTimeout(() => {
-            if (pendingRequest) {
-              pendingRequest = null;
-            }
-            resolve(null);
-          }, calculatedTimeout);
-          
-          pendingRequest = { resolve, timeout: timeoutId };
-        });
-
-        // Subscribe to binary frames - use same pattern as STATUS polling
-        const binaryFrameCallback: BinaryFrameSubscriber = (frame: Uint8Array) => {
-          // Parse the complete frame (already validated by continuous reader)
-          const parsed = parseBinaryFrame(frame);
-          
-          if (!pendingRequest) {
-            return; // No pending request
-          }
-          
-          if (parsed && parsed.cmd === cmd) {
-            // Found matching command response!
-            console.log(`[BINARY API CB] ✓ Command 0x${cmd.toString(16).toUpperCase()} response received (attempt ${attempt}/${calculatedRetries}), payload size: ${parsed.payload.length}`);
-            if (timeoutId) clearTimeout(timeoutId);
-            const request = pendingRequest;
+    try {
+      const responsePromise = new Promise<Uint8Array | null>((resolve) => {
+        timeoutId = setTimeout(() => {
+          if (pendingRequest) {
             pendingRequest = null;
-            timeoutId = null;
-            if (request) request.resolve(parsed.payload);
           }
-        };
+          resolve(null);
+        }, calculatedTimeout);
+        
+        pendingRequest = { resolve, timeout: timeoutId };
+      });
 
-        // Subscribe BEFORE sending command
-        unsubscribe = subscribeToBinaryFrames(binaryFrameCallback);
-
-        // Build and send binary frame
-        const frame = buildBinaryFrame(cmd, payload || null);
-        console.log(`[BINARY API] Attempt ${attempt}/${calculatedRetries}: Sending command 0x${cmd.toString(16).toUpperCase()}`);
-
-        const writer = currentState.port.writable?.getWriter();
-        if (!writer) {
-          console.log(`[BINARY API] Port not writable`);
+      const binaryFrameCallback: BinaryFrameSubscriber = (frame: Uint8Array) => {
+        const parsed = parseBinaryFrame(frame);
+        
+        if (!pendingRequest) {
+          return; // No pending request
+        }
+        
+        if (parsed && parsed.cmd === cmd) {
+          console.log(`[BINARY API CB] ✓ Command 0x${cmd.toString(16).toUpperCase()} response received (single attempt), payload size: ${parsed.payload.length}`);
           if (timeoutId) clearTimeout(timeoutId);
+          const request = pendingRequest;
           pendingRequest = null;
-          if (unsubscribe) unsubscribe();
-          return null;
+          timeoutId = null;
+          if (request) request.resolve(parsed.payload);
         }
+      };
 
-        await writer.write(frame);
-        writer.releaseLock();
+      unsubscribe = subscribeToBinaryFrames(binaryFrameCallback);
 
-        // Wait for response from continuous reader (via subscription)
-        const result = await responsePromise;
-        
-        // Cleanup subscription
-        if (unsubscribe) {
-          unsubscribe();
-          unsubscribe = null;
-        }
-        
-        // If we got a valid response, return it (0-length payloads are valid - e.g., empty serial number)
-        if (result && result instanceof Uint8Array) {
-          return result;
-        }
-        
-        // Retry if not last attempt
-        if (attempt < calculatedRetries) {
-          const retryDelay = calculateRetryDelay(baudRate, 5);
-          console.log(`[BINARY API] Retrying in ${retryDelay}ms... (attempt ${attempt}/${calculatedRetries} failed)`);
-          await new Promise(resolve => setTimeout(resolve, retryDelay));
-          continue;
-        }
-      } catch (error) {
-        console.error(`[BINARY API] Error on attempt ${attempt}/${calculatedRetries}:`, error);
-        
-        // Cleanup on error
+      const frame = buildBinaryFrame(cmd, payload || null);
+      console.log(`[BINARY API] Sending command 0x${cmd.toString(16).toUpperCase()} (attempts=${maxAttempts})`);
+
+      const writer = currentState.port.writable?.getWriter();
+      if (!writer) {
+        console.log(`[BINARY API] Port not writable`);
         if (timeoutId) clearTimeout(timeoutId);
         pendingRequest = null;
-        if (unsubscribe) {
-          unsubscribe();
-          unsubscribe = null;
-        }
-        
-        if (attempt < calculatedRetries) {
-          const retryDelay = calculateRetryDelay(baudRate, 5);
-          await new Promise(resolve => setTimeout(resolve, retryDelay));
-          continue;
-        }
-      } finally {
-        // Ensure cleanup in all cases
-        if (timeoutId) clearTimeout(timeoutId);
         if (unsubscribe) unsubscribe();
+        return null;
       }
+
+      await writer.write(frame);
+      writer.releaseLock();
+
+      const result = await responsePromise;
+      
+      if (unsubscribe) {
+        unsubscribe();
+        unsubscribe = null;
+      }
+      
+      if (result && result instanceof Uint8Array) {
+        return result;
+      }
+    } catch (error) {
+      console.error(`[BINARY API] Error on single attempt:`, error);
+    } finally {
+      if (timeoutId) clearTimeout(timeoutId);
+      if (unsubscribe) unsubscribe();
     }
     
-    // All retries exhausted - command failed completely
-    // Don't disconnect - just return null and let the caller handle it
-    // Individual command failures shouldn't kill the connection
-    console.warn(`[BINARY API] Command 0x${cmd.toString(16).toUpperCase()} failed after ${calculatedRetries} retries`);
-    
+    console.warn(`[BINARY API] Command 0x${cmd.toString(16).toUpperCase()} failed (single attempt, CRC removed)`);
     return null;
   }, [cleanup, subscribeToBinaryFrames]);
 
