@@ -2603,9 +2603,9 @@ export default async function ApiPage({ params }: LangProps) {
                   {
                     label: t("Params", "参数"),
                     content: isCn ? (
-                      <span>level: 0-5; 空参数时查询当前级别</span>
+                      <span>level: 0-5; 空参数时查询当前级别。设置会持续 3 个电源周期，然后自动禁用</span>
                     ) : (
-                      <span>level: 0-5; empty to query current level</span>
+                      <span>level: 0-5; empty to query current level. Setting persists for 3 power cycles, then disables automatically</span>
                     ),
                   },
                   {
@@ -4613,16 +4613,16 @@ export default async function ApiPage({ params }: LangProps) {
                     {
                       label: t("Description", "描述"),
                       content: t(
-                        "Set/get log level - 0-5",
-                        "设置/获取日志级别 - 0-5"
+                        "Set/get log level - 0-5. Setting persists for 3 power cycles, then disables automatically",
+                        "设置/获取日志级别 - 0-5。设置会持续 3 个电源周期，然后自动禁用"
                       ),
                     },
                     {
                       label: t("Params", "参数"),
                       content: isCn ? (
-                        <span>() 查询; (level) 设置日志级别。level: 0-5（0=无，5=调试）</span>
+                        <span>() 查询; (level) 设置日志级别。level: 0-5（0=无，5=调试）。设置会持续 3 个电源周期，然后自动禁用</span>
                       ) : (
-                        <span>() to query; (level) set log level. level: 0-5 (0=none, 5=debug)</span>
+                        <span>() to query; (level) set log level. level: 0-5 (0=none, 5=debug). Setting persists for 3 power cycles, then disables automatically</span>
                       ),
                     },
                     {
