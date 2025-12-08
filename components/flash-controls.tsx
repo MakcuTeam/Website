@@ -262,6 +262,15 @@ export function FlashControls({ lang, dict, onFlashLog }: FlashControlsProps) {
       setLoading(true);
       setProgress(0);
       handleFlashLog(`Starting flash: ${firmwareName}`);
+      // Log flash plan for debugging (addresses/sizes/mode/freq/size)
+      const filesSummary = flashOptions.fileArray
+        .map((f, idx) => `[#${idx} addr=0x${f.address.toString(16)} len=${f.data.length}B]`)
+        .join(", ");
+      console.log(
+        `[FLASH MODE] writeFlash plan -> files=${flashOptions.fileArray.length} ${filesSummary} ` +
+        `flashMode=${flashOptions.flashMode ?? "default"} flashFreq=${flashOptions.flashFreq ?? "default"} ` +
+        `flashSize=${flashOptions.flashSize ?? "default"} eraseAll=${!!flashOptions.eraseAll} compress=${!!flashOptions.compress}`
+      );
       
       await loader.writeFlash(flashOptions);
       
@@ -271,9 +280,14 @@ export function FlashControls({ lang, dict, onFlashLog }: FlashControlsProps) {
       handleFlashLog(`Flashed ${firmwareName}`);
       toast.success(dict?.tools.flashSuccess || "Flash successful!");
     } catch (error) {
-      const errorMsg = `Flash error: ${error}`;
-      handleFlashLog(errorMsg);
-      toast.error(errorMsg);
+      const message = (error as any)?.message || String(error);
+      const isBootloaderOffsetWarning = message.includes("BOOTLOADER_FLASH_OFFSET");
+      // Let esptool-js handle its own retries/timeouts; we only surface non-offset errors
+      if (!isBootloaderOffsetWarning) {
+        const errorMsg = `Flash error: ${message}`;
+        handleFlashLog(errorMsg);
+        toast.error(errorMsg);
+      }
     } finally {
       setLoading(false);
       setProgress(0);

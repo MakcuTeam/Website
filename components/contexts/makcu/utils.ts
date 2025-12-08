@@ -69,11 +69,37 @@ export async function openPortWithBaudRate(
 }
 
 /**
- * Safely close serial port, ignoring any errors
+ * Safely close serial port, releasing all locks first
  */
 export async function safeClosePort(port: SerialPort): Promise<void> {
   try {
-    await port.close();
+    // Release reader lock if exists
+    if (port.readable && port.readable.locked) {
+      try {
+        const reader = port.readable.getReader();
+        await reader.cancel().catch(() => {});
+        reader.releaseLock();
+      } catch (e) {
+        // Ignore lock release errors
+      }
+    }
+    
+    // Release writer lock if exists
+    if (port.writable && port.writable.locked) {
+      try {
+        const writer = port.writable.getWriter();
+        writer.releaseLock();
+      } catch (e) {
+        // Ignore lock release errors
+      }
+    }
+    
+    // Now close the port
+    if (port.readable || port.writable) {
+      await port.close();
+      // Small delay to let OS release the port
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
   } catch (e) {
     // Ignore close errors - port might already be closed
   }

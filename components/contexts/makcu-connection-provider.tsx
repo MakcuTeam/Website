@@ -313,7 +313,6 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
     binaryFrameBufferRef.current = new Uint8Array(0); // Clear frame buffer on cleanup
   }, []);
 
-
   // Try to connect in normal mode with specific baud rate and timeout
   // Uses lightweight STATUS command (17-byte payload) instead of full WEBSITE (360+ bytes)
   // This keeps connection fast while still confirming link health
@@ -323,18 +322,25 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
     console.log(`[TRY NORMAL MODE] Baud: ${baudRate}, Timeout: ${calculatedTimeout}ms, Retries: 1 (CRC removed)`);
     
     if (!port.writable || !port.readable) {
+      console.log("[TRY NORMAL MODE] Port not readable/writable");
       return false;
     }
 
     await new Promise(resolve => setTimeout(resolve, CONNECTION_DELAYS.PORT_STABILIZATION));
 
     let reader: ReadableStreamDefaultReader<Uint8Array> | null = null;
+    let writer: WritableStreamDefaultWriter<Uint8Array> | null = null;
     try {
-      const writer = port.writable.getWriter();
+      writer = port.writable.getWriter();
+      if (!writer) {
+        console.log("[TRY NORMAL MODE] Failed to get writer");
+        return false;
+      }
       const binaryCommand = buildBinaryFrame(UART0_CMD_STATUS, null);
       console.log("[TRY NORMAL MODE] Single attempt using STATUS command (no CRC)");
       await writer.write(binaryCommand);
       writer.releaseLock();
+      writer = null;
 
       reader = port.readable.getReader();
       const currentReader = reader;
@@ -425,6 +431,16 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
       return false;
     } catch (error) {
       console.error("[TRY NORMAL MODE] Error:", error);
+      return false;
+    } finally {
+      // Always release locks in finally block to ensure cleanup
+      if (writer) {
+        try {
+          writer.releaseLock();
+        } catch (e) {
+          // Ignore
+        }
+      }
       if (reader) {
         try {
           await reader.cancel();
@@ -436,9 +452,7 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
         } catch (e) {
           // Ignore
         }
-        reader = null;
       }
-      return false;
     }
   };
 
@@ -448,83 +462,118 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
   // After flashing, users reconnect anyway, so baud rate returns to website value
   const tryFlashMode = async (port: SerialPort): Promise<{ transport: Transport; loader: ESPLoader } | null> => {
     try {
+      // Ensure any background readers/writers are fully stopped before flash
+      await cleanup();
+      readerRef.current = null;
+      writerRef.current = null;
+      
+      console.log("[FLASH MODE] Preparing port for flash mode connection");
+      
       // Close the port first if it's open (required before reopening for flash mode)
+      // This will release all reader/writer locks
       await safeClosePort(port);
-
-      // Reopen for flash mode - Transport/ESPLoader will use its own baud rates
-      // This ignores the website baud rate setting (uses FLASH_MODE baud rate)
-      const transport = new Transport(port as any, false, false);
       
-      // Temporarily suppress expected timeout errors during flash mode connection
-      // ESPLoader may timeout on sync attempts before successfully connecting - this is normal
-      const originalConsoleError = console.error;
-      const suppressedErrors: Error[] = [];
-      console.error = (...args: any[]) => {
-        const errorMsg = args[0]?.toString() || "";
-        // Suppress expected timeout errors during flash mode connection
-        if (errorMsg.includes("Read timeout exceeded") || 
-            errorMsg.includes("Error reading from serial port")) {
-          // These are expected during ESPLoader sync attempts - suppress them
-          suppressedErrors.push(new Error(errorMsg));
-          return;
-        }
-        // Log other errors normally
-        originalConsoleError.apply(console, args);
-      };
-      
-      try {
-        // Route flash terminal output to serial terminal subscribers
-      const flashOptions: LoaderOptions = {
+      // Helper to build loader options
+      const buildFlashOptions = (transport: Transport): LoaderOptions => ({
         transport,
-          baudrate: BAUD_RATES.FLASH_MODE,  // Flash mode baud rate (independent of website setting)
-          romBaudrate: BAUD_RATES.ROM_BOOTLOADER,  // ROM bootloader baud rate
+        // Force high-speed connect/flash at 921600 (no 115200 step)
+        baudrate: BAUD_RATES.FLASH_MODE,
+        romBaudrate: BAUD_RATES.FLASH_MODE,
+        enableTracing: false,                   // Disable byte-level TRACE logs (removes wait_response traces)
+        debugLogging: false,                    // Keep esptool-js debug logs off
         terminal: {
-            clean() {
-              // Clear terminal - can be used if needed
-            },
-            writeLine(message: string) {
-              // Send flash log line to serial terminal
-              const messageBytes = new TextEncoder().encode(message + "\n");
-              textLogSubscribersRef.current.forEach((callback: TextLogSubscriber) => {
-                try {
-                  callback(messageBytes);
-                } catch (e) {
-                  originalConsoleError("[FLASH MODE] Text log subscriber error:", e);
-                }
-              });
-            },
-            write(message: string) {
-              // Send flash log message to serial terminal
-              const messageBytes = new TextEncoder().encode(message);
-              textLogSubscribersRef.current.forEach((callback: TextLogSubscriber) => {
-                try {
-                  callback(messageBytes);
-                } catch (e) {
-                  originalConsoleError("[FLASH MODE] Text log subscriber error:", e);
-                }
-              });
-            },
+          clean() {},
+          writeLine(message: string) {
+            const messageBytes = new TextEncoder().encode(message + "\n");
+            textLogSubscribersRef.current.forEach((callback: TextLogSubscriber) => {
+              try {
+                callback(messageBytes);
+              } catch (e) {
+                console.error("[FLASH MODE] Text log subscriber error:", e);
+              }
+            });
+          },
+          write(message: string) {
+            const messageBytes = new TextEncoder().encode(message);
+            textLogSubscribersRef.current.forEach((callback: TextLogSubscriber) => {
+              try {
+                callback(messageBytes);
+              } catch (e) {
+                console.error("[FLASH MODE] Text log subscriber error:", e);
+              }
+            });
+          },
         },
-        debugLogging: false,
+      });
+
+      // Forcefully close and unlock the port to avoid double-open issues
+      const hardClosePort = async () => {
+        try {
+          if (port.readable) {
+            try {
+              const reader = port.readable.getReader();
+              await reader.cancel().catch(() => {});
+              reader.releaseLock();
+            } catch (e) {
+              // ignore
+            }
+          }
+          if (port.writable) {
+            try {
+              const writer = port.writable.getWriter();
+              writer.releaseLock();
+            } catch (e) {
+              // ignore
+            }
+          }
+          if (port.readable || port.writable) {
+            try {
+              await port.close();
+            } catch (e) {
+              // ignore
+            }
+          }
+        } catch (e) {
+          // ignore
+        }
       };
 
-      const loader = new ESPLoader(flashOptions);
-      await loader.main();
-        
-        // Restore console.error
-        console.error = originalConsoleError;
-        
-        // Log summary if there were suppressed errors (but connection succeeded)
-        if (suppressedErrors.length > 0) {
-          console.log(`[FLASH MODE] Connection successful after ${suppressedErrors.length} expected timeout(s) during sync`);
+      // Run ESPLoader with optional suppression and return loader
+      const runLoader = async (transport: Transport) => {
+        const loader = new ESPLoader(buildFlashOptions(transport));
+          console.log(
+          `[FLASH MODE] esptool connect -> romBaud=${BAUD_RATES.FLASH_MODE}, flashBaud=${BAUD_RATES.FLASH_MODE}, resetMode=default`
+          );
+        try {
+          // First, try the default reset strategy (toggling DTR/RTS).
+          await loader.main();
+          return loader;
+        } catch (err: any) {
+          console.warn("[FLASH MODE] Default reset connect failed, retrying with no_reset (manual/held-boot mode)...", err);
+          // If user is already holding BOOT or adapter disallows signal toggles, retry without toggling on the same open port.
+          await loader.main("no_reset");
+          return loader;
         }
-      
-      return { transport, loader };
-    } catch (error) {
-        // Restore console.error before rethrowing
-        console.error = originalConsoleError;
-        throw error;
-      }
+      };
+
+      const attemptWithTransport = async () => {
+        // Ensure port is closed/unlocked before constructing transport
+        await hardClosePort();
+        // Double-check the port is closed (handles cases where browser keeps it open)
+        if (port.readable || port.writable) {
+          await safeClosePort(port);
+        }
+        // Close once more to guarantee Transport starts from a closed handle
+        await safeClosePort(port);
+
+        const transport = new Transport(port as any, false, false);
+        const loader = await runLoader(transport);
+        return { transport, loader };
+      };
+
+      // Single attempt only
+      const result = await attemptWithTransport();
+      return result;
     } catch (error) {
       // Connection failed - log the error
       console.warn("[FLASH MODE] Connection attempt failed:", error);
@@ -615,21 +664,22 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
   };
 
   /**
-   * Handle connection failure - cleanup and set fault state
+   * Handle connection failure - clean up, fully disconnect, and show Connect button
    */
   const handleConnectionFailure = async (port: SerialPort): Promise<void> => {
-      await cleanup();
+    await cleanup();
     await safeClosePort(port);
-      setState((prev) => ({ 
-        ...prev, 
-        status: "fault", 
-        mode: null, 
-        port: null, 
-        transport: null,
-        loader: null,
-        detectedBaudRate: null 
-      }));
-      toast.error("Connection failed - device not responding. Check USB connections and try again.");
+    // Reset to a clean disconnected state so the Connect button is available
+    setState({
+      status: "disconnected",
+      mode: null,
+      port: null,
+      transport: null,
+      loader: null,
+      comPort: null,
+      detectedBaudRate: null,
+    });
+    toast.error("Connection failed - device not responding. Check USB and retry.");
   };
 
   /**
@@ -664,18 +714,10 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
 
       // Request port from user
       const selectedPort = await Navigator.serial.requestPort();
+      // Always close once to guarantee a clean handle for flash connect
+      await safeClosePort(selectedPort);
       
-      // Step 1: Try normal mode with multiple baud rates
-      const normalModeResult = await attemptNormalModeConnection(selectedPort);
-      
-      if (normalModeResult.success && normalModeResult.baudRate) {
-        setConnectedState(selectedPort, "normal", normalModeResult.baudRate);
-        const baudDisplay = normalModeResult.baudRate === BAUD_RATES.STANDARD ? "115200" : "4M";
-        toast.success(`Connected in Normal mode (${baudDisplay})`);
-        return;
-      }
-
-      // Step 2: If normal mode failed, try flash mode
+      // For testing: skip normal mode and go straight to flash mode
       const flashResult = await attemptFlashModeConnection(selectedPort);
       
       if (flashResult) {
@@ -683,8 +725,7 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
         toast.success("Connected in Flash mode");
         return;
       }
-
-      // Step 3: All connection attempts failed
+      // If flash mode failed, mark fault
       await handleConnectionFailure(selectedPort);
 
     } catch (error) {
@@ -715,34 +756,7 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
 
     // Close port - this is critical
     if (currentState.port) {
-      try {
-        // Make sure port is closed properly
-        if (currentState.port.readable) {
-          const reader = currentState.port.readable.getReader();
-          try {
-            await reader.cancel();
-          } catch (e) {
-            // Ignore
-          }
-          try {
-            reader.releaseLock();
-          } catch (e) {
-            // Ignore
-          }
-        }
-        if (currentState.port.writable) {
-          const writer = currentState.port.writable.getWriter();
-          try {
-            writer.releaseLock();
-          } catch (e) {
-            // Ignore
-          }
-        }
-        await currentState.port.close();
-      } catch (e) {
-        // Ignore - port might already be closed
-        console.warn("Error closing port:", e);
-      }
+      await safeClosePort(currentState.port);
     }
 
     // Clear device info cookie when disconnecting

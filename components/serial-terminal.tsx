@@ -52,20 +52,13 @@ export function SerialTerminal({ lang }: SerialTerminalProps) {
       // This callback only receives non-0x50 data (text/logs)
       // No filtering needed - the broadcaster already filtered it
 
-      // Console log RX bytes
-      const hexBytes = Array.from(value)
-        .map((b) => b.toString(16).padStart(2, "0").toUpperCase())
-        .join(" ");
-      console.log(`[SERIAL TERMINAL] RX (${value.length} bytes):`, hexBytes);
-
       // Decode as text (UTF-8)
       let textData = "";
+      let hexBytes = "";
       try {
         textData = new TextDecoder("utf-8", { fatal: false }).decode(value);
-        console.log(`[SERIAL TERMINAL] RX (text):`, textData.replace(/\n/g, "\\n").replace(/\r/g, "\\r").replace(/\0/g, "\\0"));
       } catch (e) {
         textData = `[Binary: ${value.length} bytes]`;
-        console.log(`[SERIAL TERMINAL] RX: Failed to decode as text, treating as binary`);
       }
 
       // Filter out ESPLoader warnings that are harmless
@@ -148,6 +141,12 @@ export function SerialTerminal({ lang }: SerialTerminalProps) {
 
         // Handle binary data
         if (textData.length === 0 && value.length > 0) {
+          // Lazily compute hex only if we need to show it
+          if (!hexBytes) {
+            hexBytes = Array.from(value)
+              .map((b) => b.toString(16).padStart(2, "0").toUpperCase())
+              .join(" ");
+          }
           newLines.push({
             id: lineIdRef.current++,
             timestamp: Date.now(),
@@ -177,13 +176,6 @@ export function SerialTerminal({ lang }: SerialTerminalProps) {
     const command = inputValue.trim();
     const commandWithNewline = command.endsWith("\n") ? command : command + "\n";
     const commandBytes = new TextEncoder().encode(commandWithNewline);
-
-    // Console log TX bytes
-    const hexBytes = Array.from(commandBytes)
-      .map((b) => b.toString(16).padStart(2, "0").toUpperCase())
-      .join(" ");
-    console.log(`[SERIAL TERMINAL] TX (${commandBytes.length} bytes):`, hexBytes);
-    console.log(`[SERIAL TERMINAL] TX (text):`, commandWithNewline.replace(/\n/g, "\\n").replace(/\r/g, "\\r"));
 
     // Add outgoing line
     setLines((prev) => [
