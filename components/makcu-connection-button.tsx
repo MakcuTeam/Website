@@ -61,12 +61,15 @@ export function MakcuConnectionButton({ dict }: { dict: Dictionary }) {
     return <Plug className="h-3 w-3" />;
   };
 
-  const handleClick = () => {
+  const handleClick = async () => {
+    if (isConnecting) return;
+
     if (status === "connected") {
-      // Temporarily disable disconnect action; keep button non-clickable
+      await disconnect();
       return;
     }
-    connect();
+
+    await connect();
   };
 
   if (!browserSupported) {
@@ -103,12 +106,14 @@ export function MakcuConnectionButton({ dict }: { dict: Dictionary }) {
         variant="ghost"
         size="sm"
         onClick={handleClick}
-        disabled={isConnecting || status === "connected"}
+        disabled={isConnecting}
         className="h-8 px-2 text-xs"
       >
         {getStatusIcon()}
         <span className="ml-1 hidden sm:inline">
-          {status === "connected" ? "Connected" : dict.device_control.connection.connect}
+          {status === "connected"
+            ? dict.device_control.connection.disconnect
+            : dict.device_control.connection.connect}
         </span>
       </Button>
       {status === "connected" && detectedBaudRate && (
