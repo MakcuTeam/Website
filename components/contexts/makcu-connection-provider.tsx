@@ -442,174 +442,94 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
     }
   };
 
-  // Try to connect in flash mode - chip is ALREADY in bootloader mode
-  // We just need to open the port and let ESPLoader sync (no DTR/RTS manipulation needed)
-  const tryFlashModeDirectConnect = async (port: SerialPort): Promise<{ transport: Transport; loader: ESPLoader } | null> => {
-    console.log("[FLASH MODE] Connecting to chip already in bootloader mode");
+  // Try to connect in flash mode
+      // Note: Flash mode uses its own baud rates (FLASH_MODE for flash, ROM_BOOTLOADER for ROM)
+  // The website baud rate setting is ignored - ESPLoader handles its own baud rates
+  // After flashing, users reconnect anyway, so baud rate returns to website value
+  const tryFlashMode = async (port: SerialPort): Promise<{ transport: Transport; loader: ESPLoader } | null> => {
     try {
-      // Check current port state
-      const isOpen = port.readable || port.writable;
-      console.log(`[FLASH MODE] Port state: ${isOpen ? 'OPEN' : 'CLOSED'}`);
+      // Close the port first if it's open (required before reopening for flash mode)
+      await safeClosePort(port);
 
-      if (isOpen) {
-        // Port is open - need to close it first
-        // Aggressively clean up ANY lingering locks before closing
-        try {
-          if (port.readable) {
-            try {
-              const reader = port.readable.getReader();
-              await reader.cancel().catch(() => {});
-              reader.releaseLock();
-            } catch (e) {
-              // Reader might not exist or already locked
-            }
-          }
-        } catch (e) {
-          // Readable stream might not be available
-        }
-
-        try {
-          if (port.writable) {
-            try {
-              const writer = port.writable.getWriter();
-              writer.releaseLock();
-            } catch (e) {
-              // Writer might not exist or already locked
-            }
-          }
-        } catch (e) {
-          // Writable stream might not be available
-        }
-
-        // Now close the port
-        console.log("[FLASH MODE] Closing port...");
-        try {
-          await port.close();
-        } catch (e) {
-          console.warn("[FLASH MODE] Error closing port:", e);
-        }
-        
-        // CRITICAL: Wait for Windows to fully release all locks
-        console.log("[FLASH MODE] Waiting for port locks to clear...");
-        await new Promise(resolve => setTimeout(resolve, 500));
-      } else {
-        // Port already closed - just a short delay
-        await new Promise(resolve => setTimeout(resolve, 100));
-      }
-
-      // Verify port is closed before opening
-      if (port.readable || port.writable) {
-        console.error("[FLASH MODE] Port still has active streams after close!");
-        throw new Error("Port not fully closed");
-      }
-
-      // Open at ROM bootloader baud rate
-      console.log("[FLASH MODE] Opening port at", BAUD_RATES.ROM_BOOTLOADER, "baud");
-      await port.open({
-        baudRate: BAUD_RATES.ROM_BOOTLOADER,
-        ...SERIAL_PORT_CONFIG,
-      });
-
-      console.log("[FLASH MODE] Port opened successfully");
-
-      // Small stabilization delay
-      await new Promise(resolve => setTimeout(resolve, 100));
-
-      // Create Transport - if setSignals() fails, the whole connection fails
-      // That's OK - it means the port still has issues
-      console.log("[FLASH MODE] Creating Transport...");
+      // Reopen for flash mode - Transport/ESPLoader will use its own baud rates
+      // This ignores the website baud rate setting (uses FLASH_MODE baud rate)
       const transport = new Transport(port as any, false, false);
-
-      return await tryFlashModeCommon(transport);
-    } catch (error) {
-      const errorMsg = error instanceof Error ? error.message : String(error);
-      console.warn("[FLASH MODE] Connection failed:", errorMsg);
       
-      // Try to close port on failure
-      try {
-        if (port.readable || port.writable) {
-          await port.close();
+      // Temporarily suppress expected timeout errors during flash mode connection
+      // ESPLoader may timeout on sync attempts before successfully connecting - this is normal
+      const originalConsoleError = console.error;
+      const suppressedErrors: Error[] = [];
+      console.error = (...args: any[]) => {
+        const errorMsg = args[0]?.toString() || "";
+        // Suppress expected timeout errors during flash mode connection
+        if (errorMsg.includes("Read timeout exceeded") || 
+            errorMsg.includes("Error reading from serial port")) {
+          // These are expected during ESPLoader sync attempts - suppress them
+          suppressedErrors.push(new Error(errorMsg));
+          return;
         }
-      } catch (e) {
-        // Ignore
-      }
+        // Log other errors normally
+        originalConsoleError.apply(console, args);
+      };
       
-      return null;
-    }
-  };
-
-  // Common flash mode logic after transport is created
-  const tryFlashModeCommon = async (transport: Transport): Promise<{ transport: Transport; loader: ESPLoader } | null> => {
-    const originalConsoleError = console.error;
-    const suppressedErrors: Error[] = [];
-    console.error = (...args: any[]) => {
-      const errorMsg = args[0]?.toString() || "";
-      if (errorMsg.includes("Read timeout exceeded") || 
-          errorMsg.includes("Error reading from serial port")) {
-        suppressedErrors.push(new Error(errorMsg));
-        return;
-      }
-      originalConsoleError.apply(console, args);
-    };
-    
-    try {
+      try {
+        // Route flash terminal output to serial terminal subscribers
       const flashOptions: LoaderOptions = {
         transport,
-        baudrate: BAUD_RATES.FLASH_MODE,
-        romBaudrate: BAUD_RATES.ROM_BOOTLOADER,
+          baudrate: BAUD_RATES.FLASH_MODE,  // Flash mode baud rate (independent of website setting)
+          romBaudrate: BAUD_RATES.ROM_BOOTLOADER,  // ROM bootloader baud rate
         terminal: {
-          clean() {
-            // Clear terminal - can be used if needed
-          },
-          writeLine(message: string) {
-            const messageBytes = new TextEncoder().encode(message + "\n");
-            textLogSubscribersRef.current.forEach((callback: TextLogSubscriber) => {
-              try {
-                callback(messageBytes);
-              } catch (e) {
-                originalConsoleError("[FLASH MODE] Text log subscriber error:", e);
-              }
-            });
-          },
-          write(message: string) {
-            const messageBytes = new TextEncoder().encode(message);
-            textLogSubscribersRef.current.forEach((callback: TextLogSubscriber) => {
-              try {
-                callback(messageBytes);
-              } catch (e) {
-                originalConsoleError("[FLASH MODE] Text log subscriber error:", e);
-              }
-            });
-          },
+            clean() {
+              // Clear terminal - can be used if needed
+            },
+            writeLine(message: string) {
+              // Send flash log line to serial terminal
+              const messageBytes = new TextEncoder().encode(message + "\n");
+              textLogSubscribersRef.current.forEach((callback: TextLogSubscriber) => {
+                try {
+                  callback(messageBytes);
+                } catch (e) {
+                  originalConsoleError("[FLASH MODE] Text log subscriber error:", e);
+                }
+              });
+            },
+            write(message: string) {
+              // Send flash log message to serial terminal
+              const messageBytes = new TextEncoder().encode(message);
+              textLogSubscribersRef.current.forEach((callback: TextLogSubscriber) => {
+                try {
+                  callback(messageBytes);
+                } catch (e) {
+                  originalConsoleError("[FLASH MODE] Text log subscriber error:", e);
+                }
+              });
+            },
         },
         debugLogging: false,
       };
 
       const loader = new ESPLoader(flashOptions);
       await loader.main();
+        
+        // Restore console.error
+        console.error = originalConsoleError;
+        
+        // Log summary if there were suppressed errors (but connection succeeded)
+        if (suppressedErrors.length > 0) {
+          console.log(`[FLASH MODE] Connection successful after ${suppressedErrors.length} expected timeout(s) during sync`);
+        }
       
-      console.error = originalConsoleError;
-      
-      if (suppressedErrors.length > 0) {
-        console.log(`[FLASH MODE] Connection successful after ${suppressedErrors.length} expected timeout(s) during sync`);
-      }
-    
       return { transport, loader };
     } catch (error) {
-      console.error = originalConsoleError;
-      throw error;
+        // Restore console.error before rethrowing
+        console.error = originalConsoleError;
+        throw error;
+      }
+    } catch (error) {
+      // Connection failed - log the error
+      console.warn("[FLASH MODE] Connection attempt failed:", error);
+      return null;
     }
-  };
-
-  // Main flash mode connection function
-  // ASSUMPTION: Chip is ALREADY in bootloader mode (showing "waiting for download")
-  // We do NOT try to manipulate DTR/RTS control signals - just connect directly
-  //
-  // Note: Flash mode uses its own baud rates (FLASH_MODE for flash, ROM_BOOTLOADER for ROM)
-  // The website baud rate setting is ignored - ESPLoader handles its own baud rates
-  // After flashing, users reconnect anyway, so baud rate returns to website value
-  const tryFlashMode = async (port: SerialPort): Promise<{ transport: Transport; loader: ESPLoader } | null> => {
-    return await tryFlashModeDirectConnect(port);
   };
 
   /* ═══════════════════════════════════════════════════════════════════════════
@@ -633,56 +553,10 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
         return { success: true, baudRate };
       }
       
-      // Failed - properly clean up readers/writers before closing
-      try {
-        if (port.readable) {
-          const reader = port.readable.getReader();
-          reader.cancel().catch(() => {});
-          reader.releaseLock();
-        }
-      } catch (e) {
-        // Might not have a reader
-      }
-      
-      try {
-        if (port.writable) {
-          const writer = port.writable.getWriter();
-          writer.releaseLock();
-        }
-      } catch (e) {
-        // Might not have a writer
-      }
-      
       await safeClosePort(port);
-      
-      // Small delay to let port fully close before next attempt
-      await new Promise(resolve => setTimeout(resolve, 50));
-      
       return { success: false };
       } catch (error) {
-      // Error case - also clean up
-      try {
-        if (port.readable) {
-          const reader = port.readable.getReader();
-          reader.cancel().catch(() => {});
-          reader.releaseLock();
-        }
-      } catch (e) {
-        // Ignore
-      }
-      
-      try {
-        if (port.writable) {
-          const writer = port.writable.getWriter();
-          writer.releaseLock();
-        }
-      } catch (e) {
-        // Ignore
-      }
-      
       await safeClosePort(port);
-      await new Promise(resolve => setTimeout(resolve, 50));
-      
       return { success: false };
         }
   };
