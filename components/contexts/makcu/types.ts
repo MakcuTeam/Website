@@ -1,5 +1,5 @@
-import type { Transport } from "esptool-js";
-import type { ESPLoader } from "esptool-js";
+import type { Transport } from "@/esp_tool_fix/lib/index.js";
+import type { ESPLoader } from "@/esp_tool_fix/lib/index.js";
 
 /**
  * Connection mode types

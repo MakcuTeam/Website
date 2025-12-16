@@ -16,7 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ESPLoader, FlashOptions, LoaderOptions, Transport } from "esptool-js";
+import { ESPLoader, FlashOptions, LoaderOptions, Transport, FlashModeValues, FlashFreqValues } from "@/esp_tool_fix/lib/index.js";
 import { serial } from "web-serial-polyfill";
 import { Dictionary } from "@/lib/dictionaries";
 import { Locale } from "@/lib/locale";
@@ -206,13 +206,12 @@ export const DeviceTool: React.FC<{ lang: Locale; dict: Dictionary }> = ({ lang,
   const createFlashOptions = (buffer: ArrayBuffer): FlashOptions => {
     const data = Buffer.from(buffer).toString("binary");
     const chip = esploader?.chip as {
-      flashMode?: string;
-      flashFreq?: string;
+      flashMode?: FlashModeValues;
+      flashFreq?: FlashFreqValues;
       flashSize?: string;
     } | undefined;
-    const flashMode = chip?.flashMode ?? "dio";
-    const flashFreq = chip?.flashFreq ?? "40m";
-    const flashSize = chip?.flashSize ?? "keep";
+    const flashMode: FlashModeValues = (chip?.flashMode ?? "dio") as FlashModeValues;
+    const flashFreq: FlashFreqValues = (chip?.flashFreq ?? "40m") as FlashFreqValues;
     return {
       fileArray: [
         {
@@ -220,7 +219,6 @@ export const DeviceTool: React.FC<{ lang: Locale; dict: Dictionary }> = ({ lang,
           address: 0x0,
         },
       ],
-      flashSize,
       eraseAll: false,
       compress: true,
       flashMode,

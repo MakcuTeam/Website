@@ -16,7 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { FlashOptions } from "esptool-js";
+import { FlashOptions, FlashModeValues, FlashFreqValues } from "@/esp_tool_fix/lib/index.js";
 import { Dictionary } from "@/lib/dictionaries";
 import { Locale } from "@/lib/locale";
 import { toast } from "sonner";
@@ -138,9 +138,8 @@ export function FlashControls({ lang, dict, onFlashLog }: FlashControlsProps) {
     const data = Buffer.from(buffer).toString("binary");
     
     // Flash settings will be parsed from image header (required, no fallback)
-    let flashMode: string | undefined;
-    let flashFreq: string | undefined;
-    let flashSize: string | undefined;
+    let flashMode: FlashModeValues | undefined;
+    let flashFreq: FlashFreqValues | undefined;
     
     // Check first few bytes to see if it looks like a valid firmware
     const firstBytes = new Uint8Array(buffer.slice(0, 16));
@@ -175,7 +174,7 @@ export function FlashControls({ lang, dict, onFlashLog }: FlashControlsProps) {
       if (flashModeSize !== 0 && flashModeSize !== 0xFFFF && flashModeSize !== 0xFF) {
         // Extract flash mode from upper byte (bits 8-10)
         const flashModeByte = (flashModeSize >> 8) & 0x07;
-        const flashModeMap: Record<number, string> = {
+        const flashModeMap: Record<number, FlashModeValues> = {
           0: 'qio',   // Quad I/O
           1: 'qout',  // Quad Output
           2: 'dio',   // Dual I/O
@@ -185,7 +184,7 @@ export function FlashControls({ lang, dict, onFlashLog }: FlashControlsProps) {
         
         // Extract flash frequency from lower byte (bits 3-4)
         const flashFreqBits = (flashModeSize >> 3) & 0x03;
-        const flashFreqMap: Record<number, string> = {
+        const flashFreqMap: Record<number, FlashFreqValues> = {
           0: '40m',   // 40MHz
           1: '26m',   // 26MHz
           2: '20m',   // 20MHz
@@ -193,24 +192,9 @@ export function FlashControls({ lang, dict, onFlashLog }: FlashControlsProps) {
         };
         const detectedFlashFreq = flashFreqMap[flashFreqBits];
         
-        // Extract flash size from lower byte (bits 0-2)
-        const flashSizeBits = flashModeSize & 0x07;
-        const flashSizeMap: Record<number, string> = {
-          0: '256KB',
-          1: '512KB',
-          2: '1MB',
-          3: '2MB',
-          4: '4MB',
-          5: '8MB',
-          6: '16MB',
-          7: '32MB',
-        };
-        const detectedFlashSize = flashSizeMap[flashSizeBits];
-        
         if (detectedFlashMode && detectedFlashFreq) {
           flashMode = detectedFlashMode;
           flashFreq = detectedFlashFreq;
-          // Note: We use 'keep' for flashSize to preserve existing flash size
         }
       }
     }
@@ -220,9 +204,8 @@ export function FlashControls({ lang, dict, onFlashLog }: FlashControlsProps) {
       throw new Error(`Flash settings not parsed from image header: mode=${flashMode}, freq=${flashFreq}`);
     }
     
-    const finalFlashMode = flashMode;
-    const finalFlashFreq = flashFreq;
-    const finalFlashSize = flashSize || "keep";
+    const finalFlashMode: FlashModeValues = flashMode as FlashModeValues;
+    const finalFlashFreq: FlashFreqValues = flashFreq as FlashFreqValues;
     
     return {
       fileArray: [
@@ -231,7 +214,6 @@ export function FlashControls({ lang, dict, onFlashLog }: FlashControlsProps) {
           address: 0x0,
         },
       ],
-      flashSize: finalFlashSize,
       eraseAll: false,
       compress: true,
       flashMode: finalFlashMode,
@@ -269,7 +251,7 @@ export function FlashControls({ lang, dict, onFlashLog }: FlashControlsProps) {
       console.log(
         `[FLASH MODE] writeFlash plan -> files=${flashOptions.fileArray.length} ${filesSummary} ` +
         `flashMode=${flashOptions.flashMode ?? "default"} flashFreq=${flashOptions.flashFreq ?? "default"} ` +
-        `flashSize=${flashOptions.flashSize ?? "default"} eraseAll=${!!flashOptions.eraseAll} compress=${!!flashOptions.compress}`
+        `eraseAll=${!!flashOptions.eraseAll} compress=${!!flashOptions.compress}`
       );
       
       await loader.writeFlash(flashOptions);

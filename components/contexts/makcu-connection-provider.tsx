@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useRef, useEffect, useCallback } from "react";
-import { ESPLoader, LoaderOptions, Transport } from "esptool-js";
+import { ESPLoader, LoaderOptions, Transport } from "@/esp_tool_fix/lib/index.js";
 import { serial } from "web-serial-polyfill";
 import { toast } from "sonner";
 
@@ -313,6 +313,11 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
     binaryFrameBufferRef.current = new Uint8Array(0); // Clear frame buffer on cleanup
   }, []);
 
+  const isReadTimeoutError = (error: unknown): boolean => {
+    const msg = error instanceof Error ? error.message : String(error);
+    return msg.toLowerCase().includes("read timeout exceeded");
+  };
+
   // Try to connect in normal mode with specific baud rate and timeout
   // Uses lightweight STATUS command (17-byte payload) instead of full WEBSITE (360+ bytes)
   // This keeps connection fast while still confirming link health
@@ -460,7 +465,9 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
       // Note: Flash mode uses its own baud rates (FLASH_MODE for flash, ROM_BOOTLOADER for ROM)
   // The website baud rate setting is ignored - ESPLoader handles its own baud rates
   // After flashing, users reconnect anyway, so baud rate returns to website value
-  const tryFlashMode = async (port: SerialPort): Promise<{ transport: Transport; loader: ESPLoader } | null> => {
+  const tryFlashMode = async (
+    port: SerialPort
+  ): Promise<{ transport: Transport; loader: ESPLoader } | { readTimeout: true } | null> => {
     try {
       // Ensure any background readers/writers are fully stopped before flash
       await cleanup();
@@ -476,11 +483,12 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
       // Helper to build loader options
       const buildFlashOptions = (transport: Transport): LoaderOptions => ({
         transport,
-        // Force high-speed connect/flash at 921600 (no 115200 step)
-        baudrate: BAUD_RATES.FLASH_MODE,
-        romBaudrate: BAUD_RATES.FLASH_MODE,
-        enableTracing: false,                   // Disable byte-level TRACE logs (removes wait_response traces)
-        debugLogging: false,                    // Keep esptool-js debug logs off
+        // Connect at 115200 (ROM) then bump to 921600 for flashing.
+        // Note: romBaudrate is hardcoded to 115200 in ESPLoader, not configurable
+        baudrate: BAUD_RATES.FLASH_MODE,   // 921600 for flashing
+        flashSize: "detect",               // Auto-detect flash size
+        enableTracing: true,               // Enable byte-level TRACE logs in console
+        debugLogging: false,               // Keep esptool-js debug logs off
         terminal: {
           clean() {},
           writeLine(message: string) {
@@ -539,21 +547,65 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
       };
 
       // Run ESPLoader with optional suppression and return loader
-      const runLoader = async (transport: Transport) => {
-        const loader = new ESPLoader(buildFlashOptions(transport));
-          console.log(
-          `[FLASH MODE] esptool connect -> romBaud=${BAUD_RATES.FLASH_MODE}, flashBaud=${BAUD_RATES.FLASH_MODE}, resetMode=default`
-          );
+      // Drain any pending bytes from the port before running esptool to avoid stale data responses.
+      // This is critical - firmware responses can interfere with bootloader sync
+      const drainPort = async (port: SerialPort) => {
+        if (!port.readable) return;
+        let reader: ReadableStreamDefaultReader<Uint8Array> | null = null;
         try {
-          // First, try the default reset strategy (toggling DTR/RTS).
-          await loader.main();
-          return loader;
-        } catch (err: any) {
-          console.warn("[FLASH MODE] Default reset connect failed, retrying with no_reset (manual/held-boot mode)...", err);
-          // If user is already holding BOOT or adapter disallows signal toggles, retry without toggling on the same open port.
-          await loader.main("no_reset");
-          return loader;
+          reader = port.readable.getReader();
+          const drainTimeout = setTimeout(() => {
+            reader?.cancel().catch(() => {});
+          }, 500); // Increased timeout to drain more thoroughly
+          
+          // Read multiple times to drain all pending data
+          let drainedBytes = 0;
+          for (let i = 0; i < 10; i++) {
+            try {
+              const { value, done } = await Promise.race([
+                reader.read(),
+                new Promise<{ value: Uint8Array | undefined; done: boolean }>((resolve) => 
+                  setTimeout(() => resolve({ value: undefined, done: true }), 50)
+                )
+              ]);
+              if (done || !value) break;
+              drainedBytes += value.length;
+            } catch (e) {
+              break;
+            }
+          }
+          
+          if (drainedBytes > 0) {
+            console.log(`[FLASH MODE] Drained ${drainedBytes} bytes from port before flash mode attempt`);
+          }
+          
+          clearTimeout(drainTimeout);
+        } catch (e) {
+          // ignore
+        } finally {
+          try {
+            await reader?.cancel();
+          } catch (e) {
+            // ignore
+          }
+          try {
+            reader?.releaseLock();
+          } catch (e) {
+            // ignore
+          }
         }
+      };
+
+      const runLoader = async (): Promise<{ transport: Transport; loader: ESPLoader }> => {
+        const transport = new Transport(port as any, false, true);
+        const loader = new ESPLoader(buildFlashOptions(transport));
+        console.log(
+          `[FLASH MODE] esptool connect -> romBaud=${BAUD_RATES.STANDARD}, flashBaud=${BAUD_RATES.FLASH_MODE}, resetMode=no_reset (manual boot mode expected)`
+        );
+        // Device is already in bootloader mode - use no_reset to skip DTR/RTS toggle
+        // esptool will retry on invalid responses internally, so we let it handle retries
+        await loader.main("no_reset");
+        return { transport, loader };
       };
 
       const attemptWithTransport = async () => {
@@ -565,18 +617,108 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
         }
         // Close once more to guarantee Transport starts from a closed handle
         await safeClosePort(port);
+        
+        // Wait for port to fully settle after closing (critical for flash mode)
+        // This gives the device time to reset and enter bootloader mode
+        await new Promise(resolve => setTimeout(resolve, 300));
+        
+        // Drain any stale data that might have accumulated
+        // Reopen port temporarily to drain, then close again
+        try {
+          await openPortWithBaudRate(port, BAUD_RATES.STANDARD);
+          await drainPort(port);
+          await safeClosePort(port);
+          // Wait again after draining
+          await new Promise(resolve => setTimeout(resolve, 200));
+        } catch (e) {
+          // If drain fails, continue anyway - Transport will handle it
+          console.warn("[FLASH MODE] Port drain failed, continuing:", e);
+        }
 
-        const transport = new Transport(port as any, false, false);
-        const loader = await runLoader(transport);
+        const { transport, loader } = await runLoader();
         return { transport, loader };
       };
 
-      // Single attempt only
-      const result = await attemptWithTransport();
-      return result;
+      // Try connection with retry logic for invalid response errors
+      // When device is already in bootloader mode, initial responses might be invalid
+      // but esptool should be able to sync after retries
+      const maxRetries = 3;
+      let lastError: unknown = null;
+      
+      for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        try {
+          const result = await attemptWithTransport();
+          return result;
+        } catch (error) {
+          lastError = error;
+          
+          if (isReadTimeoutError(error)) {
+            // For read timeouts, suppress toast and simply signal timeout
+            return { readTimeout: true };
+          }
+          
+          const errorMsg = error instanceof Error ? error.message : String(error);
+          const isInvalidResponse = errorMsg.includes("invalid response") || 
+                                    errorMsg.includes("r: invalid response");
+          
+          if (isInvalidResponse && attempt < maxRetries) {
+            // Invalid response but device is in bootloader - retry
+            // This can happen if there's stale data or timing issues
+            console.log(`[FLASH MODE] Invalid response on attempt ${attempt}/${maxRetries}, retrying...`);
+            console.log(`[FLASH MODE] Device is in bootloader mode - esptool should sync on retry`);
+            
+            // Wait a bit before retry to let port settle
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            // Drain port again before retry
+            try {
+              await openPortWithBaudRate(port, BAUD_RATES.STANDARD);
+              await drainPort(port);
+              await safeClosePort(port);
+              await new Promise(resolve => setTimeout(resolve, 200));
+            } catch (e) {
+              // Ignore drain errors, continue with retry
+            }
+            
+            continue; // Retry
+          }
+          
+          // Non-retryable error or max retries reached
+          break;
+        }
+      }
+      
+      // All retries exhausted or non-retryable error
+      const errorMsg = lastError instanceof Error ? lastError.message : String(lastError);
+      const isInvalidResponse = errorMsg.includes("invalid response") || 
+                                errorMsg.includes("r: invalid response");
+      
+      if (isInvalidResponse) {
+        console.warn("[FLASH MODE] Connection failed after retries - invalid response persisted");
+        console.warn("[FLASH MODE] Device may not be in bootloader mode, or there's a communication issue");
+        console.warn("[FLASH MODE] Error details:", lastError);
+      } else {
+        // Connection failed - log non-timeout errors
+        console.warn("[FLASH MODE] Connection attempt failed:", lastError);
+      }
+      
+      return null;
     } catch (error) {
-      // Connection failed - log the error
-      console.warn("[FLASH MODE] Connection attempt failed:", error);
+      // Catch any unexpected errors that escape the retry logic
+      if (isReadTimeoutError(error)) {
+        return { readTimeout: true };
+      }
+      
+      const errorMsg = error instanceof Error ? error.message : String(error);
+      const isInvalidResponse = errorMsg.includes("invalid response") || 
+                                errorMsg.includes("r: invalid response");
+      
+      if (isInvalidResponse) {
+        console.warn("[FLASH MODE] Unexpected invalid response error:", error);
+      } else {
+        console.warn("[FLASH MODE] Unexpected connection error:", error);
+      }
+      
       return null;
     }
   };
@@ -637,7 +779,7 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
    */
   const attemptFlashModeConnection = async (
     port: SerialPort
-  ): Promise<{ transport: Transport; loader: ESPLoader } | null> => {
+  ): Promise<{ transport: Transport; loader: ESPLoader } | { readTimeout: true } | null> => {
       await cleanup();
     return await tryFlashMode(port);
   };
@@ -666,7 +808,7 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
   /**
    * Handle connection failure - clean up, fully disconnect, and show Connect button
    */
-  const handleConnectionFailure = async (port: SerialPort): Promise<void> => {
+  const handleConnectionFailure = async (port: SerialPort, error?: unknown): Promise<void> => {
     await cleanup();
     await safeClosePort(port);
     // Reset to a clean disconnected state so the Connect button is available
@@ -679,7 +821,14 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
       comPort: null,
       detectedBaudRate: null,
     });
-    toast.error("Connection failed - device not responding. Check USB and retry.");
+    
+    // Provide more specific error message for invalid response (normal mode detected)
+    const errorMsg = error instanceof Error ? error.message : String(error || "");
+    if (errorMsg.includes("invalid response") || errorMsg.includes("r: invalid response")) {
+      toast.error("Flash mode failed - device is in normal mode. Put device in bootloader mode (hold BOOT button while connecting) and retry.");
+    } else {
+      toast.error("Connection failed - device not responding. Check USB and retry.");
+    }
   };
 
   /**
@@ -687,6 +836,11 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
    */
   const handleConnectionError = (error: unknown): void => {
       const message = error instanceof Error ? error.message : String(error);
+      if (isReadTimeoutError(error)) {
+        // Suppress timeout errors (no toast)
+        setState((prev) => ({ ...prev, status: "disconnected" }));
+        return;
+      }
       if (!message.includes("Must be handling a user gesture")) {
         setState((prev) => ({ ...prev, status: "fault" }));
         toast.error(message);
@@ -720,13 +874,20 @@ export function MakcuConnectionProvider({ children }: { children: React.ReactNod
       // For testing: skip normal mode and go straight to flash mode
       const flashResult = await attemptFlashModeConnection(selectedPort);
       
-      if (flashResult) {
-        setConnectedState(selectedPort, "flash", null, flashResult);
+      if (flashResult && "transport" in flashResult) {
+        setConnectedState(selectedPort, "flash", null, flashResult as { transport: Transport; loader: ESPLoader });
         toast.success("Connected in Flash mode");
         return;
       }
-      // If flash mode failed, mark fault
-      await handleConnectionFailure(selectedPort);
+      if (flashResult && "readTimeout" in flashResult) {
+        // Gracefully back out on read timeout with no toast
+        setState((prev) => ({ ...prev, status: "disconnected" }));
+        return;
+      }
+      // If flash mode failed, mark fault with error context
+      // We need to capture the error from tryFlashMode, but it's already logged there
+      // For now, pass a generic error - the tryFlashMode already logs detailed info
+      await handleConnectionFailure(selectedPort, new Error("Flash mode connection failed - see console for details"));
 
     } catch (error) {
       handleConnectionError(error);
